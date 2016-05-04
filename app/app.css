@@ -1,0 +1,59 @@
+/* app css stylesheet */
+
+.menu {
+    list-style: none;
+    border-bottom: 0.1em solid black;
+    margin-bottom: 2em;
+    padding: 0 0 0.5em;
+}
+
+.menu:before {
+    content: "[";
+}
+
+.menu:after {
+    content: "]";
+}
+
+.menu > li {
+    display: inline;
+}
+
+.menu > li:before {
+    content: "|";
+    padding-right: 0.3em;
+}
+
+.menu > li:nth-child(1):before {
+    content: "";
+    padding: 0;
+}
+
+md-sidenav {
+    width: inherit;
+    max-width: 320px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.text-align-middle {
+    vertical-align: middle;
+}
+
+.light-blue {
+    background-color: #1A237E !important;
+}
+
+.highlighted {
+    line-color: red;
+}
+
+.faded {
+    line-color: rgba(0, 0, 0, 0.1);
+}
+
+md-sidenav {
+  max-width: 230px;
+}
