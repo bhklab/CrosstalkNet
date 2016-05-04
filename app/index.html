@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp" class="no-js">
+
+<head>
+    <meta name="generator" content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>My AngularJS App</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css" />
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css" />
+    <link rel="stylesheet" href="bower_components/qtip2/jquery.qtip.css" />
+    <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
+    <link rel="stylesheet" href="app.css" />
+    <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+    <!-- Cytoscape Web JS API (needed to reference org.cytoscapeweb.Visualization) -->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/cytoscape/dist/cytoscape.js"></script>
+    <script type="text/javascript" src="bower_components/qtip2/jquery.qtip.js"></script>
+    <script type="text/javascript" src="bower_components/cytoscape-qtip/cytoscape-qtip.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="bower_components/angular-aria/angular-aria.js"></script>
+    <script type="text/javascript" src="bower_components/angular-animate/angular-animate.js"></script>
+    <script type="text/javascript" src="bower_components/angular-material/angular-material.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="app.js"></script>
+    <script src="view1/view1.js"></script>
+    <script src="services/GraphConfigService.js"></script>
+    <script src="services/RESTService.js"></script>
+    <!--<script src="view2/view2.js"></script> -->
+    <script src="components/version/version.js"></script>
+    <script src="components/version/version-directive.js"></script>
+    <script src="components/version/interpolate-filter.js"></script>
+    </body>
+    <!--<script type="text/javascript" src="ctyodemo.js"></script>-->
+</head>
+
+<body ng-controller="CytoCtrl">
+    <md-toolbar class="light-blue">
+        <div layout="row">
+            <div class="center-text" flex="33"></div>
+            <div class="center-text" flex="33">
+                <span class="text-align-middle">BHK Lab</span>
+            </div>
+            <div class="center-text" flex="33"></div>
+        </div>
+    </md-toolbar>
+    <section layout="row">
+        <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="true">
+            <md-toolbar class="light-blue">
+                <h1 class="md-toolbar-tools">Navigation</h1>
+            </md-toolbar>
+            <md-content layout-padding>
+                <md-button ng-click="getData()">Get Data</md-button>
+                <md-button ng-click="resize()">Resize</md-button>
+                <br>
+                <md-button ng-click="replaceNodes()">Replace Nodes</md-button>
+                <md-autocomplete md-selected-item="selectedItem" md-search-text="searchText" md-selected-item-change="selectedItemChanged(item)" md-items="item in querySearch(searchText)" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+                    </md-item-template>
+                    <md-not-found>
+                        No states matching "{{ctrl.searchText}}" were found.
+                        <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
+                    </md-not-found>
+                </md-autocomplete>
+                <div>{{zoom}}</div>
+                <div style="word-wrap: break-word">{{selectedItem}}</div>
+            </md-content>
+        </md-sidenav>
+        <md-content flex>
+            <div style="width: 100%; height:500px; background-color: blue;" id="cy"></div>
+        </md-content>
+    </section>
+</body>
+
+</html>
