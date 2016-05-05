@@ -5,6 +5,7 @@ myModule.factory('GraphConfigService', function($http) {
 
     service.data = { cy: null };
     service.elemCopy = [];
+    service.firstDropdownConfig = null;
 
     service.createNodes = function(nodes, parent, column = 1) {
         var resultNodes = [];
