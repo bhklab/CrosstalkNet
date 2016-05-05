@@ -5,5 +5,8 @@ angular.module('myApp', [
   'ngRoute',
   'ngMaterial',
   'myApp.CytoCtrl',
-  'myApp.version'
+  'myApp.version', 
+  'myApp.filters'
 ]);
+
+var filters = angular.module('myApp.filters', []);
