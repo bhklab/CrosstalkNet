@@ -145,7 +145,7 @@ app.post('/first-dropdown', function(req, res) {
             console.log(parsedValue);
 
             if (parsedValue.attributes == null || parsedValue.attributes.names == null) {
-                res.json({config: initialConfig});
+                res.json({ config: initialConfig });
                 return;
             }
 
@@ -158,15 +158,19 @@ app.post('/first-dropdown', function(req, res) {
             var resultWeights = [];
 
             if (neighbourGeneWeights.length == 0) {
-                res.json({config: initialConfig});
+                res.json({ config: initialConfig });
                 return;
             }
 
-            
-            var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ? "stroma" :
+
+            var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
+                "stroma" :
                 "epi", 4, degrees);
-            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [degree]);
-            var edges = createEdgesFromNode(sourceNode[0], neighbourNodes, neighbourGeneWeights,
+            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+                degree
+            ]);
+            var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
+                neighbourGeneWeights,
                 "");
 
             elements = elements.concat(sourceNode);
@@ -180,6 +184,79 @@ app.post('/first-dropdown', function(req, res) {
             elements.push({
                 data: {
                     id: 'stroma'
+                }
+            });
+
+            var config = createConfig(elements);
+
+            res.json({ config: config });
+        });
+});
+
+app.post('/second-dropdown', function(req, res) {
+    if (initialWeights == null || initialEpiGenes == null || initialStromaGenes == null) {
+        res.json({ result: null });
+    }
+
+    console.log(req.body);
+    var gene = req.body.gene;
+    var side = req.body.side;
+    var degree = req.body.degree;
+    var originalElements = req.body.originalElements;
+
+    var neighbourSide = side == "-e" ? "-s" : "-e"
+    var child = exec(
+        "Rscript R_Scripts/findCorrelations.R --args " +
+        "\"" + gene +
+        "\"" + " " + "\"" + side + "\"", { maxBuffer: 1024 * 50000 },
+        function(error, stdout, stderr) {
+            var elements = [];
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            console.log(parsedValue);
+
+            if (parsedValue.attributes == null || parsedValue.attributes.names == null) {
+                res.json({ config: initialConfig });
+                return;
+            }
+
+            var weights = parsedValue.value[0];
+            var degrees = parsedValue.value[1].value;
+            var neighbourGeneNames = weights.attributes.names.value;
+            var dimension = neighbourGeneNames.length;
+            var neighbourGeneWeights = weights.value;
+            var neighboursGenes = [];
+            var resultWeights = [];
+
+            if (neighbourGeneWeights.length == 0) {
+                res.json({ config: initialConfig });
+                return;
+            }
+
+            var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
+                "stromaRight" :
+                "epiRight", 8, degrees);
+            
+            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+                degree
+            ]);
+
+            console.log(sourceNode);
+            var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
+                neighbourGeneWeights,
+                "");
+
+            elements = elements.concat(neighbourNodes);
+            elements = elements.concat(edges);
+            elements = elements.concat(originalElements);
+            elements.push({
+                data: {
+                    id: side == '-e' ? 'stromaRight' : 'epiRight'
                 }
             });
 
@@ -225,7 +302,18 @@ function createConfig(elements) {
 
 function createNodes(nodes, parent, column, degrees) {
     var resultNodes = [];
-    var sideFlag = parent == "epi" ? "-e" : "-s";
+    var sideFlag = "";//parent == "epi" || parent == "epiRight" ? "-e" : "-s";
+    if (parent == "epi") {
+        sideFlag = "-e";
+    } else if (parent == "epiRight") {
+        sideFlag = "-er";
+    } else if (parent == "stroma")  {
+        sideFlag = "-s";
+    }
+    else if (parent = "stromaRight") {
+        sideFlag = "-sr";
+    }
+
     for (var i = 0; i < nodes.length; i++) {
         console.log(degrees[i]);
         resultNodes.push({
@@ -239,8 +327,8 @@ function createNodes(nodes, parent, column, degrees) {
                 y: 100 + (i * 20)
             },
             style: {
-                'width': '10px',//(10 + nodes[i].degree) + 'px',
-                'height': '10px',//(10 + nodes[i].degree) + 'px',
+                'width': '10px', //(10 + nodes[i].degree) + 'px',
+                'height': '10px', //(10 + nodes[i].degree) + 'px',
                 'text-halign': column == 1 ? "left" : "right",
                 'text-valign': 'center'
             }
@@ -301,11 +389,11 @@ function createEdges(epiNodes, stromaNodes, weights) {
 
 function createEdgesFromNode(node, neighbours, weights, from) {
     var edges = [];
-
+    var idPrefix = node.data.parent == "epi" ? "EpiToStroma" : "StromaToEpi";
     for (var i = 0; i < neighbours.length; i++) {
         edges.push({
             data: {
-                id: 'StromaToEpi' + i,
+                id: idPrefix + i,
                 source: node.data.id,
                 target: neighbours[i].data.id,
                 weight: weights[i]

@@ -6,9 +6,21 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         var elements = [];
         var totalNumNodes = 1000;
 
-        $scope.selectedItem = null;
-        $scope.searchText = "";
+        $scope.selectedItemFirst = null;
+        $scope.searchTextFirst = "";
+        $scope.searchTextSecond = "";
         $scope.display = "";
+        $scope.states = {
+            initial: 0,
+            firstDropdown: 1,
+            secondDropdown: 2,
+            loadingFirst: 3,
+            loadingSecond: 4
+        };
+
+        $scope.minDegree = 0;
+
+        $scope.state = $scope.states.initial;
 
         var elemCopy = angular.copy(elements);
 
@@ -87,7 +99,8 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         $scope.loadAll = function(selectedGene = null) {
             var genes = [];
             var selectedGeneName = selectedGene == null ? '' : ', #' + selectedGene;
-            $scope.cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(node) {
+            $scope.cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(
+                node) {
                 /*if (node.id() != 'epi' && node.id() != 'stroma') {
                         
                 }*/
@@ -98,15 +111,23 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             return genes.map(function(gene) {
                 return {
                     value: gene.id.toLowerCase(),
-                    display: gene.id + ' ' + gene.degree, 
+                    display: gene.id + ' ' + gene.degree,
                     object: gene
                 };
             });
         };
 
-        $scope.querySearch = function(query) {
-            var results = query ? $scope.genes.filter(createFilterFor(query)) : $scope.genes,
-                deferred;
+        $scope.querySearch = function(query, source) {
+            if (source == "first") {
+                var results = query ? $scope.genesFirst.filter(createFilterFor(query)) :
+                    $scope.genesFirst,
+                    deferred;
+            } else {
+                var results = query ? $scope.genesSecond.filter(createFilterFor(query)) :
+                    $scope.genesSecond,
+                    deferred;
+            }
+
             if (self.simulateQuery) {
                 deferred = $q.defer();
                 $timeout(function() { deferred.resolve(results); }, Math.random() *
@@ -117,27 +138,50 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             }
         };
 
-        $scope.selectedItemChanged = function(item) {
+        $scope.selectedItemChanged = function(item, source) {
             // Run code to select gene here
             // We probably need 2 dropdowns, one for epi and one for stroma or maybe a swtich to indicate which one we are searching
             if (item == null) {
                 return;
             }
 
-            RESTService.post('first-dropdown', {
-                gene: item.value.substring(0, item.value
-                    .length - 2),
-                side: item.value.substring(item.value.length -
-                    2),
-                degree: item.object.degree 
-            }).then(function(data) {
-                console.log(data);
+            if (source == 'first') {
+                $scope.state = $scope.states.loading;
+                RESTService.post('first-dropdown', {
+                    gene: item.value.substring(0, item.value
+                        .length - 2),
+                    side: item.value.substring(item.value.length -
+                        2),
+                    degree: item.object.degree
+                }).then(function(data) {
+                    console.log(data);
+                    GraphConfigService.applyConfig(data.config);
+                    $scope.cy = GraphConfigService.data.cy;
+                    $scope.genesSecond = $scope.loadAll(item.value);
+                    $scope.neighbours = angular.copy($scope.genesSecond);
+                    GraphConfigService.firstDropdownConfig = angular.copy(data.config);
+                    $scope.state = $scope.states.firstDropdown;
+                });
+            } else {
+                var originalElements = GraphConfigService.firstDropdownConfig.elements;
+                $scope.state = $scope.states.loading;
+                RESTService.post('second-dropdown', {
+                    gene: item.value.substring(0, item.value
+                        .length - 2),
+                    side: item.value.substring(item.value.length -
+                        2),
+                    originalElements: originalElements
+                }).then(function(data) {
+                    console.log(data);
 
-                GraphConfigService.applyConfig(data.config);
-                $scope.cy = GraphConfigService.data.cy;
-                $scope.genes = $scope.loadAll(item.value);
-                $scope.neighbours = angular.copy($scope.genes);
-            });
+                    GraphConfigService.applyConfig(data.config);
+                    $scope.cy = GraphConfigService.data.cy;
+                    //$scope.genesSecond = $scope.loadAll(item.value);
+                    $scope.neighbours = angular.copy($scope.genesSecond);
+                    $scope.state = $scope.states.secondDropdown;
+                });
+            }
+
         };
 
         $scope.resize = GraphConfigService.resetZoom;
@@ -149,16 +193,21 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             };
         }
 
-        $(document).ready(function() {
+        $scope.resetData = function() {
+            GraphConfigService.firstDropdownConfig = null;
+            $scope.state = $scope.states.initial;
             $scope.getData().then(function(config) {
                 //var config = GraphConfigService.createConfig(elements);
                 console.log(config.elements);
                 GraphConfigService.applyConfig(config);
                 $scope.cy = GraphConfigService.data.cy;
-                $scope.genes = $scope.loadAll();
+                $scope.genesFirst = $scope.loadAll();
 
             });
-        });
+        };
 
+        $(document).ready(function() {
+            $scope.resetData();
+        });
     }
 ]);
