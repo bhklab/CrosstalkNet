@@ -95,13 +95,14 @@ myModule.factory('GraphConfigService', function($http) {
             }]
         };
 
-        elemCopy = angular.copy(elements);
+        service.elemCopy = angular.copy(elements);
         return initialConfig;
         //$scope.applyConfig(initialConfig);
     };
 
     service.applyConfig = function(config) {
-    	config.container = document.getElementById('cy');
+        service.elemCopy = angular.copy(config.elements);
+        config.container = document.getElementById('cy');
         service.data.cy = cytoscape(config);
         service.data.cy.fit(service.data.cy.$("*"), 10);
 
@@ -117,13 +118,13 @@ myModule.factory('GraphConfigService', function($http) {
             });
         });*/
 
-        
+
         service.data.cy.on("select", function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
             console.log('tapped ' + id);
 
-            
+
             service.data.cy.edges().forEach(function(edge) {
                 if (edge.source().id() == id) {
                     edge.addClass('highlighted');
@@ -160,14 +161,16 @@ myModule.factory('GraphConfigService', function($http) {
 
     service.resetZoom = function() {
         service.resetNodes();
-        serivce.data.cy.fit($scope.cy.$("*"), 10);
+        service.data.cy.fit(service.data.cy.$("*"), 10);
     };
 
     service.resetNodes = function() {
-        for (var i = 0; i < elemCopy.length; i++) {
-            if (elemCopy[i].target == null) {
-                if (elemCopy[i].position != null) {
-                    service.data.cy.$("#" + elemCopy[i].data.id).position({ x: elemCopy[i].position.x, y: elemCopy[i].position.y });
+        for (var i = 0; i < service.elemCopy.length; i++) {
+            if (service.elemCopy[i].target == null) {
+                if (service.elemCopy[i].position != null) {
+                    service.data.cy.$("#" + service.elemCopy[i].data.id).position({ x: service
+                            .elemCopy[i].position.x, y: service.elemCopy[i].position
+                            .y });
                 }
             }
         }
@@ -183,7 +186,8 @@ myModule.factory('GraphConfigService', function($http) {
                     parent: 'epi'
                 },
                 position: {
-                    x: i < (totalNumNodes / 2) ? 100 + (i * 10) : 100 + ((totalNumNodes - i) * 10),
+                    x: i < (totalNumNodes / 2) ? 100 + (i * 10) : 100 + ((
+                        totalNumNodes - i) * 10),
                     y: 100 + (i * 15)
                 },
                 style: {
@@ -197,7 +201,8 @@ myModule.factory('GraphConfigService', function($http) {
                     parent: 'stroma'
                 },
                 position: {
-                    x: i < (totalNumNodes / 2) ? 15000 - (i * 10) : 1500 - ((totalNumNodes - i) * 10),
+                    x: i < (totalNumNodes / 2) ? 15000 - (i * 10) : 1500 - ((
+                        totalNumNodes - i) * 10),
                     y: 100 + (i * 15)
                 }
             });
