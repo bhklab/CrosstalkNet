@@ -53,22 +53,20 @@
                 <h1 class="md-toolbar-tools">Navigation</h1>
             </md-toolbar>
             <md-content layout-padding>
-                <md-button ng-click="getData()">Get Data</md-button>
                 <md-button ng-click="resize()">Resize</md-button>
                 <br>
-                <md-button ng-click="replaceNodes()">Replace Nodes</md-button>
-                <md-button ng-click="resetData()">Initial Graph</md-button>
                 <md-progress-circular ng-show="state == states.loading || state == states.loadingFirst || state == states.  loadingSecond" md-mode="indeterminate"></md-progress-circular>
-                <md-input-container>
-                    <label>P-Value</label>
-                    <md-select ng-model="pValue" md-on-close="resetData()">
-                        <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="value.value == '05'">
-                            {{value.display}}
-                        </md-option>
-                    </md-select>
-                </md-input-container>
-                {{pValue}}
-                {{temp}}
+                <div>
+                    <md-input-container>
+                        <label>P-Value</label>
+                        <md-select ng-model="pValue">
+                            <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="value.value == '05'">
+                                {{value.display}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-button ng-click="resetData()">Refresh</md-button>
+                </div>
                 <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="selectedItemChanged(item, 'first')" md-items="item in querySearch(searchTextFirst, 'first') | degreeFilter : minDegree" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
                     <md-item-template>
                         <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
@@ -77,7 +75,13 @@
                         No states matching "{{searchTextFirst}}" were found.
                     </md-not-found>
                 </md-autocomplete>
-                <md-autocomplete ng-if="state == states.firstDropdown || state == states.secondDropdown || state == states.loadingSecond" md-no-cache='true' md-selected-item="selectedItemSecond" md-search-text="searchTextSecond" md-selected-item-change="selectedItemChanged(item, 'second')" md-items="item in querySearch(searchTextSecond, 'second')" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
+                <div ng-if="genesSecond.length > 0">Connections: {{genesSecond.length}}</div>
+                <md-list class="list-height">
+                    <md-list-item ng-repeat="gene in neighbours">
+                        <div>{{gene.display}}</div>
+                    </md-list-item>
+                </md-list>
+                <md-autocomplete ng-if="genesSecond.length > 0" md-no-cache='true' md-selected-item="selectedItemSecond" md-search-text="searchTextSecond" md-selected-item-change="selectedItemChanged(item, 'second')" md-items="item in querySearch(searchTextSecond, 'second')" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
                     <md-item-template>
                         <span md-highlight-text="searchTextSecond" md-highlight-flags="^i">{{item.display}}</span>
                     </md-item-template>
@@ -97,14 +101,8 @@
                         </div>
                     </div>
                 </div>
-
-                {{genesFirst}}
                 <!--
-                <md-list class="list-height">
-                    <md-list-item ng-repeat="gene in neighbours">
-                        <div>{{gene.display}}</div>
-                    </md-list-item>
-                </md-list>
+
                 <div>{{state}}</div>
                 <!--<div style="word-wrap: break-word">{{selectedItem}}</div>-->
             </md-content>
