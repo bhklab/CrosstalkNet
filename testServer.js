@@ -63,8 +63,8 @@ app.get('/test-correlation', function(req, res) {
 
 
         var parsedValue = JSON.parse(stdout);
-        var epiDegrees = parsedValue.value[0].value[0];
-        var stromaDegrees = parsedValue.value[0].value[1];
+        var epiDegrees = parsedValue.value[0].value[0].value;
+        var stromaDegrees = parsedValue.value[0].value[1].value;
         var weights = parsedValue.value[1];
 
         console.log(parsedValue);
@@ -81,6 +81,8 @@ app.get('/test-correlation', function(req, res) {
             initialWeights.push(temp);
         }
 
+        console.log('epiDegrees[0]: ' + epiDegrees[0]);
+        console.log('stromaDegrees[0]: ' + stromaDegrees[0]);
         var elements = [];
         var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
         var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
@@ -124,6 +126,8 @@ app.post('/first-dropdown', function(req, res) {
     console.log(req.body);
     var gene = req.body.gene;
     var side = req.body.side;
+    var degree = req.body.degree;
+
     var neighbourSide = side == "-e" ? "-s" : "-e"
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
@@ -158,9 +162,10 @@ app.post('/first-dropdown', function(req, res) {
                 return;
             }
 
-            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, []);
+            
             var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ? "stroma" :
-                "epi", 2, degrees);
+                "epi", 4, degrees);
+            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [degree]);
             var edges = createEdgesFromNode(sourceNode[0], neighbourNodes, neighbourGeneWeights,
                 "");
 
@@ -222,6 +227,7 @@ function createNodes(nodes, parent, column, degrees) {
     var resultNodes = [];
     var sideFlag = parent == "epi" ? "-e" : "-s";
     for (var i = 0; i < nodes.length; i++) {
+        console.log(degrees[i]);
         resultNodes.push({
             data: {
                 id: nodes[i] + sideFlag,
@@ -230,11 +236,11 @@ function createNodes(nodes, parent, column, degrees) {
             },
             position: {
                 x: 100 * column,
-                y: 100 + (i * 25)
+                y: 100 + (i * 20)
             },
             style: {
-                'width': (10 + nodes[i].degree) + 'px',
-                'height': (10 + nodes[i].degree) + 'px',
+                'width': '10px',//(10 + nodes[i].degree) + 'px',
+                'height': '10px',//(10 + nodes[i].degree) + 'px',
                 'text-halign': column == 1 ? "left" : "right",
                 'text-valign': 'center'
             }

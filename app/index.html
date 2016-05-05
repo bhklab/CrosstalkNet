@@ -56,7 +56,7 @@
                 <md-button ng-click="resize()">Resize</md-button>
                 <br>
                 <md-button ng-click="replaceNodes()">Replace Nodes</md-button>
-                <md-autocomplete md-selected-item="selectedItem" md-search-text="searchText" md-selected-item-change="selectedItemChanged(item)" md-items="item in querySearch(searchText)" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
+                <md-autocomplete md-no-cache='true' md-selected-item="selectedItem" md-search-text="searchText" md-selected-item-change="selectedItemChanged(item)" md-items="item in querySearch(searchText)" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
                     <md-item-template>
                         <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
                     </md-item-template>
@@ -65,12 +65,18 @@
                         <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
                     </md-not-found>
                 </md-autocomplete>
+                <md-list>
+                    <md-list-item ng-repeat="gene in neighbours">
+                        <div>{{gene.display}}</div>
+                    </md-list-item>
+                </md-list>
                 <div>{{zoom}}</div>
-                <div style="word-wrap: break-word">{{selectedItem}}</div>
+                <!--<div style="word-wrap: break-word">{{selectedItem}}</div>-->
             </md-content>
         </md-sidenav>
         <md-content flex>
             <div style="width: 100%; height:500px; background-color: blue;" id="cy"></div>
+            <!--<div>{{genes}}</div>-->
         </md-content>
     </section>
 </body>
