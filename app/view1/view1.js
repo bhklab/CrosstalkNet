@@ -39,29 +39,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             return $q(function(resolve, reject) {
                 RESTService.get('test-correlation').then(function(data) {
                     console.log(data);
-                    /*
-                var elements = [];
-                var epiNodes = GraphConfigService.createNodes(data.epiNodes, 'epi', 1);
-                var stromaNodes = GraphConfigService.createNodes(data.stromaNodes, 'stroma', 2);
-                var edges = GraphConfigService.createEdges(data.epiNodes, data.stromaNodes, data.weights);
 
-                elements = elements.concat(epiNodes);
-                elements = elements.concat(stromaNodes);
-                elements = elements.concat(edges);
-                elements.push({
-                    data: {
-                        id: 'epi'
-                    },
-                    selected: true,
-                    selectable: true
-                })
-                elements.push({
-                    data: {
-                        id: 'stroma'
-                    }
-                })
-
-                console.log(data);*/
                     resolve(data.config);
                 });
             });
@@ -104,22 +82,27 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                 edge.css({ 'line-color': 'white' });
                 edge.css({ 'opacity': '1' });
             });
-        }
+        };
 
-        $scope.loadAll = function() {
+        $scope.loadAll = function(selectedGene = null) {
             var genes = [];
-            $scope.cy.nodes().forEach(function(node) {
-                genes.push(node.id());
+            var selectedGeneName = selectedGene == null ? '' : ', #' + selectedGene;
+            $scope.cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(node) {
+                /*if (node.id() != 'epi' && node.id() != 'stroma') {
+                        
+                }*/
+
+                genes.push(node.data());
             });
 
             return genes.map(function(gene) {
                 return {
-                    value: gene.toLowerCase(),
-                    display: gene
+                    value: gene.id.toLowerCase(),
+                    display: gene.id + ' ' + gene.degree, 
+                    object: gene
                 };
             });
         };
-
 
         $scope.querySearch = function(query) {
             var results = query ? $scope.genes.filter(createFilterFor(query)) : $scope.genes,
@@ -141,53 +124,28 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                 return;
             }
 
-            /*
-            $scope.cy.nodes().unselect();
-            var node = $scope.cy.$('#' + item.value);
-            node.select();
-            var id = node.id();
-            console.log('tapped ' + id);
-            $scope.resetEdges(); 
-
-            $scope.cy.edges().forEach(function(edge) {
-                if (edge.source().id() == id) {
-                    
-                    edge.addClass('highlighted');
-                    edge.removeClass('faded');
-                    edge.css({ 'line-color': 'red' });
-                } else {
-                    edge.addClass('faded');
-                    edge.removeClass('highlighted');
-                    edge.css({ 'opacity': '0' });
-                }
-            });
-
-            $scope.selectedItem = null;
-            console.log(node);
-            console.log(item);*/
-
-
             RESTService.post('first-dropdown', {
                 gene: item.value.substring(0, item.value
                     .length - 2),
                 side: item.value.substring(item.value.length -
-                    2)
+                    2),
+                degree: item.object.degree 
             }).then(function(data) {
                 console.log(data);
 
                 GraphConfigService.applyConfig(data.config);
                 $scope.cy = GraphConfigService.data.cy;
-                $scope.genes = $scope.loadAll();
+                $scope.genes = $scope.loadAll(item.value);
+                $scope.neighbours = angular.copy($scope.genes);
             });
         };
-
 
         $scope.resize = GraphConfigService.resetZoom;
 
         function createFilterFor(query) {
             var lowercaseQuery = angular.lowercase(query);
-            return function filterFn(state) {
-                return (state.value.indexOf(lowercaseQuery) === 0);
+            return function filterFn(gene) {
+                return (gene.value.indexOf(lowercaseQuery) === 0);
             };
         }
 
