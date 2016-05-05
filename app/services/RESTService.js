@@ -6,6 +6,11 @@ myModule.factory('RESTService', function($http) {
 			return $http.get(SERVER_URL + url).then(function(result) {
 				return result.data;
 			});
+		},
+		post: function(url, data) {
+			return $http.post(SERVER_URL + url, data).then(function(result) {
+				return result.data;
+			});
 		}
 	}
 
