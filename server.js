@@ -12,9 +12,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get('/overall-graph', function(req, res) {
-    var pValue = req.params.pValue;
+    var pValue = req.query.pValue;
     console.log(pValue);
+    console.log(initialConfigs);
     if (initialConfigs[pValue] != null) {
+        console.log(initialConfigs[pValue].elements[9]);
         res.json({ config: initialConfigs[pValue] });
         return;
     }
@@ -110,7 +112,7 @@ app.post('/second-dropdown', function(req, res) {
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene +
-        "\"" + " " + "\"" + side + "\"", { maxBuffer: 1024 * 50000 },
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             var elements = [];
             console.log('stderr: ' + stderr);
@@ -359,31 +361,7 @@ function getWeightsAndDegreesFromROutput(stdout) {
 }
 
 function createAllOverallConfigs() {
-    var pValues = ["001", "01", "05", "1"];
-
-    for (var i = 0; i < pValues.length; i++) {
-        var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"" + pValues[i] +"\"", {
-            maxBuffer: 1024 *
-                50000
-        }, function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var parsed = getWeightsAndDegreesFromROutput(stdout);
-            console.log("returned");
-            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-                parsed.geneNames);
-            var config = createConfig(elements);
-            console.log(elements[9]);
-            initialConfigs[pValues[i]] = config;
-        });
-    }
-
-    /*
+    
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"001\"", {
         maxBuffer: 1024 *
             50000
@@ -467,8 +445,6 @@ function createAllOverallConfigs() {
         initialConfigs["1"] = config;
 
     });
-
-    */
 }
 
 function initializeServer() {

@@ -24,7 +24,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         $scope.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
             { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
         ];
-        $scope.pValue = null;
+        $scope.pValue = $scope.pValues[2].value;
 
         var elemCopy = angular.copy(elements);
 
@@ -148,6 +148,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             }
 
             if (source == 'first') {
+                $scope.genesSecond = [];
                 $scope.state = $scope.states.loadingFirst;
                 RESTService.post('first-dropdown', {
                     gene: item.value.substring(0, item.value
