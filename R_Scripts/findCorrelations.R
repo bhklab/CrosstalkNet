@@ -1,13 +1,14 @@
 library(jsonlite)
 
 setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
-corMatrix <- dget('corMatrix.R')
-degrees <- dget('degrees.R')
-
 
 args <- commandArgs(trailingOnly = TRUE)
 gene <- args[2]
 side <- args[3]
+pValue <- args[4]
+
+corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
+degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
 
 #gene	
 #side

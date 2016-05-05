@@ -15,12 +15,16 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             firstDropdown: 1,
             secondDropdown: 2,
             loadingFirst: 3,
-            loadingSecond: 4
+            loadingSecond: 4,
+            loading: 5
         };
 
         $scope.minDegree = 0;
-
         $scope.state = $scope.states.initial;
+        $scope.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
+            { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
+        ];
+        $scope.pValue = null;
 
         var elemCopy = angular.copy(elements);
 
@@ -48,12 +52,14 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         };
 
         $scope.getData = function() {
+            $scope.state = $scope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('test-correlation').then(function(data) {
-                    console.log(data);
+                RESTService.get('overall-graph', { params: { pValue: $scope.pValue } })
+                    .then(function(data) {
+                        console.log(data);
 
-                    resolve(data.config);
-                });
+                        resolve(data.config);
+                    });
             });
         };
 
@@ -101,10 +107,6 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             var selectedGeneName = selectedGene == null ? '' : ', #' + selectedGene;
             $scope.cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(
                 node) {
-                /*if (node.id() != 'epi' && node.id() != 'stroma') {
-                        
-                }*/
-
                 genes.push(node.data());
             });
 
@@ -146,13 +148,14 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             }
 
             if (source == 'first') {
-                $scope.state = $scope.states.loading;
+                $scope.state = $scope.states.loadingFirst;
                 RESTService.post('first-dropdown', {
                     gene: item.value.substring(0, item.value
                         .length - 2),
                     side: item.value.substring(item.value.length -
                         2),
-                    degree: item.object.degree
+                    degree: item.object.degree,
+                    pValue: $scope.pValue
                 }).then(function(data) {
                     console.log(data);
                     GraphConfigService.applyConfig(data.config);
@@ -164,13 +167,14 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                 });
             } else {
                 var originalElements = GraphConfigService.firstDropdownConfig.elements;
-                $scope.state = $scope.states.loading;
+                $scope.state = $scope.states.loadingSecond;
                 RESTService.post('second-dropdown', {
                     gene: item.value.substring(0, item.value
                         .length - 2),
                     side: item.value.substring(item.value.length -
                         2),
-                    originalElements: originalElements
+                    originalElements: originalElements,
+                    pValue: $scope.pValue
                 }).then(function(data) {
                     console.log(data);
 
@@ -195,14 +199,13 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
 
         $scope.resetData = function() {
             GraphConfigService.firstDropdownConfig = null;
-            $scope.state = $scope.states.initial;
             $scope.getData().then(function(config) {
                 //var config = GraphConfigService.createConfig(elements);
                 console.log(config.elements);
                 GraphConfigService.applyConfig(config);
                 $scope.cy = GraphConfigService.data.cy;
                 $scope.genesFirst = $scope.loadAll();
-
+                $scope.state = $scope.states.initial;
             });
         };
 

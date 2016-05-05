@@ -3,136 +3,40 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser')
 var app = express();
-var nodeModel = {
-    name: null,
-    degree: 0,
-    neighbours: []
-};
 
 var initialConfig = null;
-var initialEpiGenes = [];
-var initialStromaGenes = [];
-var initialWeights = [];
-var initialDegrees = {};
-var weightMap = null;
+var initialConfigs = { "001": null, "01": null, "05": null, "1": null };
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get('/data', function(req, res) {
-    var child = exec("Rscript C:/Users/Alex/Documents/RNode/test.R", function(error, stdout,
-        stderr) {
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-        res.json({ result: JSON.parse(stdout) });
-    });
-
-    /*
-    var r = c.spawn("R", "");
-    r.stdin.write("setwd('C:/Users/Alex/Documents/RNode')");
-    r.stdin.write("source('test.R'");
-    var result = '';
-    r.stdout.on('data', function(data) {
-        result += data.toString();
-        console.log(result)
-        
-    });*/
-});
-
-app.get('/test-correlation', function(req, res) {
-    if (initialConfig != null) {
-        res.json({ config: initialConfig });
+app.get('/overall-graph', function(req, res) {
+    var pValue = req.params.pValue;
+    console.log(pValue);
+    if (initialConfigs[pValue] != null) {
+        res.json({ config: initialConfigs[pValue] });
         return;
     }
-    var child = exec("Rscript R_Scripts/test.R", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-
-        var parsedValue = JSON.parse(stdout);
-        var epiDegrees = parsedValue.value[0].value[0].value;
-        var stromaDegrees = parsedValue.value[0].value[1].value;
-        var weights = parsedValue.value[1];
-
-        console.log(parsedValue);
-        var dimension = weights.attributes.dim.value[0];
-        var geneNames = weights.attributes.dimnames.value[0].value;
-        //console.log(geneNames);
-
-        for (var i = 0; i < dimension; i++) {
-            var temp = [];
-            for (var j = 0; j < dimension; j++) {
-                temp.push(weights.value[(dimension * i) + j]);
-            }
-
-            initialWeights.push(temp);
-        }
-
-        console.log('epiDegrees[0]: ' + epiDegrees[0]);
-        console.log('stromaDegrees[0]: ' + stromaDegrees[0]);
-        var elements = [];
-        var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
-        var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
-        var edges = createEdges(epiNodes, stromaNodes, initialWeights);
-
-        elements = elements.concat(epiNodes);
-        elements = elements.concat(stromaNodes);
-        elements = elements.concat(edges);
-        elements.push({
-            data: {
-                id: 'epi'
-            }
-        });
-        elements.push({
-            data: {
-                id: 'stroma'
-            }
-        });
-
-
-        initialConfig = createConfig(elements);
-        //console.log(initialConfig);
-
-
-        res.json({
-            weights: initialWeights,
-            stromaNodes: stromaNodes,
-            epiNodes: epiNodes,
-            config: initialConfig,
-            edges: edges,
-            parsedValue: parsedValue
-        });
-    });
 });
 
 app.post('/first-dropdown', function(req, res) {
-    if (initialWeights == null || initialEpiGenes == null || initialStromaGenes == null) {
+    /*if (initialConfig == null) {
         res.json({ result: null });
-    }
+    }*/
 
     console.log(req.body);
     var gene = req.body.gene;
     var side = req.body.side;
     var degree = req.body.degree;
+    var pValue = req.body.pValue;
 
     var neighbourSide = side == "-e" ? "-s" : "-e"
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene +
-        "\"" + " " + "\"" + side + "\"", { maxBuffer: 1024 * 50000 },
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", { maxBuffer: 1024 *
+                50000 },
         function(error, stdout, stderr) {
             var elements = [];
             console.log('stderr: ' + stderr);
@@ -144,10 +48,11 @@ app.post('/first-dropdown', function(req, res) {
             var parsedValue = JSON.parse(stdout);
             console.log(parsedValue);
 
+            /*
             if (parsedValue.attributes == null || parsedValue.attributes.names == null) {
                 res.json({ config: initialConfig });
                 return;
-            }
+            }*/
 
             var weights = parsedValue.value[0];
             var degrees = parsedValue.value[1].value;
@@ -157,11 +62,11 @@ app.post('/first-dropdown', function(req, res) {
             var neighboursGenes = [];
             var resultWeights = [];
 
+            /*
             if (neighbourGeneWeights.length == 0) {
                 res.json({ config: initialConfig });
                 return;
-            }
-
+            }*/
 
             var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
                 "stroma" :
@@ -194,15 +99,12 @@ app.post('/first-dropdown', function(req, res) {
 });
 
 app.post('/second-dropdown', function(req, res) {
-    if (initialWeights == null || initialEpiGenes == null || initialStromaGenes == null) {
-        res.json({ result: null });
-    }
-
     console.log(req.body);
     var gene = req.body.gene;
     var side = req.body.side;
     var degree = req.body.degree;
     var originalElements = req.body.originalElements;
+    var pValue = req.body.pValue;
 
     var neighbourSide = side == "-e" ? "-s" : "-e"
     var child = exec(
@@ -241,7 +143,7 @@ app.post('/second-dropdown', function(req, res) {
             var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
                 "stromaRight" :
                 "epiRight", 8, degrees);
-            
+
             var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
                 degree
             ]);
@@ -295,27 +197,23 @@ function createConfig(elements) {
         }]
     };
 
-    //elemCopy = angular.copy(elements);
     return config;
-    //$scope.applyConfig(initialConfig);
 };
 
 function createNodes(nodes, parent, column, degrees) {
     var resultNodes = [];
-    var sideFlag = "";//parent == "epi" || parent == "epiRight" ? "-e" : "-s";
+    var sideFlag = ""; //parent == "epi" || parent == "epiRight" ? "-e" : "-s";
     if (parent == "epi") {
         sideFlag = "-e";
     } else if (parent == "epiRight") {
         sideFlag = "-er";
-    } else if (parent == "stroma")  {
+    } else if (parent == "stroma") {
         sideFlag = "-s";
-    }
-    else if (parent = "stromaRight") {
+    } else if (parent = "stromaRight") {
         sideFlag = "-sr";
     }
 
     for (var i = 0; i < nodes.length; i++) {
-        console.log(degrees[i]);
         resultNodes.push({
             data: {
                 id: nodes[i] + sideFlag,
@@ -407,6 +305,234 @@ function createEdgesFromNode(node, neighbours, weights, from) {
     return edges;
 }
 
+function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
+    var initialWeights = [];
+    var dimension = geneNames.length;
+
+    for (var i = 0; i < dimension; i++) {
+        var temp = [];
+        for (var j = 0; j < dimension; j++) {
+            temp.push(weights.value[(dimension * i) + j]);
+        }
+
+        initialWeights.push(temp);
+    }
+
+    var elements = [];
+    var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
+    var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
+    var edges = createEdges(epiNodes, stromaNodes, initialWeights);
+
+    elements = elements.concat(epiNodes);
+    elements = elements.concat(stromaNodes);
+    elements = elements.concat(edges);
+    elements.push({
+        data: {
+            id: 'epi'
+        }
+    });
+    elements.push({
+        data: {
+            id: 'stroma'
+        }
+    });
+
+    return elements;
+}
+
+function getWeightsAndDegreesFromROutput(stdout) {
+    var parsedValue = JSON.parse(stdout);
+    var epiDegrees = parsedValue.value[0].value[0].value;
+    var stromaDegrees = parsedValue.value[0].value[1].value;
+    var weights = parsedValue.value[1];
+    var geneNames = weights.attributes.dimnames.value[0].value;
+
+    var result = {
+        epiDegrees: epiDegrees,
+        stromaDegrees: stromaDegrees,
+        weights: weights,
+        geneNames: geneNames
+    }
+
+    console.log("about to return");
+    return result;
+}
+
+function createAllOverallConfigs() {
+    var pValues = ["001", "01", "05", "1"];
+
+    for (var i = 0; i < pValues.length; i++) {
+        var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"" + pValues[i] +"\"", {
+            maxBuffer: 1024 *
+                50000
+        }, function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsed = getWeightsAndDegreesFromROutput(stdout);
+            console.log("returned");
+            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+                parsed.geneNames);
+            var config = createConfig(elements);
+            console.log(elements[9]);
+            initialConfigs[pValues[i]] = config;
+        });
+    }
+
+    /*
+    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"001\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        var parsed = getWeightsAndDegreesFromROutput(stdout);
+        console.log("returned");
+        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+            parsed.geneNames);
+        var config = createConfig(elements);
+
+        initialConfigs["001"] = config;
+
+    });
+
+    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"01\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+
+        var parsed = getWeightsAndDegreesFromROutput(stdout);
+        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+            parsed.geneNames);
+        var config = createConfig(elements);
+
+        initialConfigs["01"] = config;
+
+    });
+
+    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"05\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+
+        var parsed = getWeightsAndDegreesFromROutput(stdout);
+        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+            parsed.geneNames);
+        var config = createConfig(elements);
+
+        initialConfigs["05"] = config;
+
+    });
+
+    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"1\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+
+        var parsed = getWeightsAndDegreesFromROutput(stdout);
+        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+            parsed.geneNames);
+        var config = createConfig(elements);
+
+        initialConfigs["1"] = config;
+
+    });
+
+    */
+}
+
+function initializeServer() {
+    createAndStoreCorrelationsAndDegrees(createAllOverallConfigs);
+}
+
+function createAndStoreCorrelationsAndDegrees(callback) {
+    var child = exec("Rscript R_Scripts/createAndStoreCorrelationsAndDegrees.R", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        /*
+        var parsedValue = JSON.parse(stdout);
+        var epiDegrees = parsedValue.value[0].value[0].value;
+        var stromaDegrees = parsedValue.value[0].value[1].value;
+        var weights = parsedValue.value[1];
+
+        var dimension = weights.attributes.dim.value[0];
+        var geneNames = weights.attributes.dimnames.value[0].value;
+        var initialWeights = [];
+
+        for (var i = 0; i < dimension; i++) {
+            var temp = [];
+            for (var j = 0; j < dimension; j++) {
+                temp.push(weights.value[(dimension * i) + j]);
+            }
+
+            initialWeights.push(temp);
+        }
+
+        var elements = [];
+        var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
+        var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
+        var edges = createEdges(epiNodes, stromaNodes, initialWeights);
+
+        elements = elements.concat(epiNodes);
+        elements = elements.concat(stromaNodes);
+        elements = elements.concat(edges);
+        elements.push({
+            data: {
+                id: 'epi'
+            }
+        });
+        elements.push({
+            data: {
+                id: 'stroma'
+            }
+        });
+
+        initialConfig = createConfig(elements);
+        console.log("Data and config initialized. Ready to serve requests")*/
+        callback();
+    });
+}
+
 app.listen(5000, function() {
     console.log("Listening on port 5000");
+    console.log("Initializing data and config")
+    initializeServer();
 });
