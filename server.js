@@ -37,8 +37,10 @@ app.post('/first-dropdown', function(req, res) {
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", { maxBuffer: 1024 *
-                50000 },
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
         function(error, stdout, stderr) {
             var elements = [];
             console.log('stderr: ' + stderr);
@@ -112,7 +114,10 @@ app.post('/second-dropdown', function(req, res) {
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
         function(error, stdout, stderr) {
             var elements = [];
             console.log('stderr: ' + stderr);
@@ -163,6 +168,90 @@ app.post('/second-dropdown', function(req, res) {
                     id: side == '-e' ? 'stromaRight' : 'epiRight'
                 }
             });
+
+            var config = createConfig(elements);
+
+            res.json({ config: config });
+        });
+});
+
+app.post('/neighbour-general', function(req, res) {
+    console.log(req.body);
+    var neighbour = req.body.neighbour;
+    var gene = req.body.gene;
+    var side = req.body.side;
+    var degree = req.body.degree;
+    var originalElements = req.body.originalElements;
+    var pValue = req.body.pValue;
+
+    var neighbourSide = side == "-e" ? "-s" : "-e"
+    var child = exec(
+        "Rscript R_Scripts/findCorrelations.R --args " +
+        "\"" + gene +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            var elements = [];
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            console.log(parsedValue);
+
+            var weights = parsedValue.value[0];
+            var degrees = parsedValue.value[1].value;
+            var neighbourGeneNames = weights.attributes.names.value;
+            var dimension = neighbourGeneNames.length;
+            var neighbourGeneWeights = weights.value;
+            var neighboursGenes = [];
+            var resultWeights = [];
+            var parent = "";
+
+            if (neighbour == 1) {
+                parent = side == "-e" ? "stroma" : "epi";
+            } else {
+                parent = side == "-e" ? "stromaRight" : "epiRight";
+            }
+
+            var neighbourNodes = createNodes(neighbourGeneNames, parent, neighbour == 1 ? 4 : 8, degrees);
+
+            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+                degree
+            ]);
+
+            console.log(sourceNode);
+            var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
+                neighbourGeneWeights,
+                "");
+
+            if (neighbour == 1) {
+                elements = elements.concat(sourceNode);
+                elements.push({
+                    data: {
+                        id: 'epi'
+                    }
+                });
+                elements.push({
+                    data: {
+                        id: 'stroma'
+                    }
+                });
+            } else {
+                elements = elements.concat(originalElements);
+                elements.push({
+                    data: {
+                        id: side == '-e' ? 'stromaRight' : 'epiRight'
+                    }
+                });
+            }
+
+            elements = elements.concat(neighbourNodes);
+            elements = elements.concat(edges);
 
             var config = createConfig(elements);
 
@@ -361,7 +450,7 @@ function getWeightsAndDegreesFromROutput(stdout) {
 }
 
 function createAllOverallConfigs() {
-    
+
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"001\"", {
         maxBuffer: 1024 *
             50000
@@ -463,46 +552,6 @@ function createAndStoreCorrelationsAndDegrees(callback) {
             console.log('error: ' + error);
         }
 
-        /*
-        var parsedValue = JSON.parse(stdout);
-        var epiDegrees = parsedValue.value[0].value[0].value;
-        var stromaDegrees = parsedValue.value[0].value[1].value;
-        var weights = parsedValue.value[1];
-
-        var dimension = weights.attributes.dim.value[0];
-        var geneNames = weights.attributes.dimnames.value[0].value;
-        var initialWeights = [];
-
-        for (var i = 0; i < dimension; i++) {
-            var temp = [];
-            for (var j = 0; j < dimension; j++) {
-                temp.push(weights.value[(dimension * i) + j]);
-            }
-
-            initialWeights.push(temp);
-        }
-
-        var elements = [];
-        var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
-        var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
-        var edges = createEdges(epiNodes, stromaNodes, initialWeights);
-
-        elements = elements.concat(epiNodes);
-        elements = elements.concat(stromaNodes);
-        elements = elements.concat(edges);
-        elements.push({
-            data: {
-                id: 'epi'
-            }
-        });
-        elements.push({
-            data: {
-                id: 'stroma'
-            }
-        });
-
-        initialConfig = createConfig(elements);
-        console.log("Data and config initialized. Ready to serve requests")*/
         callback();
     });
 }
