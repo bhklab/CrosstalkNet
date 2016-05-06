@@ -71,7 +71,7 @@
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <md-button ng-click="resetData()">Refresh</md-button>
+                    <md-button ng-click="refreshOverallGraph()">Refresh</md-button>
                 </div>
                 <div>Total Interactions: {{totalInteractions}}</div>
                 <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="selectedItemChanged(item, 'first')" md-items="item in querySearch(searchTextFirst, 'first') | degreeFilter : minDegree" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
@@ -115,7 +115,7 @@
             </md-content>
         </md-sidenav>
         <md-content flex>
-            <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: blue;" id="cy"></div>
+            <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: #E1F5FE;" id="cy"></div>
             <div ng-show="display == 'Self Loops'">
                 <md-card>
                     <md-card-title>
@@ -126,6 +126,17 @@
                     </md-card-title>
                     <md-card-content layout="row" layout-wrap>
                         <div flex="20" ng-repeat="gene in selfLoops">{{gene}}</div>
+                    </md-card-content>
+                </md-card>
+                <md-card ng-if="neighbours.length > 0">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">First Neighbours</span>
+                            <span class="md-subhead">Total: {{neighbours.length}}</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content layout="row" layout-wrap>
+                        <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}} <br>Degree: {{gene.object.degree}}</div>
                     </md-card-content>
                 </md-card>
             </div>
