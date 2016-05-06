@@ -7,67 +7,6 @@ myModule.factory('GraphConfigService', function($http) {
     service.elemCopy = [];
     service.firstDropdownConfig = null;
 
-    service.createNodes = function(nodes, parent, column = 1) {
-        var resultNodes = [];
-
-        for (var i = 0; i < nodes.length; i++) {
-            resultNodes.push({
-                data: {
-                    id: nodes[i].name,
-                    parent: parent
-                },
-                position: {
-                    x: 100 * column,
-                    y: 100 + (i * 25)
-                },
-                style: {
-                    'width': (10 + nodes[i].degree) + 'px',
-                    'height': (10 + nodes[i].degree) + 'px',
-                    'text-halign': column == 1 ? "left" : "right",
-                    'text-valign': 'center'
-                }
-            })
-        }
-
-        return resultNodes;
-    };
-
-    service.createEdges = function(epiNodes, stromaNodes, weights) {
-        var edges = [];
-
-        for (var i = 0; i < epiNodes.length; i++) {
-            for (var j = i + 1; j < stromaNodes.length; j++) {
-                if (weights[i][j] > 0) {
-                    edges.push({
-                        data: {
-                            id: 'EpiToStroma' + i + j,
-                            source: epiNodes[i].name,
-                            target: stromaNodes[j].name
-                        },
-                        style: {
-                            'label': 'data(label)' // maps to data.label
-                        }
-                    });
-                }
-
-                if (weights[j][i] > 0) {
-                    edges.push({
-                        data: {
-                            id: 'StromaToEpi' + i + j,
-                            source: stromaNodes[i].name,
-                            target: epiNodes[j].name
-                        },
-                        style: {
-                            'label': 'data(label)' // maps to data.label
-                        }
-                    });
-                }
-            }
-        }
-
-        return edges;
-    };
-
     service.createConfig = function(elements) {
         var initialConfig = {
 
@@ -117,7 +56,7 @@ myModule.factory('GraphConfigService', function($http) {
                 }
                 service.zoom = service.cy.zoom();
             });
-        });*/
+        });
 
 
         service.data.cy.on("select", function(evt) {

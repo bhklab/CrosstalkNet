@@ -8,7 +8,7 @@ load('TE-LGenes.RData')
 load('TS-LGenes.RData')
 View(edataTE.ERNeg.LGenes)
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
-CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+#CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
 TESLGenes.padj.FDR <- p.adjust(Signif.TESLGenes$p,method="fdr",length(Signif.TESLGenes$p)) # FDR Adjustment for multiple testing
 CorTESLGenes.FDRadj.001 <- CorTES.LGenes 
