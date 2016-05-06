@@ -3,6 +3,7 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser')
 var app = express();
+var nodeUtils = require('nodeUtils');
 
 var initialConfig = null;
 var initialConfigs = { "001": null, "01": null, "05": null, "1": null };
@@ -91,10 +92,10 @@ app.post('/first-dropdown', function(req, res) {
                 return;
             }*/
 
-            var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
+            var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames, side == "-e" ?
                 "stroma" :
-                "epi", 4, degrees);
-            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+                "epi", 3, degrees);
+            var sourceNode = nodeUtils.createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
                 degree
             ]);
             var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
@@ -166,11 +167,11 @@ app.post('/second-dropdown', function(req, res) {
                 return;
             }
 
-            var neighbourNodes = createNodes(neighbourGeneNames, side == "-e" ?
+            var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames, side == "-e" ?
                 "stromaRight" :
-                "epiRight", 8, degrees);
+                "epiRight", 6, degrees);
 
-            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+            var sourceNode = nodeUtils.createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
                 degree
             ]);
 
@@ -237,12 +238,18 @@ app.post('/neighbour-general', function(req, res) {
                 parent = side == "-e" ? "stromaRight" : "epiRight";
             }
 
-            var neighbourNodes = createNodes(neighbourGeneNames, parent, neighbour == 1 ?
+            var neighbourBgColor = side == "-e" ? "red" : "blue";
+            var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames, parent, neighbour == 1 ?
                 4 : 8, degrees);
+            neighbourNodes = nodeUtils.addPositionsToNodes(neighbourNodes, neighbour == 1 ? 400 : 800, 100, 0, 20);
+            neighbourNodes = nodeUtils.addStyleToNodes(neighbourNodes, 10, 10, "left", "center", neighbourBgColor);
 
-            var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
+            var sourceNode = nodeUtils.createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
                 degree
             ]);
+            var sourceBgColor = side == "-e" ? "blue" : "red";
+            sourceNode = nodeUtils.addPositionsToNodes(sourceNode, 100, 100, 0, 0);
+            sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10, "left", "center", sourceBgColor);
 
             console.log(sourceNode);
             var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
@@ -311,41 +318,11 @@ function createConfig(elements) {
     return config;
 };
 
-function createNodes(nodes, parent, column, degrees) {
-    var resultNodes = [];
-    var sideFlag = ""; //parent == "epi" || parent == "epiRight" ? "-e" : "-s";
-    if (parent == "epi") {
-        sideFlag = "-e";
-    } else if (parent == "epiRight") {
-        sideFlag = "-er";
-    } else if (parent == "stroma") {
-        sideFlag = "-s";
-    } else if (parent = "stromaRight") {
-        sideFlag = "-sr";
-    }
 
-    for (var i = 0; i < nodes.length; i++) {
-        resultNodes.push({
-            data: {
-                id: nodes[i] + sideFlag,
-                degree: degrees[i],
-                parent: parent
-            },
-            position: {
-                x: 100 * column,
-                y: 100 + (i * 20)
-            },
-            style: {
-                'width': '10px', //(10 + nodes[i].degree) + 'px',
-                'height': '10px', //(10 + nodes[i].degree) + 'px',
-                'text-halign': column == 1 ? "left" : "right",
-                'text-valign': 'center'
-            }
-        })
-    }
 
-    return resultNodes;
-};
+/*  For now, xPattern and yPattern will simply be increments to add at every step of the loop
+ */
+
 
 function createEdges(epiNodes, stromaNodes, weights) {
     var edges = [];
@@ -358,10 +335,11 @@ function createEdges(epiNodes, stromaNodes, weights) {
                         id: 'EpiToStroma' + i + j,
                         source: epiNodes[i].data.id,
                         target: stromaNodes[j].data.id
-                    },
-                    style: {
-                        'curve-style': 'haystack'
                     }
+                    /*,
+                                        style: {
+                                            'curve-style': 'haystack'
+                                        }*/
                 });
             }
 
@@ -371,10 +349,11 @@ function createEdges(epiNodes, stromaNodes, weights) {
                         id: 'StromaToEpi' + i + j,
                         source: stromaNodes[i].data.id,
                         target: epiNodes[j].data.id
-                    },
-                    style: {
-                        'curve-style': 'haystack'
                     }
+                    /*,
+                                        style: {
+                                            'curve-style': 'haystack'
+                                        }*/
                 });
             }
         }
@@ -385,10 +364,11 @@ function createEdges(epiNodes, stromaNodes, weights) {
                     id: 'StromaToEpi' + i + j,
                     source: stromaNodes[i].data.id,
                     target: epiNodes[i].data.id
-                },
-                style: {
-                    'curve-style': 'haystack'
                 }
+                /*,
+                                style: {
+                                    'curve-style': 'haystack'
+                                }*/
             });
         }
     }
@@ -430,8 +410,14 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     }
 
     var elements = [];
-    var epiNodes = createNodes(geneNames, 'epi', 1, epiDegrees);
-    var stromaNodes = createNodes(geneNames, 'stroma', 2, stromaDegrees);
+    var epiNodes = nodeUtils.createNodes(geneNames, 'epi', 1, epiDegrees);
+    epiNodes = nodeUtils.addPositionsToNodes(epiNodes, 100, 100, 0, 20);
+    epiNodes = nodeUtils.addStyleToNodes(epiNodes, 10, 10, "left", "center", "blue");
+    var stromaNodes = nodeUtils.createNodes(geneNames, 'stroma', 2, stromaDegrees);
+
+    stromaNodes = nodeUtils.addPositionsToNodes(stromaNodes, 300, 100, 0, 20);
+    stromaNodes = nodeUtils.addStyleToNodes(stromaNodes, 10, 10, "right", "center", "red");
+
     var edges = createEdges(epiNodes, stromaNodes, initialWeights);
 
     elements = elements.concat(epiNodes);
@@ -499,7 +485,7 @@ function createConfigForPValue(pValue, script) {
             stromaToEpiInteractions: parsed.stromaToEpiInteractions
         }
 
-        initialConfigs[pValue] = allInfo;    
+        initialConfigs[pValue] = allInfo;
 
     });
 }
@@ -524,7 +510,7 @@ function createListOfSelfLoopGenes(pValue, script) {
             numberOfLoops: numberOfLoops
         };
 
-        selfLoopGeneNames[pValue] = allInfo;    
+        selfLoopGeneNames[pValue] = allInfo;
     });
 }
 
@@ -533,112 +519,8 @@ function createAllOverallConfigs() {
 
     for (var i = 0; i < pValues.length; i++) {
         createConfigForPValue(pValues[i], "R_Scripts/getWeightsAndDegrees.R");
-        createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");   
+        createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");
     }
-    /*
-    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"001\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-        var parsed = getWeightsAndDegreesFromROutput(stdout);
-        console.log("returned");
-        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-            parsed.geneNames);
-        var config = createConfig(elements);
-        var allInfo = {
-            config: config,
-            totalInteractions: parsed.totalInteractions,
-            epiToStromaInteractions: parsed.epiToStromaInteractions,
-            stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        }
-
-        initialConfigs["001"] = allInfo;
-    });
-
-    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"01\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-
-        var parsed = getWeightsAndDegreesFromROutput(stdout);
-        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-            parsed.geneNames);
-        var config = createConfig(elements);
-        var allInfo = {
-            config: config,
-            totalInteractions: parsed.totalInteractions,
-            epiToStromaInteractions: parsed.epiToStromaInteractions,
-            stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        }
-
-        initialConfigs["01"] = allInfo;
-    });
-
-    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"05\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-
-        var parsed = getWeightsAndDegreesFromROutput(stdout);
-        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-            parsed.geneNames);
-        var config = createConfig(elements);
-        var allInfo = {
-            config: config,
-            totalInteractions: parsed.totalInteractions,
-            epiToStromaInteractions: parsed.epiToStromaInteractions,
-            stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        }
-
-        initialConfigs["05"] = allInfo;
-    });
-
-    var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"1\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-
-        var parsed = getWeightsAndDegreesFromROutput(stdout);
-        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-            parsed.geneNames);
-        var config = createConfig(elements);
-        var allInfo = {
-            config: config,
-            totalInteractions: parsed.totalInteractions,
-            epiToStromaInteractions: parsed.epiToStromaInteractions,
-            stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        }
-
-        initialConfigs["1"] = allInfo;
-    });*/
 }
 
 function initializeServer() {
