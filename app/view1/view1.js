@@ -3,20 +3,20 @@
 angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 'RESTService',
     'GraphConfigService', '$q', '$timeout',
     function($scope, RESTService, GraphConfigService, $q, $timeout) {
-        var elements = [];
         var totalNumNodes = 1000;
 
         $scope.selectedItemFirst = null;
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
-        $scope.display = "";
+        
         $scope.states = {
             initial: 0,
             firstDropdown: 1,
             secondDropdown: 2,
             loadingFirst: 3,
             loadingSecond: 4,
-            loading: 5
+            loading: 5,
+            loadingConfig: 6
         };
 
         $scope.minDegree = 0;
@@ -25,30 +25,19 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
         ];
         $scope.pValue = $scope.pValues[2].value;
+        $scope.totalInteractions = null;
+        $scope.selfLoops = [];
+        $scope.selfLoopsCount = 0;
 
-        var elemCopy = angular.copy(elements);
+        $scope.display = "Graph";
+        $scope.switchModel = false;
 
-        $scope.replaceNodes = function() {
-            var newElements = [{
-                data: {
-                    id: "new1"
-                },
-                position: {
-                    x: 100,
-                    y: 100
-                }
-            }, {
-                data: {
-                    id: "new2"
-                },
-                position: {
-                    x: 100,
-                    y: 200
-                }
-            }];
-
-            elemCopy = newElements;
-            $scope.cy.json({ elements: newElements });
+        $scope.changeDisplay = function() {
+            if ($scope.display == "Graph") {
+                $scope.display = "Self Loops";
+            } else {
+                $scope.display = "Graph";
+            }
         };
 
         $scope.getData = function() {
@@ -57,42 +46,20 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                 RESTService.get('overall-graph', { params: { pValue: $scope.pValue } })
                     .then(function(data) {
                         console.log(data);
-
+                        $scope.state = $scope.states.loadingConfig;
+                        $scope.totalInteractions = data.totalInteractions;
                         resolve(data.config);
                     });
             });
         };
 
-        $scope.createConfig = function(elements) {
-            var initialConfig = {
-
-                container: document.getElementById('cy'),
-
-                elements: elements,
-                layout: {
-                    name: 'preset'
-                },
-                style: [{
-                    selector: 'node',
-                    style: {
-                        'content': 'data(id)',
-                        'font-size': '8px'
-                    }
-                }, {
-                    selector: ':parent',
-                    style: {
-                        'background-opacity': 0.6
-                    }
-                }, {
-                    selector: 'node:selected',
-                    style: {
-                        'background-color': 'red'
-                    }
-                }]
-            };
-
-            return initialConfig;
-            //$scope.applyConfig(initialConfig);
+        $scope.getSelfLoops = function() {
+            RESTService.get('self-loops', { params: { pValue: $scope.pValue } })
+                .then(function(data) {
+                    console.log(data);
+                    $scope.selfLoops = data.geneNames;
+                    $scope.selfLoopsCount = data.numberOfLoops;
+                });
         };
 
         $scope.resetEdges = function() {
@@ -160,6 +127,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                     neighbour: 1
                 }).then(function(data) {
                     console.log(data);
+                    $scope.state = $scope.states.loadingConfig;
                     GraphConfigService.applyConfig(data.config);
                     $scope.cy = GraphConfigService.data.cy;
                     $scope.genesSecond = $scope.loadAll(item.value);
@@ -180,7 +148,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                     neighbour: 2
                 }).then(function(data) {
                     console.log(data);
-
+                    $scope.state = $scope.states.loadingConfig;
                     GraphConfigService.applyConfig(data.config);
                     $scope.cy = GraphConfigService.data.cy;
                     //$scope.genesSecond = $scope.loadAll(item.value);
@@ -201,10 +169,12 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         }
 
         $scope.resetData = function() {
+            $scope.getSelfLoops();
             GraphConfigService.firstDropdownConfig = null;
             $scope.getData().then(function(config) {
                 //var config = GraphConfigService.createConfig(elements);
                 console.log(config.elements);
+                $scope.state = $scope.states.loadingConfig;
                 GraphConfigService.applyConfig(config);
                 $scope.cy = GraphConfigService.data.cy;
                 $scope.genesFirst = $scope.loadAll();

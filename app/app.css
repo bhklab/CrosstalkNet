@@ -69,3 +69,15 @@ md-sidenav {
   border-width: 1px; 
   color: #9E9E9E;
 }
+
+fieldset.standard div {
+    color: black;
+}
+
+.header-background {
+    background-color: #0288D1 !important; 
+}
+
+.title-font {
+    font-size: 40px;
+}

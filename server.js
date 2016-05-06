@@ -6,6 +6,7 @@ var app = express();
 
 var initialConfig = null;
 var initialConfigs = { "001": null, "01": null, "05": null, "1": null };
+var selfLoopGeneNames = { "001": null, "01": null, "05": null, "1": null };
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,8 +17,26 @@ app.get('/overall-graph', function(req, res) {
     console.log(pValue);
     console.log(initialConfigs);
     if (initialConfigs[pValue] != null) {
-        console.log(initialConfigs[pValue].elements[9]);
-        res.json({ config: initialConfigs[pValue] });
+        //console.log(initialConfigs[pValue].elements[9]);
+        res.json({
+            config: initialConfigs[pValue].config,
+            totalInteractions: initialConfigs[pValue].totalInteractions,
+            epiToStromaInteractions: initialConfigs[pValue].epiToStromaInteractions,
+            stromaToEpiInteractions: initialConfigs[pValue].stromaToEpiInteractions
+        });
+        return;
+    }
+});
+
+app.get('/self-loops', function(req, res) {
+    var pValue = req.query.pValue;
+    console.log(pValue);
+    if (selfLoopGeneNames[pValue] != null) {
+        //console.log(initialConfigs[pValue].elements[9]);
+        res.json({
+            geneNames: selfLoopGeneNames[pValue].geneNames,
+            numberOfLoops: selfLoopGeneNames[pValue].numberOfLoops
+        });
         return;
     }
 });
@@ -218,7 +237,8 @@ app.post('/neighbour-general', function(req, res) {
                 parent = side == "-e" ? "stromaRight" : "epiRight";
             }
 
-            var neighbourNodes = createNodes(neighbourGeneNames, parent, neighbour == 1 ? 4 : 8, degrees);
+            var neighbourNodes = createNodes(neighbourGeneNames, parent, neighbour == 1 ?
+                4 : 8, degrees);
 
             var sourceNode = createNodes([gene], side == "-e" ? "epi" : "stroma", 1, [
                 degree
@@ -437,20 +457,85 @@ function getWeightsAndDegreesFromROutput(stdout) {
     var stromaDegrees = parsedValue.value[0].value[1].value;
     var weights = parsedValue.value[1];
     var geneNames = weights.attributes.dimnames.value[0].value;
+    var totalInteractions = parsedValue.value[2].value[0];
+    var epiToStromaInteractions = parsedValue.value[3].value[0];
+    var stromaToEpiInteractions = parsedValue.value[4].value[0];
 
     var result = {
         epiDegrees: epiDegrees,
         stromaDegrees: stromaDegrees,
         weights: weights,
-        geneNames: geneNames
+        geneNames: geneNames,
+        totalInteractions: totalInteractions,
+        epiToStromaInteractions: epiToStromaInteractions,
+        stromaToEpiInteractions: stromaToEpiInteractions
     }
 
     console.log("about to return");
     return result;
 }
 
-function createAllOverallConfigs() {
+function createConfigForPValue(pValue, script) {
+    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
 
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        var parsed = getWeightsAndDegreesFromROutput(stdout);
+        console.log("returned");
+        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
+            parsed.geneNames);
+        var config = createConfig(elements);
+        var allInfo = {
+            config: config,
+            totalInteractions: parsed.totalInteractions,
+            epiToStromaInteractions: parsed.epiToStromaInteractions,
+            stromaToEpiInteractions: parsed.stromaToEpiInteractions
+        }
+
+        initialConfigs[pValue] = allInfo;    
+
+    });
+}
+
+function createListOfSelfLoopGenes(pValue, script) {
+    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        //console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        var parsedValue = JSON.parse(stdout);
+        var geneNames = parsedValue.value[0].value;
+        var numberOfLoops = parsedValue.value[1].value[0];
+        var allInfo = {
+            geneNames: geneNames,
+            numberOfLoops: numberOfLoops
+        };
+
+        selfLoopGeneNames[pValue] = allInfo;    
+    });
+}
+
+function createAllOverallConfigs() {
+    var pValues = ["001", "01", "05", "1"];
+
+    for (var i = 0; i < pValues.length; i++) {
+        createConfigForPValue(pValues[i], "R_Scripts/getWeightsAndDegrees.R");
+        createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");   
+    }
+    /*
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"001\"", {
         maxBuffer: 1024 *
             50000
@@ -467,9 +552,14 @@ function createAllOverallConfigs() {
         var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
             parsed.geneNames);
         var config = createConfig(elements);
+        var allInfo = {
+            config: config,
+            totalInteractions: parsed.totalInteractions,
+            epiToStromaInteractions: parsed.epiToStromaInteractions,
+            stromaToEpiInteractions: parsed.stromaToEpiInteractions
+        }
 
-        initialConfigs["001"] = config;
-
+        initialConfigs["001"] = allInfo;
     });
 
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"01\"", {
@@ -488,9 +578,14 @@ function createAllOverallConfigs() {
         var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
             parsed.geneNames);
         var config = createConfig(elements);
+        var allInfo = {
+            config: config,
+            totalInteractions: parsed.totalInteractions,
+            epiToStromaInteractions: parsed.epiToStromaInteractions,
+            stromaToEpiInteractions: parsed.stromaToEpiInteractions
+        }
 
-        initialConfigs["01"] = config;
-
+        initialConfigs["01"] = allInfo;
     });
 
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"05\"", {
@@ -509,9 +604,14 @@ function createAllOverallConfigs() {
         var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
             parsed.geneNames);
         var config = createConfig(elements);
+        var allInfo = {
+            config: config,
+            totalInteractions: parsed.totalInteractions,
+            epiToStromaInteractions: parsed.epiToStromaInteractions,
+            stromaToEpiInteractions: parsed.stromaToEpiInteractions
+        }
 
-        initialConfigs["05"] = config;
-
+        initialConfigs["05"] = allInfo;
     });
 
     var child = exec("Rscript R_Scripts/getWeightsAndDegrees.R --args \"1\"", {
@@ -530,10 +630,15 @@ function createAllOverallConfigs() {
         var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
             parsed.geneNames);
         var config = createConfig(elements);
+        var allInfo = {
+            config: config,
+            totalInteractions: parsed.totalInteractions,
+            epiToStromaInteractions: parsed.epiToStromaInteractions,
+            stromaToEpiInteractions: parsed.stromaToEpiInteractions
+        }
 
-        initialConfigs["1"] = config;
-
-    });
+        initialConfigs["1"] = allInfo;
+    });*/
 }
 
 function initializeServer() {
