@@ -8,7 +8,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         $scope.selectedItemFirst = null;
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
-        
+
         $scope.states = {
             initial: 0,
             firstDropdown: 1,
@@ -40,7 +40,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             }
         };
 
-        $scope.getData = function() {
+        $scope.getDataForOverallGraph = function() {
             $scope.state = $scope.states.loading;
             return $q(function(resolve, reject) {
                 RESTService.get('overall-graph', { params: { pValue: $scope.pValue } })
@@ -60,13 +60,6 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                     $scope.selfLoops = data.geneNames;
                     $scope.selfLoopsCount = data.numberOfLoops;
                 });
-        };
-
-        $scope.resetEdges = function() {
-            $scope.cy.edges().forEach(function(edge) {
-                edge.css({ 'line-color': 'white' });
-                edge.css({ 'opacity': '1' });
-            });
         };
 
         $scope.loadAll = function(selectedGene = null) {
@@ -168,10 +161,22 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             };
         }
 
-        $scope.resetData = function() {
+        $scope.resetInputFields = function() {
+            $("md-autocomplete input").each(function() {
+                $(this).val('');
+            });
+        };
+
+        $scope.resetAllData = function() {
+            $scope.neighbours = null;
+        };
+
+        $scope.refreshOverallGraph = function() {
+            $scope.resetAllData();
+            $scope.resetInputFields();
             $scope.getSelfLoops();
             GraphConfigService.firstDropdownConfig = null;
-            $scope.getData().then(function(config) {
+            $scope.getDataForOverallGraph().then(function(config) {
                 //var config = GraphConfigService.createConfig(elements);
                 console.log(config.elements);
                 $scope.state = $scope.states.loadingConfig;
@@ -183,7 +188,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         };
 
         $(document).ready(function() {
-            $scope.resetData();
+            $scope.refreshOverallGraph();
         });
     }
 ]);
