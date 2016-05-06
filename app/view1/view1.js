@@ -150,13 +150,14 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             if (source == 'first') {
                 $scope.genesSecond = [];
                 $scope.state = $scope.states.loadingFirst;
-                RESTService.post('first-dropdown', {
+                RESTService.post('neighbour-general', {
                     gene: item.value.substring(0, item.value
                         .length - 2),
                     side: item.value.substring(item.value.length -
                         2),
                     degree: item.object.degree,
-                    pValue: $scope.pValue
+                    pValue: $scope.pValue,
+                    neighbour: 1
                 }).then(function(data) {
                     console.log(data);
                     GraphConfigService.applyConfig(data.config);
@@ -169,13 +170,14 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             } else {
                 var originalElements = GraphConfigService.firstDropdownConfig.elements;
                 $scope.state = $scope.states.loadingSecond;
-                RESTService.post('second-dropdown', {
+                RESTService.post('neighbour-general', {
                     gene: item.value.substring(0, item.value
                         .length - 2),
                     side: item.value.substring(item.value.length -
                         2),
                     originalElements: originalElements,
-                    pValue: $scope.pValue
+                    pValue: $scope.pValue,
+                    neighbour: 2
                 }).then(function(data) {
                     console.log(data);
 
