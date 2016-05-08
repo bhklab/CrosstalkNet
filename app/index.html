@@ -43,7 +43,7 @@
             <div class="" flex="40">Status:
                 <span ng-if="state == states.loadingFirst || state == states.loadingSecond || state == states.loading">Loading Data From Server...</span>
                 <span ng-if="state == states.loadingConfig">Initializing Graph...</span>
-                <span ng-if="state == states.initial || state == states.firstDropdown || state == states.secondDropdown">Displaying Graph</span>
+                <span ng-if="state == states.initial || state == states.firstDropdown || state == states.secondDropdown">Displaying Graph for P-Value={{pValueActual}}</span>
                 <md-progress-circular ng-show="state == states.loading || state == states.loadingFirst || state == states.  loadingSecond" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="center-text" flex="33">
@@ -65,16 +65,28 @@
                 <div>
                     <md-input-container>
                         <label>P-Value</label>
-                        <md-select ng-model="pValue">
+                        <md-select ng-model="pValueDisplayed">
                             <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="value.value == '05'">
                                 {{value.display}}
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <md-button ng-click="refreshOverallGraph()">Refresh</md-button>
+                    <md-button ng-click="refreshOverallGraph()">Get Graph</md-button>
                 </div>
                 <div>Total Interactions: {{totalInteractions}}</div>
-                <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="selectedItemChanged(item, 'first')" md-items="item in querySearch(searchTextFirst, 'first') | degreeFilter : minDegree" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
+                <div layout-wrap>
+                    <div flex="100" layout layout-align="center center">
+                        <span class="md-body-1">Min Degree</span>
+                    </div>
+                    <div layout="row">
+                        <md-slider flex min="0" max="100" ng-model="minDegree.first" aria-label="red" id="min-degree-first" class>
+                        </md-slider>
+                        <div flex="20" layout layout-align="center center">
+                            <input flex type="number" ng-model="minDegree.first" aria-label="red" aria-controls="min-degree-first">
+                        </div>
+                    </div>
+                </div>
+                <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="selectedItemChanged(item, 'first')" md-items="item in querySearch(searchTextFirst, 'first') | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
                     <md-item-template>
                         <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                     </md-item-template>
@@ -88,7 +100,19 @@
                         <div>{{gene.display}}</div>
                     </md-list-item>
                 </md-list>
-                <md-autocomplete ng-if="genesSecond.length > 0" md-no-cache='true' md-selected-item="selectedItemSecond" md-search-text="searchTextSecond" md-selected-item-change="selectedItemChanged(item, 'second')" md-items="item in querySearch(searchTextSecond, 'second')" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
+                <div ng-if="genesSecond.length > 0" layout-wrap>
+                    <div flex="100" layout layout-align="center center">
+                        <span class="md-body-1">Min Degree</span>
+                    </div>
+                    <div layout="row">
+                        <md-slider flex min="0" max="100" ng-model="minDegree.second" aria-label="red" id="min-degree-second" class>
+                        </md-slider>
+                        <div flex="20" layout layout-align="center center">
+                            <input flex type="number" ng-model="minDegree.second" aria-label="red" aria-controls="min-degree-second">
+                        </div>
+                    </div>
+                </div>
+                <md-autocomplete ng-if="genesSecond.length > 0" md-no-cache='true' md-selected-item="selectedItemSecond" md-search-text="searchTextSecond" md-selected-item-change="selectedItemChanged(item, 'second')" md-items="item in querySearch(searchTextSecond, 'second') | degreeFilter : minDegree.second" md-item-text="item.display" md-min-length="0" placeholder="Please enter a gene of interest">
                     <md-item-template>
                         <span md-highlight-text="searchTextSecond" md-highlight-flags="^i">{{item.display}}</span>
                     </md-item-template>
@@ -96,18 +120,6 @@
                         No states matching "{{searchTextSecond}}" were found.
                     </md-not-found>
                 </md-autocomplete>
-                <div layout-wrap>
-                    <div flex="100" layout layout-align="center center">
-                        <span class="md-body-1">Min Degree</span>
-                    </div>
-                    <div layout="row">
-                        <md-slider flex min="0" max="100" ng-model="minDegree" aria-label="red" id="min-degree" class>
-                        </md-slider>
-                        <div flex="20" layout layout-align="center center">
-                            <input flex type="number" ng-model="minDegree" aria-label="red" aria-controls="min-degree">
-                        </div>
-                    </div>
-                </div>
                 <!--
 
                 <div>{{state}}</div>
@@ -115,7 +127,7 @@
             </md-content>
         </md-sidenav>
         <md-content flex>
-            <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: #E1F5FE;" id="cy"></div>
+            <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cy"></div>
             <div ng-show="display == 'Self Loops'">
                 <md-card>
                     <md-card-title>
@@ -136,7 +148,8 @@
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content layout="row" layout-wrap>
-                        <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}} <br>Degree: {{gene.object.degree}}</div>
+                        <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}}
+                            <br>Degree: {{gene.object.degree}}</div>
                     </md-card-content>
                 </md-card>
             </div>

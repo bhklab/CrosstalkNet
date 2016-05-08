@@ -19,12 +19,16 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
             loadingConfig: 6
         };
 
-        $scope.minDegree = 0;
+        $scope.minDegree = {
+            first: 0,
+            second: 0
+        }
         $scope.state = $scope.states.initial;
         $scope.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
             { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
         ];
-        $scope.pValue = $scope.pValues[2].value;
+        $scope.pValueDisplayed = $scope.pValues[2].value;
+        $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
         $scope.selfLoops = [];
         $scope.selfLoopsCount = 0;
@@ -43,7 +47,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         $scope.getDataForOverallGraph = function() {
             $scope.state = $scope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('overall-graph', { params: { pValue: $scope.pValue } })
+                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual } })
                     .then(function(data) {
                         console.log(data);
                         $scope.state = $scope.states.loadingConfig;
@@ -54,7 +58,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         };
 
         $scope.getSelfLoops = function() {
-            RESTService.get('self-loops', { params: { pValue: $scope.pValue } })
+            RESTService.get('self-loops', { params: { pValue: $scope.pValueActual } })
                 .then(function(data) {
                     console.log(data);
                     $scope.selfLoops = data.geneNames;
@@ -116,7 +120,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                     side: item.value.substring(item.value.length -
                         2),
                     degree: item.object.degree,
-                    pValue: $scope.pValue,
+                    pValue: $scope.pValueActual,
                     neighbour: 1
                 }).then(function(data) {
                     console.log(data);
@@ -137,7 +141,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
                     side: item.value.substring(item.value.length -
                         2),
                     originalElements: originalElements,
-                    pValue: $scope.pValue,
+                    pValue: $scope.pValueActual,
                     neighbour: 2
                 }).then(function(data) {
                     console.log(data);
@@ -172,6 +176,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         };
 
         $scope.refreshOverallGraph = function() {
+            $scope.pValueActual = $scope.pValueDisplayed;
             $scope.resetAllData();
             $scope.resetInputFields();
             $scope.getSelfLoops();
