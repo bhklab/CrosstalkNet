@@ -35,6 +35,8 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
 
         $scope.display = "Graph";
         $scope.switchModel = false;
+        $scope.layouts = [{ display: "Bipartite", value: "preset" }, { display: "Concentric",
+            value: "Concentric" }];
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -47,7 +49,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
         $scope.getDataForOverallGraph = function() {
             $scope.state = $scope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual } })
+                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual} })
                     .then(function(data) {
                         console.log(data);
                         $scope.state = $scope.states.loadingConfig;
