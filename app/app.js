@@ -4,7 +4,7 @@
 angular.module('myApp', [
   'ngRoute',
   'ngMaterial',
-  'myApp.CytoCtrl',
+  'myApp.MainController',
   'myApp.version', 
   'myApp.filters'
 ]);

@@ -19,7 +19,7 @@ app.get('/overall-graph', function(req, res) {
     // The client side will also be specifying what kind of layout they want. For now, we'll stick to 
     // the preset layout
     var pValue = req.query.pValue;
-    var requestedLayout = 'concentric'; //req.query.layout;
+    var requestedLayout = 'random'; //req.query.layout;
     var config = null;
     var configLayout = null;
 
@@ -49,7 +49,7 @@ app.get('/overall-graph', function(req, res) {
             configUtils.setConfigLayout(config, configLayout);
 
 
-        } else if (requestedLayout == 'concentric') {
+        } else if (requestedLayout == 'random') {
             console.log(elements.epiNodes[0]);
             elements.epiParent = null;
             elements.stromaParent = null;
@@ -60,14 +60,14 @@ app.get('/overall-graph', function(req, res) {
             configUtils.setConfigLayout(config, configLayout);
             console.log(config.elements[0]);
             var epiColor = {
-                'selector': 'node[id$="-e"], node[id$="-er"]',
+                'selector': 'node[id$="-e"], node[id$="-Er"]',
                 'style': {
                     'background-color': 'red'
                 }
             };
 
             var stromaColor = {
-                'selector': 'node[id$="-s"], node[id$="-sr"]',
+                'selector': 'node[id$="-S"], node[id$="-sr"]',
                 'style': {
                     'background-color': 'blue'
                 }
@@ -110,8 +110,12 @@ app.post('/neighbour-general', function(req, res) {
     var degree = req.body.degree;
     var originalElements = req.body.originalElements;
     var pValue = req.body.pValue;
+    var requestedLayout = req.body.layout;
+    var first = req.body.first;
+    var second = req.body.second;
 
-    var neighbourSide = side == "-e" ? "-s" : "-e"
+    console.log(req.body);
+    var neighbourSide = side == "-E" ? "-S" : "-E"
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene.toUpperCase() +
@@ -142,28 +146,35 @@ app.post('/neighbour-general', function(req, res) {
             var parent = "";
 
             if (neighbour == 1) {
-                parent = side == "-e" ? "stroma" : "epi";
+                parent = side == "-E" ? "stroma" : "epi";
             } else {
-                parent = side == "-e" ? "stromaRight" : "epiRight";
+                parent = side == "-E" ? "stromaRight" : "epiRight";
             }
 
-            var neighbourBgColor = side == "-e" ? "red" : "blue";
+            var neighbourBgColor = side == "-E" ? "red" : "blue";
             var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames, parent,
                 neighbour == 1 ?
                 4 : 8, degrees);
-            neighbourNodes = nodeUtils.addPositionsToNodes(neighbourNodes, neighbour ==
-                1 ? 400 : 800, 100, 0, 20);
-            neighbourNodes = nodeUtils.addStyleToNodes(neighbourNodes, 10, 10, "left",
-                "center", neighbourBgColor);
-
-            var sourceNode = nodeUtils.createNodes([gene], side == "-e" ? "epi" :
+            var sourceNode = nodeUtils.createNodes([gene], side == "-E" ? "epi" :
                 "stroma", 1, [
                     degree
                 ]);
-            var sourceBgColor = side == "-e" ? "blue" : "red";
-            sourceNode = nodeUtils.addPositionsToNodes(sourceNode, 100, 100, 0, 0);
-            sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10, "left", "center",
-                sourceBgColor);
+            var sourceBgColor = side == "-E" ? "blue" : "red";
+
+            if (requestedLayout == 'hierarchical') {
+                neighbourNodes = nodeUtils.addPositionsToNodes(neighbourNodes,
+                    neighbour ==
+                    1 ? 400 : 800, 100, 0, 20);
+                neighbourNodes = nodeUtils.addStyleToNodes(neighbourNodes, 10, 10,
+                    "left",
+                    "center", neighbourBgColor);
+
+
+                sourceNode = nodeUtils.addPositionsToNodes(sourceNode, 100, 100, 0, 0);
+                sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10, "left",
+                    "center",
+                    sourceBgColor);
+            }
 
             var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
                 neighbourGeneWeights,
@@ -171,29 +182,33 @@ app.post('/neighbour-general', function(req, res) {
 
             if (neighbour == 1) {
                 elements = elements.concat(sourceNode);
-                elements.push({
-                    data: {
-                        id: 'epi'
-                    }
-                });
-                elements.push({
-                    data: {
-                        id: 'stroma'
-                    }
-                });
-            } else {
-                elements = elements.concat(originalElements);
-                if (neighbourNodes.length > 0) {
+
+                if (requestedLayout == "hierarchical") {
                     elements.push({
                         data: {
-                            id: side == '-e' ? 'stromaRight' : 'epiRight'
+                            id: 'epi'
+                        }
+                    });
+                    elements.push({
+                        data: {
+                            id: 'stroma'
                         }
                     });
                 }
+            } else {
+                elements = elements.concat(originalElements);
 
-                var opposite = side == "-e" ? "-s" : "-e";
+                if (neighbourNodes.length > 0) {
+                    if (requestedLayout == "hierarchical") {
+                        elements.push({
+                            data: {
+                                id: side == '-E' ? 'stromaRight' : 'epiRight'
+                            }
+                        });
+                    }
+                }
 
-                console.log(hasSelfLoop);
+                var opposite = side == "-E" ? "-S" : "-E";
 
                 if (hasSelfLoop) {
                     elements.push({
@@ -209,7 +224,7 @@ app.post('/neighbour-general', function(req, res) {
             elements = elements.concat(neighbourNodes);
             elements = elements.concat(edges);
 
-            var firstEdgeSelector = side == '-s' ? 'EpiToStroma' : 'StromaToEpi';
+            var firstEdgeSelector = side == '-S' ? 'EpiToStroma' : 'StromaToEpi';
             firstEdgeSelector = firstEdgeSelector + gene;
             var config = configUtils.createConfig();
 
@@ -234,9 +249,15 @@ app.post('/neighbour-general', function(req, res) {
                 }
             });
             configUtils.setConfigElements(config, elements);
-            var presetLayout = configUtils.createPresetLayout();
-            configUtils.setConfigLayout(config, presetLayout);
 
+            var layout = null;
+            if (requestedLayout == "hierarchical") {
+                layout = configUtils.createPresetLayout();
+            } else if (requestedLayout == "concentric") {
+                layout = configUtils.createConcentricLayout(sourceNode[0].data.id);    
+            }
+
+            configUtils.setConfigLayout(config, layout);    
             res.json({ config: config });
         });
 });
