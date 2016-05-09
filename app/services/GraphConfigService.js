@@ -57,7 +57,7 @@ myModule.factory('GraphConfigService', function($http) {
                 service.zoom = service.cy.zoom();
             });
         });
-
+    
 
         service.data.cy.on("select", function(evt) {
             var node = evt.cyTarget;

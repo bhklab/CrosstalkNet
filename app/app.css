@@ -79,5 +79,9 @@ fieldset.standard div {
 }
 
 .title-font {
-    font-size: 40px;
+    font-size: 30px;
+}
+
+md-toolbar {
+    min-height: 40px !important;
 }
