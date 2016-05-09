@@ -44,38 +44,37 @@ app.get('/overall-graph', function(req, res) {
                 "center",
                 "red");
 
-            config = configUtils.addElementsToConfig(config, elements);
+            configUtils.setConfigElements(config, elements);
             configLayout = configUtils.createPresetLayout();
-            config = configUtils.addLayoutToConfig(config, configLayout);
+            configUtils.setConfigLayout(config, configLayout);
 
 
         } else if (requestedLayout == 'concentric') {
             console.log(elements.epiNodes[0]);
-            /*
             elements.epiParent = null;
-            elements.stromaParent = null;*/
+            elements.stromaParent = null;
             console.log(elements.epiNodes[0]);
-            config = configUtils.addElementsToConfig(config, elements);
+            configUtils.setConfigElements(config, elements);
             console.log(config.elements[0]);
-            configLayout = configUtils.createConcentricLayout();
-            config = configUtils.addLayoutToConfig(config, configLayout);
+            configLayout = configUtils.createRandomLayout();
+            configUtils.setConfigLayout(config, configLayout);
             console.log(config.elements[0]);
             var epiColor = {
-                'selector': 'node[parent = "epi"]',
+                'selector': 'node[id$="-e"], node[id$="-er"]',
                 'style': {
                     'background-color': 'red'
                 }
             };
 
             var stromaColor = {
-                'selector': 'node[parent = "stroma"]',
+                'selector': 'node[id$="-s"], node[id$="-sr"]',
                 'style': {
                     'background-color': 'blue'
                 }
             };
 
-            config = configUtils.addStyleToConfig(config, epiColor);
-            config = configUtils.addStyleToConfig(config, stromaColor);
+            configUtils.addStyleToConfig(config, epiColor);
+            configUtils.addStyleToConfig(config, stromaColor);
 
             console.log(config.elements[0]);
         }
@@ -105,7 +104,6 @@ app.get('/self-loops', function(req, res) {
 });
 
 app.post('/neighbour-general', function(req, res) {
-    console.log(req.body);
     var neighbour = req.body.neighbour;
     var gene = req.body.gene;
     var side = req.body.side;
@@ -116,8 +114,9 @@ app.post('/neighbour-general', function(req, res) {
     var neighbourSide = side == "-e" ? "-s" : "-e"
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
-        "\"" + gene +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
+        "\"" + gene.toUpperCase() +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" +
+        pValue + "\"", {
             maxBuffer: 1024 *
                 50000
         },
@@ -134,6 +133,7 @@ app.post('/neighbour-general', function(req, res) {
 
             var weights = parsedValue.value[0];
             var degrees = parsedValue.value[1].value;
+            var hasSelfLoop = parsedValue.value[2].value;
             var neighbourGeneNames = weights.attributes.names.value;
             var dimension = neighbourGeneNames.length;
             var neighbourGeneWeights = weights.value;
@@ -165,10 +165,9 @@ app.post('/neighbour-general', function(req, res) {
             sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10, "left", "center",
                 sourceBgColor);
 
-            console.log(sourceNode);
             var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
                 neighbourGeneWeights,
-                "");
+                hasSelfLoop);
 
             if (neighbour == 1) {
                 elements = elements.concat(sourceNode);
@@ -184,19 +183,59 @@ app.post('/neighbour-general', function(req, res) {
                 });
             } else {
                 elements = elements.concat(originalElements);
-                elements.push({
-                    data: {
-                        id: side == '-e' ? 'stromaRight' : 'epiRight'
-                    }
-                });
+                if (neighbourNodes.length > 0) {
+                    elements.push({
+                        data: {
+                            id: side == '-e' ? 'stromaRight' : 'epiRight'
+                        }
+                    });
+                }
+
+                var opposite = side == "-e" ? "-s" : "-e";
+
+                console.log(hasSelfLoop);
+
+                if (hasSelfLoop) {
+                    elements.push({
+                        data: {
+                            id: 'selfLoop' + gene,
+                            source: gene + side,
+                            target: gene + opposite
+                        }
+                    });
+                }
             }
 
             elements = elements.concat(neighbourNodes);
             elements = elements.concat(edges);
 
-            var config = configUtils.createConfig(elements);
+            var firstEdgeSelector = side == '-s' ? 'EpiToStroma' : 'StromaToEpi';
+            firstEdgeSelector = firstEdgeSelector + gene;
+            var config = configUtils.createConfig();
+
+            configUtils.addStyleToConfig(config, {
+                'selector': 'edge[id = "selfLoop' + gene + '"]',
+                'style': {
+                    'curve-style': 'bezier',
+                    'line-style': 'solid',
+                    'line-color': '#FF6D00',
+                    'target-arrow-color': '#FF6D00',
+                    'target-arrow-shape': 'triangle'
+                }
+            });
+            configUtils.addStyleToConfig(config, {
+                'selector': 'edge[id = "' + firstEdgeSelector + '"]',
+                'style': {
+                    'curve-style': 'bezier',
+                    'line-style': 'solid',
+                    'line-color': '#FF6D00',
+                    'target-arrow-color': '#FF6D00',
+                    'target-arrow-shape': 'triangle'
+                }
+            });
+            configUtils.setConfigElements(config, elements);
             var presetLayout = configUtils.createPresetLayout();
-            config = configUtils.addLayoutToConfig(config, presetLayout);
+            configUtils.setConfigLayout(config, presetLayout);
 
             res.json({ config: config });
         });
@@ -215,28 +254,20 @@ function createEdges(epiNodes, stromaNodes, weights) {
             if (weights[i][j] > 0) {
                 edges.push({
                     data: {
-                        id: 'EpiToStroma' + i + j,
+                        id: 'EpiToStroma' + epiNodes[i].data.id.slice(0, -2),
                         source: epiNodes[i].data.id,
                         target: stromaNodes[j].data.id
                     }
-                    /*,
-                                        style: {
-                                            'curve-style': 'haystack'
-                                        }*/
                 });
             }
 
             if (weights[j][i] > 0) {
                 edges.push({
                     data: {
-                        id: 'StromaToEpi' + i + j,
+                        id: 'StromaToEpi' + epiNodes[i].data.id.slice(0, -2),
                         source: stromaNodes[i].data.id,
                         target: epiNodes[j].data.id
                     }
-                    /*,
-                                        style: {
-                                            'curve-style': 'haystack'
-                                        }*/
                 });
             }
         }
@@ -244,14 +275,10 @@ function createEdges(epiNodes, stromaNodes, weights) {
         if (weights[i][i] > 0) {
             edges.push({
                 data: {
-                    id: 'StromaToEpi' + i + j,
+                    id: 'selfLoop' + epiNodes[i].data.id,
                     source: stromaNodes[i].data.id,
                     target: epiNodes[i].data.id
                 }
-                /*,
-                                style: {
-                                    'curve-style': 'haystack'
-                                }*/
             });
         }
     }
@@ -259,21 +286,19 @@ function createEdges(epiNodes, stromaNodes, weights) {
     return edges;
 };
 
-function createEdgesFromNode(node, neighbours, weights, from) {
+function createEdgesFromNode(node, neighbours, weights) {
     var edges = [];
     var idPrefix = node.data.parent == "epi" ? "EpiToStroma" : "StromaToEpi";
     for (var i = 0; i < neighbours.length; i++) {
-        edges.push({
-            data: {
-                id: idPrefix + i,
-                source: node.data.id,
-                target: neighbours[i].data.id,
-                weight: weights[i]
-            },
-            style: {
-                'curve-style': 'haystack'
-            }
-        })
+        if (node.data.id)
+            edges.push({
+                data: {
+                    id: idPrefix + neighbours[i].data.id.slice(0, -2),
+                    source: node.data.id,
+                    target: neighbours[i].data.id,
+                    weight: weights[i]
+                }
+            })
     }
 
     return edges;

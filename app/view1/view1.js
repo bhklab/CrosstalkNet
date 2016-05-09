@@ -78,7 +78,7 @@ angular.module('myApp.CytoCtrl', ['ngRoute']).controller('CytoCtrl', ['$scope', 
 
             return genes.map(function(gene) {
                 return {
-                    value: gene.id.toLowerCase(),
+                    value: gene.id,
                     display: gene.id + ' ' + gene.degree,
                     object: gene
                 };
