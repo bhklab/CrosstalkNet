@@ -19,27 +19,28 @@ app.get('/overall-graph', function(req, res) {
     // The client side will also be specifying what kind of layout they want. For now, we'll stick to 
     // the preset layout
     var pValue = req.query.pValue;
-    var requestedLayout = 'preset'; //req.query.layout;
+    var requestedLayout = 'concentric'; //req.query.layout;
     var config = null;
     var configLayout = null;
 
-    console.log(pValue);
-    console.log(initialElements);
+    //console.log(pValue);
+    //console.log(initialElements);
 
     if (initialElements[pValue] != null) {
         var elements = copyUtils.createElementsCopy(initialElements[pValue].elements);
-        
+        config = configUtils.createConfig(elements);
 
         if (requestedLayout == 'preset') {
-            config = configUtils.createConfig(elements);
-            
-            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100, 100, 0, 20);
+            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100, 100,
+                0, 20);
             elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10, "left",
                 "center", "blue");
 
-            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes, 300, 100, 0,
+            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes, 300,
+                100, 0,
                 20);
-            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10, 10, "right",
+            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10, 10,
+                "right",
                 "center",
                 "red");
 
@@ -48,11 +49,38 @@ app.get('/overall-graph', function(req, res) {
             config = configUtils.addLayoutToConfig(config, configLayout);
 
 
-        } else if (layout == 'concentric') {
+        } else if (requestedLayout == 'concentric') {
+            console.log(elements.epiNodes[0]);
+            /*
+            elements.epiParent = null;
+            elements.stromaParent = null;*/
+            console.log(elements.epiNodes[0]);
+            config = configUtils.addElementsToConfig(config, elements);
+            console.log(config.elements[0]);
+            configLayout = configUtils.createConcentricLayout();
+            config = configUtils.addLayoutToConfig(config, configLayout);
+            console.log(config.elements[0]);
+            var epiColor = {
+                'selector': 'node[parent = "epi"]',
+                'style': {
+                    'background-color': 'red'
+                }
+            };
 
+            var stromaColor = {
+                'selector': 'node[parent = "stroma"]',
+                'style': {
+                    'background-color': 'blue'
+                }
+            };
+
+            config = configUtils.addStyleToConfig(config, epiColor);
+            config = configUtils.addStyleToConfig(config, stromaColor);
+
+            console.log(config.elements[0]);
         }
 
-
+        console.log(config.elements[0]);
         res.json({
             config: config,
             totalInteractions: initialElements[pValue].totalInteractions,
