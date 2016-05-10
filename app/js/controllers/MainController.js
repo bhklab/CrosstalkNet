@@ -4,11 +4,13 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
     '$rootScope', 'RESTService',
     'GraphConfigService', '$q', '$timeout',
     function($scope, $rootScope, RESTService, GraphConfigService, $q, $timeout) {
-        var totalNumNodes = 1000;
-
+        $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
+        $scope.minPositiveWeight = 0;
+        $scope.minNegativeWeight = 0;
+        $scope.ctrl = "neighbour";
 
         $rootScope.states = {
             initial: 0,
@@ -43,7 +45,16 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.selectedLayout = $scope.layouts[1].value;
 
 
+        $scope.applyConfig = function(config, containerID) {
+            $scope.elemCopy = angular.copy(config.elements);
+            $scope.styleCopy = angular.copy(config.style);
+            config.container = document.getElementById(containerID);
+            $scope.cy = cytoscape(config);
 
+            $scope.elementTest = $scope.cy.elements();
+
+            $scope.cy.fit($scope.cy.$("*"), 10);
+        }
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -56,7 +67,9 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.getDataForOverallGraph = function() {
             $rootScope.state = $rootScope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual } })
+                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual,
+                            minNegativeWeight: $scope.minNegativeWeight == null ? 0 : $scope.minNegativeWeight,
+                            minPositiveWeight: $scope.minPositiveWeight == null ? 0 : $scope.minPositiveWeight } })
                     .then(function(data) {
                         console.log(data);
                         $rootScope.state = $rootScope.states.loadingConfig;
@@ -121,8 +134,10 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
 
             if (source == 'first') {
+                $rootScope.selectedTab = 1;
                 $scope.firstSelectedGene = item.value.substring(0, item.value
                     .length - 2).toUpperCase();
+                GraphConfigService.firstSelectedGene = $scope.firstSelectedGene;
                 $scope.genesSecond = [];
                 $rootScope.state = $rootScope.states.loadingFirst;
                 RESTService.post('neighbour-general', {
@@ -139,15 +154,16 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 }).then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
-                    GraphConfigService.applyConfig(data.config);
-                    $scope.cy = GraphConfigService.data.cy;
+                    //$scope.applyConfig(data.config, "cyMain");
                     $scope.genesSecond = $scope.loadAll(item.value);
                     $scope.neighbours = angular.copy($scope.genesSecond);
-                    GraphConfigService.firstDropdownConfig = angular.copy(data.config);
+                    GraphConfigService.neighbourConfigs.firstDropdownConfig =
+                        angular.copy(data.config);
                     $rootScope.state = $rootScope.states.firstDropdown;
                 });
             } else {
-                var originalElements = GraphConfigService.firstDropdownConfig.elements;
+                $rootScope.selectedTab = 1;
+                var originalElements = $scope.firstDropdownConfig.elements;
                 $rootScope.state = $rootScope.states.loadingSecond;
                 RESTService.post('neighbour-general', {
                     gene: item.value.substring(0, item.value
@@ -164,10 +180,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 }).then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
-                    GraphConfigService.applyConfig(data.config);
-                    $scope.cy = GraphConfigService.data.cy;
+                    //$scope.applyConfig(data.config, "cyMain");
                     //$scope.genesSecond = $scope.loadAll(item.value);
                     $scope.neighbours = angular.copy($scope.genesSecond);
+                    GraphConfigService.neighbourConfigs.secondDropdownConfig =
+                        angular.copy(data.config);
                     $rootScope.state = $rootScope.states.secondDropdown;
                 });
             }
@@ -198,13 +215,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.resetAllData();
             $scope.resetInputFields();
             $scope.getSelfLoops();
-            GraphConfigService.firstDropdownConfig = null;
+            $scope.firstDropdownConfig = null;
             $scope.getDataForOverallGraph().then(function(config) {
-                //var config = GraphConfigService.createConfig(elements);
                 console.log(config.elements);
                 $rootScope.state = $rootScope.states.loadingConfig;
-                GraphConfigService.applyConfig(config);
-                $scope.cy = GraphConfigService.data.cy;
+                $scope.applyConfig(config, "cyMain");
                 $scope.genesFirst = $scope.loadAll();
                 $rootScope.state = $rootScope.states.initial;
             });
@@ -213,5 +228,27 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $(document).ready(function() {
             $scope.refreshOverallGraph();
         });
+
+        /*
+        $scope.$watch('minPositiveWeight', function(newValue, oldValue) {
+            if (newValue != null && $scope.styleCopy != null) {
+                $scope.cy.edges().forEach(function(edge) {
+                    if (edge.json().data.weight < newValue && edge.json().data
+                        .weight >= 0) {
+                        //edge.style({'visibility': 'hidden'});    
+                        edge.css({ 'visibility': 'hidden' })
+                    } else {
+                        edge.css({ 'visibility': 'visible' })
+                    }
+
+                });
+
+                $scope.totalInteractions = $scope.cy.edges(':visible').length;
+            }
+        });*/
+
+        $scope.filterWeight = function() {
+            $scope.refreshOverallGraph();
+        };
     }
 ]);

@@ -20,75 +20,62 @@ app.get('/overall-graph', function(req, res) {
     // the preset layout
     var pValue = req.query.pValue;
     var requestedLayout = 'random'; //req.query.layout;
-    var config = null;
-    var configLayout = null;
 
-    //console.log(pValue);
-    //console.log(initialElements);
+    var minPositiveWeight = req.query.minPositiveWeight;
+    var minNegativeWeight = req.query.minNegativeWeight;
 
-    if (initialElements[pValue] != null) {
-        var elements = copyUtils.createElementsCopy(initialElements[pValue].elements);
-        config = configUtils.createConfig(elements);
+    if (minPositiveWeight != 0 || minNegativeWeight != 0) {
+        var child = exec("Rscript R_scripts/getWeightsAndDegreesFilterByWeight.R" + " --args \"" +
+            pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" +
+            minPositiveWeight + "\"", {
+                maxBuffer: 1024 *
+                    50000
+            },
+            function(error, stdout, stderr) {
+                //console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
 
-        if (requestedLayout == 'preset') {
-            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100, 100,
-                0, 20);
-            elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10, "left",
-                "center", "blue");
-
-            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes, 300,
-                100, 0,
-                20);
-            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10, 10,
-                "right",
-                "center",
-                "red");
-
-            configUtils.setConfigElements(config, elements);
-            configLayout = configUtils.createPresetLayout();
-            configUtils.setConfigLayout(config, configLayout);
-
-
-        } else if (requestedLayout == 'random') {
-            console.log(elements.epiNodes[0]);
-            elements.epiParent = null;
-            elements.stromaParent = null;
-            console.log(elements.epiNodes[0]);
-            configUtils.setConfigElements(config, elements);
-            console.log(config.elements[0]);
-            configLayout = configUtils.createRandomLayout();
-            configUtils.setConfigLayout(config, configLayout);
-            console.log(config.elements[0]);
-            var epiColor = {
-                'selector': 'node[id$="-E"], node[id$="-Er"]',
-                'style': {
-                    'background-color': 'red'
+                if (error != null) {
+                    console.log('error: ' + error);
                 }
-            };
 
-            var stromaColor = {
-                'selector': 'node[id$="-S"], node[id$="-sr"]',
-                'style': {
-                    'background-color': 'blue'
-                }
-            };
+                var parsed = getWeightsAndDegreesFromROutput(stdout);
+                console.log("returned");
+                var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
+                    parsed.weights,
+                    parsed.geneNames);
 
-            configUtils.addStyleToConfig(config, epiColor);
-            configUtils.addStyleToConfig(config, stromaColor);
+                var allInfo = {
+                    elements: elements,
+                    totalInteractions: parsed.totalInteractions,
+                    epiToStromaInteractions: parsed.epiToStromaInteractions,
+                    stromaToEpiInteractions: parsed.stromaToEpiInteractions
+                };
 
-            console.log(config.elements[0]);
-        }
+                var config = createOverallConfig(elements, requestedLayout);
 
-        console.log(config.elements[0]);
+                res.json({
+                    config: config,
+                    totalInteractions: allInfo.totalInteractions,
+                    epiToStromaInteractions: allInfo.epiToStromaInteractions,
+                    stromaToEpiInteractions: allInfo.stromaToEpiInteractions
+                });
+            });
+    } else {
+
+        var config = createOverallConfig(initialElements[pValue], requestedLayout);
+
+
         res.json({
             config: config,
             totalInteractions: initialElements[pValue].totalInteractions,
             epiToStromaInteractions: initialElements[pValue].epiToStromaInteractions,
             stromaToEpiInteractions: initialElements[pValue].stromaToEpiInteractions
         });
-        return;
     }
 });
+
+
 
 app.get('/self-loops', function(req, res) {
     var pValue = req.query.pValue;
@@ -131,7 +118,8 @@ app.post('/neighbour-general', function(req, res) {
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene.toUpperCase() +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" + exclude + "\"" + " " + "\"" +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" +
+        exclude + "\"" + " " + "\"" +
         pValue + "\"", {
             maxBuffer: 1024 *
                 50000
@@ -282,45 +270,105 @@ app.post('/neighbour-general', function(req, res) {
 
 /*  For now, xPattern and yPattern will simply be increments to add at every step of the loop
  */
+function createOverallConfig(originalElements, requestedLayout) {
+    var config = null;
+    var configLayout = null;
 
+    if (originalElements != null) {
+        var elements = originalElements.elements != null ? copyUtils.createElementsCopy(originalElements.elements) : copyUtils.createElementsCopy(originalElements);
+        config = configUtils.createConfig(elements);
+        if (requestedLayout == 'preset') {
+            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100, 100,
+                0, 20);
+            elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10, "left",
+                "center", "blue");
+
+            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes, 300,
+                100, 0,
+                20);
+            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10, 10,
+                "right",
+                "center",
+                "red");
+
+            configUtils.setConfigElements(config, elements);
+            configLayout = configUtils.createPresetLayout();
+            configUtils.setConfigLayout(config, configLayout);
+
+
+        } else if (requestedLayout == 'random') {
+            elements.epiParent = null;
+            elements.stromaParent = null;
+            configUtils.setConfigElements(config, elements);
+            configLayout = configUtils.createRandomLayout();
+            configUtils.setConfigLayout(config, configLayout);
+            var epiColor = {
+                'selector': 'node[id$="-E"], node[id$="-Er"]',
+                'style': {
+                    'background-color': 'red'
+                }
+            };
+
+            var stromaColor = {
+                'selector': 'node[id$="-S"], node[id$="-sr"]',
+                'style': {
+                    'background-color': 'blue'
+                }
+            };
+
+            configUtils.addStyleToConfig(config, epiColor);
+            configUtils.addStyleToConfig(config, stromaColor);
+        }
+    }
+
+    return config;
+}
 
 function createEdges(epiNodes, stromaNodes, weights) {
     var edges = [];
 
     for (var i = 0; i < epiNodes.length; i++) {
         for (var j = i + 1; j < stromaNodes.length; j++) {
-            if (weights[i][j] > 0) {
+            if (weights[i][j] != 0) {
                 edges.push({
                     data: {
-                        id: 'EpiToStroma' + epiNodes[i].data.id.slice(0, -2),
+                        id: 'EpiToStroma' + epiNodes[i].data.id.slice(0, -2) +
+                            stromaNodes[j].data.id.slice(0, -2),
                         source: epiNodes[i].data.id,
-                        target: stromaNodes[j].data.id
+                        target: stromaNodes[j].data.id,
+                        weight: weights[i][j]
                     }
                 });
             }
 
-            if (weights[j][i] > 0) {
+            if (weights[j][i] != 0) {
                 edges.push({
                     data: {
-                        id: 'StromaToEpi' + epiNodes[i].data.id.slice(0, -2),
+                        id: 'StromaToEpi' + stromaNodes[i].data.id.slice(0, -2) +
+                            epiNodes[j].data.id.slice(0, -2),
                         source: stromaNodes[i].data.id,
-                        target: epiNodes[j].data.id
+                        target: epiNodes[j].data.id,
+                        weight: weights[j][i]
                     }
                 });
             }
         }
 
-        if (weights[i][i] > 0) {
+        if (weights[i][i] != 0) {
             edges.push({
                 data: {
                     id: 'selfLoop' + epiNodes[i].data.id,
                     source: stromaNodes[i].data.id,
-                    target: epiNodes[i].data.id
+                    target: epiNodes[i].data.id,
+                    weight: weights[i][i]
                 }
             });
         }
     }
 
+    console.log('Epi Nodes Length: ' + epiNodes.length);
+    console.log('Stroma Nodes Length: ' + stromaNodes.length);
+    console.log("Edges Length: " + edges.length);
     return edges;
 };
 
@@ -346,6 +394,8 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     var initialWeights = [];
     var dimension = geneNames.length;
 
+    //console.log(weights.value);
+    console.log("Dimension: " + dimension);
     for (var i = 0; i < dimension; i++) {
         var temp = [];
         for (var j = 0; j < dimension; j++) {
@@ -355,7 +405,13 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
         initialWeights.push(temp);
     }
 
-    var elements = { epiNodes: null, stromaNodes: null, edges: null, epiParent: null, stromaParent: null };
+    var elements = {
+        epiNodes: null,
+        stromaNodes: null,
+        edges: null,
+        epiParent: null,
+        stromaParent: null
+    };
     var epiNodes = nodeUtils.createNodes(geneNames, 'epi', 1, epiDegrees);
     var stromaNodes = nodeUtils.createNodes(geneNames, 'stroma', 2, stromaDegrees);
     var edges = createEdges(epiNodes, stromaNodes, initialWeights);
@@ -423,10 +479,9 @@ function cacheElementsForPValue(pValue, script) {
             totalInteractions: parsed.totalInteractions,
             epiToStromaInteractions: parsed.epiToStromaInteractions,
             stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        }
+        };
 
         initialElements[pValue] = allInfo;
-
     });
 }
 

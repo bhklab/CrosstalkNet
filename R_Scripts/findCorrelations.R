@@ -29,7 +29,7 @@ if (side == '-E') {
 
 		index <- index[which(names(index) != gene)]	
 	}
-	#index <- index[which(names(index) != exclude)]
+	index <- index[which(names(index) != exclude)]
 	
 	resultDegrees <- degrees$stromaDegree[index]#degrees$stromaDegree[names( which(corMatrix[gene, ] != 0))]
 	#print(as.character(which(corMatrix[gene, ] != 0)))
@@ -48,7 +48,7 @@ if (side == '-E') {
 
 		index <- index[which(names(index) != gene)]	
 	}
-	#index <- index[which(names(index) != exclude)]
+	index <- index[which(names(index) != exclude)]
 	
 	resultDegrees <- degrees$epiDegree[index]
 	resultWeights <- corMatrix[index, gene]
