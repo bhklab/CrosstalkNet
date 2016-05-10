@@ -2,49 +2,14 @@ var myModule = angular.module("myApp");
 myModule.factory('GraphConfigService', function($http) {
 
     var service = {};
-
-    service.data = { cy: null };
-    service.elemCopy = [];
-    service.firstDropdownConfig = null;
-
-    service.createConfig = function(elements) {
-        var initialConfig = {
-
-            container: document.getElementById('cy'),
-
-            elements: elements,
-            layout: {
-                name: 'preset'
-            },
-            style: [{
-                selector: 'node',
-                style: {
-                    'content': 'data(id)',
-                    'font-size': '8px'
-                }
-            }, {
-                selector: ':parent',
-                style: {
-                    'background-opacity': 0.6
-                }
-            }, {
-                selector: 'node:selected',
-                style: {
-                    'background-color': 'red'
-                }
-            }]
-        };
-
-        service.elemCopy = angular.copy(elements);
-        return initialConfig;
-        //$scope.applyConfig(initialConfig);
-    };
+    service.neighbourConfigs = {firstDropdownConfig: null, secondDropdownConfig: null};
+    service.firstSelectedGene = null;
 
     service.applyConfig = function(config) {
-        service.elemCopy = angular.copy(config.elements);
+        service.data.main.elemCopy = angular.copy(config.elements);
         config.container = document.getElementById('cy');
-        service.data.cy = cytoscape(config);
-        service.data.cy.fit(service.data.cy.$("*"), 10);
+        service.data.main.cy = cytoscape(config);
+        service.data.main.cy.fit(service.data.main.cy.$("*"), 10);
 
         /*
         service.cy.on("zoom", function() {
@@ -59,13 +24,13 @@ myModule.factory('GraphConfigService', function($http) {
         });
     
 
-        service.data.cy.on("select", function(evt) {
+        service.data.main.cy.on("select", function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
             console.log('tapped ' + id);
 
 
-            service.data.cy.edges().forEach(function(edge) {
+            service.data.main.cy.edges().forEach(function(edge) {
                 if (edge.source().id() == id) {
                     edge.addClass('highlighted');
                     edge.removeClass('faded');
@@ -82,7 +47,7 @@ myModule.factory('GraphConfigService', function($http) {
         });
 
         /*
-        service.data.cy.on("unselect", function(evt) {
+        service.data.main.cy.on("unselect", function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 
@@ -92,28 +57,31 @@ myModule.factory('GraphConfigService', function($http) {
         });*/
     };
 
-    service.resetEdges = function() {
-        service.data.cy.edges().forEach(function(edge) {
+    service.resetEdges = function(cy) {
+        cy.edges().forEach(function(edge) {
             edge.css({ 'line-color': 'white' });
             edge.css({ 'opacity': '1' });
         });
     };
 
-    service.resetZoom = function() {
-        service.resetNodes();
-        service.data.cy.fit(service.data.cy.$("*"), 10);
+    service.resetZoom = function(cy) {
+        service.resetNodes(cy);
+        cy.fit(cy.$("*"), 10);
     };
 
-    service.resetNodes = function() {
-        for (var i = 0; i < service.elemCopy.length; i++) {
-            if (service.elemCopy[i].target == null) {
-                if (service.elemCopy[i].position != null) {
-                    service.data.cy.$("#" + service.elemCopy[i].data.id).position({ x: service
-                            .elemCopy[i].position.x, y: service.elemCopy[i].position
-                            .y });
+    service.resetNodes = function(cy, originalElements) {
+        cy.json({elements: originalElements});
+        /*
+        for (var i = 0; i < originalElements.length; i++) {
+            if (originalElements[i].target == null) {
+                if (originalElements[i].position != null) {
+                    cy.$("#" + originalElements[i].data.id).position({
+                        x: originalElements[i].position.x,
+                        y: originalElements[i].position.y
+                    });
                 }
             }
-        }
+        }*/
     };
 
     service.createLargeWeaveGraph = function() {

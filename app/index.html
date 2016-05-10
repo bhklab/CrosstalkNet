@@ -26,6 +26,7 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="app.js"></script>
     <script src="js/controllers/MainController.js"></script>
+    <script src="js/controllers/NeighbourController.js"></script>
     <script src="services/GraphConfigService.js"></script>
     <script src="services/RESTService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
@@ -54,14 +55,14 @@
     </md-toolbar>
     <div>
         <md-content>
-            <md-tabs md-dynamic-height md-border-bottom>
-                <md-tab label="Random Layout">
+            <md-tabs md-selected="selectedTab" md-dynamic-height md-border-bottom>
+                <md-tab label="Main Graph">
                     <md-content ng-controller="MainController">
                         <section layout="row">
                             <div ng-include="'partials/sideBar.html'">
                             </div>
                             <md-content flex>
-                                <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cy"></div>
+                                <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cyMain"></div>
                                 <div ng-show="display == 'Self Loops'">
                                     <md-card>
                                         <md-card-title>
@@ -92,8 +93,41 @@
                         </section>
                     </md-content>
                 </md-tab>
-                <md-tab label="two">
-                    <md-content class="md-padding">
+                <md-tab label="View Neighbours">
+                    <md-content ng-controller="NeighbourController">
+                        <section layout="row">
+                            <div ng-include="'partials/sideBar.html'">
+                            </div>
+                            <md-content flex>
+                                <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cyNeighbour"></div>
+                                <div ng-show="display == 'Self Loops'">
+                                    <md-card>
+                                        <md-card-title>
+                                            <md-card-title-text>
+                                                <span class="md-headline">All Self Loops</span>
+                                                <span class="md-subhead">Total: {{selfLoopsCount}}</span>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                        <md-card-content layout="row" layout-wrap>
+                                            <div flex="20" ng-repeat="gene in selfLoops">{{gene}}</div>
+                                        </md-card-content>
+                                    </md-card>
+                                    <md-card ng-if="neighbours.length > 0">
+                                        <md-card-title>
+                                            <md-card-title-text>
+                                                <span class="md-headline">First Neighbours</span>
+                                                <span class="md-subhead">Total: {{neighbours.length}}</span>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                        <md-card-content layout="row" layout-wrap>
+                                            <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}}
+                                                <br>Degree: {{gene.object.degree}}</div>
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+                                <!--<div>{{genes}}</div>-->
+                            </md-content>
+                        </section>
                     </md-content>
                 </md-tab>
                 <md-tab label="three">

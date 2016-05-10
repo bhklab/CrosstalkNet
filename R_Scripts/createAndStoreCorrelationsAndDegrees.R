@@ -4,10 +4,12 @@ library(psych)
 setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
 source('helpers.R')
 
+ptm <- proc.time()
 load('TELGenes_GeneSym.RData')
 load('TSLGenes_GeneSym.Rdata')
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
-CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+#CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
 TESLGenes.padj.FDR <- p.adjust(Signif.TESLGenes$p,method="fdr",length(Signif.TESLGenes$p)) # FDR Adjustment for multiple testing
 CorTESLGenes.FDRadj.001 <- CorTES.LGenes 
@@ -15,17 +17,34 @@ CorTESLGenes.FDRadj.01 <- CorTES.LGenes
 CorTESLGenes.FDRadj.05 <- CorTES.LGenes 
 CorTESLGenes.FDRadj.1 <- CorTES.LGenes 
 
+timeDif <- proc.time() - ptm 
+write("Significance Test Took: ", stderr())
+write(timeDif, stderr())
+
+ptm <- proc.time()
 CorTESLGenes.FDRadj.001[TESLGenes.padj.FDR>0.001] <- 0 
 CorTESLGenes.FDRadj.01[TESLGenes.padj.FDR>0.01] <- 0 
 CorTESLGenes.FDRadj.05[TESLGenes.padj.FDR>0.05] <- 0 
 CorTESLGenes.FDRadj.1[TESLGenes.padj.FDR>0.1] <- 0 
 
+timeDif <- proc.time() - ptm 
+write("Overwriting Matrices With Zeros Took: ", stderr())
+write(timeDif, stderr())
+
+ptm <- proc.time()
 degrees.001 <- getDegrees(CorTESLGenes.FDRadj.001)
 degrees.01 <- getDegrees(CorTESLGenes.FDRadj.01)
 degrees.05 <- getDegrees(CorTESLGenes.FDRadj.05)
 degrees.1 <- getDegrees(CorTESLGenes.FDRadj.1)
 
-#corMatrix <- removeUnnecessaryGenes(CorTESLGenes.FDRadj, degrees$epiDegree, degrees$stromaDegree)
+timeDif <- proc.time() - ptm 
+write("Calculating Degrees Took: ", stderr())
+write(timeDif, stderr())
+
+#CorTESLGenes.FDRadj.001 <- removeUnnecessaryGenes(CorTESLGenes.FDRadj.001, degrees.001$epiDegree, degrees.001$stromaDegree)
+#CorTESLGenes.FDRadj.01 <- removeUnnecessaryGenes(CorTESLGenes.FDRadj.01, degrees.01$epiDegree, degrees.01$stromaDegree)
+#CorTESLGenes.FDRadj.05 <- removeUnnecessaryGenes(CorTESLGenes.FDRadj.05, degrees.05$epiDegree, degrees.05$stromaDegree)
+#CorTESLGenes.FDRadj.1 <- removeUnnecessaryGenes(CorTESLGenes.FDRadj.1, degrees.1$epiDegree, degrees.1$stromaDegree)
 #degrees <- getDegrees(corMatrix)
 
 dput(CorTESLGenes.FDRadj.001, 'corMatrix.001.R')

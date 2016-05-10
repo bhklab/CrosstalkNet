@@ -19,12 +19,23 @@ getDegrees <- function(corMatrix) {
 
 removeUnnecessaryGenes <- function(corMatrix, epiDegrees, stromaDegrees) {
     result <- corMatrix
+    indices <- c()
+
     for (index in 1:nrow(corMatrix)) {
-        if (epiDegrees[index] == 0 && stromaDegrees[index] == 0) {
-            result <- result[, -index]
-            result <- result[-index, ]
+        if (length(which(corMatrix[index,] == 0)) && length(which(corMatrix[, index] == 0))) {
+            indices <- c(indices, index)
         }
     }
+
+    result <- result[-indices, -indices]
+
+
+    # for (index in 1:nrow(corMatrix)) {
+    #     if (epiDegrees[index] == 0 && stromaDegrees[index] == 0) {
+    #         result <- result[, -index]
+    #         result <- result[-index, ]
+    #     }
+    # }
     
     result
 }
