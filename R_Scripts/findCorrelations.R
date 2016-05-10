@@ -6,7 +6,10 @@ args <- commandArgs(trailingOnly = TRUE)
 gene <- args[2]
 side <- args[3]
 neighbour <- args[4]
-pValue <- args[5]
+
+exclude <- ''
+exclude <- args[5]
+pValue <- args[6]
 
 corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
 degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
@@ -15,7 +18,7 @@ degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
 #side
 hasSelfLoop <- FALSE
 gene <- as.character(gene)
-if (side == '-e') {
+if (side == '-E') {
 	index <- which(corMatrix[gene, ] != 0)
 	if (neighbour != '1') {
 		if (length(which(names(index) == gene)) > 0) {
@@ -26,6 +29,7 @@ if (side == '-e') {
 
 		index <- index[which(names(index) != gene)]	
 	}
+	#index <- index[which(names(index) != exclude)]
 	
 	resultDegrees <- degrees$stromaDegree[index]#degrees$stromaDegree[names( which(corMatrix[gene, ] != 0))]
 	#print(as.character(which(corMatrix[gene, ] != 0)))
@@ -44,6 +48,7 @@ if (side == '-e') {
 
 		index <- index[which(names(index) != gene)]	
 	}
+	#index <- index[which(names(index) != exclude)]
 	
 	resultDegrees <- degrees$epiDegree[index]
 	resultWeights <- corMatrix[index, gene]
