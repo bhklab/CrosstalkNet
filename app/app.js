@@ -5,6 +5,7 @@ angular.module('myApp', [
   'ngRoute',
   'ngMaterial',
   'myApp.MainController',
+  'myApp.NeighbourController',
   'myApp.version', 
   'myApp.filters'
 ]);
