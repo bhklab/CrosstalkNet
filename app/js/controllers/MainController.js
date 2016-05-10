@@ -229,24 +229,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.refreshOverallGraph();
         });
 
-        /*
-        $scope.$watch('minPositiveWeight', function(newValue, oldValue) {
-            if (newValue != null && $scope.styleCopy != null) {
-                $scope.cy.edges().forEach(function(edge) {
-                    if (edge.json().data.weight < newValue && edge.json().data
-                        .weight >= 0) {
-                        //edge.style({'visibility': 'hidden'});    
-                        edge.css({ 'visibility': 'hidden' })
-                    } else {
-                        edge.css({ 'visibility': 'visible' })
-                    }
-
-                });
-
-                $scope.totalInteractions = $scope.cy.edges(':visible').length;
-            }
-        });*/
-
         $scope.filterWeight = function() {
             $scope.refreshOverallGraph();
         };
