@@ -60,7 +60,7 @@ app.get('/overall-graph', function(req, res) {
             configUtils.setConfigLayout(config, configLayout);
             console.log(config.elements[0]);
             var epiColor = {
-                'selector': 'node[id$="-e"], node[id$="-Er"]',
+                'selector': 'node[id$="-E"], node[id$="-Er"]',
                 'style': {
                     'background-color': 'red'
                 }
@@ -106,20 +106,32 @@ app.get('/self-loops', function(req, res) {
 app.post('/neighbour-general', function(req, res) {
     var neighbour = req.body.neighbour;
     var gene = req.body.gene;
-    var side = req.body.side;
+    var side = req.body.side.toUpperCase();
     var degree = req.body.degree;
     var originalElements = req.body.originalElements;
     var pValue = req.body.pValue;
     var requestedLayout = req.body.layout;
     var first = req.body.first;
     var second = req.body.second;
+    var exclude = 'NA';
 
     console.log(req.body);
+
+    if (first == second) {
+        neighbour = 2;
+    } else {
+        neighbour = 1;
+    }
+
+    if (second != null) {
+        exclude = first;
+    }
+
     var neighbourSide = side == "-E" ? "-S" : "-E"
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene.toUpperCase() +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" + exclude + "\"" + " " + "\"" +
         pValue + "\"", {
             maxBuffer: 1024 *
                 50000
@@ -180,7 +192,7 @@ app.post('/neighbour-general', function(req, res) {
                 neighbourGeneWeights,
                 hasSelfLoop);
 
-            if (neighbour == 1) {
+            if (second == null) {
                 elements = elements.concat(sourceNode);
 
                 if (requestedLayout == "hierarchical") {
@@ -210,14 +222,16 @@ app.post('/neighbour-general', function(req, res) {
 
                 var opposite = side == "-E" ? "-S" : "-E";
 
-                if (hasSelfLoop) {
-                    elements.push({
-                        data: {
-                            id: 'selfLoop' + gene,
-                            source: gene + side,
-                            target: gene + opposite
-                        }
-                    });
+                if (first == second) {
+                    if (hasSelfLoop) {
+                        elements.push({
+                            data: {
+                                id: 'selfLoop' + gene,
+                                source: gene + side,
+                                target: gene + opposite
+                            }
+                        });
+                    }
                 }
             }
 
@@ -228,36 +242,39 @@ app.post('/neighbour-general', function(req, res) {
             firstEdgeSelector = firstEdgeSelector + gene;
             var config = configUtils.createConfig();
 
-            configUtils.addStyleToConfig(config, {
-                'selector': 'edge[id = "selfLoop' + gene + '"]',
-                'style': {
-                    'curve-style': 'bezier',
-                    'line-style': 'solid',
-                    'line-color': '#FF6D00',
-                    'target-arrow-color': '#FF6D00',
-                    'target-arrow-shape': 'triangle'
-                }
-            });
-            configUtils.addStyleToConfig(config, {
-                'selector': 'edge[id = "' + firstEdgeSelector + '"]',
-                'style': {
-                    'curve-style': 'bezier',
-                    'line-style': 'solid',
-                    'line-color': '#FF6D00',
-                    'target-arrow-color': '#FF6D00',
-                    'target-arrow-shape': 'triangle'
-                }
-            });
+            if (first == second) {
+                configUtils.addStyleToConfig(config, {
+                    'selector': 'edge[id = "selfLoop' + gene + '"]',
+                    'style': {
+                        'curve-style': 'bezier',
+                        'line-style': 'solid',
+                        'line-color': '#FF6D00',
+                        'target-arrow-color': '#FF6D00',
+                        'target-arrow-shape': 'triangle'
+                    }
+                });
+                configUtils.addStyleToConfig(config, {
+                    'selector': 'edge[id = "' + firstEdgeSelector + '"]',
+                    'style': {
+                        'curve-style': 'bezier',
+                        'line-style': 'solid',
+                        'line-color': '#FF6D00',
+                        'target-arrow-color': '#FF6D00',
+                        'target-arrow-shape': 'triangle'
+                    }
+                });
+            }
+
             configUtils.setConfigElements(config, elements);
 
             var layout = null;
             if (requestedLayout == "hierarchical") {
                 layout = configUtils.createPresetLayout();
             } else if (requestedLayout == "concentric") {
-                layout = configUtils.createConcentricLayout(sourceNode[0].data.id);    
+                layout = configUtils.createConcentricLayout(sourceNode[0].data.id);
             }
 
-            configUtils.setConfigLayout(config, layout);    
+            configUtils.setConfigLayout(config, layout);
             res.json({ config: config });
         });
 });

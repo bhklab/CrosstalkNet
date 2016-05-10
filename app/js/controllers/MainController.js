@@ -1,6 +1,7 @@
 'use strict';
 
-angular.module('myApp.MainController', ['ngRoute']).controller('MainController', ['$scope', '$rootScope', 'RESTService',
+angular.module('myApp.MainController', ['ngRoute']).controller('MainController', ['$scope',
+    '$rootScope', 'RESTService',
     'GraphConfigService', '$q', '$timeout',
     function($scope, $rootScope, RESTService, GraphConfigService, $q, $timeout) {
         var totalNumNodes = 1000;
@@ -27,17 +28,21 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
             { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
         ];
-        $scope.pValueDisplayed = null;
-        $scope.pValueActual = null;
+        $scope.pValueDisplayed = $scope.pValues[2].value;
+        $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
         $scope.selfLoops = [];
         $scope.selfLoopsCount = 0;
 
         $scope.display = "Graph";
         $scope.switchModel = false;
-        $scope.layouts = [{ display: "Bipartite", value: "preset" }, { display: "Concentric",
-            value: "concentric" }, {display: "Hierarchical", value: "hierarchical"}];
-        $scope.selectedLayout = null;
+        $scope.layouts = [{ display: "Bipartite", value: "preset" }, {
+            display: "Concentric",
+            value: "concentric"
+        }, { display: "Hierarchical", value: "hierarchical" }];
+        $scope.selectedLayout = $scope.layouts[1].value;
+
+
 
 
         $scope.changeDisplay = function() {
@@ -51,7 +56,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.getDataForOverallGraph = function() {
             $rootScope.state = $rootScope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual} })
+                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual } })
                     .then(function(data) {
                         console.log(data);
                         $rootScope.state = $rootScope.states.loadingConfig;
@@ -116,6 +121,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
 
             if (source == 'first') {
+                $scope.firstSelectedGene = item.value.substring(0, item.value
+                    .length - 2).toUpperCase();
                 $scope.genesSecond = [];
                 $rootScope.state = $rootScope.states.loadingFirst;
                 RESTService.post('neighbour-general', {
@@ -126,7 +133,9 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     degree: item.object.degree,
                     pValue: $scope.pValueActual,
                     neighbour: 1,
-                    layout: $scope.selectedLayout
+                    layout: $scope.selectedLayout,
+                    first: $scope.firstSelectedGene,
+                    second: null
                 }).then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
@@ -148,7 +157,10 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     originalElements: originalElements,
                     pValue: $scope.pValueActual,
                     neighbour: 2,
-                    layout: $scope.selectedLayout
+                    layout: $scope.selectedLayout,
+                    first: $scope.firstSelectedGene,
+                    second: item.value.substring(0, item.value
+                        .length - 2).toUpperCase()
                 }).then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
