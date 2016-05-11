@@ -1,4 +1,5 @@
 var exec = require('child_process').exec;
+var async = require('async');
 var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser')
@@ -6,6 +7,8 @@ var app = express();
 var nodeUtils = require('nodeUtils');
 var configUtils = require('configUtils');
 var copyUtils = require('copyUtils');
+var edgeUtils = require('edgeUtils');
+var styleUtils = require('styleUtils');
 
 var initialConfig = null;
 var initialElements = { "001": null, "01": null, "05": null, "1": null };
@@ -24,58 +27,78 @@ app.get('/overall-graph', function(req, res) {
     var minPositiveWeight = req.query.minPositiveWeight;
     var minNegativeWeight = req.query.minNegativeWeight;
 
-    if (minPositiveWeight != 0 || minNegativeWeight != 0) {
-        var child = exec("Rscript R_scripts/getWeightsAndDegreesFilterByWeight.R" + " --args \"" +
-            pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" +
-            minPositiveWeight + "\"", {
-                maxBuffer: 1024 *
-                    50000
-            },
-            function(error, stdout, stderr) {
-                //console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-
-                if (error != null) {
-                    console.log('error: ' + error);
-                }
-
-                var parsed = getWeightsAndDegreesFromROutput(stdout);
-                console.log("returned");
-                var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
-                    parsed.weights,
-                    parsed.geneNames);
-
-                var allInfo = {
-                    elements: elements,
-                    totalInteractions: parsed.totalInteractions,
-                    epiToStromaInteractions: parsed.epiToStromaInteractions,
-                    stromaToEpiInteractions: parsed.stromaToEpiInteractions
-                };
-
-                var config = createOverallConfig(elements, requestedLayout);
-
-                res.json({
-                    config: config,
-                    totalInteractions: allInfo.totalInteractions,
-                    epiToStromaInteractions: allInfo.epiToStromaInteractions,
-                    stromaToEpiInteractions: allInfo.stromaToEpiInteractions
-                });
-            });
-    } else {
-
-        var config = createOverallConfig(initialElements[pValue], requestedLayout);
+    if (initialElements[pValue] != null) {
+        var config = createOverallConfig(initialElements[pValue],
+            requestedLayout);
 
 
         res.json({
             config: config,
             totalInteractions: initialElements[pValue].totalInteractions,
-            epiToStromaInteractions: initialElements[pValue].epiToStromaInteractions,
-            stromaToEpiInteractions: initialElements[pValue].stromaToEpiInteractions
+            minPositiveWeight: initialElements[pValue].minPositiveWeight,
+            maxPositiveWeight: initialElements[pValue].maxPositiveWeight,
+            minNegativeWeight: initialElements[pValue].minNegativeWeight,
+            maxNegativeWeight: initialElements[pValue].maxNegativeWeight
         });
+    } else {
+
     }
 });
 
+app.get('/overall-graph-weight-filter', function(req, res) {
+    var pValue = req.query.pValue;
+    var requestedLayout = 'random'; //req.query.layout;
+    var minPositiveWeight = req.query.minPositiveWeight;
+    var minNegativeWeight = req.query.minNegativeWeight;
+    var filter = 'yes';
 
+    if (minNegativeWeight === "NA" && minPositiveWeight ==="NA") {
+        filter = 'no';
+    }
+
+    var child = exec("Rscript R_scripts/getWeightsAndDegreesFilterByWeight.R" +
+        " --args \"" +
+        pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" +
+        minPositiveWeight + "\"" + " " + "\"" + filter + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsed = getWeightsAndDegreesFromROutput(stdout);
+            console.log("returned");
+            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
+                parsed.weights,
+                parsed.geneNames);
+
+            var allInfo = {
+                elements: elements,
+                totalInteractions: parsed.totalInteractions,
+                maxPositiveWeight: parsed.maxPositiveWeight,
+                minPositiveWeight: parsed.minPositiveWeight,
+                maxNegativeWeight: parsed.maxNegativeWeight,
+                minNegativeWeight: parsed.minNegativeWeight
+            };
+
+            var config = createOverallConfig(elements, requestedLayout);
+
+            res.json({
+                config: config,
+                totalInteractions: allInfo.totalInteractions,
+                maxPositiveWeight: allInfo.maxPositiveWeight,
+                minPositiveWeight: allInfo.minPositiveWeight,
+                maxNegativeWeight: allInfo.maxNegativeWeight,
+                minNegativeWeight: allInfo.minNegativeWeight
+
+            });
+        });
+});
 
 app.get('/self-loops', function(req, res) {
     var pValue = req.query.pValue;
@@ -118,7 +141,8 @@ app.post('/neighbour-general', function(req, res) {
     var child = exec(
         "Rscript R_Scripts/findCorrelations.R --args " +
         "\"" + gene.toUpperCase() +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" + " " + "\"" +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + neighbour + "\"" +
+        " " + "\"" +
         exclude + "\"" + " " + "\"" +
         pValue + "\"", {
             maxBuffer: 1024 *
@@ -152,31 +176,38 @@ app.post('/neighbour-general', function(req, res) {
             }
 
             var neighbourBgColor = side == "-E" ? "red" : "blue";
-            var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames, parent,
+            var neighbourNodes = nodeUtils.createNodes(neighbourGeneNames,
+                parent,
                 neighbour == 1 ?
                 4 : 8, degrees);
-            var sourceNode = nodeUtils.createNodes([gene], side == "-E" ? "epi" :
+            var sourceNode = nodeUtils.createNodes([gene], side == "-E" ?
+                "epi" :
                 "stroma", 1, [
                     degree
                 ]);
             var sourceBgColor = side == "-E" ? "blue" : "red";
 
             if (requestedLayout == 'hierarchical') {
-                neighbourNodes = nodeUtils.addPositionsToNodes(neighbourNodes,
+                neighbourNodes = nodeUtils.addPositionsToNodes(
+                    neighbourNodes,
                     neighbour ==
                     1 ? 400 : 800, 100, 0, 20);
-                neighbourNodes = nodeUtils.addStyleToNodes(neighbourNodes, 10, 10,
+                neighbourNodes = nodeUtils.addStyleToNodes(neighbourNodes,
+                    10, 10,
                     "left",
                     "center", neighbourBgColor);
 
 
-                sourceNode = nodeUtils.addPositionsToNodes(sourceNode, 100, 100, 0, 0);
-                sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10, "left",
+                sourceNode = nodeUtils.addPositionsToNodes(sourceNode, 100,
+                    100, 0, 0);
+                sourceNode = nodeUtils.addStyleToNodes(sourceNode, 10, 10,
+                    "left",
                     "center",
                     sourceBgColor);
             }
 
-            var edges = createEdgesFromNode(sourceNode[0], neighbourNodes,
+            var edges = edgeUtils.createEdgesFromNode(sourceNode[0],
+                neighbourNodes,
                 neighbourGeneWeights,
                 hasSelfLoop);
 
@@ -226,30 +257,20 @@ app.post('/neighbour-general', function(req, res) {
             elements = elements.concat(neighbourNodes);
             elements = elements.concat(edges);
 
-            var firstEdgeSelector = side == '-S' ? 'EpiToStroma' : 'StromaToEpi';
+            var firstEdgeSelector = side == '-S' ? 'EpiToStroma' :
+                'StromaToEpi';
             firstEdgeSelector = firstEdgeSelector + gene;
             var config = configUtils.createConfig();
 
             if (first == second) {
                 configUtils.addStyleToConfig(config, {
                     'selector': 'edge[id = "selfLoop' + gene + '"]',
-                    'style': {
-                        'curve-style': 'bezier',
-                        'line-style': 'solid',
-                        'line-color': '#FF6D00',
-                        'target-arrow-color': '#FF6D00',
-                        'target-arrow-shape': 'triangle'
-                    }
+                    'style': styleUtils.selfLoopEdge
                 });
                 configUtils.addStyleToConfig(config, {
-                    'selector': 'edge[id = "' + firstEdgeSelector + '"]',
-                    'style': {
-                        'curve-style': 'bezier',
-                        'line-style': 'solid',
-                        'line-color': '#FF6D00',
-                        'target-arrow-color': '#FF6D00',
-                        'target-arrow-shape': 'triangle'
-                    }
+                    'selector': 'edge[id = "' + firstEdgeSelector +
+                        '"]',
+                    'style': styleUtils.selfLoopEdge
                 });
             }
 
@@ -259,7 +280,8 @@ app.post('/neighbour-general', function(req, res) {
             if (requestedLayout == "hierarchical") {
                 layout = configUtils.createPresetLayout();
             } else if (requestedLayout == "concentric") {
-                layout = configUtils.createConcentricLayout(sourceNode[0].data.id);
+                layout = configUtils.createConcentricLayout(sourceNode[0].data
+                    .id);
             }
 
             configUtils.setConfigLayout(config, layout);
@@ -275,18 +297,24 @@ function createOverallConfig(originalElements, requestedLayout) {
     var configLayout = null;
 
     if (originalElements != null) {
-        var elements = originalElements.elements != null ? copyUtils.createElementsCopy(originalElements.elements) : copyUtils.createElementsCopy(originalElements);
+        var elements = originalElements.elements != null ? copyUtils.createElementsCopy(
+            originalElements.elements) : copyUtils.createElementsCopy(
+            originalElements);
         config = configUtils.createConfig(elements);
         if (requestedLayout == 'preset') {
-            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100, 100,
+            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100,
+                100,
                 0, 20);
-            elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10, "left",
+            elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10,
+                "left",
                 "center", "blue");
 
-            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes, 300,
+            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes,
+                300,
                 100, 0,
                 20);
-            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10, 10,
+            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10,
+                10,
                 "right",
                 "center",
                 "red");
@@ -324,72 +352,6 @@ function createOverallConfig(originalElements, requestedLayout) {
     return config;
 }
 
-function createEdges(epiNodes, stromaNodes, weights) {
-    var edges = [];
-
-    for (var i = 0; i < epiNodes.length; i++) {
-        for (var j = i + 1; j < stromaNodes.length; j++) {
-            if (weights[i][j] != 0) {
-                edges.push({
-                    data: {
-                        id: 'EpiToStroma' + epiNodes[i].data.id.slice(0, -2) +
-                            stromaNodes[j].data.id.slice(0, -2),
-                        source: epiNodes[i].data.id,
-                        target: stromaNodes[j].data.id,
-                        weight: weights[i][j]
-                    }
-                });
-            }
-
-            if (weights[j][i] != 0) {
-                edges.push({
-                    data: {
-                        id: 'StromaToEpi' + stromaNodes[i].data.id.slice(0, -2) +
-                            epiNodes[j].data.id.slice(0, -2),
-                        source: stromaNodes[i].data.id,
-                        target: epiNodes[j].data.id,
-                        weight: weights[j][i]
-                    }
-                });
-            }
-        }
-
-        if (weights[i][i] != 0) {
-            edges.push({
-                data: {
-                    id: 'selfLoop' + epiNodes[i].data.id,
-                    source: stromaNodes[i].data.id,
-                    target: epiNodes[i].data.id,
-                    weight: weights[i][i]
-                }
-            });
-        }
-    }
-
-    console.log('Epi Nodes Length: ' + epiNodes.length);
-    console.log('Stroma Nodes Length: ' + stromaNodes.length);
-    console.log("Edges Length: " + edges.length);
-    return edges;
-};
-
-function createEdgesFromNode(node, neighbours, weights) {
-    var edges = [];
-    var idPrefix = node.data.parent == "epi" ? "EpiToStroma" : "StromaToEpi";
-    for (var i = 0; i < neighbours.length; i++) {
-        if (node.data.id)
-            edges.push({
-                data: {
-                    id: idPrefix + neighbours[i].data.id.slice(0, -2),
-                    source: node.data.id,
-                    target: neighbours[i].data.id,
-                    weight: weights[i]
-                }
-            })
-    }
-
-    return edges;
-}
-
 function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     var initialWeights = [];
     var dimension = geneNames.length;
@@ -414,7 +376,7 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     };
     var epiNodes = nodeUtils.createNodes(geneNames, 'epi', 1, epiDegrees);
     var stromaNodes = nodeUtils.createNodes(geneNames, 'stroma', 2, stromaDegrees);
-    var edges = createEdges(epiNodes, stromaNodes, initialWeights);
+    var edges = edgeUtils.createEdges(epiNodes, stromaNodes, initialWeights);
 
     elements.epiNodes = epiNodes;
     elements.stromaNodes = stromaNodes;
@@ -440,8 +402,10 @@ function getWeightsAndDegreesFromROutput(stdout) {
     var weights = parsedValue.value[1];
     var geneNames = weights.attributes.dimnames.value[0].value;
     var totalInteractions = parsedValue.value[2].value[0];
-    var epiToStromaInteractions = parsedValue.value[3].value[0];
-    var stromaToEpiInteractions = parsedValue.value[4].value[0];
+    var minPositiveWeight = parsedValue.value[3].value[0];
+    var maxPositiveWeight = parsedValue.value[4].value[0];
+    var minNegativeWeight = parsedValue.value[5].value[0];
+    var maxNegativeWeight = parsedValue.value[6].value[0];
 
     var result = {
         epiDegrees: epiDegrees,
@@ -449,40 +413,58 @@ function getWeightsAndDegreesFromROutput(stdout) {
         weights: weights,
         geneNames: geneNames,
         totalInteractions: totalInteractions,
-        epiToStromaInteractions: epiToStromaInteractions,
-        stromaToEpiInteractions: stromaToEpiInteractions
-    }
+        minPositiveWeight: minPositiveWeight,
+        maxPositiveWeight: maxPositiveWeight,
+        minNegativeWeight: minNegativeWeight,
+        maxNegativeWeight: maxNegativeWeight
+    };
 
     console.log("about to return");
     return result;
 }
+/*
+function generalOutputParser(json) {
+    if (json.attributes == null || json.attributes.names == null) {
+        return null;
+    }
+
+    var names = json.attributes.names.value;
+
+    for (var i = 0; i < names; i++) {
+        if ()
+    }
+}*/
 
 function cacheElementsForPValue(pValue, script) {
-    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
+    var child = exec("Rscript " + script + " --args \"" + pValue + "\"" + " " + "\"NA" + "\"" + " " +
+        "\"NA" + "\"" + " " + "\"no\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
 
-        if (error != null) {
-            console.log('error: ' + error);
-        }
+            if (error != null) {
+                console.log('error: ' + error);
+            }
 
-        var parsed = getWeightsAndDegreesFromROutput(stdout);
-        console.log("returned");
-        var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees, parsed.weights,
-            parsed.geneNames);
+            var parsed = getWeightsAndDegreesFromROutput(stdout);
+            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
+                parsed.weights,
+                parsed.geneNames);
 
-        var allInfo = {
-            elements: elements,
-            totalInteractions: parsed.totalInteractions,
-            epiToStromaInteractions: parsed.epiToStromaInteractions,
-            stromaToEpiInteractions: parsed.stromaToEpiInteractions
-        };
+            var allInfo = {
+                elements: elements,
+                totalInteractions: parsed.totalInteractions,
+                minPositiveWeight: parsed.minPositiveWeight,
+                maxPositiveWeight: parsed.maxPositiveWeight,
+                minNegativeWeight: parsed.minNegativeWeight,
+                maxNegativeWeight: parsed.maxNegativeWeight
+            };
 
-        initialElements[pValue] = allInfo;
-    });
+            initialElements[pValue] = allInfo;
+        });
 }
 
 function createListOfSelfLoopGenes(pValue, script) {
@@ -509,17 +491,26 @@ function createListOfSelfLoopGenes(pValue, script) {
     });
 }
 
-function createAllOverallConfigs() {
+function createOverallElements() {
     var pValues = ["001", "01", "05", "1"];
+    console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
-        cacheElementsForPValue(pValues[i], "R_Scripts/getWeightsAndDegrees.R");
+        cacheElementsForPValue(pValues[i], "R_Scripts/getWeightsAndDegreesFilterByWeight.R");
         createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");
     }
 }
 
 function initializeServer() {
-    createAndStoreCorrelationsAndDegrees(createAllOverallConfigs);
+    createAndStoreCorrelationsAndDegrees(createOverallElements);
+
+    /*async.series([function(callback) {
+        createAndStoreCorrelationsAndDegrees();
+        callback();
+    }, function(callback) {
+        createOverallElements();
+        callback();
+    }], function() {});*/
 }
 
 function createAndStoreCorrelationsAndDegrees(callback) {
@@ -533,6 +524,8 @@ function createAndStoreCorrelationsAndDegrees(callback) {
         if (error != null) {
             console.log('error: ' + error);
         }
+
+        console.log("Done creating and storing degrees");
 
         callback();
     });
