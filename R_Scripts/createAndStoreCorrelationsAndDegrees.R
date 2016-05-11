@@ -7,6 +7,9 @@ source('helpers.R')
 ptm <- proc.time()
 load('TELGenes_GeneSym.RData')
 load('TSLGenes_GeneSym.Rdata')
+
+#load('esetTE_ERNeg.RData')
+#load('esetTS_ERNeg.RData')
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
 CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
 
@@ -47,6 +50,7 @@ write(timeDif, stderr())
 #CorTESLGenes.FDRadj.1 <- removeUnnecessaryGenes(CorTESLGenes.FDRadj.1, degrees.1$epiDegree, degrees.1$stromaDegree)
 #degrees <- getDegrees(corMatrix)
 
+ptm <- proc.time()
 dput(CorTESLGenes.FDRadj.001, 'corMatrix.001.R')
 dput(CorTESLGenes.FDRadj.01, 'corMatrix.01.R')
 dput(CorTESLGenes.FDRadj.05, 'corMatrix.05.R')
@@ -56,6 +60,9 @@ dput(degrees.001, 'degrees.001.R')
 dput(degrees.01, 'degrees.01.R')
 dput(degrees.05, 'degrees.05.R')
 dput(degrees.1, 'degrees.1.R')
+timeDif <- proc.time() - ptm 
+write("Serializing the data took: ", stderr())
+write(timeDif, stderr())
 
 #output <- list(degrees = degrees.05, weights = CorTESLGenes.FDRadj.05)
 #cat(format(serializeJSON(output)))

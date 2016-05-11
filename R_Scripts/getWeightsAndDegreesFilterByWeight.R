@@ -7,27 +7,24 @@ args <- commandArgs(trailingOnly = TRUE)
 pValue <- args[2]
 minNegativeWeight <- as.numeric(args[3])
 minPositiveWeight <- as.numeric(args[4])
+weightFilter <- args[5]
 
 
 weights <- dget(paste('corMatrix.', pValue, ".R", sep=""))
 
-if (minNegativeWeight == 0) {
-	weights[weights < 0] = 0
+if (weightFilter == 'yes') {
+	weights <- filterCorrelationsByWeight(weights, minNegativeWeight, minPositiveWeight)
 } 
-
-if (minPositiveWeight == 0) {
-	weights[weights > 0] = 0
-}
-
-weights[weights > minNegativeWeight & weights < 0] = 0		
-weights[weights < minPositiveWeight & weights > 0] = 0
 
 degrees <- getDegrees(weights)
 
 totalInteractions <- length(which((weights)!=0))
-epiToStromaInteractions <- sum(degrees$epiDegree )
-stromaToEpiInteractions <- sum(degrees$stromaDegree)
+minPositiveWeight <- min(weights[weights > 0])
+maxPositiveWeight <- max(weights[weights > 0])
 
-output <- list(degrees = degrees, weights = weights, totalInteractions = totalInteractions, epiToStromaInteractions = epiToStromaInteractions,
-	stromaToEpiInteractions = stromaToEpiInteractions)
+#Min negative weight means the negative weight with that smallest magnitude, not value
+minNegativeWeight <- min(weights[weights < 0])
+maxNegativeWeight <- max(weights[weights < 0])
+
+output <- list(degrees = degrees, weights = weights, totalInteractions = totalInteractions, minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
 cat(format(serializeJSON(output)))

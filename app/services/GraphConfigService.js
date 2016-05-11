@@ -2,7 +2,7 @@ var myModule = angular.module("myApp");
 myModule.factory('GraphConfigService', function($http) {
 
     var service = {};
-    service.neighbourConfigs = {firstDropdownConfig: null, secondDropdownConfig: null};
+    service.neighbourConfigs = { firstDropdownConfig: null, secondDropdownConfig: null };
     service.firstSelectedGene = null;
 
     service.applyConfig = function(config) {
@@ -70,7 +70,7 @@ myModule.factory('GraphConfigService', function($http) {
     };
 
     service.resetNodes = function(cy, originalElements) {
-        cy.json({elements: originalElements});
+        cy.json({ elements: originalElements });
         /*
         for (var i = 0; i < originalElements.length; i++) {
             if (originalElements[i].target == null) {

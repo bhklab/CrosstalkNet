@@ -39,3 +39,20 @@ removeUnnecessaryGenes <- function(corMatrix, epiDegrees, stromaDegrees) {
     
     result
 }
+
+filterCorrelationsByWeight <- function(weights, minNegativeWeight, minPositiveWeight) {
+    if (is.na(minNegativeWeight)|| is.nan(minNegativeWeight)) {
+        weights[weights < 0] = 0
+        minNegativeWeight <- 0
+    } 
+
+    if (is.na(minPositiveWeight) || is.nan(minPositiveWeight)) {
+        weights[weights > 0] = 0
+        minPositiveWeight <- 0
+    }
+
+    weights[weights > minNegativeWeight & weights < 0] = 0      
+    weights[weights < minPositiveWeight & weights > 0] = 0  
+
+    weights
+}

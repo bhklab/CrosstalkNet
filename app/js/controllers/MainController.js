@@ -44,6 +44,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         }, { display: "Hierarchical", value: "hierarchical" }];
         $scope.selectedLayout = $scope.layouts[1].value;
 
+        $scope.sliderMinWeightNegative = 0;
+        $scope.sliderMaxWeightPositive = 0;
+
+        $scope.negativeFilterEnabled = false;
+        $scope.positiveFilterEnabled = false;
 
         $scope.applyConfig = function(config, containerID) {
             $scope.elemCopy = angular.copy(config.elements);
@@ -64,16 +69,18 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
         };
 
-        $scope.getDataForOverallGraph = function() {
+        $scope.getDataForOverallGraph = function(path) {
             $rootScope.state = $rootScope.states.loading;
             return $q(function(resolve, reject) {
-                RESTService.get('overall-graph', { params: { pValue: $scope.pValueActual,
-                            minNegativeWeight: $scope.minNegativeWeight == null ? 0 : $scope.minNegativeWeight,
-                            minPositiveWeight: $scope.minPositiveWeight == null ? 0 : $scope.minPositiveWeight } })
+                RESTService.get(path, { params: { pValue: $scope.pValueActual,
+                            minNegativeWeight: $scope.minNegativeWeight == null || !$scope.negativeFilterEnabled ? "NA" : $scope.minNegativeWeight,
+                            minPositiveWeight: $scope.minPositiveWeight == null || !$scope.positiveFilterEnabled ? "NA" : $scope.minPositiveWeight } })
                     .then(function(data) {
                         console.log(data);
                         $rootScope.state = $rootScope.states.loadingConfig;
                         $scope.totalInteractions = data.totalInteractions;
+                        $scope.sliderMinWeightNegative = data.minNegativeWeight;
+                        $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
                         resolve(data.config);
                     });
             });
@@ -210,13 +217,13 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.neighbours = null;
         };
 
-        $scope.refreshOverallGraph = function() {
+        $scope.refreshOverallGraph = function(path) {
             $scope.pValueActual = $scope.pValueDisplayed;
             $scope.resetAllData();
             $scope.resetInputFields();
             $scope.getSelfLoops();
             $scope.firstDropdownConfig = null;
-            $scope.getDataForOverallGraph().then(function(config) {
+            $scope.getDataForOverallGraph(path).then(function(config) {
                 console.log(config.elements);
                 $rootScope.state = $rootScope.states.loadingConfig;
                 $scope.applyConfig(config, "cyMain");
@@ -226,11 +233,15 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $(document).ready(function() {
-            $scope.refreshOverallGraph();
+            $scope.refreshOverallGraph('overall-graph');
         });
 
-        $scope.filterWeight = function() {
-            $scope.refreshOverallGraph();
+        $scope.refreshGraphFilter = function() {
+            $scope.refreshOverallGraph('overall-graph-weight-filter');  
+        };
+
+        $scope.refreshGraphNoFilter = function() {
+            $scope.refreshOverallGraph('overall-graph');  
         };
     }
 ]);
