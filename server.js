@@ -52,7 +52,7 @@ app.get('/overall-graph-weight-filter', function(req, res) {
     var minNegativeWeight = req.query.minNegativeWeight;
     var filter = 'yes';
 
-    if (minNegativeWeight === "NA" && minPositiveWeight ==="NA") {
+    if (minNegativeWeight === "NA" && minPositiveWeight === "NA") {
         filter = 'no';
     }
 
@@ -111,6 +111,170 @@ app.get('/self-loops', function(req, res) {
         });
         return;
     }
+});
+
+app.post('/new-neighbour-general', function(req, res) {
+    var side = req.body.side.toUpperCase();
+    var pValue = req.body.pValue;
+    var requestedLayout = req.body.layout;
+    var firstGeneName = req.body.first;
+    var secondGeneName = req.body.second;
+    var firstParent = "";
+    var secondParent = "";
+
+    if (secondGeneName.toLowerCase() == "null") {
+        firstParent = side == "-E" ? "stroma" : "epi";
+    } else {
+        firstParent = side == "-E" ? "epi" : "stroma";
+        secondParent = side == "-E" ? "stromaRight" : "epiRight";
+    }
+
+    var child = exec("Rscript R_scripts/findCorrelationsComplete.R --args " +
+        "\"" + firstGeneName.toUpperCase() + "\"" + " " + "\"" + secondGeneName.toUpperCase() +
+        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var config = null;
+            var layout = null;
+            var elements = [];
+            var firstNeigboursBgColor = firstParent == "epi" ? "red" : "blue";
+            var secondNeigboursBgColor = secondParent == "epiRight" ? "red" : "blue";
+            var firstSourceNode = null;
+            var secondSourceNode = null;
+
+            var firstNeighboursNodes = [];
+            var firstNeighboursEdges = [];
+            var secondNeighboursNodes = [];
+            var secondNeighboursEdges = [];
+
+            var parsedValue = JSON.parse(stdout);
+            console.log(parsedValue);
+
+            var firstNeighboursWeights = parsedValue.value[0].value;
+            var firstNeighboursDegrees = parsedValue.value[2].value;
+            var firstNeighboursGeneNames = parsedValue.value[0].attributes.names.value;
+
+            var secondNeighbourWeights = [];
+            var secondNeighboursDegrees = [];
+            var secondNeighboursGeneNames = [];
+
+            if (secondGeneName.toLowerCase() != 'null') {
+                secondNeighbourWeights = parsedValue.value[1].value;
+                secondNeighboursDegrees = parsedValue.value[3].value;
+                secondNeighboursGeneNames = parsedValue.value[1].attributes.names.value;
+
+                secondSourceNode = nodeUtils.createNodes([secondGeneName], side == "-E" ?
+                    "epi" : "stroma", 4, [0]);
+
+                secondNeighboursNodes = nodeUtils.createNodes(secondNeighboursGeneNames,
+                    secondParent, 8, secondNeighboursDegrees);
+
+                secondNeighboursEdges = edgeUtils.createEdgesFromNode(secondSourceNode[
+                    0], secondNeighboursNodes, secondNeighboursGeneNames, false);
+            }
+
+            var temp = side == "-E" ? "epi" : "stroma";
+
+            if (secondGeneName != "null") {
+                if (side == "-E") {
+
+                    temp = "stroma"
+                } else {
+
+                    temp = "epi"
+                }
+            }
+
+            firstSourceNode = nodeUtils.createNodes([firstGeneName], temp, 1, [
+                0 //degree
+            ]);
+
+            firstNeighboursNodes = nodeUtils.createNodes(firstNeighboursGeneNames,
+                firstParent,
+                4, firstNeighboursDegrees);
+
+            firstNeighboursEdges = edgeUtils.createEdgesFromNode(firstSourceNode[0],
+                firstNeighboursNodes, firstNeighboursGeneNames, false);
+
+            if (requestedLayout == 'hierarchical') {
+                firstNeighboursNodes = nodeUtils.addPositionsToNodes(
+                    firstNeighboursNodes,
+                    400, 100, 0, 20);
+
+                firstNeighboursNodes = nodeUtils.addStyleToNodes(firstNeighboursNodes,
+                    10, 10,
+                    "left",
+                    "center", firstNeigboursBgColor);
+
+                firstSourceNode = nodeUtils.addPositionsToNodes(firstSourceNode, 100,
+                    100, 0, 0);
+                firstSourceNode = nodeUtils.addStyleToNodes(firstSourceNode, 10, 10,
+                    "left",
+                    "center",
+                    firstNeigboursBgColor == "blue" ? "red" : "blue");
+
+                elements.push({
+                    data: {
+                        id: 'epi'
+                    }
+                });
+                elements.push({
+                    data: {
+                        id: 'stroma'
+                    }
+                });
+
+                if (secondGeneName != "null") {
+                    elements.push({
+                        data: {
+                            id: side == '-E' ? 'stromaRight' : 'epiRight'
+                        }
+                    });
+
+                    secondNeighboursNodes = nodeUtils.addPositionsToNodes(
+                        secondNeighboursNodes,
+                        800, 100, 0, 20);
+
+                    secondNeighboursNodes = nodeUtils.addStyleToNodes(
+                        secondNeighboursNodes,
+                        10, 10,
+                        "right",
+                        "center", secondNeigboursBgColor);
+                }
+            }
+
+            console.log("First neighbours nodes:");
+            console.log(firstNeighboursNodes);
+            console.log("Second neighbours nodes:");
+            console.log(secondNeighboursNodes);
+            elements = elements.concat(firstSourceNode);
+            elements = elements.concat(firstNeighboursNodes);
+            elements = elements.concat(firstNeighboursEdges);
+            elements = elements.concat(secondNeighboursNodes);
+            elements = elements.concat(secondNeighboursEdges);
+
+            config = configUtils.createConfig();
+
+            configUtils.setConfigElements(config, elements);
+
+            if (requestedLayout == "hierarchical") {
+                layout = configUtils.createPresetLayout();
+            } else if (requestedLayout == "concentric") {
+                layout = configUtils.createConcentricLayout(firstSourceNode[0].data
+                    .id);
+            }
+
+            configUtils.setConfigLayout(config, layout);
+            res.json({ config: config });
+        });
 });
 
 app.post('/neighbour-general', function(req, res) {
@@ -436,7 +600,8 @@ function generalOutputParser(json) {
 }*/
 
 function cacheElementsForPValue(pValue, script) {
-    var child = exec("Rscript " + script + " --args \"" + pValue + "\"" + " " + "\"NA" + "\"" + " " +
+    var child = exec("Rscript " + script + " --args \"" + pValue + "\"" + " " + "\"NA" +
+        "\"" + " " +
         "\"NA" + "\"" + " " + "\"no\"", {
             maxBuffer: 1024 *
                 50000
