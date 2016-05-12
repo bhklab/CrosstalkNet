@@ -147,7 +147,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 GraphConfigService.firstSelectedGene = $scope.firstSelectedGene;
                 $scope.genesSecond = [];
                 $rootScope.state = $rootScope.states.loadingFirst;
-                RESTService.post('neighbour-general', {
+                RESTService.post('new-neighbour-general', {
                     gene: item.value.substring(0, item.value
                         .length - 2).toUpperCase(),
                     side: item.value.substring(item.value.length -
@@ -157,7 +157,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     neighbour: 1,
                     layout: $scope.selectedLayout,
                     first: $scope.firstSelectedGene,
-                    second: null
+                    second: "null"
                 }).then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;

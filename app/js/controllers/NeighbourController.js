@@ -115,7 +115,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
             var originalElements = GraphConfigService.neighbourConfigs.firstDropdownConfig.elements;
             $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('neighbour-general', {
+            RESTService.post('new-neighbour-general', {
                 gene: item.value.substring(0, item.value
                     .length - 2).toUpperCase(),
                 side: item.value.substring(item.value.length -
