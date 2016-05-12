@@ -27,8 +27,9 @@
     <script src="app.js"></script>
     <script src="js/controllers/MainController.js"></script>
     <script src="js/controllers/NeighbourController.js"></script>
-    <script src="services/GraphConfigService.js"></script>
-    <script src="services/RESTService.js"></script>
+    <script src="js/services/BasicDataService.js"></script>
+    <script src="js/services/GraphConfigService.js"></script>
+    <script src="js/services/RESTService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <!--<script src="view2/view2.js"></script> -->
     <script src="components/version/version.js"></script>
@@ -105,11 +106,11 @@
                                         <md-card-title>
                                             <md-card-title-text>
                                                 <span class="md-headline">All Self Loops</span>
-                                                <span class="md-subhead">Total: {{selfLoopsCount}}</span>
+                                                <span class="md-subhead">Total: {{data.selfLoopsCount}}</span>
                                             </md-card-title-text>
                                         </md-card-title>
                                         <md-card-content layout="row" layout-wrap>
-                                            <div flex="20" ng-repeat="gene in selfLoops">{{gene}}</div>
+                                            <div flex="20" ng-repeat="gene in data.selfLoops">{{gene}}</div>
                                         </md-card-content>
                                     </md-card>
                                     <md-card ng-if="neighbours.length > 0">
