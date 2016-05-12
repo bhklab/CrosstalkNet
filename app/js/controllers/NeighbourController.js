@@ -3,32 +3,23 @@
 angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, $q, $timeout) {
+    'GraphConfigService', 'BasicDataService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, $q, $timeout) {
         $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
         $scope.ctrl = "neighbour";
 
-        $rootScope.states = {
-            initial: 0,
-            firstDropdown: 1,
-            secondDropdown: 2,
-            loadingFirst: 3,
-            loadingSecond: 4,
-            loading: 5,
-            loadingConfig: 6
-        };
+        $rootScope.states = angular.copy(BasicDataService.states);
+        $scope.pValues = angular.copy(BasicDataService.pValues);
+        $scope.layouts = angular.copy(BasicDataService.layouts);
 
         $scope.minDegree = {
             first: 0,
             second: 0
         }
         $rootScope.state = $rootScope.states.initial;
-        $scope.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
-            { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
-        ];
         $scope.pValueDisplayed = $scope.pValues[2].value;
         $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
@@ -37,10 +28,6 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.display = "Graph";
         $scope.switchModel = false;
-        $scope.layouts = [{ display: "Bipartite", value: "preset" }, {
-            display: "Concentric",
-            value: "concentric"
-        }, { display: "Hierarchical", value: "hierarchical" }];
         $scope.selectedLayout = $scope.layouts[1].value;
 
 
@@ -59,52 +46,11 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
             }
         };
 
-        $scope.getSelfLoops = function() {
-            RESTService.get('self-loops', { params: { pValue: $scope.pValueActual } })
-                .then(function(data) {
-                    console.log(data);
-                    $scope.selfLoops = data.geneNames;
-                    $scope.selfLoopsCount = data.numberOfLoops;
-                });
-        };
+        $scope.getSelfLoops = GraphConfigService.getSelfLoops;
 
-        $scope.loadAll = function(selectedGene = null) {
-            var genes = [];
-            var selectedGeneName = selectedGene == null ? '' : ', #' + selectedGene.toUpperCase();
-            $scope.cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(
-                node) {
-                genes.push(node.data());
-            });
+        $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
 
-            return genes.map(function(gene) {
-                return {
-                    value: gene.id.toLowerCase(),
-                    display: gene.id + ' ' + gene.degree,
-                    object: gene
-                };
-            });
-        };
-
-        $scope.querySearch = function(query, source) {
-            if (source == "first") {
-                var results = query ? $scope.genesFirst.filter(createFilterFor(query)) :
-                    $scope.genesFirst,
-                    deferred;
-            } else {
-                var results = query ? $scope.genesSecond.filter(createFilterFor(query)) :
-                    $scope.genesSecond,
-                    deferred;
-            }
-
-            if (self.simulateQuery) {
-                deferred = $q.defer();
-                $timeout(function() { deferred.resolve(results); }, Math.random() *
-                    1000, false);
-                return deferred.promise;
-            } else {
-                return results;
-            }
-        };
+        $scope.querySearch = BasicDataService.querySearch;
 
         $scope.selectedItemChanged = function(item, source) {
             // Run code to select gene here
@@ -130,8 +76,6 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
             }).then(function(data) {
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;
-                //$scope.applyConfig(data.config, "cyMain");
-                //$scope.genesSecond = $scope.loadAll(item.value);
                 $scope.neighbours = angular.copy($scope.genesSecond);
                 GraphConfigService.neighbourConfigs.secondDropdownConfig = angular
                     .copy(data.config);
@@ -140,13 +84,6 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         };
 
         $scope.resize = GraphConfigService.resetZoom;
-
-        function createFilterFor(query) {
-            var lowercaseQuery = angular.lowercase(query);
-            return function filterFn(gene) {
-                return (gene.value.indexOf(lowercaseQuery) === 0);
-            };
-        }
 
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {
@@ -163,7 +100,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour");
-                $scope.genesFirst = $scope.loadAll();
+                $scope.genesFirst = $scope.loadDropdownOptions($scope.cy);
             }
         });
 

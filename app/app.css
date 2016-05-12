@@ -85,3 +85,15 @@ fieldset.standard div {
 md-toolbar {
     min-height: 40px !important;
 }
+
+md-input-container.select {
+    margin: 0px !important;
+}
+
+md-switch {
+    margin: 0px !important;
+}
+
+.md-button {
+    line-height: inherit !important;
+}
