@@ -1,0 +1,74 @@
+library(jsonlite)
+
+setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
+source('helpers.R')
+
+args <- commandArgs(trailingOnly = TRUE)
+pValue <- as.character(args[2])
+numberOfGenes <- as.character(args[3])
+genesOfInterest <- c()
+
+corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
+degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
+
+for (x in 1:numberOfGenes) {
+	genesOfInterest <- c(genesOfInterest, as.character(args[3 + x]))
+}
+
+maxNeighbours <- 3
+epiGenes <- c()
+stromaGenes <- c()
+
+for (gene in genesOfInterest) {
+	temp = substr(gene, 1, nchar(gene) - 2)
+
+	if (tolower(substr(gene, nchar(gene) - 1, nchar(gene))) == "-s") {
+		stromaGenes = c(stromaGenes, temp)
+	} else {
+		epiGenes = c(epiGenes, temp)
+	}
+}
+
+topFirstNeighbours <- c()
+for (gene in stromaGenes) {
+	topFirstNeighbours <- c(topFirstNeighbours, names(tail(sort(corMatrix[, gene]), maxNeighbours)))
+}
+
+epiGenes <- c(epiGenes, topFirstNeighbours)
+
+topSecondNeighbours <- c()
+for (gene in topFirstNeighbours) {
+	topSecondNeighbours <- c(topSecondNeighbours, names(tail(sort(corMatrix[gene, ]), maxNeighbours)))
+}
+
+stromaGenes <- c(stromaGenes, topSecondNeighbours)
+
+
+topFirstNeighbours <- c()
+for (gene in epiGenes) {
+	topFirstNeighbours <- c(topFirstNeighbours, names(tail(sort(corMatrix[gene, ]), maxNeighbours)))
+}
+
+stromaGenes <- c(stromaGenes, topFirstNeighbours)
+
+topSecondNeighbours <- c()
+for (gene in topFirstNeighbours) {
+	topSecondNeighbours <- c(topSecondNeighbours, names(tail(sort(corMatrix[, gene]), maxNeighbours)))
+}
+
+epiGenes <- c(epiGenes, topSecondNeighbours)
+
+weights <- corMatrix[unique(epiGenes), unique(stromaGenes)]
+
+
+totalInteractions <- length(which((weights)!=0))
+minPositiveWeight <- min(weights[weights > 0])
+maxPositiveWeight <- max(weights[weights > 0])
+
+#Min negative weight means the negative weight with that smallest magnitude, not value
+minNegativeWeight <- min(weights[weights < 0])
+maxNegativeWeight <- max(weights[weights < 0])
+
+degrees <- getDegrees(weights)
+
+output <- list(degrees = degrees, weights = weights, totalInteractions = totalInteractions, minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
