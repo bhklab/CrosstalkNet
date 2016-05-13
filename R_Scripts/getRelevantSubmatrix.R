@@ -20,7 +20,7 @@ epiGenes <- c()
 stromaGenes <- c()
 
 for (gene in genesOfInterest) {
-	temp = substr(gene, 1, nchar(gene) - 2)
+	temp = toupper(substr(gene, 1, nchar(gene) - 2));
 
 	if (tolower(substr(gene, nchar(gene) - 1, nchar(gene))) == "-s") {
 		stromaGenes = c(stromaGenes, temp)
@@ -31,34 +31,46 @@ for (gene in genesOfInterest) {
 
 topFirstNeighbours <- c()
 for (gene in stromaGenes) {
-	topFirstNeighbours <- c(topFirstNeighbours, names(tail(sort(corMatrix[, gene]), maxNeighbours)))
+	topFirstNeighbours <- c(topFirstNeighbours, names(which(tail(sort(corMatrix[, gene]), maxNeighbours) != 0)))
 }
 
 epiGenes <- c(epiGenes, topFirstNeighbours)
 
 topSecondNeighbours <- c()
 for (gene in topFirstNeighbours) {
-	topSecondNeighbours <- c(topSecondNeighbours, names(tail(sort(corMatrix[gene, ]), maxNeighbours)))
+	topSecondNeighbours <- c(topSecondNeighbours, names(which(tail(sort(corMatrix[gene, ]), maxNeighbours) != 0)))
 }
 
 stromaGenes <- c(stromaGenes, topSecondNeighbours)
 
-
 topFirstNeighbours <- c()
 for (gene in epiGenes) {
-	topFirstNeighbours <- c(topFirstNeighbours, names(tail(sort(corMatrix[gene, ]), maxNeighbours)))
+	topFirstNeighbours <- c(topFirstNeighbours, names(which(tail(sort(corMatrix[gene, ]), maxNeighbours) != 0)))
 }
 
 stromaGenes <- c(stromaGenes, topFirstNeighbours)
 
+
 topSecondNeighbours <- c()
 for (gene in topFirstNeighbours) {
-	topSecondNeighbours <- c(topSecondNeighbours, names(tail(sort(corMatrix[, gene]), maxNeighbours)))
+	topSecondNeighbours <- c(topSecondNeighbours, names(which(tail(sort(corMatrix[, gene]), maxNeighbours) != 0)))
 }
+
 
 epiGenes <- c(epiGenes, topSecondNeighbours)
 
+write("stroma genes", stderr())
+write(unique(stromaGenes), stderr())
+write("epi genes", stderr())
+write(unique(epiGenes), stderr())
+
 weights <- corMatrix[unique(epiGenes), unique(stromaGenes)]
+
+dput(weights, "temp.Rdata")
+
+write("weights", stderr())
+write(weights	, stderr())
+
 
 
 totalInteractions <- length(which((weights)!=0))
@@ -72,3 +84,5 @@ maxNegativeWeight <- max(weights[weights < 0])
 degrees <- getDegrees(weights)
 
 output <- list(degrees = degrees, weights = weights, totalInteractions = totalInteractions, minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
+
+cat(format(serializeJSON(output)))

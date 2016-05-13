@@ -19,7 +19,7 @@ myModule.factory('BasicDataService', function($http) {
     service.layouts = [{ display: "Bipartite", value: "preset" }, {
         display: "Concentric",
         value: "concentric"
-    }, { display: "Hierarchical", value: "hierarchical" }];
+    }, { display: "Hierarchical", value: "hierarchical" },{ display: "Random", value: "random" }];
 
     service.loadDropdownOptions = loadDropdownOptions;
     service.querySearch = querySearch;

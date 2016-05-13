@@ -55,7 +55,7 @@ md-sidenav {
 }
 
 md-sidenav {
-  max-width: 230px;
+    max-width: 230px;
 }
 
 .list-height {
@@ -63,11 +63,11 @@ md-sidenav {
     overflow: auto;
 }
 
- fieldset.standard {
-  border-style: solid;
-  border-color: #9E9E9E;
-  border-width: 1px; 
-  color: #9E9E9E;
+fieldset.standard {
+    border-style: solid;
+    border-color: #9E9E9E;
+    border-width: 1px;
+    color: #9E9E9E;
 }
 
 fieldset.standard div {
@@ -75,7 +75,7 @@ fieldset.standard div {
 }
 
 .header-background {
-    background-color: #0288D1 !important; 
+    background-color: #0288D1 !important;
 }
 
 .title-font {
@@ -96,4 +96,20 @@ md-switch {
 
 .md-button {
     line-height: inherit !important;
+}
+
+md-menu-content {
+    min-width: inherit !important;
+}
+
+.interaction-card {
+    background-color: black;
+    padding-left: 1px;
+    margin-bottom: 2px;
+    color: white;
+    border-right: 1px solid green;
+}
+
+.interaction-card:nth-child(5n + 0) {
+    border-right: none;
 }

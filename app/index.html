@@ -88,6 +88,33 @@
                                                 <br>Degree: {{gene.object.degree}}</div>
                                         </md-card-content>
                                     </md-card>
+                                    <md-card>
+                                        <md-card-title>
+                                            <md-card-title-text>
+                                                <span class="md-headline">Interactions</span>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                        <md-card-content layout="row" layout-wrap>
+                                            <div flex="20" ng-repeat="elem in cy.edges()">
+                                                <div class="interaction-card">
+                                                    {{elem.source().id()}} with {{elem.target().id()}}
+                                                    <br> Strength: {{elem.data('weight')}}
+                                                </div>
+                                            </div>
+                                        </md-card-content>
+                                    </md-card>
+                                    <!--<md-card>
+                                        <md-card-title>
+                                            <md-card-title-text>
+                                                <span class="md-headline">All Elements</span>
+                                                <span class="md-headline">Edges: {{edges}}</span>
+                                                <span class="md-headline">Nodes: {{nodes}}</span>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                        <md-card-content layout="row" layout-wrap>
+                                            <div flex="20" ng-repeat="elem in elemCopy">{{elem.data}}</div>
+                                        </md-card-content>
+                                    </md-card>-->
                                 </div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
@@ -123,6 +150,21 @@
                                         <md-card-content layout="row" layout-wrap>
                                             <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}}
                                                 <br>Degree: {{gene.object.degree}}</div>
+                                        </md-card-content>
+                                    </md-card>
+                                    <md-card>
+                                        <md-card-title>
+                                            <md-card-title-text>
+                                                <span class="md-headline">Interactions</span>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                        <md-card-content layout="row" layout-wrap>
+                                            <div flex="20" ng-repeat="elem in cy.edges()">
+                                                <div class="interaction-card">
+                                                    {{elem.source().id()}} with {{elem.target().id()}}
+                                                    <br> Strength: {{elem.data('weight')}}
+                                                </div>
+                                            </div>
                                         </md-card-content>
                                     </md-card>
                                 </div>

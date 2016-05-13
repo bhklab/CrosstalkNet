@@ -22,7 +22,7 @@ app.get('/overall-graph', function(req, res) {
     // The client side will also be specifying what kind of layout they want. For now, we'll stick to 
     // the preset layout
     var pValue = req.query.pValue;
-    var requestedLayout = 'random'; //req.query.layout;
+    var requestedLayout = req.query.layout;
 
     var minPositiveWeight = req.query.minPositiveWeight;
     var minNegativeWeight = req.query.minNegativeWeight;
@@ -30,7 +30,6 @@ app.get('/overall-graph', function(req, res) {
     if (initialElements[pValue] != null) {
         var config = createOverallConfig(initialElements[pValue],
             requestedLayout);
-
 
         res.json({
             config: config,
@@ -71,22 +70,9 @@ app.get('/overall-graph-weight-filter', function(req, res) {
                 console.log('error: ' + error);
             }
 
-            var parsed = getWeightsAndDegreesFromROutput(stdout);
-            console.log("returned");
-            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
-                parsed.weights,
-                parsed.geneNames);
+            var allInfo = extractElementsAndInteractions(stdout);
 
-            var allInfo = {
-                elements: elements,
-                totalInteractions: parsed.totalInteractions,
-                maxPositiveWeight: parsed.maxPositiveWeight,
-                minPositiveWeight: parsed.minPositiveWeight,
-                maxNegativeWeight: parsed.maxNegativeWeight,
-                minNegativeWeight: parsed.minNegativeWeight
-            };
-
-            var config = createOverallConfig(elements, requestedLayout);
+            var config = createOverallConfig(allInfo.elements, requestedLayout);
 
             res.json({
                 config: config,
@@ -162,12 +148,12 @@ app.post('/new-neighbour-general', function(req, res) {
             var firstNeighboursDegrees = parsedValue.value[2].value;
             var firstNeighboursGeneNames = parsedValue.value[0].attributes.names.value;
 
-            var secondNeighbourWeights = [];
+            var secondNeighboursWeights = [];
             var secondNeighboursDegrees = [];
             var secondNeighboursGeneNames = [];
 
             if (secondGeneName.toLowerCase() != 'null') {
-                secondNeighbourWeights = parsedValue.value[1].value;
+                secondNeighboursWeights = parsedValue.value[1].value;
                 secondNeighboursDegrees = parsedValue.value[3].value;
                 secondNeighboursGeneNames = parsedValue.value[1].attributes.names.value;
 
@@ -178,7 +164,7 @@ app.post('/new-neighbour-general', function(req, res) {
                     secondParent, 8, secondNeighboursDegrees);
 
                 secondNeighboursEdges = edgeUtils.createEdgesFromNode(secondSourceNode[
-                    0], secondNeighboursNodes, secondNeighboursGeneNames, false);
+                    0], secondNeighboursNodes, secondNeighboursWeights, false);
             }
 
             var temp = side == "-E" ? "epi" : "stroma";
@@ -202,9 +188,9 @@ app.post('/new-neighbour-general', function(req, res) {
                 4, firstNeighboursDegrees);
 
             firstNeighboursEdges = edgeUtils.createEdgesFromNode(firstSourceNode[0],
-                firstNeighboursNodes, firstNeighboursGeneNames, false);
+                firstNeighboursNodes, firstNeighboursWeights, false);
 
-            if (requestedLayout == 'hierarchical') {
+            if (requestedLayout == 'hierarchical' || requestedLayout == 'preset' || requestedLayout == 'random' ) {
                 firstNeighboursNodes = nodeUtils.addPositionsToNodes(
                     firstNeighboursNodes,
                     400, 100, 0, 20);
@@ -265,7 +251,7 @@ app.post('/new-neighbour-general', function(req, res) {
 
             configUtils.setConfigElements(config, elements);
 
-            if (requestedLayout == "hierarchical") {
+            if (requestedLayout == "hierarchical" || requestedLayout == 'preset' || requestedLayout == 'random') {
                 layout = configUtils.createPresetLayout();
             } else if (requestedLayout == "concentric") {
                 layout = configUtils.createConcentricLayout(firstSourceNode[0].data
@@ -281,13 +267,22 @@ app.get('/submatrix', function(req, res) {
     var genes = req.query.genes;
     var pValue = req.query.pValue;
 
+    if (genes instanceof String) {
+        genes = [genes];
+    } else if (genes == null || genes == "" || genes == []) {
+        res.json({ error: "Error" });
+        return;
+    }
+
+    console.log(req.query);
     var geneArgs = "";
 
     for (var i = 0; i < genes.length; i++) {
         geneArgs = geneArgs + " " + "\"" + genes[i] + "\"";
     }
 
-    var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args" geneArgs + " " + "\"" + pValue + "\"", {
+    var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args " +
+        "\"" + pValue + "\"" + " " + "\"" + genes.length + "\"" + geneArgs, {
             maxBuffer: 1024 *
                 50000
         },
@@ -299,24 +294,40 @@ app.get('/submatrix', function(req, res) {
                 console.log('error: ' + error);
             }
 
-            var parsed = getWeightsAndDegreesFromROutput(stdout);
-            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
-                parsed.weights,
-                parsed.geneNames);
+            console.log(stdout);
+            var allInfo = extractElementsAndInteractions(stdout);
 
-            var allInfo = {
-                elements: elements,
-                totalInteractions: parsed.totalInteractions,
-                minPositiveWeight: parsed.minPositiveWeight,
-                maxPositiveWeight: parsed.maxPositiveWeight,
-                minNegativeWeight: parsed.minNegativeWeight,
-                maxNegativeWeight: parsed.maxNegativeWeight
-            };
+            var config = createOverallConfig(allInfo.elements,
+                "random");
 
-            res.json() = allInfo;
+            res.json({
+                config: config,
+                totalInteractions: allInfo.totalInteractions,
+                minPositiveWeight: allInfo.minPositiveWeight,
+                maxPositiveWeight: allInfo.maxPositiveWeight,
+                minNegativeWeight: allInfo.minNegativeWeight,
+                maxNegativeWeight: allInfo.maxNegativeWeight
+            });
         });
-
 });
+
+function extractElementsAndInteractions(stdout) {
+    var parsed = getWeightsAndDegreesFromROutput(stdout);
+    var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
+        parsed.weights,
+        parsed.geneNames);
+
+    var allInfo = {
+        elements: elements,
+        totalInteractions: parsed.totalInteractions,
+        minPositiveWeight: parsed.minPositiveWeight,
+        maxPositiveWeight: parsed.maxPositiveWeight,
+        minNegativeWeight: parsed.minNegativeWeight,
+        maxNegativeWeight: parsed.maxNegativeWeight
+    };
+
+    return allInfo;
+}
 
 function buildStringArgs(script, args) {
     var stringArgs = "";
@@ -359,7 +370,7 @@ function createOverallConfig(originalElements, requestedLayout) {
             elements.epiParent = null;
             elements.stromaParent = null;
             configUtils.setConfigElements(config, elements);
-            configLayout = configUtils.createRandomLayout();
+            configLayout = configUtils.createRandomLayout(elements.epiNodes.length + elements.stromaNodes.length);
             configUtils.setConfigLayout(config, configLayout);
             var epiColor = {
                 'selector': 'node[id$="-E"], node[id$="-Er"]',
@@ -386,13 +397,23 @@ function createOverallConfig(originalElements, requestedLayout) {
 function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     var initialWeights = [];
     var dimension = geneNames.length;
+    var epiGeneNames = [];
+    var stromaGeneNames = [];
+
+    if (geneNames.epiGeneNames != null) {
+        epiGeneNames = geneNames.epiGeneNames;
+        stromaGeneNames = geneNames.stromaGeneNames;
+    } else {
+        epiGeneNames = geneNames;
+        stromaGeneNames = geneNames;
+    }
 
     //console.log(weights.value);
     console.log("Dimension: " + dimension);
-    for (var i = 0; i < dimension; i++) {
+    for (var i = 0; i < epiGeneNames.length; i++) {
         var temp = [];
-        for (var j = 0; j < dimension; j++) {
-            temp.push(weights.value[(dimension * i) + j]);
+        for (var j = 0; j < stromaGeneNames.length; j++) {
+            temp.push(weights.value[(epiGeneNames.length * j) + i]);
         }
 
         initialWeights.push(temp);
@@ -405,8 +426,13 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
         epiParent: null,
         stromaParent: null
     };
-    var epiNodes = nodeUtils.createNodes(geneNames, 'epi', 1, epiDegrees);
-    var stromaNodes = nodeUtils.createNodes(geneNames, 'stroma', 2, stromaDegrees);
+    var epiNodes = nodeUtils.createNodes(epiGeneNames, 'epi', 1, epiDegrees);
+    var stromaNodes = nodeUtils.createNodes(stromaGeneNames, 'stroma', 2, stromaDegrees);
+
+    /*
+    console.log(epiNodes);
+    console.log(stromaNodes);*/
+
     var edges = edgeUtils.createEdges(epiNodes, stromaNodes, initialWeights);
 
     elements.epiNodes = epiNodes;
@@ -431,7 +457,15 @@ function getWeightsAndDegreesFromROutput(stdout) {
     var epiDegrees = parsedValue.value[0].value[0].value;
     var stromaDegrees = parsedValue.value[0].value[1].value;
     var weights = parsedValue.value[1];
-    var geneNames = weights.attributes.dimnames.value[0].value;
+    var geneNames = { epiGeneNames: null, stromaGeneNames: null }; //weights.attributes.dimnames.value[0].value;
+
+    geneNames.epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
+    geneNames.stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
+
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+    console.log(parsedValue.value[0].value[0].attributes.names.value);
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+
     var totalInteractions = parsedValue.value[2].value[0];
     var minPositiveWeight = parsedValue.value[3].value[0];
     var maxPositiveWeight = parsedValue.value[4].value[0];
@@ -481,20 +515,7 @@ function cacheElementsForPValue(pValue, script) {
                 console.log('error: ' + error);
             }
 
-            var parsed = getWeightsAndDegreesFromROutput(stdout);
-            var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
-                parsed.weights,
-                parsed.geneNames);
-
-            var allInfo = {
-                elements: elements,
-                totalInteractions: parsed.totalInteractions,
-                minPositiveWeight: parsed.minPositiveWeight,
-                maxPositiveWeight: parsed.maxPositiveWeight,
-                minNegativeWeight: parsed.minNegativeWeight,
-                maxNegativeWeight: parsed.maxNegativeWeight
-            };
-
+            var allInfo = extractElementsAndInteractions(stdout);
             initialElements[pValue] = allInfo;
         });
 }

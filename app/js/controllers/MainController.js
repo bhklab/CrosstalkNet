@@ -34,7 +34,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.display = "Graph";
         $scope.switchModel = false;
 
-        $scope.selectedLayout = $scope.layouts[1].value;
+        $scope.selectedLayout = $scope.layouts[0].value;
 
         $scope.sliderMinWeightNegative = 0;
         $scope.sliderMaxWeightPositive = 0;
@@ -47,8 +47,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.getSelfLoops = GraphConfigService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
-
-
+        $scope.genesOfInterest = [];
 
         $scope.applyConfig = function(config, containerID) {
             $scope.elemCopy = angular.copy(config.elements);
@@ -56,8 +55,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             config.container = document.getElementById(containerID);
             $scope.cy = cytoscape(config);
 
+            $scope.nodes = $scope.cy.nodes().length;
+            $scope.edges = $scope.cy.edges().length;
+
             $scope.cy.fit($scope.cy.$("*"), 10);
         }
+
+        $scope.edges = 0;
+        $scope.nodes = 0;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -78,7 +83,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                                 "NA" : $scope.minNegativeWeight,
                             minPositiveWeight: $scope.minPositiveWeight ==
                                 null || !$scope.positiveFilterEnabled ?
-                                "NA" : $scope.minPositiveWeight
+                                "NA" : $scope.minPositiveWeight,
+                            layout: $scope.selectedLayout
                         }
                     })
                     .then(function(data) {
@@ -91,8 +97,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     });
             });
         };
-
-
 
         $scope.selectedItemChanged = function(item, source) {
             // Run code to select gene here
@@ -163,6 +167,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $("md-autocomplete input").each(function() {
                 $(this).val('');
             });
+
+            //$mdAutocompleteCtrl.clear();
         };
 
         $scope.resetAllData = function() {
@@ -200,8 +206,32 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.searchForGene = function(gene) {
             if (gene != null) {
                 $scope.findGeneInGraph($scope.cy, gene.value);
-            }
 
+                if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                    $scope.genesOfInterest.push(gene.value);
+                }
+            }
+        };
+
+        $scope.getRelevantGenes = function() {
+            RESTService.get("submatrix", {
+                    params: {
+                        pValue: $scope.pValueActual,
+                        genes: $scope.genesOfInterest
+                    }
+                })
+                .then(function(data) {
+                    console.log(data);
+                    $rootScope.state = $rootScope.states.loadingConfig;
+                    $scope.totalInteractions = data.totalInteractions;
+                    $scope.sliderMinWeightNegative = data.minNegativeWeight;
+                    $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
+                    $scope.applyConfig(data.config, "cyMain");
+                });
+        };
+
+        $scope.removeGene = function(gene) {
+            $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
         };
     }
 ]);
