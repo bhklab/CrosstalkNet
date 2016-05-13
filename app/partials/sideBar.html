@@ -11,6 +11,25 @@
                 No states matching "{{searchTextFirst}}" were found.
             </md-not-found>
         </md-autocomplete>
+        <div>
+            <md-list>
+                <md-list-item ng-repeat="gene in genesOfInterest">
+                    <md-menu>
+                        <md-button ng-click="$mdOpenMenu($event)">
+                            {{gene}}
+                        </md-button>
+                        <md-menu-content width="6">
+                            <md-menu-item ng-repeat="item in [1]">
+                                <md-button ng-click="removeGene(gene)">
+                                    Remove Gene
+                                </md-button>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
+                </md-list-item>
+            </md-list>
+        </div>
+        <md-button ng-click="getRelevantGenes()">Get Genes</md-button>
         <div layout="row">
             <div flex="50">
                 <md-switch ng-model="$parent.switchModel" aria-label="Switch 1" ng-change="changeDisplay()">
@@ -25,7 +44,7 @@
             <md-input-container class="select">
                 <label>Layout</label>
                 <md-select ng-model="$parent.selectedLayout">
-                    <md-option ng-repeat="layout in layouts" value="{{layout.value}}" ng-selected="layout.value == 'concentric'">
+                    <md-option ng-repeat="layout in layouts" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
                         {{layout.display}}
                     </md-option>
                 </md-select>
