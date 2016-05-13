@@ -267,7 +267,7 @@ app.get('/submatrix', function(req, res) {
     var genes = req.query.genes;
     var pValue = req.query.pValue;
 
-    if (genes instanceof String) {
+    if (! (genes instanceof Array)) {
         genes = [genes];
     } else if (genes == null || genes == "" || genes == []) {
         res.json({ error: "Error" });
