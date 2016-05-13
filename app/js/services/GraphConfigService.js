@@ -88,8 +88,8 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
         
-        cy.fit(cy.$("#" + gene.toUpperCase()));
-        cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
+        cy.fit(cy.$("#" + gene.toUpperCase()), 200);
+        //cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
     };
 
     service.resetEdges = function(cy) {

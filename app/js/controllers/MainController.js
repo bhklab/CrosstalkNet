@@ -173,6 +173,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.resetAllData = function() {
             $scope.neighbours = null;
+            $scope.genesOfInterest = [];
+            $scope.sliderMinWeightNegative = 1;
+            $scope.sliderMaxWeightPositive = 1;
+            $scope.elemCopy = null;
+            $scope.styleCopy = null;
         };
 
         $scope.refreshOverallGraph = function(path) {
