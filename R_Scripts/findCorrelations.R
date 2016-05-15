@@ -1,7 +1,6 @@
 library(jsonlite)
 
-setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
-
+setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
 args <- commandArgs(trailingOnly = TRUE)
 gene <- args[2]
 side <- args[3]

@@ -49,6 +49,44 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.querySearch = BasicDataService.querySearch;
         $scope.genesOfInterest = [];
 
+        $scope.getInteractingNodes = function(node) {
+            var attribute = '';
+
+            if (node.id().endsWith('-E')) {
+                attribute = 'source';
+            } else {
+                attribute = 'target';
+            }
+
+            var edges = $scope.cy.edges("[" + attribute + "='" + node.id() + "']");
+            var nodes = [];
+
+
+            for (var i = 0; i < edges.length; i++) {
+                if (attribute == 'source') {
+                    nodes.push(edges[i].target());
+                } else {
+                    nodes.push(edges[i].source());
+                }
+                
+            }
+
+            return nodes;
+        };
+
+        $scope.getNodesWithMinDegree = function() {
+            var nodes = $scope.cy.nodes();
+            var result = [];
+
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].data('degree') > $scope.minDegree.first) {
+                    result.push(nodes[i]);
+                }
+            }
+
+            return result;
+        };
+
         $scope.applyConfig = function(config, containerID) {
             $scope.elemCopy = angular.copy(config.elements);
             $scope.styleCopy = angular.copy(config.style);
