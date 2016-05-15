@@ -1,0 +1,69 @@
+<div ng-show="display == 'Self Loops'">
+    <md-card>
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">All Self Loops</span>
+                <span class="md-subhead">Total: {{selfLoopsCount}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="row" layout-wrap>
+            <div flex="20" ng-repeat="gene in selfLoops">{{gene}}</div>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="neighbours.length > 0">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">First Neighbours</span>
+                <span class="md-subhead">Total: {{neighbours.length}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="row" layout-wrap>
+            <div flex="20" ng-repeat="gene in neighbours">Gene: {{gene.value}}
+                <br>Degree: {{gene.object.degree}}</div>
+        </md-card-content>
+    </md-card>
+
+    <md-card ng-if="cy != null && cy.edges() != null">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">All Interactions</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="row" layout-wrap>
+            <div flex="20" ng-repeat="elem in cy.edges()">
+                <div class="interaction-card">
+                    {{elem.source().id()}} with {{elem.target().id()}}
+                    <br> Strength: {{elem.data('weight')}}
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+    <!--
+    <md-card ng-if="cy != null">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Degree Cutoff Interactions</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="row" layout-wrap>
+            <div flex="20" ng-repeat="node in getNodesWithMinDegree()">
+                <div class="interaction-card">
+                    {{node.id()}}
+                    <span ng-repeat="child in getInteractingNodes(node)">{{child.id()}}</span>
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+    <!--<md-card>
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">All Elements</span>
+                <span class="md-headline">Edges: {{edges}}</span>
+                <span class="md-headline">Nodes: {{nodes}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="row" layout-wrap>
+            <div flex="20" ng-repeat="elem in elemCopy">{{elem.data}}</div>
+        </md-card-content>
+    </md-card>-->
+</div>
