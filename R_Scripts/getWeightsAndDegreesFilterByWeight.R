@@ -1,6 +1,6 @@
 library(jsonlite)
 
-setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
+setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
 source('helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)

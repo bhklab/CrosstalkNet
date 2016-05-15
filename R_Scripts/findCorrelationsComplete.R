@@ -1,7 +1,6 @@
 library(jsonlite)
 
-setwd('C:/Users/Alex/Documents/EpiStroma/R_Scripts')
-
+setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
 args <- commandArgs(trailingOnly = TRUE)
 first <- as.character(args[2])
 second <- as.character(args[3])
@@ -57,7 +56,7 @@ if (side == '-E') { # First neighbour gene is an epi gene
 		secondNeigboursWeights <- corMatrix[second, secondNeighboursIndex]
 		names(secondNeigboursWeights) <- names(secondNeighboursIndex)
 
-		secondNeighboursDegrees <- degrees$epiDegree[secondNeighboursIndex]
+		secondNeighboursDegrees <- degrees$stromaDegree[secondNeighboursIndex]
 	} else {
 		secondNeigboursWeights <- c()
 		secondNeighboursDegrees <- c()
@@ -66,7 +65,7 @@ if (side == '-E') { # First neighbour gene is an epi gene
 	firstNeighboursWeights <- corMatrix[firstNeighboursIndex, first]
 	names(firstNeighboursWeights) <- names(firstNeighboursIndex)
 
-	firstNeighboursDegrees <- degrees$stromaDegree[firstNeighboursIndex]
+	firstNeighboursDegrees <- degrees$epiDegree[firstNeighboursIndex]
 	
 	result <- list(firstNeighboursWeights = firstNeighboursWeights, secondNeigboursWeights = secondNeigboursWeights, 
 		firstNeighboursDegrees = firstNeighboursDegrees, secondNeighboursDegrees = secondNeighboursDegrees)
