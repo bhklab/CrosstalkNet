@@ -31,11 +31,16 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
     };
 
-    service.applyConfig = function(config) {
-        service.data.main.elemCopy = angular.copy(config.elements);
-        config.container = document.getElementById('cy');
-        service.data.main.cy = cytoscape(config);
-        service.data.main.cy.fit(service.data.main.cy.$("*"), 10);
+    service.applyConfig = function(config, containerID, scope) {
+        scope.elemCopy = angular.copy(config.elements);
+        scope.styleCopy = angular.copy(config.style);
+        config.container = document.getElementById(containerID);
+        scope.cy = cytoscape(config);
+
+        scope.nodes = scope.cy.nodes().length;
+        scope.edges = scope.cy.edges().length;
+
+        scope.cy.fit(scope.cy.$("*"), 10);
 
         /*
         service.cy.on("zoom", function() {
@@ -83,11 +88,36 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });*/
     };
 
+    service.getInteractingNodes = function(node, cy) {
+        var attribute = '';
+
+        if (node.id().endsWith('-E')) {
+            attribute = 'source';
+        } else {
+            attribute = 'target';
+        }
+
+        var edges = cy.edges("[" + attribute + "='" + node.id() + "']");
+        var nodes = [];
+
+
+        for (var i = 0; i < edges.length; i++) {
+            if (attribute == 'source') {
+                nodes.push(edges[i].target());
+            } else {
+                nodes.push(edges[i].source());
+            }
+
+        }
+
+        return nodes;
+    };
+
     service.findGeneInGraph = function(cy, gene) {
         var node = cy.$("#" + gene.toUpperCase());
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
-        
+
         cy.fit(cy.$("#" + gene.toUpperCase()), 200);
         //cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
     };

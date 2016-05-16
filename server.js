@@ -9,7 +9,10 @@ var configUtils = require('configUtils');
 var copyUtils = require('copyUtils');
 var edgeUtils = require('edgeUtils');
 var styleUtils = require('styleUtils');
+var geneUtils = require('geneUtils');
 
+
+var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
 var initialElements = { "001": null, "01": null, "05": null, "1": null };
 var selfLoopGeneNames = { "001": null, "01": null, "05": null, "1": null };
@@ -99,18 +102,37 @@ app.get('/self-loops', function(req, res) {
     }
 });
 
+app.get('/gene-list', function(req, res) {
+    var pValue = req.query.pValue;
+    console.log(pValue);
+
+    if (geneListCache[pValue] != null) {
+        res.json({ geneList: geneListCache[pValue] });
+    } else {
+        res.json({ error: "Could not get gene list for P Value:" + pValue });
+    }
+});
+
 app.post('/final-neighbour-general', function(req, res) {
     var selectedGenes = req.body.selectedGenes;
     var pValue = req.body.pValue;
-    var numberOfGenes = selectedGenes.length;
+    var requestedLayout = req.body.layout;
+    var numberOfGenes = 0;
     var genesArg = "";
+    console.log("selectedGenes:");
+    console.log(selectedGenes);
+    console.log("pValue: ")
+    console.log(pValue);
 
-     if (!(selectedGenes instanceof Array)) {
+    if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
     } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
         res.json({ error: "Error" });
         return;
     }
+
+    var initialColor = selectedGenes[0].endsWith("-E") ? "red" : "blue";
+    numberOfGenes = selectedGenes.length;
 
     for (var i = 0; i < selectedGenes.length; i++) {
         genesArg = genesArg + " " + "\"" + selectedGenes[i] + "\"";
@@ -134,23 +156,53 @@ app.post('/final-neighbour-general', function(req, res) {
             var parentNodes = [];
             var edges = [];
             var elements = [];
+            var config = null;
+            var layout = null;
 
             //geneNames.epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
-
-            for (var i = 0; i < selectedGenes.length + 1; i++) {
-                parentNodes.push({
-                    data: {
-                        id: "par" + i
-                    }
-                });
-            }
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i]], 'par' + i, 0, 0));
             }
 
+            if (weights[0].attributes.names == null) {
+                sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                    100, 0, 0);
+                sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                    "left",
+                    "center",
+                    "blue");
+                elements.push(sourceNodes[0][0]);
+
+                config = configUtils.createConfig();
+                layout = configUtils.createPresetLayout();
+
+                configUtils.setConfigElements(config, elements);
+                configUtils.setConfigLayout(config, layout);
+
+                res.json({ config: config });
+                return;
+            }
+
             for (var i = 0; i < weights.length; i++) {
                 nodes["" + i] = nodeUtils.createNodes(weights[i].attributes.names.value, "par" + (i + 1), 0, degrees[i].value);
+            }
+
+
+            for (var i = 0; i < selectedGenes.length + 1; i++) {
+                if (i < 1) {
+                    parentNodes.push({
+                        data: {
+                            id: "par" + i
+                        }
+                    });
+                } else if (nodes["" + (i - 1)].length > 0) {
+                    parentNodes.push({
+                        data: {
+                            id: "par" + i
+                        }
+                    });
+                }
             }
 
             var i = 0;
@@ -160,178 +212,32 @@ app.post('/final-neighbour-general', function(req, res) {
                 i++;
             }
 
+            sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                100, 0, 0);
+            sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                "left",
+                "center",
+                initialColor);
+
             elements = elements.concat(parentNodes);
             elements = elements.concat(edges);
             elements.push(sourceNodes[0][0]);
 
+            i = 1;
             for (nodeCollection in nodes) {
+                initialColor = initialColor == "red" ? "blue" : "red";
+                nodes[nodeCollection] = nodeUtils.addPositionsToNodes(nodes[nodeCollection], 400 * i, 100, 0, 20);
+                nodes[nodeCollection] = nodeUtils.addStyleToNodes(nodes[nodeCollection], 10, 10, "center", "top", initialColor);
                 elements = elements.concat(nodes[nodeCollection]);
+                i++;
             }
-
-            res.json({elements: elements});
-        });
-});
-
-app.post('/new-neighbour-general', function(req, res) {
-    var side = req.body.side.toUpperCase();
-    var pValue = req.body.pValue;
-    var requestedLayout = req.body.layout;
-    var firstGeneName = req.body.first;
-    var secondGeneName = req.body.second;
-    var firstParent = "";
-    var secondParent = "";
-
-    if (secondGeneName.toLowerCase() == "null") {
-        firstParent = side == "-E" ? "stroma" : "epi";
-    } else {
-        firstParent = side == "-E" ? "epi" : "stroma";
-        secondParent = side == "-E" ? "stromaRight" : "epiRight";
-    }
-
-    var child = exec("Rscript R_scripts/findCorrelationsComplete.R --args " +
-        "\"" + firstGeneName.toUpperCase() + "\"" + " " + "\"" + secondGeneName.toUpperCase() +
-        "\"" + " " + "\"" + side + "\"" + " " + "\"" + pValue + "\"", {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var config = null;
-            var layout = null;
-            var elements = [];
-            var firstNeigboursBgColor = firstParent == "epi" ? "red" : "blue";
-            var secondNeigboursBgColor = secondParent == "epiRight" ? "red" : "blue";
-            var firstSourceNode = null;
-            var secondSourceNode = null;
-
-            var firstNeighboursNodes = [];
-            var firstNeighboursEdges = [];
-            var secondNeighboursNodes = [];
-            var secondNeighboursEdges = [];
-
-            var parsedValue = JSON.parse(stdout);
-            console.log(parsedValue);
-
-            var firstNeighboursWeights = parsedValue.value[0].value;
-            var firstNeighboursDegrees = parsedValue.value[2].value;
-            var firstNeighboursGeneNames = parsedValue.value[0].attributes.names.value;
-
-            var secondNeighboursWeights = [];
-            var secondNeighboursDegrees = [];
-            var secondNeighboursGeneNames = [];
-
-            if (secondGeneName.toLowerCase() != 'null') {
-                secondNeighboursWeights = parsedValue.value[1].value;
-                secondNeighboursDegrees = parsedValue.value[3].value;
-                secondNeighboursGeneNames = parsedValue.value[1].attributes.names.value;
-
-                secondSourceNode = nodeUtils.createNodes([secondGeneName], side == "-E" ?
-                    "epi" : "stroma", 4, [0]);
-
-                secondNeighboursNodes = nodeUtils.createNodes(secondNeighboursGeneNames,
-                    secondParent, 8, secondNeighboursDegrees);
-
-                secondNeighboursEdges = edgeUtils.createEdgesFromNode(secondSourceNode[
-                    0], secondNeighboursNodes, secondNeighboursWeights, false);
-            }
-
-            var temp = side == "-E" ? "epi" : "stroma";
-
-            if (secondGeneName != "null") {
-                if (side == "-E") {
-
-                    temp = "stroma"
-                } else {
-
-                    temp = "epi"
-                }
-            }
-
-            firstSourceNode = nodeUtils.createNodes([firstGeneName], temp, 1, [
-                0 //degree
-            ]);
-
-            firstNeighboursNodes = nodeUtils.createNodes(firstNeighboursGeneNames,
-                firstParent,
-                4, firstNeighboursDegrees);
-
-            firstNeighboursEdges = edgeUtils.createEdgesFromNode(firstSourceNode[0],
-                firstNeighboursNodes, firstNeighboursWeights, false);
-
-            if (requestedLayout == 'hierarchical' || requestedLayout == 'preset' || requestedLayout == 'random') {
-                firstNeighboursNodes = nodeUtils.addPositionsToNodes(
-                    firstNeighboursNodes,
-                    400, 100, 0, 20);
-
-                firstNeighboursNodes = nodeUtils.addStyleToNodes(firstNeighboursNodes,
-                    10, 10,
-                    "left",
-                    "center", firstNeigboursBgColor);
-
-                firstSourceNode = nodeUtils.addPositionsToNodes(firstSourceNode, 100,
-                    100, 0, 0);
-                firstSourceNode = nodeUtils.addStyleToNodes(firstSourceNode, 10, 10,
-                    "left",
-                    "center",
-                    firstNeigboursBgColor == "blue" ? "red" : "blue");
-
-                elements.push({
-                    data: {
-                        id: 'epi'
-                    }
-                });
-                elements.push({
-                    data: {
-                        id: 'stroma'
-                    }
-                });
-
-                if (secondGeneName != "null") {
-                    elements.push({
-                        data: {
-                            id: side == '-E' ? 'stromaRight' : 'epiRight'
-                        }
-                    });
-
-                    secondNeighboursNodes = nodeUtils.addPositionsToNodes(
-                        secondNeighboursNodes,
-                        800, 100, 0, 20);
-
-                    secondNeighboursNodes = nodeUtils.addStyleToNodes(
-                        secondNeighboursNodes,
-                        10, 10,
-                        "right",
-                        "center", secondNeigboursBgColor);
-                }
-            }
-
-            console.log("First neighbours nodes:");
-            console.log(firstNeighboursNodes);
-            console.log("Second neighbours nodes:");
-            console.log(secondNeighboursNodes);
-            elements = elements.concat(firstSourceNode);
-            elements = elements.concat(firstNeighboursNodes);
-            elements = elements.concat(firstNeighboursEdges);
-            elements = elements.concat(secondNeighboursNodes);
-            elements = elements.concat(secondNeighboursEdges);
 
             config = configUtils.createConfig();
+            layout = configUtils.createPresetLayout();
 
             configUtils.setConfigElements(config, elements);
-
-            if (requestedLayout == "hierarchical" || requestedLayout == 'preset' || requestedLayout == 'random') {
-                layout = configUtils.createPresetLayout();
-            } else if (requestedLayout == "concentric") {
-                layout = configUtils.createConcentricLayout(firstSourceNode[0].data
-                    .id);
-            }
-
             configUtils.setConfigLayout(config, layout);
+
             res.json({ config: config });
         });
 });
@@ -339,6 +245,10 @@ app.post('/new-neighbour-general', function(req, res) {
 app.get('/submatrix', function(req, res) {
     var genes = req.query.genes;
     var pValue = req.query.pValue;
+
+    var minPositiveWeight = req.query.minPositiveWeight;
+    var minNegativeWeight = req.query.minNegativeWeight;
+    var filter = req.query.filter;
 
     if (!(genes instanceof Array)) {
         genes = [genes];
@@ -355,7 +265,7 @@ app.get('/submatrix', function(req, res) {
     }
 
     var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args " +
-        "\"" + pValue + "\"" + " " + "\"" + genes.length + "\"" + geneArgs, {
+        "\"" + pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" + minPositiveWeight + "\"" + " " + "\"" + filter + "\"" + " " + "\"" + genes.length + "\"" + geneArgs, {
             maxBuffer: 1024 *
                 50000
         },
@@ -601,6 +511,35 @@ function cacheElementsForPValue(pValue, script) {
         });
 }
 
+function cacheGeneListForPValue(pValue, script) {
+    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            var allGenes = [];
+
+            var epiDegrees = parsedValue.value[0].value[0].value;
+            var stromaDegrees = parsedValue.value[0].value[1].value;
+
+            var epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
+            var stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
+
+            allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
+            allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
+
+            geneListCache[pValue] = allGenes;
+        });
+}
+
 function createListOfSelfLoopGenes(pValue, script) {
     var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
         maxBuffer: 1024 *
@@ -630,8 +569,9 @@ function createOverallElements() {
     console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
-        cacheElementsForPValue(pValues[i], "R_Scripts/getWeightsAndDegreesFilterByWeight.R");
-        createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");
+        //cacheElementsForPValue(pValues[i], "R_Scripts/getWeightsAndDegreesFilterByWeight.R");
+        //createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");
+        cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
     }
 }
 

@@ -5,14 +5,17 @@ source('helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
 pValue <- as.character(args[2])
-numberOfGenes <- as.character(args[3])
+minNegativeWeight <- as.numeric(args[3])
+minPositiveWeight <- as.numeric(args[4])
+weightFilter <- as.character(args[5])
+numberOfGenes <- as.character(args[6])
 genesOfInterest <- c()
 
 corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
 degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
 
 for (x in 1:numberOfGenes) {
-	genesOfInterest <- c(genesOfInterest, as.character(args[3 + x]))
+	genesOfInterest <- c(genesOfInterest, as.character(args[6 + x]))
 }
 
 maxNeighbours <- 3
@@ -20,12 +23,10 @@ epiGenes <- c()
 stromaGenes <- c()
 
 for (gene in genesOfInterest) {
-	temp = toupper(substr(gene, 1, nchar(gene) - 2));
-
 	if (tolower(substr(gene, nchar(gene) - 1, nchar(gene))) == "-s") {
-		stromaGenes = c(stromaGenes, temp)
+		stromaGenes = c(stromaGenes, gene)
 	} else {
-		epiGenes = c(epiGenes, temp)
+		epiGenes = c(epiGenes, gene)
 	}
 }
 
@@ -53,6 +54,8 @@ stromaGenes <- c(stromaGenes, topSecondNeighbours)
 
 topFirstNeighbours <- c()
 for (gene in epiGenes) {
+	write("gene:", stderr())
+	write(gene, stderr())
 	toAppend <- corMatrix[gene, which(corMatrix[gene, ] != 0)]
 	names(toAppend) <- names(which(corMatrix[gene, ] != 0))
 	toAppend <- names(which(tail(sort(toAppend), maxNeighbours) != 0))
@@ -83,12 +86,17 @@ weights <- corMatrix[unique(epiGenes), unique(stromaGenes), drop=FALSE]
 
 dput(weights, "temp.Rdata")
 
-write("weights", stderr())
-write(class(weights), stderr())
-write(weights	, stderr())
+#write("weights", stderr())
+#write(class(weights), stderr())
+#write(weights	, stderr())
+write("minNegativeWeight", stderr())
+write(minNegativeWeight, stderr())
+write("minPositiveWeight", stderr())
+write(minPositiveWeight, stderr())
 
-
-
+if (weightFilter == 'yes') {
+	weights <- filterCorrelationsByWeight(weights, minNegativeWeight, minPositiveWeight)
+} 
 
 totalInteractions <- length(which((weights)!=0))
 minPositiveWeight <- min(weights[weights > 0])

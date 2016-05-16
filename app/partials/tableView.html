@@ -22,8 +22,7 @@
                 <br>Degree: {{gene.object.degree}}</div>
         </md-card-content>
     </md-card>
-
-    <md-card ng-if="cy != null && cy.edges() != null">
+    <md-card ng-if="cy != null && cy.edges() != null && cy.edges().length > 0">
         <md-card-title>
             <md-card-title-text>
                 <span class="md-headline">All Interactions</span>
@@ -38,7 +37,7 @@
             </div>
         </md-card-content>
     </md-card>
-    <!--
+    
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -46,10 +45,10 @@
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="node in getNodesWithMinDegree()">
+            <div flex="20" ng-repeat="node in getNodesWithMinDegree($parent)">
                 <div class="interaction-card">
-                    {{node.id()}}
-                    <span ng-repeat="child in getInteractingNodes(node)">{{child.id()}}</span>
+                    {{node.id()}} - {{node.data('degree')}}
+                    <span ng-repeat="child in getInteractingNodes(node, cy)">{{child.id()}}</span>
                 </div>
             </div>
         </md-card-content>

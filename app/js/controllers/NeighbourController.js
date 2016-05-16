@@ -30,6 +30,8 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.switchModel = false;
         $scope.selectedLayout = $scope.layouts[1].value;
 
+        $scope.selectedNeighbourGenes = [];
+
 
         $scope.applyConfig = function(config, containerID) {
             $scope.elemCopy = angular.copy(config.elements);
@@ -47,10 +49,10 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         };
 
         $scope.getSelfLoops = GraphConfigService.getSelfLoops;
-
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
-
         $scope.querySearch = BasicDataService.querySearch;
+        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
+        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
         $scope.selectedItemChanged = function(item, source) {
             // Run code to select gene here
@@ -59,28 +61,8 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
                 return;
             }
 
-            var originalElements = GraphConfigService.neighbourConfigs.firstDropdownConfig.elements;
-            $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('new-neighbour-general', {
-                gene: item.value.substring(0, item.value
-                    .length - 2).toUpperCase(),
-                side: item.value.substring(item.value.length -
-                    2),
-                originalElements: originalElements,
-                pValue: $scope.pValueActual,
-                neighbour: 2,
-                layout: $scope.selectedLayout,
-                first:  GraphConfigService.firstSelectedGene,
-                second: item.value.substring(0, item.value
-                    .length - 2).toUpperCase()
-            }).then(function(data) {
-                console.log(data);
-                $rootScope.state = $rootScope.states.loadingConfig;
-                $scope.neighbours = angular.copy($scope.genesSecond);
-                GraphConfigService.neighbourConfigs.secondDropdownConfig = angular
-                    .copy(data.config);
-                $rootScope.state = $rootScope.states.secondDropdown;
-            });
+            $scope.selectedNeighbourGenes.push(item.value);
+
         };
 
         $scope.resize = GraphConfigService.resetZoom;
@@ -95,18 +77,36 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
             $scope.neighbours = null;
         };
 
+        $scope.getConfigForSelectedNeighbours = function() {
+            $rootScope.state = $rootScope.states.loadingSecond;
+            RESTService.post('final-neighbour-general', {
+                pValue: $scope.pValueActual,
+                layout: $scope.selectedLayout,
+                selectedGenes: $scope.selectedNeighbourGenes
+            }).then(function(data) {
+                console.log(data);
+                $rootScope.state = $rootScope.states.loadingConfig;
+                $scope.neighbours = angular.copy($scope.genesSecond);
+                GraphConfigService.neighbourConfigs.secondDropdownConfig = angular
+                    .copy(data.config);
+                $rootScope.state = $rootScope.states.secondDropdown;
+            });
+        };
+
         $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
 
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour");
-                $scope.genesFirst = $scope.loadDropdownOptions($scope.cy);
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy);
+                $scope.selectedNeighbourGenes = [GraphConfigService.firstSelectedGene];
             }
         });
 
         $scope.$watch('neighbourConfigs.secondDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour");
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy);
             }
         });
     }

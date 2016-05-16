@@ -51,8 +51,8 @@ filterCorrelationsByWeight <- function(weights, minNegativeWeight, minPositiveWe
         minPositiveWeight <- 0
     }
 
-    weights[weights > minNegativeWeight & weights < 0] = 0      
-    weights[weights < minPositiveWeight & weights > 0] = 0  
+    weights[weights >= minNegativeWeight & weights < 0] = 0      
+    weights[weights <= minPositiveWeight & weights > 0] = 0  
 
     weights
 }
@@ -83,10 +83,8 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
-
-
         neighbours <- corMatrix[gene, neighboursNames]
-        names(neighbours) <- names(corMatrix[gene, neighboursNames])
+        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
 
                 write('neighbours: ', stderr())
         write(neighbours, stderr())
@@ -95,16 +93,20 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
         neighbours <- corMatrix[neighboursNames, gene]
-        names(neighbours) <- names(corMatrix[neighboursNames , gene])
+        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
     }
 
     neighbours
 }
 
 getDegreesForNeighbours <- function(degrees, neighbours) {
-    first <- names(neighbours[i])
+    first <- names(neighbours[1])
     write('first: ', stderr())
     write(first, stderr())
+
+    if (length(neighbours) < 1) {
+        return(c(0))
+    }
 
     if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
         resultDegrees <- degrees$epiDegree[names(neighbours)]
