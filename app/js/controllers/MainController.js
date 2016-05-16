@@ -68,7 +68,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 } else {
                     nodes.push(edges[i].source());
                 }
-                
+
             }
 
             return nodes;
@@ -276,5 +276,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.removeGene = function(gene) {
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
         };
+
+        $scope.testNewNeighbours = function() {
+            RESTService.post('final-neighbour-general', {
+                selectedGenes: $scope.firstSelectedGene,
+                pValue: $scope.pValueActual
+            }).then(function(data) {
+                console.log(data);
+            });
+        }
     }
 ]);
