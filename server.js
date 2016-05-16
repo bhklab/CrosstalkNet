@@ -99,6 +99,79 @@ app.get('/self-loops', function(req, res) {
     }
 });
 
+app.post('/final-neighbour-general', function(req, res) {
+    var selectedGenes = req.body.selectedGenes;
+    var pValue = req.body.pValue;
+    var numberOfGenes = selectedGenes.length;
+    var genesArg = "";
+
+     if (!(selectedGenes instanceof Array)) {
+        selectedGenes = [selectedGenes];
+    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        res.json({ error: "Error" });
+        return;
+    }
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        genesArg = genesArg + " " + "\"" + selectedGenes[i] + "\"";
+    }
+
+    var child = exec("Rscript R_scripts/findCorrelationsNew.R --args" + " " + "\"" + numberOfGenes + "\"" + genesArg + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
+        function(error, stdout, stderr) {
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            var weights = parsedValue.value[0].value;
+            var degrees = parsedValue.value[1].value;
+            console.log(weights);
+            console.log(degrees);
+            var sourceNodes = [];
+            var nodes = {};
+            var parentNodes = [];
+            var edges = [];
+            var elements = [];
+
+            //geneNames.epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
+
+            for (var i = 0; i < selectedGenes.length + 1; i++) {
+                parentNodes.push({
+                    data: {
+                        id: "par" + i
+                    }
+                });
+            }
+
+            for (var i = 0; i < selectedGenes.length; i++) {
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i]], 'par' + i, 0, 0));
+            }
+
+            for (var i = 0; i < weights.length; i++) {
+                nodes["" + i] = nodeUtils.createNodes(weights[i].attributes.names.value, "par" + (i + 1), 0, degrees[i].value);
+            }
+
+            var i = 0;
+
+            for (nodeCollection in nodes) {
+                edges = edges.concat(edgeUtils.createEdgesFromNode(sourceNodes[i][0], nodes["" + i], weights[i].value));
+                i++;
+            }
+
+            elements = elements.concat(parentNodes);
+            elements = elements.concat(edges);
+            elements.push(sourceNodes[0][0]);
+
+            for (nodeCollection in nodes) {
+                elements = elements.concat(nodes[nodeCollection]);
+            }
+
+            res.json({elements: elements});
+        });
+});
+
 app.post('/new-neighbour-general', function(req, res) {
     var side = req.body.side.toUpperCase();
     var pValue = req.body.pValue;
@@ -190,7 +263,7 @@ app.post('/new-neighbour-general', function(req, res) {
             firstNeighboursEdges = edgeUtils.createEdgesFromNode(firstSourceNode[0],
                 firstNeighboursNodes, firstNeighboursWeights, false);
 
-            if (requestedLayout == 'hierarchical' || requestedLayout == 'preset' || requestedLayout == 'random' ) {
+            if (requestedLayout == 'hierarchical' || requestedLayout == 'preset' || requestedLayout == 'random') {
                 firstNeighboursNodes = nodeUtils.addPositionsToNodes(
                     firstNeighboursNodes,
                     400, 100, 0, 20);
@@ -267,7 +340,7 @@ app.get('/submatrix', function(req, res) {
     var genes = req.query.genes;
     var pValue = req.query.pValue;
 
-    if (! (genes instanceof Array)) {
+    if (!(genes instanceof Array)) {
         genes = [genes];
     } else if (genes == null || genes == "" || genes == []) {
         res.json({ error: "Error" });
@@ -450,6 +523,14 @@ function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
     };
 
     return elements;
+}
+
+function getNeighbourWeightsAndDegrees(stdout) {
+    var parsedValue = JSON.parse(stdout);
+    var weights = parsedValue.value[0].value;
+    var degrees = parsedValue.value[1].value;
+
+    return { weights: weights, degrees: degrees };
 }
 
 function getWeightsAndDegreesFromROutput(stdout) {
