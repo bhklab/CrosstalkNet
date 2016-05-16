@@ -13,7 +13,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.searchTextSecond = "";
         $scope.minPositiveWeight = 0;
         $scope.minNegativeWeight = 0;
-        $scope.ctrl = "neighbour";
+        $scope.ctrl = "main";
 
         $rootScope.states = angular.copy(BasicDataService.states);
         $scope.pValues = angular.copy(BasicDataService.pValues);
@@ -36,8 +36,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.selectedLayout = $scope.layouts[0].value;
 
-        $scope.sliderMinWeightNegative = 0;
-        $scope.sliderMaxWeightPositive = 0;
+        $scope.sliderMinWeightNegative = -1;
+        $scope.sliderMaxWeightPositive = 1;
 
         $scope.negativeFilterEnabled = false;
         $scope.positiveFilterEnabled = false;
@@ -46,58 +46,15 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
         $scope.getSelfLoops = GraphConfigService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
+        $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
         $scope.genesOfInterest = [];
 
-        $scope.getInteractingNodes = function(node) {
-            var attribute = '';
+        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
-            if (node.id().endsWith('-E')) {
-                attribute = 'source';
-            } else {
-                attribute = 'target';
-            }
+        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
 
-            var edges = $scope.cy.edges("[" + attribute + "='" + node.id() + "']");
-            var nodes = [];
-
-
-            for (var i = 0; i < edges.length; i++) {
-                if (attribute == 'source') {
-                    nodes.push(edges[i].target());
-                } else {
-                    nodes.push(edges[i].source());
-                }
-
-            }
-
-            return nodes;
-        };
-
-        $scope.getNodesWithMinDegree = function() {
-            var nodes = $scope.cy.nodes();
-            var result = [];
-
-            for (var i = 0; i < nodes.length; i++) {
-                if (nodes[i].data('degree') > $scope.minDegree.first) {
-                    result.push(nodes[i]);
-                }
-            }
-
-            return result;
-        };
-
-        $scope.applyConfig = function(config, containerID) {
-            $scope.elemCopy = angular.copy(config.elements);
-            $scope.styleCopy = angular.copy(config.style);
-            config.container = document.getElementById(containerID);
-            $scope.cy = cytoscape(config);
-
-            $scope.nodes = $scope.cy.nodes().length;
-            $scope.edges = $scope.cy.edges().length;
-
-            $scope.cy.fit($scope.cy.$("*"), 10);
-        }
+        $scope.applyConfig = GraphConfigService.applyConfig;
 
         $scope.edges = 0;
         $scope.nodes = 0;
@@ -143,60 +100,23 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 return;
             }
 
-            if (source == 'first') {
-                $rootScope.selectedTab = 1;
-                $scope.firstSelectedGene = item.value.substring(0, item.value
-                    .length - 2).toUpperCase();
-                GraphConfigService.firstSelectedGene = $scope.firstSelectedGene;
-                $scope.genesSecond = [];
-                $rootScope.state = $rootScope.states.loadingFirst;
-                RESTService.post('new-neighbour-general', {
-                    gene: item.value.substring(0, item.value
-                        .length - 2).toUpperCase(),
-                    side: item.value.substring(item.value.length -
-                        2),
-                    degree: item.object.degree,
-                    pValue: $scope.pValueActual,
-                    neighbour: 1,
-                    layout: $scope.selectedLayout,
-                    first: $scope.firstSelectedGene,
-                    second: "null"
-                }).then(function(data) {
-                    console.log(data);
-                    $rootScope.state = $rootScope.states.loadingConfig;
-                    //$scope.applyConfig(data.config, "cyMain");
-                    $scope.genesSecond = $scope.loadDropdownOptions($scope.cy,
-                        item.value);
-                    $scope.neighbours = angular.copy($scope.genesSecond);
-                    GraphConfigService.neighbourConfigs.firstDropdownConfig =
-                        angular.copy(data.config);
-                    $rootScope.state = $rootScope.states.firstDropdown;
-                });
-            } else {
-                $rootScope.selectedTab = 1;
-                var originalElements = $scope.firstDropdownConfig.elements;
-                $rootScope.state = $rootScope.states.loadingSecond;
-                RESTService.post('new-neighbour-general', {
-                    gene: item.value.substring(0, item.value
-                        .length - 2).toUpperCase(),
-                    side: item.value.substring(item.value.length -
-                        2),
-                    pValue: $scope.pValueActual,
-                    layout: $scope.selectedLayout,
-                    first: $scope.firstSelectedGene,
-                    second: item.value.substring(0, item.value
-                        .length - 2).toUpperCase()
-                }).then(function(data) {
-                    console.log(data);
-                    $rootScope.state = $rootScope.states.loadingConfig;
-                    //$scope.applyConfig(data.config, "cyMain");
-                    //$scope.genesSecond = $scope.loadDropdownOptions(item.value);
-                    $scope.neighbours = angular.copy($scope.genesSecond);
-                    GraphConfigService.neighbourConfigs.secondDropdownConfig =
-                        angular.copy(data.config);
-                    $rootScope.state = $rootScope.states.secondDropdown;
-                });
-            }
+            GraphConfigService.firstSelectedGene = item.value;
+            $rootScope.selectedTab = 1;
+            RESTService.post('final-neighbour-general', {
+                selectedGenes: item.value.toUpperCase(),
+                pValue: $scope.pValueActual,
+                layout: $scope.selectedLayout
+            }).then(function(data) {
+                console.log(data);
+                $rootScope.state = $rootScope.states.loadingConfig;
+                //$scope.applyConfig(data.config, "cyMain");
+                //$scope.genesSecond = $scope.loadDropdownOptions($scope.cy,
+                //    item.value);
+                $scope.neighbours = angular.copy($scope.genesSecond);
+                GraphConfigService.neighbourConfigs.firstDropdownConfig =
+                    angular.copy(data.config);
+                $rootScope.state = $rootScope.states.firstDropdown;
+            });
         };
 
         $scope.resize = GraphConfigService.resetZoom;
@@ -205,8 +125,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $("md-autocomplete input").each(function() {
                 $(this).val('');
             });
-
-            //$mdAutocompleteCtrl.clear();
         };
 
         $scope.resetAllData = function() {
@@ -222,16 +140,18 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.pValueActual = $scope.pValueDisplayed;
             $scope.resetAllData();
             $scope.resetInputFields();
-            $scope.getSelfLoops(GraphConfigService.tabNames.main, $scope.pValueActual,
+            /*$scope.getSelfLoops(GraphConfigService.tabNames.main, $scope.pValueActual,
                 $scope);
             $scope.firstDropdownConfig = null;
             $scope.getDataForOverallGraph(path).then(function(config) {
                 console.log(config.elements);
                 $rootScope.state = $rootScope.states.loadingConfig;
-                $scope.applyConfig(config, "cyMain");
-                $scope.genesFirst = $scope.loadDropdownOptions($scope.cy);
+                $scope.applyConfig(config, "cyMain", $scope);
+                $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy);
                 $rootScope.state = $rootScope.states.initial;
-            });
+            });*/
+
+            $scope.getGeneList();
         };
 
         $(document).ready(function() {
@@ -248,7 +168,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.searchForGene = function(gene) {
             if (gene != null) {
-                $scope.findGeneInGraph($scope.cy, gene.value);
+                //$scope.findGeneInGraph($scope.cy, gene.value);
 
                 if ($scope.genesOfInterest.indexOf(gene) < 0) {
                     $scope.genesOfInterest.push(gene.value);
@@ -256,20 +176,31 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
         };
 
-        $scope.getRelevantGenes = function() {
+        $scope.getRelevantGenes = function(filter) {
+            var filtered = filter && ($scope.negativeFilterEnabled || $scope.positiveFilterEnabled) ? 'yes' : 'no';
             RESTService.get("submatrix", {
                     params: {
                         pValue: $scope.pValueActual,
-                        genes: $scope.genesOfInterest
+                        genes: $scope.genesOfInterest,
+                        minNegativeWeight: $scope.minNegativeWeight ==
+                            null || !$scope.negativeFilterEnabled ?
+                            "NA" : $scope.minNegativeWeight,
+                        minPositiveWeight: $scope.minPositiveWeight ==
+                            null || !$scope.positiveFilterEnabled ?
+                            "NA" : $scope.minPositiveWeight,
+                        filter: filtered
                     }
                 })
                 .then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
                     $scope.totalInteractions = data.totalInteractions;
-                    $scope.sliderMinWeightNegative = data.minNegativeWeight;
-                    $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
-                    $scope.applyConfig(data.config, "cyMain");
+                    if (filtered != 'yes') {
+                        $scope.sliderMinWeightNegative = data.minNegativeWeight;
+                        $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
+                    }
+                    $scope.applyConfig(data.config, "cyMain", $scope);
+                    $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy);
                 });
         };
 
@@ -277,13 +208,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
         };
 
-        $scope.testNewNeighbours = function() {
-            RESTService.post('final-neighbour-general', {
-                selectedGenes: $scope.firstSelectedGene,
-                pValue: $scope.pValueActual
-            }).then(function(data) {
-                console.log(data);
-            });
-        }
+        $scope.getGeneList = function() {
+            RESTService.get('gene-list', { params: { pValue: $scope.pValueActual } })
+                .then(function(data) {
+                    $scope.geneList = $scope.loadGeneListDropdownOptions(data.geneList);
+                });
+        };
     }
 ]);

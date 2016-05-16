@@ -19,10 +19,12 @@ myModule.factory('BasicDataService', function($http) {
     service.layouts = [{ display: "Bipartite", value: "preset" }, {
         display: "Concentric",
         value: "concentric"
-    }, { display: "Hierarchical", value: "hierarchical" },{ display: "Random", value: "random" }];
+    }, { display: "Hierarchical", value: "hierarchical" }, { display: "Random", value: "random" }];
 
     service.loadDropdownOptions = loadDropdownOptions;
+    service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
     service.querySearch = querySearch;
+    service.getNodesWithMinDegree = getNodesWithMinDegree;
 
     function loadDropdownOptions(cy, selectedGene = null) {
         var genes = [];
@@ -34,8 +36,18 @@ myModule.factory('BasicDataService', function($http) {
 
         return genes.map(function(gene) {
             return {
-                value: gene.id.toLowerCase(),
+                value: gene.id,
                 display: gene.id + ' ' + gene.degree,
+                object: gene
+            };
+        });
+    }
+
+    function loadGeneListDropdownOptions(geneList) {
+        return geneList.map(function(gene) {
+            return {
+                value: gene.name,
+                display: gene.name + ' ' + gene.degree,
                 object: gene
             };
         });
@@ -43,10 +55,15 @@ myModule.factory('BasicDataService', function($http) {
 
     function querySearch(query, source, scope) {
         if (source == "first") {
-            var results = query ? scope.genesFirst.filter(createFilterFor(query)) :
-                scope.genesFirst,
+            var results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
+                scope.firstNeighbourDropdownOptions,
                 deferred;
-        } else {
+        } else if (source == "geneList")  {
+            var results = query ? scope.geneList.filter(createFilterFor(query)) :
+                scope.geneList,
+                deferred;   
+        }
+        else {
             var results = query ? scope.genesSecond.filter(createFilterFor(query)) :
                 scope.genesSecond,
                 deferred;
@@ -65,8 +82,21 @@ myModule.factory('BasicDataService', function($http) {
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(gene) {
-            return (gene.value.indexOf(lowercaseQuery) === 0);
+            return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);
         };
+    }
+
+    function getNodesWithMinDegree(scope) {
+        var nodes = scope.cy.nodes();
+        var result = [];
+
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].data('degree') > scope.minDegree.first) {
+                result.push(nodes[i]);
+            }
+        }
+
+        return result;
     }
 
     return service;
