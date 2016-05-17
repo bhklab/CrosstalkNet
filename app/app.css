@@ -86,6 +86,10 @@ md-toolbar {
     min-height: 40px !important;
 }
 
+md-input-container {
+    margin: 25px 0px;
+}
+
 md-input-container.select {
     margin: 0px !important;
 }

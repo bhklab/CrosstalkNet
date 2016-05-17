@@ -44,7 +44,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.data = GraphConfigService.tabs.main.data;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
-        $scope.getSelfLoops = GraphConfigService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
@@ -56,6 +55,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.applyConfig = GraphConfigService.applyConfig;
 
+        $scope.getSelfLoops = BasicDataService.getSelfLoops;
         $scope.edges = 0;
         $scope.nodes = 0;
 
@@ -170,7 +170,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             if (gene != null) {
                 //$scope.findGeneInGraph($scope.cy, gene.value);
 
-                if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                if ($scope.genesOfInterest.indexOf(gene.value) < 0) {
                     $scope.genesOfInterest.push(gene.value);
                 }
             }
@@ -188,7 +188,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                         minPositiveWeight: $scope.minPositiveWeight ==
                             null || !$scope.positiveFilterEnabled ?
                             "NA" : $scope.minPositiveWeight,
-                        filter: filtered
+                        filter: filtered,
+                        layout: $scope.selectedLayout
                     }
                 })
                 .then(function(data) {
@@ -200,7 +201,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                         $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
                     }
                     $scope.applyConfig(data.config, "cyMain", $scope);
-                    $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy);
+                    $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy, []);
                 });
         };
 

@@ -20,17 +20,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     service.neighbourConfigs = { firstDropdownConfig: null, secondDropdownConfig: null };
     service.firstSelectedGene = null;
 
-    service.getSelfLoops = function(tab, pValue, scope) {
-        RESTService.get('self-loops', { params: { pValue: pValue } })
-            .then(function(data) {
-                /*service.tabs[tab].data.selfLoops = data.geneNames;
-                service.tabs[tab].data.selfLoopsCount = data.numberOfLoops;*/
-
-                scope.selfLoops = data.geneNames;
-                scope.selfLoopsCount = data.numberOfLoops;
-            });
-    };
-
     service.applyConfig = function(config, containerID, scope) {
         scope.elemCopy = angular.copy(config.elements);
         scope.styleCopy = angular.copy(config.style);

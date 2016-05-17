@@ -11,7 +11,6 @@ var edgeUtils = require('edgeUtils');
 var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
 
-
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
 var initialElements = { "001": null, "01": null, "05": null, "1": null };
@@ -138,7 +137,7 @@ app.post('/final-neighbour-general', function(req, res) {
         genesArg = genesArg + " " + "\"" + selectedGenes[i] + "\"";
     }
 
-    var child = exec("Rscript R_scripts/findCorrelationsNew.R --args" + " " + "\"" + numberOfGenes + "\"" + genesArg + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_scripts/findCorrelations.R --args" + " " + "\"" + numberOfGenes + "\"" + genesArg + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             console.log('stderr: ' + stderr);
 
@@ -245,7 +244,7 @@ app.post('/final-neighbour-general', function(req, res) {
 app.get('/submatrix', function(req, res) {
     var genes = req.query.genes;
     var pValue = req.query.pValue;
-
+    var requestedLayout = req.query.layout;
     var minPositiveWeight = req.query.minPositiveWeight;
     var minNegativeWeight = req.query.minNegativeWeight;
     var filter = req.query.filter;
@@ -281,7 +280,7 @@ app.get('/submatrix', function(req, res) {
             var allInfo = extractElementsAndInteractions(stdout);
 
             var config = createOverallConfig(allInfo.elements,
-                "random");
+                requestedLayout);
 
             res.json({
                 config: config,
