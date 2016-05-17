@@ -1,13 +1,13 @@
 <div ng-show="display == 'Self Loops'">
-    <md-card>
+    <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
                 <span class="md-headline">All Self Loops</span>
-                <span class="md-subhead">Total: {{selfLoopsCount}}</span>
+                <span class="md-subhead">Total: {{getSelfLoops($parent).length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="gene in selfLoops">{{gene}}</div>
+            <div flex="20" ng-repeat="gene in getSelfLoops($parent) track by $index">{{gene}}</div>
         </md-card-content>
     </md-card>
     <md-card ng-if="neighbours.length > 0">

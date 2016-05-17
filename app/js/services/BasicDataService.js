@@ -25,11 +25,21 @@ myModule.factory('BasicDataService', function($http) {
     service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
+    service.getSelfLoops = getSelfLoops;
 
-    function loadDropdownOptions(cy, selectedGene = null) {
+    function loadDropdownOptions(cy, selectedGenes = null) {
         var genes = [];
-        var selectedGeneName = selectedGene == null ? '' : ', #' + selectedGene.toUpperCase();
-        cy.nodes().not('#epi, #stroma' + selectedGeneName).forEach(function(
+        var selectedGenesStr = "";
+        var parentContainers = "#par0";
+        var parents = "";
+
+        for (var i = 0; i < selectedGenes.length; i++) {
+            selectedGenesStr += ', #' + selectedGenes[i];
+            parentContainers += ", #par" + (i + 1);
+            parents += ", [parent='par" + i + "']"
+        }
+
+        cy.nodes().not(parentContainers + parents + selectedGenesStr).forEach(function(
             node) {
             genes.push(node.data());
         });
@@ -58,12 +68,11 @@ myModule.factory('BasicDataService', function($http) {
             var results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
                 scope.firstNeighbourDropdownOptions,
                 deferred;
-        } else if (source == "geneList")  {
+        } else if (source == "geneList") {
             var results = query ? scope.geneList.filter(createFilterFor(query)) :
                 scope.geneList,
-                deferred;   
-        }
-        else {
+                deferred;
+        } else {
             var results = query ? scope.genesSecond.filter(createFilterFor(query)) :
                 scope.genesSecond,
                 deferred;
@@ -93,6 +102,26 @@ myModule.factory('BasicDataService', function($http) {
         for (var i = 0; i < nodes.length; i++) {
             if (nodes[i].data('degree') > scope.minDegree.first) {
                 result.push(nodes[i]);
+            }
+        }
+
+        return result;
+    }
+
+    function getSelfLoops(scope) {
+        var edges = scope.cy.edges();
+        var result = [];
+
+        for (var i = 0; i < edges.length; i++) {
+            var source = edges[i].source().id().substr(0, edges[i].source().id().length - 2);
+            var target = edges[i].target().id().substr(0, edges[i].target().id().length - 2);
+
+            if (source == target) {
+                result.push(source);
+                /*
+                if (result.indexOf(source) < 0) {
+                   
+                }*/
             }
         }
 
