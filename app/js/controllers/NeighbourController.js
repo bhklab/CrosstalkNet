@@ -54,15 +54,14 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
-        $scope.selectedItemChanged = function(item, source) {
-            // Run code to select gene here
-            // We probably need 2 dropdowns, one for epi and one for stroma or maybe a swtich to indicate which one we are searching
+        $scope.selectedItemChanged = function(gene, source) {
             if (item == null) {
                 return;
             }
 
-            $scope.selectedNeighbourGenes.push(item.value);
-
+            if ($scope.selectedNeighbourGenes.indexOf(gene.value) < 0) {
+                $scope.selectedNeighbourGenes.push(gene.value);
+            }
         };
 
         $scope.resize = GraphConfigService.resetZoom;
@@ -98,7 +97,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour");
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy);
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
                 $scope.selectedNeighbourGenes = [GraphConfigService.firstSelectedGene];
             }
         });
@@ -106,7 +105,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.$watch('neighbourConfigs.secondDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour");
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy);
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
             }
         });
     }
