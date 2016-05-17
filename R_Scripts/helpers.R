@@ -129,3 +129,35 @@ getExclusions <- function(exclusions, i, selectedGenes) {
 
     exclusions
 }
+
+#methods for new and standard approach of creating graphs
+getNeighbourNames <- function(corMatrix, gene, exclusion) {
+    write('Gene: ', stderr())
+    write(gene, stderr())
+
+    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
+    } else {
+        neighboursNames <- names(which(corMatrix[, gene] != 0))
+    }
+    neighboursNames <- setdiff(neighboursNames, exclusion)
+    neighboursNames
+}
+
+getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
+    first <- neighbourNames
+    write('first: ', stderr())
+    write(first, stderr())
+
+    if (length(neighbours) < 1) {
+        return(c(0))
+    }
+
+    if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
+        resultDegrees <- degrees$epiDegree[neighbourNames]
+    } else {
+        resultDegrees <- degrees$stromaDegree[neighbourNames]
+    }
+
+    resultDegrees
+}
