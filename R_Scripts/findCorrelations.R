@@ -3,14 +3,13 @@ library(jsonlite)
 setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
 source('helpers.R')
 args <- commandArgs(trailingOnly = TRUE)
-numberOfNeighbours <- as.numeric(args[2])
+pValue <- args[2]
+numberOfNeighbours <- as.numeric(args[3])
 selectedGenes <- c()
 
 for (i in 1:numberOfNeighbours) {
-	selectedGenes <- c(selectedGenes, as.character(args[2 + i]))
+	selectedGenes <- c(selectedGenes, as.character(args[3 + i]))
 }
-
-pValue <- args[length(args)]
 
 #write(paste(first, second, side, pValue), stderr())
 corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))

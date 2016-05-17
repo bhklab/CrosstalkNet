@@ -2,18 +2,34 @@
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
-                <span class="md-headline">All Self Loops</span>
+                <div layout="row">
+                    <div flex><span class="md-headline">All Self Loops</span></div>
+                    <div flex style="position: relative;">
+                        <md-input-container class="filter-input">
+                            <label>Filter Self Loops</label>
+                            <input ng-model="selfLoopSearch">
+                        </md-input-container>
+                    </div>
+                </div>
                 <span class="md-subhead">Total: {{getSelfLoops($parent).length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="gene in getSelfLoops($parent) track by $index">{{gene}}</div>
+            <div flex="20" ng-repeat="gene in getSelfLoops($parent) | filter: selfLoopSearch track by $index">{{gene}}</div>
         </md-card-content>
     </md-card>
     <md-card ng-if="neighbours.length > 0">
         <md-card-title>
             <md-card-title-text>
-                <span class="md-headline">First Neighbours</span>
+                <div layout="row">
+                    <div flex><span class="md-headline">First Neighbours</span></div>
+                    <div flex style="position: relative;">
+                        <md-input-container class="filter-input">
+                            <label>Filter Interactions</label>
+                            <input ng-model="user.title">
+                        </md-input-container>
+                    </div>
+                </div>
                 <span class="md-subhead">Total: {{neighbours.length}}</span>
             </md-card-title-text>
         </md-card-title>
@@ -25,11 +41,20 @@
     <md-card ng-if="cy != null && cy.edges() != null && cy.edges().length > 0">
         <md-card-title>
             <md-card-title-text>
-                <span class="md-headline">All Interactions</span>
+                <div layout="row">
+                    <div flex><span class="md-headline">All Interactions</span></div>
+                    <div flex style="position: relative;">
+                        <md-input-container class="filter-input">
+                            <label>Filter Self Loops</label>
+                            <input ng-model="interactionSearch">
+                        </md-input-container>
+                    </div>
+                </div>
+                <span class="md-subhead">Total: {{cy.edges().length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="elem in cy.edges()">
+            <div flex="20" ng-repeat="elem in cy.edges() | interactionFilter : interactionSearch">
                 <div class="interaction-card">
                     {{elem.source().id()}} with {{elem.target().id()}}
                     <br> Strength: {{elem.data('weight')}}
@@ -37,7 +62,6 @@
             </div>
         </md-card-content>
     </md-card>
-    
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -48,7 +72,7 @@
             <div flex="20" ng-repeat="node in getNodesWithMinDegree($parent)">
                 <div class="interaction-card">
                     {{node.id()}} - {{node.data('degree')}}
-                    <span ng-repeat="child in getInteractingNodes(node, cy)">{{child.id()}}</span>
+                    <span ng-repeat="child in getInteractingNodes(node, cy)">{{child.id()}} </span>
                 </div>
             </div>
         </md-card-content>
