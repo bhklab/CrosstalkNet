@@ -31,7 +31,7 @@
 
 md-sidenav {
     width: inherit;
-    max-width: 320px;
+    max-width: 350px;
 }
 
 .center-text {
@@ -52,10 +52,6 @@ md-sidenav {
 
 .faded {
     line-color: rgba(0, 0, 0, 0.1);
-}
-
-md-sidenav {
-    max-width: 230px;
 }
 
 .list-height {
@@ -116,4 +112,10 @@ md-menu-content {
 
 .interaction-card:nth-child(5n + 0) {
     border-right: none;
+}
+
+.filter-input {
+    margin: 0px !important;
+    position: absolute;
+    right: 0px;
 }

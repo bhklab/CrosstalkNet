@@ -10,6 +10,7 @@ var copyUtils = require('copyUtils');
 var edgeUtils = require('edgeUtils');
 var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
+var execUtils = require('execUtils');
 
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
@@ -19,87 +20,6 @@ var selfLoopGeneNames = { "001": null, "01": null, "05": null, "1": null };
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-app.get('/overall-graph', function(req, res) {
-    // The client side will also be specifying what kind of layout they want. For now, we'll stick to 
-    // the preset layout
-    var pValue = req.query.pValue;
-    var requestedLayout = req.query.layout;
-
-    var minPositiveWeight = req.query.minPositiveWeight;
-    var minNegativeWeight = req.query.minNegativeWeight;
-
-    if (initialElements[pValue] != null) {
-        var config = createOverallConfig(initialElements[pValue],
-            requestedLayout);
-
-        res.json({
-            config: config,
-            totalInteractions: initialElements[pValue].totalInteractions,
-            minPositiveWeight: initialElements[pValue].minPositiveWeight,
-            maxPositiveWeight: initialElements[pValue].maxPositiveWeight,
-            minNegativeWeight: initialElements[pValue].minNegativeWeight,
-            maxNegativeWeight: initialElements[pValue].maxNegativeWeight
-        });
-    } else {
-
-    }
-});
-
-app.get('/overall-graph-weight-filter', function(req, res) {
-    var pValue = req.query.pValue;
-    var requestedLayout = 'random'; //req.query.layout;
-    var minPositiveWeight = req.query.minPositiveWeight;
-    var minNegativeWeight = req.query.minNegativeWeight;
-    var filter = 'yes';
-
-    if (minNegativeWeight === "NA" && minPositiveWeight === "NA") {
-        filter = 'no';
-    }
-
-    var child = exec("Rscript R_scripts/getWeightsAndDegreesFilterByWeight.R" +
-        " --args \"" +
-        pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" +
-        minPositiveWeight + "\"" + " " + "\"" + filter + "\"", {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var allInfo = extractElementsAndInteractions(stdout);
-
-            var config = createOverallConfig(allInfo.elements, requestedLayout);
-
-            res.json({
-                config: config,
-                totalInteractions: allInfo.totalInteractions,
-                maxPositiveWeight: allInfo.maxPositiveWeight,
-                minPositiveWeight: allInfo.minPositiveWeight,
-                maxNegativeWeight: allInfo.maxNegativeWeight,
-                minNegativeWeight: allInfo.minNegativeWeight
-
-            });
-        });
-});
-
-app.get('/self-loops', function(req, res) {
-    var pValue = req.query.pValue;
-    console.log(pValue);
-    if (selfLoopGeneNames[pValue] != null) {
-        //console.log(initialElements[pValue].elements[9]);
-        res.json({
-            geneNames: selfLoopGeneNames[pValue].geneNames,
-            numberOfLoops: selfLoopGeneNames[pValue].numberOfLoops
-        });
-        return;
-    }
-});
 
 app.get('/gene-list', function(req, res) {
     var pValue = req.query.pValue;
@@ -112,7 +32,9 @@ app.get('/gene-list', function(req, res) {
     }
 });
 
-app.post('/final-neighbour-general', function(req, res) {
+app.post('/neighbour-general', function(req, res) {
+    var argsString = "";
+    var argsArray = [];
     var selectedGenes = req.body.selectedGenes;
     var pValue = req.body.pValue;
     var requestedLayout = req.body.layout;
@@ -133,11 +55,11 @@ app.post('/final-neighbour-general', function(req, res) {
     var initialColor = selectedGenes[0].endsWith("-E") ? "red" : "blue";
     numberOfGenes = selectedGenes.length;
 
-    for (var i = 0; i < selectedGenes.length; i++) {
-        genesArg = genesArg + " " + "\"" + selectedGenes[i] + "\"";
-    }
+    argsArray = [pValue, numberOfGenes];
+    argsArray = argsArray.concat(selectedGenes);
+    argsString = execUtils.createArgsStringFromArray(argsArray);
 
-    var child = exec("Rscript R_scripts/findCorrelations.R --args" + " " + "\"" + numberOfGenes + "\"" + genesArg + " " + "\"" + pValue + "\"", { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_scripts/findCorrelations.R --args " + argsString, { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             console.log('stderr: ' + stderr);
 
@@ -157,8 +79,6 @@ app.post('/final-neighbour-general', function(req, res) {
             var elements = [];
             var config = null;
             var layout = null;
-
-            //geneNames.epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i]], 'par' + i, 0, 0));
@@ -242,6 +162,8 @@ app.post('/final-neighbour-general', function(req, res) {
 });
 
 app.get('/submatrix', function(req, res) {
+    var argsString = "";
+    var argsArray = [];
     var genes = req.query.genes;
     var pValue = req.query.pValue;
     var requestedLayout = req.query.layout;
@@ -255,16 +177,13 @@ app.get('/submatrix', function(req, res) {
         res.json({ error: "Error" });
         return;
     }
-
     console.log(req.query);
-    var geneArgs = "";
 
-    for (var i = 0; i < genes.length; i++) {
-        geneArgs = geneArgs + " " + "\"" + genes[i] + "\"";
-    }
+    argsArray = [pValue, minNegativeWeight, minPositiveWeight, filter, genes.length];
+    argsArray = argsArray.concat(genes);
+    argsString = execUtils.createArgsStringFromArray(argsArray);
 
-    var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args " +
-        "\"" + pValue + "\"" + " " + "\"" + minNegativeWeight + "\"" + " " + "\"" + minPositiveWeight + "\"" + " " + "\"" + filter + "\"" + " " + "\"" + genes.length + "\"" + geneArgs, {
+    var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args " + argsString, {
             maxBuffer: 1024 *
                 50000
         },
@@ -346,7 +265,6 @@ function createOverallConfig(originalElements, requestedLayout) {
             configUtils.setConfigElements(config, elements);
             configLayout = configUtils.createPresetLayout();
             configUtils.setConfigLayout(config, configLayout);
-
 
         } else if (requestedLayout == 'random') {
             elements.epiParent = null;
@@ -477,38 +395,6 @@ function getWeightsAndDegreesFromROutput(stdout) {
     console.log("about to return");
     return result;
 }
-/*
-function generalOutputParser(json) {
-    if (json.attributes == null || json.attributes.names == null) {
-        return null;
-    }
-
-    var names = json.attributes.names.value;
-
-    for (var i = 0; i < names; i++) {
-        if ()
-    }
-}*/
-
-function cacheElementsForPValue(pValue, script) {
-    var child = exec("Rscript " + script + " --args \"" + pValue + "\"" + " " + "\"NA" +
-        "\"" + " " +
-        "\"NA" + "\"" + " " + "\"no\"", {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var allInfo = extractElementsAndInteractions(stdout);
-            initialElements[pValue] = allInfo;
-        });
-}
 
 function cacheGeneListForPValue(pValue, script) {
     var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
@@ -539,51 +425,17 @@ function cacheGeneListForPValue(pValue, script) {
         });
 }
 
-function createListOfSelfLoopGenes(pValue, script) {
-    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-        var parsedValue = JSON.parse(stdout);
-        var geneNames = parsedValue.value[0].value;
-        var numberOfLoops = parsedValue.value[1].value[0];
-        var allInfo = {
-            geneNames: geneNames,
-            numberOfLoops: numberOfLoops
-        };
-
-        selfLoopGeneNames[pValue] = allInfo;
-    });
-}
-
 function createOverallElements() {
     var pValues = ["001", "01", "05", "1"];
     console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
-        //cacheElementsForPValue(pValues[i], "R_Scripts/getWeightsAndDegreesFilterByWeight.R");
-        //createListOfSelfLoopGenes(pValues[i], "R_Scripts/getSelfLoopGeneNames.R");
         cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
     }
 }
 
 function initializeServer() {
     createAndStoreCorrelationsAndDegrees(createOverallElements);
-
-    /*async.series([function(callback) {
-        createAndStoreCorrelationsAndDegrees();
-        callback();
-    }, function(callback) {
-        createOverallElements();
-        callback();
-    }], function() {});*/
 }
 
 function createAndStoreCorrelationsAndDegrees(callback) {

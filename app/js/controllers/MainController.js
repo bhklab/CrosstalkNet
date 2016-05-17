@@ -28,8 +28,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.pValueDisplayed = $scope.pValues[2].value;
         $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
-        $scope.selfLoops = [];
-        $scope.selfLoopsCount = 0;
 
         $scope.display = "Graph";
         $scope.switchModel = false;
@@ -67,32 +65,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
         };
 
-        $scope.getDataForOverallGraph = function(path) {
-            $rootScope.state = $rootScope.states.loading;
-            return $q(function(resolve, reject) {
-                RESTService.get(path, {
-                        params: {
-                            pValue: $scope.pValueActual,
-                            minNegativeWeight: $scope.minNegativeWeight ==
-                                null || !$scope.negativeFilterEnabled ?
-                                "NA" : $scope.minNegativeWeight,
-                            minPositiveWeight: $scope.minPositiveWeight ==
-                                null || !$scope.positiveFilterEnabled ?
-                                "NA" : $scope.minPositiveWeight,
-                            layout: $scope.selectedLayout
-                        }
-                    })
-                    .then(function(data) {
-                        console.log(data);
-                        $rootScope.state = $rootScope.states.loadingConfig;
-                        $scope.totalInteractions = data.totalInteractions;
-                        $scope.sliderMinWeightNegative = data.minNegativeWeight;
-                        $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
-                        resolve(data.config);
-                    });
-            });
-        };
-
         $scope.selectedItemChanged = function(item, source) {
             // Run code to select gene here
             // We probably need 2 dropdowns, one for epi and one for stroma or maybe a swtich to indicate which one we are searching
@@ -102,7 +74,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
             GraphConfigService.firstSelectedGene = item.value;
             $rootScope.selectedTab = 1;
-            RESTService.post('final-neighbour-general', {
+            RESTService.post('neighbour-general', {
                 selectedGenes: item.value.toUpperCase(),
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout
@@ -134,36 +106,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.sliderMaxWeightPositive = 1;
             $scope.elemCopy = null;
             $scope.styleCopy = null;
-        };
-
-        $scope.refreshOverallGraph = function(path) {
-            $scope.pValueActual = $scope.pValueDisplayed;
-            $scope.resetAllData();
-            $scope.resetInputFields();
-            /*$scope.getSelfLoops(GraphConfigService.tabNames.main, $scope.pValueActual,
-                $scope);
-            $scope.firstDropdownConfig = null;
-            $scope.getDataForOverallGraph(path).then(function(config) {
-                console.log(config.elements);
-                $rootScope.state = $rootScope.states.loadingConfig;
-                $scope.applyConfig(config, "cyMain", $scope);
-                $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy);
-                $rootScope.state = $rootScope.states.initial;
-            });*/
-
-            $scope.getGeneList();
-        };
-
-        $(document).ready(function() {
-            $scope.refreshOverallGraph('overall-graph');
-        });
-
-        $scope.refreshGraphFilter = function() {
-            $scope.refreshOverallGraph('overall-graph-weight-filter');
-        };
-
-        $scope.refreshGraphNoFilter = function() {
-            $scope.refreshOverallGraph('overall-graph');
         };
 
         $scope.searchForGene = function(gene) {
@@ -215,5 +157,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     $scope.geneList = $scope.loadGeneListDropdownOptions(data.geneList);
                 });
         };
+
+        $scope.getGeneList();
     }
 ]);
