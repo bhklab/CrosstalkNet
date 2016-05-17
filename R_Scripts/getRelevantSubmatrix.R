@@ -18,6 +18,9 @@ for (x in 1:numberOfGenes) {
 	genesOfInterest <- c(genesOfInterest, as.character(args[6 + x]))
 }
 
+write("genesOfInterest:", stderr())
+write(genesOfInterest, stderr())
+
 maxNeighbours <- 3
 epiGenes <- c()
 stromaGenes <- c()
@@ -30,6 +33,8 @@ for (gene in genesOfInterest) {
 	}
 }
 
+write("stromaGenes:", stderr())
+write(stromaGenes, stderr())
 topFirstNeighbours <- c()
 for (gene in stromaGenes) {
 	toAppend <- corMatrix[which(corMatrix[, gene] != 0) , gene]
@@ -39,7 +44,10 @@ for (gene in stromaGenes) {
 	topFirstNeighbours <- c(topFirstNeighbours, toAppend)
 }
 
-epiGenes <- c(epiGenes, topFirstNeighbours)
+write("topFirstNeighbours:", stderr())
+write(topFirstNeighbours, stderr())
+#epiGenes <- c(epiGenes, topFirstNeighbours)
+epiGenesAreNeighbours <- c(epiGenes, topFirstNeighbours)
 
 topSecondNeighbours <- c()
 for (gene in topFirstNeighbours) {
@@ -50,11 +58,12 @@ for (gene in topFirstNeighbours) {
 	topSecondNeighbours <- c(topSecondNeighbours, toAppend)
 }
 
-stromaGenes <- c(stromaGenes, topSecondNeighbours)
+#stromaGenes <- c(stromaGenes, topSecondNeighbours)
+stromaGenesAreNeighbours <- c(stromaGenes, topSecondNeighbours)
 
 topFirstNeighbours <- c()
 for (gene in epiGenes) {
-	write("gene:", stderr())
+	write("epi gene:", stderr())
 	write(gene, stderr())
 	toAppend <- corMatrix[gene, which(corMatrix[gene, ] != 0)]
 	names(toAppend) <- names(which(corMatrix[gene, ] != 0))
@@ -63,7 +72,7 @@ for (gene in epiGenes) {
 	topFirstNeighbours <- c(topFirstNeighbours, toAppend)
 }
 
-stromaGenes <- c(stromaGenes, topFirstNeighbours)
+stromaGenesAreNeighbours <- c(stromaGenesAreNeighbours, topFirstNeighbours)
 
 topSecondNeighbours <- c()
 for (gene in topFirstNeighbours) {
@@ -75,14 +84,14 @@ for (gene in topFirstNeighbours) {
 }
 
 
-epiGenes <- c(epiGenes, topSecondNeighbours)
+epiGenesAreNeighbours <- c(epiGenesAreNeighbours, topSecondNeighbours)
 
 write("stroma genes", stderr())
 write(unique(stromaGenes), stderr())
 write("epi genes", stderr())
 write(unique(epiGenes), stderr())
 
-weights <- corMatrix[unique(epiGenes), unique(stromaGenes), drop=FALSE]
+weights <- corMatrix[unique(epiGenesAreNeighbours), unique(stromaGenesAreNeighbours), drop=FALSE]
 
 dput(weights, "temp.Rdata")
 
