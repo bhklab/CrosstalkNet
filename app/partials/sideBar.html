@@ -48,12 +48,12 @@
             <md-button ng-click="getRelevantGenes('yes')">Filter</md-button>
         </div>
         <div layout="row">
-            <div flex="50">
+            <div flex="60">
                 <md-switch ng-model="$parent.switchModel" aria-label="Switch 1" ng-change="changeDisplay()">
                     {{$parent.display}}
                 </md-switch>
             </div>
-            <div flex="50">
+            <div flex="40">
                 <md-button ng-click="resize(cy)">Resize</md-button>
             </div>
         </div>

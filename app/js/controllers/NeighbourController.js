@@ -55,7 +55,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
         $scope.selectedItemChanged = function(gene, source) {
-            if (item == null) {
+            if (gene == null) {
                 return;
             }
 
@@ -78,7 +78,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('final-neighbour-general', {
+            RESTService.post('neighbour-general', {
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.selectedNeighbourGenes
