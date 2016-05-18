@@ -31,7 +31,7 @@ edges <- list()
 k <- 0
 
 for (i in 1:length(genesOfInterest)) {
-    #exclusions = getExclusionsSubmatrix(exclusions, i, firstNeighbours)
+    exclusions = getExclusionsSubmatrix(exclusions, i, firstNeighbours)
     exclusions = c(exclusions, genesOfInterest[i])
     firstNeighbours[[i]] = getNeighbourNames(corMatrix, genesOfInterest[i], exclusions)
     resultDegreesFirst[[i]] = getDegreesForNeighbourNames(degrees, firstNeighbours[[i]])
@@ -40,6 +40,8 @@ for (i in 1:length(genesOfInterest)) {
 }
 
 exclusions <- c(exclusions, firstNeighbours[[1]])
+write("Unlisted firstNeighbours: ", stderr())
+write(unlist(firstNeighbours), stderr())
 
 secondNeighbours <- list()
 resultDegreesSecond <- list()
@@ -59,6 +61,8 @@ if (length(firstNeighbours) > 0) {
 				secondNeighbours[[i]] = getNeighbourNames(corMatrix, firstNeighbours[[i]][j], exclusions)
 				edges[[k + i]] = createTopEdges(corMatrix, firstNeighbours[[i]][j], exclusions, 10)	
 			}
+
+			exclusions <- unique(c(exclusions, secondNeighbours[[i]]))
 		}
 		
 		resultDegreesSecond[[i]] = getDegreesForNeighbourNames(degrees, secondNeighbours[[i]])
