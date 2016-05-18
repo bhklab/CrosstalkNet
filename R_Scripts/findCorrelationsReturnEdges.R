@@ -20,12 +20,14 @@ exclusions <- list()
 neighbours <- list()
 resultDegrees <- list()
 edges <- list()
+edgeExclusion <- c()
 
 for (i in 1:length(selectedGenes)) {
     exclusions = getExclusions(exclusions, i, selectedGenes)
     neighbours[[i]] = getNeighbourNames(corMatrix, selectedGenes[i], exclusions[[i]])
     resultDegrees[[i]] = getDegreesForNeighbourNames(degrees, neighbours[[i]])
-    edges[[i]] <- createEdges(corMatrix, selectedGenes[i], exclusions[[i]])
+    edges[[i]] <- createEdges(corMatrix, selectedGenes[i], edgeExclusion)
+    edgeExclusion <- selectedGenes[i]
 }
 
 write("edges length:", stderr())
