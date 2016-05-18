@@ -105,7 +105,7 @@ getDegreesForNeighbours <- function(degrees, neighbours) {
     write(first, stderr())
 
     if (length(neighbours) < 1) {
-        return(c(0))
+        return(integer())
     }
 
     if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
@@ -135,6 +135,10 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
     write('Gene: ', stderr())
     write(gene, stderr())
 
+    if (length(gene) == 0 || is.na(gene)) {
+        return(character())
+    }
+
     if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
     } else {
@@ -145,18 +149,18 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
 }
 
 getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
-    first <- neighbourNames
+    first <- neighbourNames[1]
     write('first: ', stderr())
     write(first, stderr())
 
-    if (length(neighbours) < 1) {
-        return(c(0))
+    if (length(neighbourNames) < 1 || is.na(first)) {
+        return(integer())
     }
 
     if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
-        resultDegrees <- degrees$epiDegree[neighbourNames]
+        resultDegrees <- degrees$epiDegree[na.omit(neighbourNames)]
     } else {
-        resultDegrees <- degrees$stromaDegree[neighbourNames]
+        resultDegrees <- degrees$stromaDegree[na.omit(neighbourNames)]
     }
 
     resultDegrees
@@ -165,6 +169,7 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
 createEdges <- function(corMatrix, gene, exclusion) {
     edges <- list()
     if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        write("Neighbour ")
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
         
@@ -182,9 +187,75 @@ createEdges <- function(corMatrix, gene, exclusion) {
         names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
     }
 
-    for (i in 1:length(neighbours)) {
+    if (length(neighbours) == 0) {
+        return(edges)
+    }
+
+    for (i in 1:length(neighbours)) {       
         edges[[i]] <- list(gene, names(neighbours[i]), neighbours[i])
     }
 
     edges
 }
+
+createTopEdges <- function(corMatrix, gene, exclusion, maxNeighbours) {
+    edges <- list()
+    write("gene passed to createTopEdges", stderr())
+    write(gene, stderr())
+
+    if (length(gene) == 0 || is.na(gene)) {
+        return(list())
+    }
+
+    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        toAppend <- corMatrix[gene, which(corMatrix[gene, ] != 0)]
+        names(toAppend) <- names(which(corMatrix[gene, ] != 0))
+        write("names(toAppend)", stderr())
+        write(names(toAppend), stderr())
+        write("length(exclusion)", stderr())
+        write(length(exclusion), stderr())
+        write("which(names(toAppend) %in% exclusion)", stderr())
+        write(which(names(toAppend) %in% exclusion), stderr())
+        if (length(exclusion) > 0 && length(which(names(toAppend) %in% exclusion)) != 0) {
+            toAppend <- toAppend[-which(names(toAppend) %in% exclusion)]    
+        }
+
+        toAppendNames <- names(which(tail(sort(toAppend), maxNeighbours) != 0))
+    } else {
+        toAppend <- corMatrix[which(corMatrix[, gene] != 0), gene]
+        names(toAppend) <- names(which(corMatrix[, gene] != 0))
+        write("names(toAppend)", stderr())
+        write(names(toAppend), stderr())
+        write("length(exclusion)", stderr())
+        write(length(exclusion), stderr())
+                write("which(names(toAppend) %in% exclusion)", stderr())
+        write(which(names(toAppend) %in% exclusion), stderr())
+        if (length(exclusion) > 0 && length(which(names(toAppend) %in% exclusion)) != 0) {
+            toAppend <- toAppend[-which(names(toAppend) %in% exclusion)]    
+        }
+        
+        toAppendNames <- names(which(tail(sort(toAppend), maxNeighbours) != 0))
+    }
+
+    if (length(toAppend) == 0) {
+        return(edges)
+    }
+
+    for (i in 1:length(toAppendNames)) {
+        edges[[i]] <- list(gene, toAppendNames[i], toAppend[toAppendNames[i]])
+    }
+
+    edges
+}   
+
+getExclusionsSubmatrix <- function(exclusions, i, neighbours) {
+    if (i == 1) {
+        exclusions = c(exclusions, NA)
+    } else {
+        exclusions = c(exclusions, neighbours[[i - 1]])
+    }
+
+    exclusions
+}
+
+#getTopNeighbourNames <- function()

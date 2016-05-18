@@ -78,7 +78,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('neighbour-general-new', {
+            RESTService.post('neighbour-general', {
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.selectedNeighbourGenes
@@ -93,6 +93,10 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         };
 
         $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
+
+        $scope.removeGene = function(gene) {
+            $scope.selectedNeighbourGenes.splice($scope.selectedNeighbourGenes.indexOf(gene), 1);
+        };
 
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
