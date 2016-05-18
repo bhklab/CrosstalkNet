@@ -74,7 +74,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
             GraphConfigService.firstSelectedGene = item.value;
             $rootScope.selectedTab = 1;
-            RESTService.post('neighbour-general-new', {
+            RESTService.post('neighbour-general', {
                 selectedGenes: item.value.toUpperCase(),
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout
@@ -120,8 +120,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.getRelevantGenes = function(filter) {
             var filtered = filter && ($scope.negativeFilterEnabled || $scope.positiveFilterEnabled) ? 'yes' : 'no';
-            RESTService.get("submatrix", {
-                    params: {
+            RESTService.post("submatrix-new", {
+                    
                         pValue: $scope.pValueActual,
                         genes: $scope.genesOfInterest,
                         minNegativeWeight: $scope.minNegativeWeight ==
@@ -132,7 +132,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                             "NA" : $scope.minPositiveWeight,
                         filter: filtered,
                         layout: $scope.selectedLayout
-                    }
+                    
                 })
                 .then(function(data) {
                     console.log(data);
