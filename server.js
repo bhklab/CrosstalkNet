@@ -11,6 +11,7 @@ var edgeUtils = require('edgeUtils');
 var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
+var layoutUtils = require('layoutUtils');
 
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
@@ -206,19 +207,21 @@ app.post('/submatrix-new', function(req, res) {
             var firstNodes = {};
             var secondNodes = {};
             var parentNodes = [];
+            var allNodes = [];
             var edges = [];
             var elements = [];
             var config = null;
             var layout = null;
 
+
             for (var i = 0; i < genes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([genes[i]], 'par' + i, 0, 0));
+                sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0));
             }
 
             console.log("parsed edges:");
             console.log(parsedEdges);
 
-            if (false) {//degreesFirst[0].attributes.names == null) {
+            if (false) { //degreesFirst[0].attributes.names == null) {
                 sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
                 sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
@@ -237,12 +240,15 @@ app.post('/submatrix-new', function(req, res) {
                 return;
             }
 
+            console.log("weightsFirst");
+            console.log(weightsFirst);
+
             for (var i = 0; i < weightsFirst.length; i++) {
-                firstNodes["" + i] = nodeUtils.createNodes(weightsFirst[i].value, "par" + (i + 1), 0, degreesFirst[i].value);
+                firstNodes["" + i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
             }
 
             for (var i = 0; i < weightsSecond.length; i++) {
-                secondNodes["" + i] = nodeUtils.createNodes(weightsSecond[i].value, "par" + (i + 1), 0, degreesSecond[i].value);
+                secondNodes["" + i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
             }
 
 
@@ -254,23 +260,40 @@ app.post('/submatrix-new', function(req, res) {
             //elements.push(sourceNodes[0][0]);
 
             for (var i = 0; i < sourceNodes.length; i++) {
-                elements = elements.concat(sourceNodes[i]);
+
+                allNodes = allNodes.concat(sourceNodes[i]);
             }
 
             for (nodeCollection in firstNodes) {
-
-                elements = elements.concat(firstNodes[nodeCollection]);
+                console.log(firstNodes[nodeCollection]);
+                allNodes = allNodes.concat(firstNodes[nodeCollection]);
             }
 
             for (nodeCollection in secondNodes) {
-
-                elements = elements.concat(secondNodes[nodeCollection]);
+                console.log(secondNodes[nodeCollection]);
+                allNodes = allNodes.concat(secondNodes[nodeCollection]);
             }
 
             config = configUtils.createConfig();
-            layout = configUtils.createRandomLayout();
 
-            configUtils.setConfigElements(config, elements);
+            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                allNodes.push({
+                    data: { id: "epi" }
+                });
+                allNodes.push({
+                    data: { id: "stroma" }
+                });
+                layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
+                layout = layoutUtils.createPresetLayout();
+
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma);
+            } else {
+                layout = configUtils.createRandomLayout();
+            }
+
+
+            configUtils.setConfigElements(config, edges.concat(allNodes));
             configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
