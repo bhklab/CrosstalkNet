@@ -161,3 +161,30 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
 
     resultDegrees
 }
+
+createEdges <- function(corMatrix, gene, exclusion) {
+    edges <- list()
+    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+        
+
+        neighbours <- corMatrix[gene, neighboursNames]
+        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
+
+                write('neighbours: ', stderr())
+        write(neighbours, stderr())
+    } else {
+        neighboursNames <- names(which(corMatrix[, gene] != 0))
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+
+        neighbours <- corMatrix[neighboursNames, gene]
+        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
+    }
+
+    for (i in 1:length(neighbours)) {
+        edges[[i]] <- list(gene, names(neighbours[i]), neighbours[i])
+    }
+
+    edges
+}

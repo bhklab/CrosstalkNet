@@ -74,7 +74,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
             GraphConfigService.firstSelectedGene = item.value;
             $rootScope.selectedTab = 1;
-            RESTService.post('neighbour-general', {
+            RESTService.post('neighbour-general-new', {
                 selectedGenes: item.value.toUpperCase(),
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout

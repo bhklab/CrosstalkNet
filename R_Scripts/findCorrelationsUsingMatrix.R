@@ -14,7 +14,7 @@ epiStromaFlag <- TRUE
 #     selectedGenes <- c(selectedGenes, as.character(args[3 + i]))
 # }
 pValue <- '05'
-selectedGenes = c('TBP-E', 'UBE2C-S', 'STAT3-E')
+selectedGenes = c('VPS72-E', 'UBE2C-S', 'TBP-E', 'CDC45-S')
 
 firstHalf <- selectedGenes[seq(from = 1, to = length(selectedGenes), by = 2)]
 
@@ -76,7 +76,8 @@ if (epiStromaFlag == TRUE) {
     }
 
     weights <- corMatrix[unique(epiIndex), unique(stromaIndex)]
+    weights[-which(rownames(weights) %in% epiSelected), -which(colnames(weights) %in% stromaSelected)] = 0
 }
 
-result <- list(neighbours = neighbours, degrees = resultDegrees, weights = weights)
+result <- list(degrees = resultDegrees, weights = weights)
 cat(format(serializeJSON(result)))
