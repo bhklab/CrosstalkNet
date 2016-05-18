@@ -78,7 +78,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('neighbour-general', {
+            RESTService.post('neighbour-general-new', {
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.selectedNeighbourGenes
