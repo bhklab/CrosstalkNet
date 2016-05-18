@@ -12,7 +12,6 @@ numberOfGenes <- as.character(args[6])
 genesOfInterest <- c()
 
 corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
-degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
 
 for (x in 1:numberOfGenes) {
 	genesOfInterest <- c(genesOfInterest, as.character(args[6 + x]))
