@@ -132,9 +132,6 @@ getExclusions <- function(exclusions, i, selectedGenes) {
 
 #methods for new and standard approach of creating graphs
 getNeighbourNames <- function(corMatrix, gene, exclusion) {
-    write('Gene: ', stderr())
-    write(gene, stderr())
-
     if (length(gene) == 0 || is.na(gene)) {
         return(character())
     }
@@ -145,14 +142,14 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
     }
 
-    if ("CDC45-E" %in% neighboursNames) {
-        write(" cdc 45 exclusions", stderr())
-        write(exclusions, stderr())
+    # if ("CDC45-E" %in% neighboursNames) {
+    #     write(" cdc 45 exclusions", stderr())
+    #     write(exclusions, stderr())
 
-        write(" cdc 45 neighboursNames", stderr())
-        write(neighboursNames, stderr())
+    #     write(" cdc 45 neighboursNames", stderr())
+    #     write(neighboursNames, stderr())
 
-    }
+    # }
 
     neighboursNames <- setdiff(neighboursNames, exclusion)
     neighboursNames
@@ -184,16 +181,12 @@ createEdges <- function(corMatrix, gene, exclusion) {
     }
 
     if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
-        write("Neighbour ")
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
         
 
         neighbours <- corMatrix[gene, neighboursNames]
         names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
-
-                write('neighbours: ', stderr())
-        write(neighbours, stderr())
     } else {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
         neighboursNames <- setdiff(neighboursNames, exclusion)
@@ -215,8 +208,6 @@ createEdges <- function(corMatrix, gene, exclusion) {
 
 createTopEdges <- function(corMatrix, gene, exclusion, maxNeighbours) {
     edges <- list()
-    write("gene passed to createTopEdges", stderr())
-    write(gene, stderr())
 
     if (length(gene) == 0 || is.na(gene)) {
         return(list())

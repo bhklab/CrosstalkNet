@@ -56,6 +56,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.getSelfLoops = BasicDataService.getSelfLoops;
         $scope.edges = 0;
         $scope.nodes = 0;
+        $scope.displaySecondNeighbours = true;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -131,8 +132,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                             null || !$scope.positiveFilterEnabled ?
                             "NA" : $scope.minPositiveWeight,
                         filter: filtered,
-                        layout: $scope.selectedLayout
-                    
+                        layout: $scope.selectedLayout,
+                        depth: $scope.displaySecondNeighbours == true ? 2 : 1                    
                 })
                 .then(function(data) {
                     console.log(data);
