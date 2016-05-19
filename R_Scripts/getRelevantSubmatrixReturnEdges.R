@@ -24,52 +24,48 @@ for (x in 1:numberOfGenes) {
 
 maxNeighbours <- 3
 
-exclusions <- c()#genesOfInterest
+exclusions <- genesOfInterest
 firstNeighbours <- list()
 resultDegreesFirst <- list()
 edges <- list()
 k <- 0
+edgeExclusions <- c()
 
 for (i in 1:length(genesOfInterest)) {
-    exclusions = getExclusionsSubmatrix(exclusions, i, firstNeighbours)
-    exclusions = c(exclusions, genesOfInterest[i])
+    #exclusions = c(exclusions, genesOfInterest[i]) This is not needed for epi stroma. Might come in useful for epi-epi or stroma-stroma though.
     firstNeighbours[[i]] = getNeighbourNames(corMatrix, genesOfInterest[i], exclusions)
     resultDegreesFirst[[i]] = getDegreesForNeighbourNames(degrees, firstNeighbours[[i]])
-    edges[[i]] <- createEdges(corMatrix, genesOfInterest[i], exclusions)
+    edges[[i]] <- createEdges(corMatrix, genesOfInterest[i], edgeExclusions)
     k <- i
+    edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
+    exclusions <- c(exclusions, firstNeighbours[[i]])
 }
-
-exclusions <- c(exclusions, firstNeighbours[[1]])
-write("Unlisted firstNeighbours: ", stderr())
-write(unlist(firstNeighbours), stderr())
 
 secondNeighbours <- list()
 resultDegreesSecond <- list()
+edgeExclusions <- c(genesOfInterest)
 
 if (length(firstNeighbours) > 0) {
 	for (i in 1:length(firstNeighbours)) {
 		secondNeighbours[[i]] = c(NA)
-		exclusions = unique(getExclusionsSubmatrix(exclusions, i, secondNeighbours))
 
 		for (j in 1:length(firstNeighbours[[i]])) {
-			exclusions = c(exclusions, firstNeighbours[[i]][j])
-
 			if (j > 1) {
 				secondNeighbours[[i]] = c(secondNeighbours[[i]], getNeighbourNames(corMatrix, firstNeighbours[[i]][j], exclusions))		
-				edges[[k + i]] = c(edges[[k + i]], createEdges(corMatrix, firstNeighbours[[i]][j], exclusions))
+				edges[[k + i]] = c(edges[[k + i]], createEdges(corMatrix, firstNeighbours[[i]][j], edgeExclusions))
 			} else {
 				secondNeighbours[[i]] = getNeighbourNames(corMatrix, firstNeighbours[[i]][j], exclusions)
-				edges[[k + i]] = createEdges(corMatrix, firstNeighbours[[i]][j], exclusions)	
+				edges[[k + i]] = createEdges(corMatrix, firstNeighbours[[i]][j], edgeExclusions)	
 			}
 
 			exclusions <- c(exclusions, secondNeighbours[[i]])
+			edgeExclusions <- c(edgeExclusions, firstNeighbours[[i]][j])
 		}
 		
+		exclusions <- unique(exclusions)
 		resultDegreesSecond[[i]] = getDegreesForNeighbourNames(degrees, secondNeighbours[[i]])
 	}	
 }
-
-dput(weights, "temp.Rdata")
 
 totalInteractions <- 0#length(which((weights)!=0))
 minPositiveWeight <- 0#min(weights[weights > 0])
