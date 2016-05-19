@@ -18,7 +18,7 @@ myModule.factory('BasicDataService', function($http) {
 
     service.layouts = [{ display: "Bipartite", value: "preset" }, {
         display: "Concentric",
-        value: "concentric"
+        value: "clustered"
     }, { display: "Hierarchical", value: "hierarchical" }, { display: "Random", value: "random" }];
 
     service.loadDropdownOptions = loadDropdownOptions;
