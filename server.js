@@ -170,6 +170,7 @@ app.post('/submatrix-new', function(req, res) {
     var minPositiveWeight = req.body.minPositiveWeight;
     var minNegativeWeight = req.body.minNegativeWeight;
     var filter = req.body.filter;
+    var depth = req.body.depth;
 
     if (!(genes instanceof Array)) {
         genes = [genes];
@@ -177,9 +178,9 @@ app.post('/submatrix-new', function(req, res) {
         res.json({ error: "Error" });
         return;
     }
-    console.log(req.query);
+    console.log(req.body);
 
-    argsArray = [pValue, minNegativeWeight, minPositiveWeight, filter, genes.length];
+    argsArray = [pValue, minNegativeWeight, minPositiveWeight, filter, genes.length, depth];
     argsArray = argsArray.concat(genes);
     argsString = execUtils.createArgsStringFromArray(argsArray);
 
@@ -196,12 +197,18 @@ app.post('/submatrix-new', function(req, res) {
             }
 
             var parsedValue = JSON.parse(stdout);
-            var weightsFirst = parsedValue.value[0].value;
-            var degreesFirst = parsedValue.value[1].value;
+            var weights = parsedValue.value[0].value;
+            var degrees = parsedValue.value[1].value;
+            var parsedEdges = parsedValue.value[2].value;
 
-            var weightsSecond = parsedValue.value[2].value;
-            var degreesSecond = parsedValue.value[3].value;
-            var parsedEdges = parsedValue.value[4].value;
+            var weightsFirst = weights[0].value;
+            var weightsSecond = weights[1].value;
+
+            var degreesFirst = degrees[0].value;
+            var degreesSecond = degrees[1].value;
+
+            var parsedEdgesFirst = parsedEdges[0].value;
+            var parsedEdgesSecond = parsedEdges[1].value;
 
             var sourceNodes = [];
             var firstNodes = [];
@@ -217,9 +224,6 @@ app.post('/submatrix-new', function(req, res) {
             for (var i = 0; i < genes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0)[0]);
             }
-
-            console.log("sourceNodes:");
-            console.log("%j", sourceNodes);
 
             if (false) { //degreesFirst[0].attributes.names == null) {
                 sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -240,9 +244,6 @@ app.post('/submatrix-new', function(req, res) {
                 return;
             }
 
-            console.log("weightsFirst");
-            console.log(weightsFirst);
-
             for (var i = 0; i < weightsFirst.length; i++) {
                 firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
             }
@@ -251,26 +252,26 @@ app.post('/submatrix-new', function(req, res) {
                 secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
             }
 
+            for (var i = 0; i < parsedEdgesFirst.length; i++) {
+                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i].value));
+            }
 
-            for (var i = 0; i < parsedEdges.length; i++) {
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i].value));
+            for (var i = 0; i < parsedEdgesSecond.length; i++) {
+                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i].value));
             }
 
             elements = elements.concat(edges);
             //elements.push(sourceNodes[0][0]);
 
             for (var i = 0; i < sourceNodes.length; i++) {
-
                 allNodes = allNodes.concat(sourceNodes[i]);
             }
 
             for (var i = 0; i < firstNodes.length; i++) {
-                console.log(firstNodes[i]);
                 allNodes = allNodes.concat(firstNodes[i]);
             }
 
             for (var i = 0; i < secondNodes.length; i++) {
-                console.log(secondNodes[i]);
                 allNodes = allNodes.concat(secondNodes[i]);
             }
 
@@ -299,11 +300,8 @@ app.post('/submatrix-new', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
             } else if (requestedLayout == 'clustered') {
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i], secondNodes[i], i, sourceNodes.length);
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
                 }
-
-                console.log("allNodes: %j", allNodes);
-
 
                 layout = layoutUtils.createPresetLayout();
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
@@ -315,62 +313,9 @@ app.post('/submatrix-new', function(req, res) {
                 layout = configUtils.createRandomLayout();
             }
 
-
-
             configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
-        });
-});
-
-app.get('/submatrix', function(req, res) {
-    var argsString = "";
-    var argsArray = [];
-    var genes = req.query.genes;
-    var pValue = req.query.pValue;
-    var requestedLayout = req.query.layout;
-    var minPositiveWeight = req.query.minPositiveWeight;
-    var minNegativeWeight = req.query.minNegativeWeight;
-    var filter = req.query.filter;
-
-    if (!(genes instanceof Array)) {
-        genes = [genes];
-    } else if (genes == null || genes == "" || genes == []) {
-        res.json({ error: "Error" });
-        return;
-    }
-    console.log(req.query);
-
-    argsArray = [pValue, minNegativeWeight, minPositiveWeight, filter, genes.length];
-    argsArray = argsArray.concat(genes);
-    argsString = execUtils.createArgsStringFromArray(argsArray);
-
-    var child = exec("Rscript R_Scripts/getRelevantSubmatrix.R --args " + argsString, {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            console.log(stdout);
-            var allInfo = extractElementsAndInteractions(stdout);
-
-            var config = createOverallConfig(allInfo.elements,
-                requestedLayout);
-
-            res.json({
-                config: config,
-                totalInteractions: allInfo.totalInteractions,
-                minPositiveWeight: allInfo.minPositiveWeight,
-                maxPositiveWeight: allInfo.maxPositiveWeight,
-                minNegativeWeight: allInfo.minNegativeWeight,
-                maxNegativeWeight: allInfo.maxNegativeWeight
-            });
         });
 });
 
