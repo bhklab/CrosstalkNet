@@ -43,7 +43,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
         });*/
 
-        scope.cy.on("select", function(evt) {
+        scope.cy.on('select', 'node', function(evt){
             var node = evt.cyTarget;
             var id = node.id();
             console.log('tapped ' + id);
@@ -75,7 +75,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });
 
         
-        scope.cy.on("unselect", function(evt) {
+        scope.cy.on("unselect", 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 

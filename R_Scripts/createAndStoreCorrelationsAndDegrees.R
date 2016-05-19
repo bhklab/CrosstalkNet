@@ -8,8 +8,9 @@ ptm <- proc.time()
 load('TELGenes_GeneSym.RData')
 load('TSLGenes_GeneSym.Rdata')
 
-#load('esetTE_ERNeg.RData')
-#load('esetTS_ERNeg.RData')
+# load('esetTE_ERNeg.RData')
+# load('esetTS_ERNeg.RData')
+
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
 #CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
 
