@@ -204,8 +204,8 @@ app.post('/submatrix-new', function(req, res) {
             var parsedEdges = parsedValue.value[4].value;
 
             var sourceNodes = [];
-            var firstNodes = {};
-            var secondNodes = {};
+            var firstNodes = [];
+            var secondNodes = [];
             var parentNodes = [];
             var allNodes = [];
             var edges = [];
@@ -244,11 +244,11 @@ app.post('/submatrix-new', function(req, res) {
             console.log(weightsFirst);
 
             for (var i = 0; i < weightsFirst.length; i++) {
-                firstNodes["" + i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
+                firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
             }
 
             for (var i = 0; i < weightsSecond.length; i++) {
-                secondNodes["" + i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
+                secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
             }
 
 
@@ -264,6 +264,17 @@ app.post('/submatrix-new', function(req, res) {
                 allNodes = allNodes.concat(sourceNodes[i]);
             }
 
+            for (var i = 0; i < firstNodes.length; i++) {
+                console.log(firstNodes[i]);
+                allNodes = allNodes.concat(firstNodes[i]);                
+            }
+
+            for (var i = 0; i < secondNodes.length; i++) {
+                console.log(secondNodes[i]);
+                allNodes = allNodes.concat(secondNodes[i]);                
+            }
+
+            /*
             for (nodeCollection in firstNodes) {
                 console.log(firstNodes[nodeCollection]);
                 allNodes = allNodes.concat(firstNodes[nodeCollection]);
@@ -272,7 +283,11 @@ app.post('/submatrix-new', function(req, res) {
             for (nodeCollection in secondNodes) {
                 console.log(secondNodes[nodeCollection]);
                 allNodes = allNodes.concat(secondNodes[nodeCollection]);
-            }
+            }*/
+
+            console.log("length of sourceNodes: " + sourceNodes.length);
+            console.log("length of first neighbours: " + Object.keys(firstNodes).length);
+            console.log("length of second neighbours: " + Object.keys(secondNodes).length);
 
             config = configUtils.createConfig();
 
@@ -286,14 +301,27 @@ app.post('/submatrix-new', function(req, res) {
                 layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
                 layout = layoutUtils.createPresetLayout();
 
+                configUtils.setConfigElements(config, edges.concat(allNodes));
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma);
-            } else {
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+            } else if (requestedLayout == 'clustered')  {
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes["" + i], secondNodes["" + i], i, sourceNodes.length);
+                }
+
+                console.log("allNodes[0].position: " + allNodes[0].position);
+                layout = layoutUtils.createPresetLayout();
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+                configUtils.setConfigElements(config, edges.concat(allNodes));
+            }
+            else {
+                configUtils.setConfigElements(config, edges.concat(allNodes));
                 layout = configUtils.createRandomLayout();
             }
 
 
-            configUtils.setConfigElements(config, edges.concat(allNodes));
+            
             configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
