@@ -41,40 +41,48 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
                 }
                 service.zoom = service.cy.zoom();
             });
-        });
-    
+        });*/
 
-        service.data.main.cy.on("select", function(evt) {
+        scope.cy.on("select", function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
             console.log('tapped ' + id);
 
 
-            service.data.main.cy.edges().forEach(function(edge) {
-                if (edge.source().id() == id) {
-                    edge.addClass('highlighted');
-                    edge.removeClass('faded');
-                    edge.css({ 'line-color': 'red' });
-                } else {
+            scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+                edge.addClass('highlighted');
+                edge.removeClass('faded');
+                edge.css({ 'line-color': 'magenta' });
+                /*else {
                     edge.addClass('faded');
                     edge.removeClass('highlighted');
                     edge.css({ 'opacity': '0' });
-                }
+                }*/
+            });
+            scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+                edge.addClass('faded');
+                edge.removeClass('highlighted');
+                edge.css({ 'opacity': '0' });
+                /*else {
+                    edge.addClass('faded');
+                    edge.removeClass('highlighted');
+                    edge.css({ 'opacity': '0' });
+                }*/
             });
 
             service.selectedItem = null;
             console.log(node);
         });
 
-        /*
-        service.data.main.cy.on("unselect", function(evt) {
+        
+        scope.cy.on("unselect", function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 
-            service.resetEdges();
+            service.resetEdges(scope.cy);
             console.log('tapped ' + id);
             console.log(node);
-        });*/
+        });
     };
 
     service.getInteractingNodes = function(node, cy) {
@@ -113,7 +121,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
     service.resetEdges = function(cy) {
         cy.edges().forEach(function(edge) {
-            edge.css({ 'line-color': 'white' });
+            edge.css({ 'line-color': 'black' });
             edge.css({ 'opacity': '1' });
         });
     };
