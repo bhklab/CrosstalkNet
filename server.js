@@ -215,11 +215,11 @@ app.post('/submatrix-new', function(req, res) {
 
 
             for (var i = 0; i < genes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0));
+                sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0)[0]);
             }
 
-            console.log("parsed edges:");
-            console.log(parsedEdges);
+            console.log("sourceNodes:");
+            console.log("%j", sourceNodes);
 
             if (false) { //degreesFirst[0].attributes.names == null) {
                 sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -266,28 +266,13 @@ app.post('/submatrix-new', function(req, res) {
 
             for (var i = 0; i < firstNodes.length; i++) {
                 console.log(firstNodes[i]);
-                allNodes = allNodes.concat(firstNodes[i]);                
+                allNodes = allNodes.concat(firstNodes[i]);
             }
 
             for (var i = 0; i < secondNodes.length; i++) {
                 console.log(secondNodes[i]);
-                allNodes = allNodes.concat(secondNodes[i]);                
+                allNodes = allNodes.concat(secondNodes[i]);
             }
-
-            /*
-            for (nodeCollection in firstNodes) {
-                console.log(firstNodes[nodeCollection]);
-                allNodes = allNodes.concat(firstNodes[nodeCollection]);
-            }
-
-            for (nodeCollection in secondNodes) {
-                console.log(secondNodes[nodeCollection]);
-                allNodes = allNodes.concat(secondNodes[nodeCollection]);
-            }*/
-
-            console.log("length of sourceNodes: " + sourceNodes.length);
-            console.log("length of first neighbours: " + Object.keys(firstNodes).length);
-            console.log("length of second neighbours: " + Object.keys(secondNodes).length);
 
             config = configUtils.createConfig();
 
@@ -302,26 +287,36 @@ app.post('/submatrix-new', function(req, res) {
                 layout = layoutUtils.createPresetLayout();
 
                 configUtils.setConfigElements(config, edges.concat(allNodes));
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma);
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
-            } else if (requestedLayout == 'clustered')  {
-                for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes["" + i], secondNodes["" + i], i, sourceNodes.length);
+
+                for (prop in styleUtils.bipartiteStyles.epi) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
                 }
 
-                console.log("allNodes[0].position: " + allNodes[0].position);
+                for (prop in styleUtils.bipartiteStyles.stroma) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
+                }
+
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+            } else if (requestedLayout == 'clustered') {
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i], secondNodes[i], i, sourceNodes.length);
+                }
+
+                console.log("allNodes: %j", allNodes);
+
+
                 layout = layoutUtils.createPresetLayout();
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
                 configUtils.setConfigElements(config, edges.concat(allNodes));
-            }
-            else {
+            } else {
                 configUtils.setConfigElements(config, edges.concat(allNodes));
                 layout = configUtils.createRandomLayout();
             }
 
 
-            
+
             configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
