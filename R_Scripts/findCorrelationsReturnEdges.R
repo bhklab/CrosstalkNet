@@ -16,18 +16,19 @@ for (i in 1:numberOfNeighbours) {
 corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
 degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
 
-exclusions <- list()
+exclusions <- c()	
 neighbours <- list()
 resultDegrees <- list()
 edges <- list()
 edgeExclusion <- c()
 
 for (i in 1:length(selectedGenes)) {
-    exclusions = getExclusions(exclusions, i, selectedGenes)
-    neighbours[[i]] = getNeighbourNames(corMatrix, selectedGenes[i], exclusions[[i]])
+    exclusions <- c(exclusions, selectedGenes[i])
+    neighbours[[i]] = getNeighbourNames(corMatrix, selectedGenes[i], exclusions)
     resultDegrees[[i]] = getDegreesForNeighbourNames(degrees, neighbours[[i]])
     edges[[i]] <- createEdges(corMatrix, selectedGenes[i], edgeExclusion)
     edgeExclusion <- selectedGenes[i]
+    exclusions <- c(exclusions, neighbours[[i]])
 }
 
 write("edges length:", stderr())
