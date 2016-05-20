@@ -109,7 +109,6 @@ app.post('/neighbour-general', function(req, res) {
                 nodes["" + i] = nodeUtils.createNodes(weights[i].value, "par" + (i + 1), 0, degrees[i].value);
             }
 
-
             for (var i = 0; i < selectedGenes.length + 1; i++) {
                 if (i < 1) {
                     parentNodes.push({
@@ -161,15 +160,18 @@ app.post('/neighbour-general', function(req, res) {
         });
 });
 
-app.post('/submatrix-new', function(req, res) {
+app.post('/submatrix', function(req, res) {
     var argsString = "";
     var argsArray = [];
     var genes = req.body.genes;
     var pValue = req.body.pValue;
     var requestedLayout = req.body.layout;
-    var minPositiveWeight = req.body.minPositiveWeight;
-    var minNegativeWeight = req.body.minNegativeWeight;
-    var filter = req.body.filter;
+    var minPositiveWeightFirst = req.body.minPositiveWeightFirst;
+    var minNegativeWeightFirst = req.body.minNegativeWeightFirst;
+    var minPositiveWeightSecond = req.body.minPositiveWeightSecond;
+    var minNegativeWeightSecond = req.body.minNegativeWeightSecond;
+    var filterFirst = req.body.filterFirst;
+    var filterSecond = req.body.filterSecond;
     var depth = req.body.depth;
 
     if (!(genes instanceof Array)) {
@@ -180,7 +182,7 @@ app.post('/submatrix-new', function(req, res) {
     }
     console.log(req.body);
 
-    argsArray = [pValue, minNegativeWeight, minPositiveWeight, filter, genes.length, depth];
+    argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, genes.length, depth];
     argsArray = argsArray.concat(genes);
     argsString = execUtils.createArgsStringFromArray(argsArray);
 
@@ -209,6 +211,8 @@ app.post('/submatrix-new', function(req, res) {
 
             var parsedEdgesFirst = parsedEdges[0].value;
             var parsedEdgesSecond = parsedEdges[1].value;
+            var minNegativeWeight = parsedValue.value[3].value[0];
+            var maxPositiveWeight = parsedValue.value[6].value[0];
 
             var sourceNodes = [];
             var firstNodes = [];
@@ -220,9 +224,9 @@ app.post('/submatrix-new', function(req, res) {
             var config = null;
             var layout = null;
 
-
             for (var i = 0; i < genes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0)[0]);
+                allNodes.push(sourceNodes[i]);
             }
 
             if (false) { //degreesFirst[0].attributes.names == null) {
@@ -246,10 +250,12 @@ app.post('/submatrix-new', function(req, res) {
 
             for (var i = 0; i < weightsFirst.length; i++) {
                 firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
+                allNodes = allNodes.concat(firstNodes[i]);
             }
 
             for (var i = 0; i < weightsSecond.length; i++) {
                 secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
+                allNodes = allNodes.concat(secondNodes[i]);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -261,20 +267,6 @@ app.post('/submatrix-new', function(req, res) {
             }
 
             elements = elements.concat(edges);
-            //elements.push(sourceNodes[0][0]);
-
-            for (var i = 0; i < sourceNodes.length; i++) {
-                allNodes = allNodes.concat(sourceNodes[i]);
-            }
-
-            for (var i = 0; i < firstNodes.length; i++) {
-                allNodes = allNodes.concat(firstNodes[i]);
-            }
-
-            for (var i = 0; i < secondNodes.length; i++) {
-                allNodes = allNodes.concat(secondNodes[i]);
-            }
-
             config = configUtils.createConfig();
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
@@ -286,8 +278,6 @@ app.post('/submatrix-new', function(req, res) {
                 });
                 layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
                 layout = layoutUtils.createPresetLayout();
-
-                configUtils.setConfigElements(config, edges.concat(allNodes));
 
                 for (prop in styleUtils.bipartiteStyles.epi) {
                     configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
@@ -307,39 +297,21 @@ app.post('/submatrix-new', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-                configUtils.setConfigElements(config, edges.concat(allNodes));
             } else {
-                configUtils.setConfigElements(config, edges.concat(allNodes));
                 layout = configUtils.createRandomLayout();
             }
 
+            configUtils.setConfigElements(config, edges.concat(allNodes));
             configUtils.setConfigLayout(config, layout);
 
-            res.json({ config: config });
+            res.json({
+                config: config,
+                minNegativeWeight: minNegativeWeight,
+                maxPositiveWeight: maxPositiveWeight
+            });
         });
 });
 
-function extractElementsAndInteractions(stdout) {
-    var parsed = getWeightsAndDegreesFromROutput(stdout);
-    var elements = createElements(parsed.epiDegrees, parsed.stromaDegrees,
-        parsed.weights,
-        parsed.geneNames);
-
-    var allInfo = {
-        elements: elements,
-        totalInteractions: parsed.totalInteractions,
-        minPositiveWeight: parsed.minPositiveWeight,
-        maxPositiveWeight: parsed.maxPositiveWeight,
-        minNegativeWeight: parsed.minNegativeWeight,
-        maxNegativeWeight: parsed.maxNegativeWeight
-    };
-
-    return allInfo;
-}
-
-function buildStringArgs(script, args) {
-    var stringArgs = "";
-}
 /*  For now, xPattern and yPattern will simply be increments to add at every step of the loop
  */
 function createOverallConfig(originalElements, requestedLayout) {
@@ -399,108 +371,6 @@ function createOverallConfig(originalElements, requestedLayout) {
     }
 
     return config;
-}
-
-function createElements(epiDegrees, stromaDegrees, weights, geneNames) {
-    var initialWeights = [];
-    var dimension = geneNames.length;
-    var epiGeneNames = [];
-    var stromaGeneNames = [];
-
-    if (geneNames.epiGeneNames != null) {
-        epiGeneNames = geneNames.epiGeneNames;
-        stromaGeneNames = geneNames.stromaGeneNames;
-    } else {
-        epiGeneNames = geneNames;
-        stromaGeneNames = geneNames;
-    }
-
-    //console.log(weights.value);
-    console.log("Dimension: " + dimension);
-    for (var i = 0; i < epiGeneNames.length; i++) {
-        var temp = [];
-        for (var j = 0; j < stromaGeneNames.length; j++) {
-            temp.push(weights.value[(epiGeneNames.length * j) + i]);
-        }
-
-        initialWeights.push(temp);
-    }
-
-    var elements = {
-        epiNodes: null,
-        stromaNodes: null,
-        edges: null,
-        epiParent: null,
-        stromaParent: null
-    };
-    var epiNodes = nodeUtils.createNodes(epiGeneNames, 'epi', 1, epiDegrees);
-    var stromaNodes = nodeUtils.createNodes(stromaGeneNames, 'stroma', 2, stromaDegrees);
-
-    /*
-    console.log(epiNodes);
-    console.log(stromaNodes);*/
-
-    var edges = edgeUtils.createEdges(epiNodes, stromaNodes, initialWeights);
-
-    elements.epiNodes = epiNodes;
-    elements.stromaNodes = stromaNodes;
-    elements.edges = edges;
-    elements.epiParent = {
-        data: {
-            id: 'epi'
-        }
-    };
-    elements.stromaParent = {
-        data: {
-            id: 'stroma'
-        }
-    };
-
-    return elements;
-}
-
-function getNeighbourWeightsAndDegrees(stdout) {
-    var parsedValue = JSON.parse(stdout);
-    var weights = parsedValue.value[0].value;
-    var degrees = parsedValue.value[1].value;
-
-    return { weights: weights, degrees: degrees };
-}
-
-function getWeightsAndDegreesFromROutput(stdout) {
-    var parsedValue = JSON.parse(stdout);
-    var epiDegrees = parsedValue.value[0].value[0].value;
-    var stromaDegrees = parsedValue.value[0].value[1].value;
-    var weights = parsedValue.value[1];
-    var geneNames = { epiGeneNames: null, stromaGeneNames: null }; //weights.attributes.dimnames.value[0].value;
-
-    geneNames.epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
-    geneNames.stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
-
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
-    console.log(parsedValue.value[0].value[0].attributes.names.value);
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
-
-    var totalInteractions = parsedValue.value[2].value[0];
-    var minPositiveWeight = parsedValue.value[3].value[0];
-    var maxPositiveWeight = parsedValue.value[4].value[0];
-    var minNegativeWeight = parsedValue.value[5].value[0];
-    var maxNegativeWeight = parsedValue.value[6].value[0];
-
-    var result = {
-        epiDegrees: epiDegrees,
-        stromaDegrees: stromaDegrees,
-        weights: weights,
-        geneNames: geneNames,
-        totalInteractions: totalInteractions,
-        minPositiveWeight: minPositiveWeight,
-        maxPositiveWeight: maxPositiveWeight,
-        minNegativeWeight: minNegativeWeight,
-        maxNegativeWeight: maxNegativeWeight
-    };
-
-    console.log("about to return");
-    return result;
 }
 
 function cacheGeneListForPValue(pValue, script) {
