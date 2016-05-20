@@ -13,7 +13,8 @@
                 </md-not-found>
             </md-autocomplete>
             <div>
-                <md-list>
+                <span class="md-subhead">Selected Genes:</span>
+                <md-list class="selected-genes-list">
                     <md-list-item ng-repeat="gene in genesOfInterest">
                         <md-menu>
                             <md-button ng-click="$mdOpenMenu($event)">
@@ -31,32 +32,61 @@
                 </md-list>
             </div>
             <div layout="row">
+                {{$parent.GOIState}}
                 <div flex>
-                    <md-button ng-click="getRelevantGenes('no')">Get Genes</md-button>
+                    <md-button ng-click="removeGenesOfInterest()">Remove All</md-button>
                 </div>
                 <div flex>
-                    <md-checkbox ng-model="$parent.displaySecondNeighbours">
-                        Show Second Neighbours
-                    </md-checkbox>
+                    <md-button style="float: right;" ng-click="getRelevantGenes(false)">Get {{$parent.GOIState == $parent.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
                 </div>
             </div>
-        </div>
-        <div style="margin-top: 10px;">
-            <md-input-container class="md-icon-float md-icon-right md-block">
-                <label>Min Positive Correlation | Highest: {{sliderMaxWeightPositive}}</label>
-                <input ng-model="$parent.minPositiveWeight" min="0" max="{{sliderMaxWeightPositive}}" type="number" step="0.001">
-            </md-input-container>
-            <md-checkbox ng-model="$parent.positiveFilterEnabled" aria-label="Checkbox 1">
-                Enable
-            </md-checkbox>
-            <md-input-container class="md-icon-float md-icon-right md-block">
-                <label>Min Negative Correlation | Lowest: {{sliderMinWeightNegative}}</label>
-                <input ng-model="$parent.minNegativeWeight" min="{{sliderMinWeightNegative}}" max="0" type="number" step="0.001">
-            </md-input-container>
-            <md-checkbox ng-model="$parent.negativeFilterEnabled" aria-label="Checkbox 1">
-                Enable
-            </md-checkbox>
-            <md-button ng-click="getRelevantGenes('yes')">Filter</md-button>
+            <md-button ng-click="getRelevantGenes(true)">Filter</md-button>
+            <fieldset ng-disabled="$parent.GOIState != $parent.GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
+                <legend class="fieldset-legend">First Neighbour Filters</legend>
+                <div style="margin-top: 10px;" layout="row">
+                    <div flex="50">
+                        <md-input-container class="md-icon-float md-icon-right md-block">
+                            <label class="label-position">Min Positive Correlation | Highest: {{$parent.correlationFilterFirst.max}}</label>
+                            <input ng-model="$parent.correlationFilterFirst.positiveFilter" min="0" max="{{$parent.correlationFilterFirst.max}}" type="number" step="0.001">
+                        </md-input-container>
+                        <md-checkbox ng-disabled="$parent.GOIState != $parent.GOIStates.filterFirst" ng-model="$parent.correlationFilterFirst.positiveEnabled" aria-label="Checkbox 1">
+                            Enable
+                        </md-checkbox>
+                    </div>
+                    <div flex="50">
+                        <md-input-container class="md-icon-float md-icon-right md-block">
+                            <label class="label-position">Min Negative Correlation | Lowest: {{$parent.correlationFilterFirst.min}}</label>
+                            <input ng-model="$parent.correlationFilterFirst.negativeFilter" min="{{$parent.correlationFilterFirst.min}}" max="0" type="number" step="0.001">
+                        </md-input-container>
+                        <md-checkbox ng-disabled="$parent.GOIState != $parent.GOIStates.filterFirst" ng-model="$parent.correlationFilterFirst.negativeEnabled" aria-label="Checkbox 1">
+                            Enable
+                        </md-checkbox>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset ng-show="$parent.GOIState > $parent.GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
+                <legend class="fieldset-legend">Second Neighbour Filters</legend>
+                <div style="margin-top: 10px;" layout="row">
+                    <div flex="50">
+                        <md-input-container class="md-icon-float md-icon-right md-block">
+                            <label class="label-position">Min Positive Correlation | Highest: {{$parent.correlationFilterSecond.max}}</label>
+                            <input ng-model="$parent.correlationFilterSecond.positiveFilter" min="0" max="{{$parent.correlationFilterSecond.max}}" type="number" step="0.001">
+                        </md-input-container>
+                        <md-checkbox ng-model="$parent.correlationFilterSecond.positiveEnabled" aria-label="Checkbox 1">
+                            Enable
+                        </md-checkbox>
+                    </div>
+                    <div flex="50">
+                        <md-input-container class="md-icon-float md-icon-right md-block">
+                            <label class="label-position">Min Negative Correlation | Lowest: {{$parent.correlationFilterSecond.min}}</label>
+                            <input ng-model="$parent.correlationFilterSecond.negativeFilter" min="{{$parent.correlationFilterSecond.min}}" max="0" type="number" step="0.001">
+                        </md-input-container>
+                        <md-checkbox ng-model="$parent.correlationFilterSecond.negativeEnabled" aria-label="Checkbox 1">
+                            Enable
+                        </md-checkbox>
+                    </div>
+                </div>
+            </fieldset>
         </div>
         <div layout="row">
             <div flex="60">

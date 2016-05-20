@@ -37,6 +37,24 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.sliderMinWeightNegative = -1;
         $scope.sliderMaxWeightPositive = 1;
 
+        $scope.correlationFilterFirst = {
+            min: -1,
+            max: 1,
+            negativeFilter: 0,
+            positiveFilter: 0,
+            negativeEnabled: false,
+            positiveEnabled: false
+        };
+
+        $scope.correlationFilterSecond = {
+            min: -1,
+            max: 1,
+            negativeFilter: 0,
+            positiveFilter: 0,
+            negativeEnabled: false,
+            positiveEnabled: false
+        };
+
         $scope.negativeFilterEnabled = false;
         $scope.positiveFilterEnabled = false;
 
@@ -57,6 +75,15 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.edges = 0;
         $scope.nodes = 0;
         $scope.displaySecondNeighbours = true;
+
+        $scope.GOIStates = {
+            initial: 0,
+            filterFirst: 1,
+            getSecondNeighbours: 2,
+            filterSecond: 3
+        };
+
+        $scope.GOIState = $scope.GOIStates.initial;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -119,32 +146,63 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
         };
 
+        $scope.removeGenesOfInterest = function() {
+            $scope.genesOfInterest = [];
+        };
+
         $scope.getRelevantGenes = function(filter) {
-            var filtered = filter && ($scope.negativeFilterEnabled || $scope.positiveFilterEnabled) ? 'yes' : 'no';
-            RESTService.post("submatrix-new", {
-                    
-                        pValue: $scope.pValueActual,
-                        genes: $scope.genesOfInterest,
-                        minNegativeWeight: $scope.minNegativeWeight ==
-                            null || !$scope.negativeFilterEnabled ?
-                            "NA" : $scope.minNegativeWeight,
-                        minPositiveWeight: $scope.minPositiveWeight ==
-                            null || !$scope.positiveFilterEnabled ?
-                            "NA" : $scope.minPositiveWeight,
-                        filter: filtered,
-                        layout: $scope.selectedLayout,
-                        depth: $scope.displaySecondNeighbours == true ? 2 : 1                    
+            var filterFirst = false;
+            var filterSecond = false;
+            var depth = 1;
+
+            if ($scope.GOIState == $scope.GOIStates.filterFirst) {
+                if (filter == false) {
+                    depth = 2;
+                } 
+                filter = true;
+                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
+            } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
+                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
+                filterSecond = $scope.correlationFilterSecond.negativeEnabled || $scope.correlationFilterSecond.positiveEnabled;
+                depth = 2;
+            }
+
+            RESTService.post("submatrix", {
+                    pValue: $scope.pValueActual,
+                    genes: $scope.genesOfInterest,
+                    minNegativeWeightFirst: $scope.correlationFilterFirst.negativeFilter ==
+                        null || !$scope.correlationFilterFirst.negativeEnabled ?
+                        "NA" : $scope.correlationFilterFirst.negativeFilter,
+                    minPositiveWeightFirst: $scope.correlationFilterFirst.positiveFilter ==
+                        null || !$scope.correlationFilterFirst.positiveEnabled ?
+                        "NA" : $scope.correlationFilterFirst.positiveFilter,
+                    minNegativeWeightSecond: $scope.correlationFilterSecond.negativeFilter ==
+                        null || !$scope.correlationFilterSecond.negativeEnabled ?
+                        "NA" : $scope.correlationFilterSecond.negativeFilter,
+                    minPositiveWeightSecond: $scope.correlationFilterSecond.positiveFilter ==
+                        null || !$scope.correlationFilterSecond.positiveEnabled ?
+                        "NA" : $scope.correlationFilterSecond.positiveFilter,
+                    filterFirst: filterFirst && filter,
+                    filterSecond: filterSecond && filter,
+                    layout: $scope.selectedLayout,
+                    depth: depth
                 })
                 .then(function(data) {
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
                     $scope.totalInteractions = data.totalInteractions;
-                    if (filtered != 'yes') {
-                        $scope.sliderMinWeightNegative = data.minNegativeWeight;
-                        $scope.sliderMaxWeightPositive = data.maxPositiveWeight;
+                    if ($scope.GOIState == $scope.GOIStates.initial) {//filtered != 'yes') {
+                        $scope.correlationFilterFirst.min = data.minNegativeWeight;
+                        $scope.correlationFilterFirst.max = data.maxPositiveWeight;
                     }
                     $scope.applyConfig(data.config, "cyMain", $scope);
                     $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy, []);
+
+                    if ($scope.GOIState == $scope.GOIStates.initial) {
+                        $scope.GOIState = $scope.GOIStates.filterFirst;
+                    } else if ($scope.GOIState == $scope.GOIStates.filterFirst && depth == 2) {
+                        $scope.GOIState = $scope.GOIStates.getSecondNeighbours;
+                    }
                 });
         };
 
