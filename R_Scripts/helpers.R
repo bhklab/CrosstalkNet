@@ -67,10 +67,6 @@ appendSideToMatrixNames <- function(corMatrix, side, rowOrCol) {
     corMatrix
 }
 
-determineSide <- function() {
-
-}
-
 #Say that we are calling this function in order to obtain second neighbours. Say that the first node 
 #we selected in the dropdown was A, then the node we selected in the second dropdown was F. The exclusion will be
 #A since we don't want to duplicate A in the third panel. 
@@ -142,15 +138,6 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
     }
 
-    # if ("CDC45-E" %in% neighboursNames) {
-    #     write(" cdc 45 exclusions", stderr())
-    #     write(exclusions, stderr())
-
-    #     write(" cdc 45 neighboursNames", stderr())
-    #     write(neighboursNames, stderr())
-
-    # }
-
     neighboursNames <- setdiff(neighboursNames, exclusion)
     neighboursNames
 }
@@ -205,52 +192,3 @@ createEdges <- function(corMatrix, gene, exclusion) {
 
     edges
 }
-
-createTopEdges <- function(corMatrix, gene, exclusion, maxNeighbours) {
-    edges <- list()
-
-    if (length(gene) == 0 || is.na(gene)) {
-        return(list())
-    }
-
-    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
-        toAppend <- corMatrix[gene, which(corMatrix[gene, ] != 0)]
-        names(toAppend) <- names(which(corMatrix[gene, ] != 0))
-        if (length(exclusion) > 0 && length(which(names(toAppend) %in% exclusion)) != 0) {
-            toAppend <- toAppend[-which(names(toAppend) %in% exclusion)]    
-        }
-
-        toAppendNames <- names(which(tail(sort(toAppend), maxNeighbours) != 0))
-    } else {
-        toAppend <- corMatrix[which(corMatrix[, gene] != 0), gene]
-        names(toAppend) <- names(which(corMatrix[, gene] != 0))
-
-        if (length(exclusion) > 0 && length(which(names(toAppend) %in% exclusion)) != 0) {
-            toAppend <- toAppend[-which(names(toAppend) %in% exclusion)]    
-        }
-        
-        toAppendNames <- names(which(tail(sort(toAppend), maxNeighbours) != 0))
-    }
-
-    if (length(toAppend) == 0) {
-        return(edges)
-    }
-
-    for (i in 1:length(toAppendNames)) {
-        edges[[i]] <- list(gene, toAppendNames[i], toAppend[toAppendNames[i]])
-    }
-
-    edges
-}   
-
-getExclusionsSubmatrix <- function(exclusions, i, neighbours) {
-    if (i == 1) {
-        exclusions = c(exclusions, NA)
-    } else {
-        exclusions = c(exclusions, neighbours[[i - 1]])
-    }
-
-    exclusions
-}
-
-#getTopNeighbourNames <- function()

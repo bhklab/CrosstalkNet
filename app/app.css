@@ -83,7 +83,8 @@ md-toolbar {
 }
 
 md-input-container {
-    margin: 25px 0px;
+    margin-top: 25px;
+    margin-bottom: 0px;
 }
 
 md-input-container.select {
@@ -114,8 +115,35 @@ md-menu-content {
     border-right: none;
 }
 
-.filter-input {
+.no-margin {
     margin: 0px !important;
+}
+
+.right-aligned {
     position: absolute;
     right: 0px;
+}
+
+.selected-genes-list {
+    max-height: 250px;
+    overflow: auto;
+}
+
+.fieldset-legend {
+    font-size: 15px;
+    font-color: grey;
+}
+
+.fieldset-border {
+    border-color: grey;
+    border-width: 1px;
+    border-style: solid;
+} 
+
+.fieldset-left-padding {
+    padding-left: 5px;
+}
+
+.label-position {
+    bottom: 60% !important;
 }
