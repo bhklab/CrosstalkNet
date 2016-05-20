@@ -12,7 +12,7 @@ load('TSLGenes_GeneSym.Rdata')
 # load('esetTS_ERNeg.RData')
 
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
-#CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
 
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
 TESLGenes.padj.FDR <- p.adjust(Signif.TESLGenes$p,method="fdr",length(Signif.TESLGenes$p)) # FDR Adjustment for multiple testing
@@ -28,7 +28,7 @@ write(timeDif, stderr())
 ptm <- proc.time()
 CorTESLGenes.FDRadj.001[TESLGenes.padj.FDR>0.001] <- 0 
 CorTESLGenes.FDRadj.01[TESLGenes.padj.FDR>0.01] <- 0 
-CorTESLGenes.FDRadj.05[TESLGenes.padj.FDR>0.05] <- 0 
+CorTESLGenes.FDRadj.05[TESLGenes.padj.FDR>0.05] <- 0
 CorTESLGenes.FDRadj.1[TESLGenes.padj.FDR>0.1] <- 0
 
 CorTESLGenes.FDRadj.001 <- appendSideToMatrixNames(CorTESLGenes.FDRadj.001, 'E', 'row')
