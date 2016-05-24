@@ -7,10 +7,12 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $timeout) {
         $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
-        $scope.selectedZoomGene = null;
-        $scope.searchTextZoom = "";
+        $scope.selectedGOI = null;
+        $scope.zoomGene = null;
+        $scope.searchTextGOI = "";
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
+        $scope.searchTextZoom = "";
         $scope.minPositiveWeight = 0;
         $scope.minNegativeWeight = 0;
         $scope.ctrl = "main";
@@ -140,7 +142,9 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
         };
 
-        $scope.locateGene = function() {};
+        $scope.locateGene = function(gene) {
+            $scope.findGeneInGraph($scope.cy, gene.id());
+        };
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
