@@ -1,18 +1,14 @@
-library(jsonlite)
 library(psych)
 
-setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
+setwd('/mnt/work1/users/home2/aadam/R_Scripts')
 source('helpers.R')
 
 ptm <- proc.time()
-load('TELGenes_GeneSym.RData')
-load('TSLGenes_GeneSym.Rdata')
 
-# load('esetTE_ERNeg.RData')
-# load('esetTS_ERNeg.RData')
+load('esetTE_ERNeg.RData')
+load('esetTS_ERNeg.RData')
 
-CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
-#CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+CorTES.LGenes <- cor(t(edataTE.ERNeg),t(edataTS.ERNeg))
 
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
 TESLGenes.padj.FDR <- p.adjust(Signif.TESLGenes$p,method="fdr",length(Signif.TESLGenes$p)) # FDR Adjustment for multiple testing
@@ -64,15 +60,15 @@ write(timeDif, stderr())
 #degrees <- getDegrees(corMatrix)
 
 ptm <- proc.time()
-save(CorTESLGenes.FDRadj.001, filename='corMatrix.001.R')
-save(CorTESLGenes.FDRadj.01, filename='corMatrix.01.R')
-save(CorTESLGenes.FDRadj.05, filename='corMatrix.05.R')
-save(CorTESLGenes.FDRadj.1, filename='corMatrix.1.R')
+dput(CorTESLGenes.FDRadj.001, 'corMatrix.001.R')
+dput(CorTESLGenes.FDRadj.01, 'corMatrix.01.R')
+dput(CorTESLGenes.FDRadj.05, 'corMatrix.05.R')
+dput(CorTESLGenes.FDRadj.1, 'corMatrix.1.R')
 
-save(degrees.001, filename='degrees.001.R')
-save(degrees.01, filename='degrees.01.R')
-save(degrees.05, filename='degrees.05.R')
-save(degrees.1, filename='degrees.1.R')
+dput(degrees.001, 'degrees.001.R')
+dput(degrees.01, 'degrees.01.R')
+dput(degrees.05, 'degrees.05.R')
+dput(degrees.1, 'degrees.1.R')
 timeDif <- proc.time() - ptm 
 write("Serializing the data took: ", stderr())
 write(timeDif, stderr())

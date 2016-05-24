@@ -15,9 +15,10 @@ numberOfGenes <- as.character(args[9])
 depth <- as.numeric(args[10])
 genesOfInterest <- c()
 
-corMatrixFirstNeighbours <- dget(paste('corMatrix.', pValue, ".R", sep=""))
+ptm <- proc.time()
+corMatrixFirstNeighbours <- load(paste('corMatrix.', pValue, ".R", sep=""))
 corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
-degrees <- dget(paste('degrees.', pValue, '.R', sep=""))
+degrees <- load(paste('degrees.', pValue, '.R', sep=""))
 
 if (weightFilterFirst == TRUE) {
 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -30,6 +31,8 @@ if (weightFilterSecond == TRUE) {
 for (x in 1:numberOfGenes) {
 	genesOfInterest <- c(genesOfInterest, as.character(args[10 + x]))
 }
+
+
 
 maxNeighbours <- 3
 
@@ -49,6 +52,10 @@ for (i in 1:length(genesOfInterest)) {
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
     exclusions <- c(exclusions, firstNeighbours[[i]])
 }
+
+timeDif <- proc.time() - ptm 
+write("Getting first neighbours took: ", stderr())
+write(timeDif, stderr())
 
 edgesSecond <- list()
 secondNeighbours <- list()
@@ -78,9 +85,15 @@ if (length(firstNeighbours) > 0 && depth == 2) {
 }
 
 totalInteractions <- 0#length(which((weights)!=0))
-edgeTest <- na.omit(as.numeric(c(unlist(edgesFirst), unlist(edgesSecond))))
-write("edgeTest:", stderr())
-write(edgeTest, stderr())
+if (depth == 1) {
+	edgeTest <- na.omit(as.numeric(unlist(edgesFirst)))
+} else if (depth == 2) {
+	edgeTest <- na.omit(as.numeric(unlist(edgesSecond)))
+}
+
+#edgeTest <- na.omit(as.numeric(c(unlist(edgesFirst), unlist(edgesSecond))))
+
+
 minPositiveWeight <- min(edgeTest[edgeTest > 0])
 maxPositiveWeight <- max(edgeTest[edgeTest > 0])
 

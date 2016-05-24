@@ -2,8 +2,8 @@
 
 angular.module('myApp.MainController', ['ngRoute']).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, $q,
+    'GraphConfigService', 'BasicDataService', 'ExportService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, $q,
         $timeout) {
         $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
@@ -37,7 +37,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.sliderMinWeightNegative = -1;
         $scope.sliderMaxWeightPositive = 1;
 
-        $scope.correlationFilterFirst = {
+        $scope.correlationFilterModel = {
             min: -1,
             max: 1,
             negativeFilter: 0,
@@ -46,32 +46,25 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             positiveEnabled: false
         };
 
-        $scope.correlationFilterSecond = {
-            min: -1,
-            max: 1,
-            negativeFilter: 0,
-            positiveFilter: 0,
-            negativeEnabled: false,
-            positiveEnabled: false
-        };
+        $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel)
+
+        $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
 
         $scope.negativeFilterEnabled = false;
         $scope.positiveFilterEnabled = false;
 
-        $scope.data = GraphConfigService.tabs.main.data;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
+        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
+        $scope.applyConfig = GraphConfigService.applyConfig;
+
+        $scope.flattenNeighbours = BasicDataService.flattenNeighbours;
+        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
+        $scope.getSelfLoops = BasicDataService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
+
         $scope.genesOfInterest = [];
-
-        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
-
-        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-
-        $scope.applyConfig = GraphConfigService.applyConfig;
-
-        $scope.getSelfLoops = BasicDataService.getSelfLoops;
         $scope.edges = 0;
         $scope.nodes = 0;
         $scope.displaySecondNeighbours = true;
@@ -85,33 +78,45 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.GOIState = $scope.GOIStates.initial;
 
+        $scope.firstNeighbourInteractions = [];
+        $scope.secondNeighbourInteractions = [];
+
+        $scope.firstNeighbours = {
+            epi: [],
+            stroma: []
+        };
+
+        $scope.secondNeighbours = {
+            epi: [],
+            stroma: []
+        };
+
+        $scope.resize = GraphConfigService.resetZoom;
+
+        $scope.edgeDictionary = {};
+
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
-                $scope.display = "Self Loops";
+                $scope.display = "Tables";
             } else {
                 $scope.display = "Graph";
             }
         };
 
-        $scope.selectedItemChanged = function(item, source) {
-            // Run code to select gene here
-            // We probably need 2 dropdowns, one for epi and one for stroma or maybe a swtich to indicate which one we are searching
+        $scope.inspectNeighbours = function(item, source) {
             if (item == null) {
                 return;
             }
 
-            GraphConfigService.firstSelectedGene = item.value;
+            GraphConfigService.firstSelectedGene = item;
             $rootScope.selectedTab = 1;
             RESTService.post('neighbour-general', {
-                selectedGenes: item.value.toUpperCase(),
+                selectedGenes: [item],
                 pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout
             }).then(function(data) {
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;
-                //$scope.applyConfig(data.config, "cyMain");
-                //$scope.genesSecond = $scope.loadDropdownOptions($scope.cy,
-                //    item.value);
                 $scope.neighbours = angular.copy($scope.genesSecond);
                 GraphConfigService.neighbourConfigs.firstDropdownConfig =
                     angular.copy(data.config);
@@ -119,32 +124,23 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             });
         };
 
-        $scope.resize = GraphConfigService.resetZoom;
-
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {
                 $(this).val('');
             });
         };
 
-        $scope.resetAllData = function() {
-            $scope.neighbours = null;
-            $scope.genesOfInterest = [];
-            $scope.sliderMinWeightNegative = 1;
-            $scope.sliderMaxWeightPositive = 1;
-            $scope.elemCopy = null;
-            $scope.styleCopy = null;
-        };
-
-        $scope.searchForGene = function(gene) {
+        $scope.addGeneOfInterest = function(gene) {
             if (gene != null) {
                 //$scope.findGeneInGraph($scope.cy, gene.value);
 
-                if ($scope.genesOfInterest.indexOf(gene.value) < 0) {
-                    $scope.genesOfInterest.push(gene.value);
+                if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                    $scope.genesOfInterest.push(gene);
                 }
             }
         };
+
+        $scope.locateGene = function() {};
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
@@ -158,10 +154,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             if ($scope.GOIState == $scope.GOIStates.filterFirst) {
                 if (filter == false) {
                     depth = 2;
-                } 
+                }
                 filter = true;
                 filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
             } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
+                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
+                filterSecond = $scope.correlationFilterSecond.negativeEnabled || $scope.correlationFilterSecond.positiveEnabled;
+                depth = 2;
+            } else if ($scope.GOIState == $scope.GOIStates.filterSecond) {
                 filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
                 filterSecond = $scope.correlationFilterSecond.negativeEnabled || $scope.correlationFilterSecond.positiveEnabled;
                 depth = 2;
@@ -169,7 +169,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
             RESTService.post("submatrix", {
                     pValue: $scope.pValueActual,
-                    genes: $scope.genesOfInterest,
+                    selectedGenes: $scope.genesOfInterest,
                     minNegativeWeightFirst: $scope.correlationFilterFirst.negativeFilter ==
                         null || !$scope.correlationFilterFirst.negativeEnabled ?
                         "NA" : $scope.correlationFilterFirst.negativeFilter,
@@ -188,20 +188,30 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     depth: depth
                 })
                 .then(function(data) {
+                    if (data.config == null) {
+                        return;
+                    }
+
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
                     $scope.totalInteractions = data.totalInteractions;
-                    if ($scope.GOIState == $scope.GOIStates.initial) {//filtered != 'yes') {
-                        $scope.correlationFilterFirst.min = data.minNegativeWeight;
-                        $scope.correlationFilterFirst.max = data.maxPositiveWeight;
-                    }
+                    $scope.firstNeighbourInteractions = data.firstNeighbourInteractions;
+                    $scope.secondNeighbourInteractions = data.secondNeighbourInteractions;
                     $scope.applyConfig(data.config, "cyMain", $scope);
-                    $scope.firstNeighbourDropdownOptions = $scope.loadDropdownOptions($scope.cy, []);
+                    $scope.setNeighbours(1);
+                    $scope.setNeighbours(2);
+                    $scope.edgeDictionary = BasicDataService.createEdgeDictionary($scope.cy.edges());
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
+                        $scope.correlationFilterFirst.min = data.minNegativeWeight;
+                        $scope.correlationFilterFirst.max = data.maxPositiveWeight;
                         $scope.GOIState = $scope.GOIStates.filterFirst;
                     } else if ($scope.GOIState == $scope.GOIStates.filterFirst && depth == 2) {
+                        $scope.correlationFilterSecond.min = data.minNegativeWeight;
+                        $scope.correlationFilterSecond.max = data.maxPositiveWeight;
                         $scope.GOIState = $scope.GOIStates.getSecondNeighbours;
+                    } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
+                        $scope.GOIState = $scope.GOIStates.filterSecond;
                     }
                 });
         };
@@ -215,6 +225,76 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                 .then(function(data) {
                     $scope.geneList = $scope.loadGeneListDropdownOptions(data.geneList);
                 });
+        };
+
+        $scope.resetGeneSelection = function() {
+            $scope.GOIState = $scope.GOIStates.initial;
+            $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
+            $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
+        };
+
+        $scope.setNeighbours = function(level) {
+            if (level == 1) {
+                $scope.firstNeighbours.epi = $scope.cy.filter(function(i, element) {
+                    if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('epi')) {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                $scope.firstNeighbours.stroma = $scope.cy.filter(function(i, element) {
+                    if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('stroma')) {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            } else if (level == 2) {
+                $scope.secondNeighbours.epi = $scope.cy.filter(function(i, element) {
+                    if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('epi')) {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                $scope.secondNeighbours.stroma = $scope.cy.filter(function(i, element) {
+                    if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('stroma')) {
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+        };
+
+        $scope.getInteraction = function(source, target) {
+            var edge = null;
+
+            edge = $scope.cy.filter(function(i, element) {
+                if (element.isEdge() && ((element.source().id() == source.id() && element.target().id() == target.id()) ||
+                        (element.target().id() == source.id() && element.source().id() == target.id()))) {
+                    return true;
+                }
+
+                return false
+            });
+
+            return edge.length == 0 ? 0 : edge.data('weight');
+        };
+
+        $scope.getInteractionViaDictionary = function(source, target) {
+            if ($scope.edgeDictionary[source.id()][target.id()] != null) {
+                return $scope.edgeDictionary[source.id()][target.id()];
+            } else {
+                return 0;
+            }
+        };
+
+        $scope.exportTableToCSV = function(level) {
+            $("#" + level + "-neighbours-table").tableToCSV();
         };
 
         $scope.getGeneList();

@@ -26,6 +26,8 @@ myModule.factory('BasicDataService', function($http) {
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
     service.getSelfLoops = getSelfLoops;
+    service.flattenNeighbours = flattenNeighbours;
+    service.createEdgeDictionary = createEdgeDictionary;
 
     function loadDropdownOptions(cy, selectedGenes = null) {
         var genes = [];
@@ -34,7 +36,7 @@ myModule.factory('BasicDataService', function($http) {
         var parents = "";
 
         for (var i = 0; i < selectedGenes.length; i++) {
-            selectedGenesStr += ', #' + selectedGenes[i];
+            selectedGenesStr += ', #' + selectedGenes[i].value;
             parentContainers += ", #par" + (i + 1);
             parents += ", [parent='par" + i + "']"
         }
@@ -126,6 +128,41 @@ myModule.factory('BasicDataService', function($http) {
         }
 
         return result;
+    }
+
+    function createEdgeDictionary(edges) {
+        var dictionary = {};
+
+        for (var i = 0; i < edges.length; i++) {
+            var id = edges[i].source().id(); 
+            if (id.endsWith('-E')) {
+                if (dictionary[id] == null) {
+                    dictionary[id] = {};
+                }
+
+                dictionary[id][edges[i].target().id()] = edges[i].data('weight');
+            } else {
+                id = edges[i].target().id();
+                
+                if (dictionary[id] == null) {
+                    dictionary[id] = {};
+                }
+
+                dictionary[id][edges[i].source().id()] = edges[i].data('weight');
+            }
+        }
+
+        return dictionary;
+    }
+
+    function flattenNeighbours(neighbours) {
+        var flattened = [];
+
+        for (var i = 0; i < neighbours.length; i++) {
+            flattened = flattened.concat(neighbours[i]);
+        }
+
+        return flattened;
     }
 
     return service;
