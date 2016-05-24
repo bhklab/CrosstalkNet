@@ -16,9 +16,9 @@ depth <- as.numeric(args[10])
 genesOfInterest <- c()
 
 ptm <- proc.time()
-corMatrixFirstNeighbours <- load(paste('corMatrix.', pValue, ".R", sep=""))
+corMatrixFirstNeighbours <- readRDS(paste('corMatrix.', pValue, ".RData", sep=""))
 corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
-degrees <- load(paste('degrees.', pValue, '.R', sep=""))
+degrees <- readRDS(paste('degrees.', pValue, '.RData', sep=""))
 
 if (weightFilterFirst == TRUE) {
 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -31,8 +31,6 @@ if (weightFilterSecond == TRUE) {
 for (x in 1:numberOfGenes) {
 	genesOfInterest <- c(genesOfInterest, as.character(args[10 + x]))
 }
-
-
 
 maxNeighbours <- 3
 
@@ -52,10 +50,6 @@ for (i in 1:length(genesOfInterest)) {
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
     exclusions <- c(exclusions, firstNeighbours[[i]])
 }
-
-timeDif <- proc.time() - ptm 
-write("Getting first neighbours took: ", stderr())
-write(timeDif, stderr())
 
 edgesSecond <- list()
 secondNeighbours <- list()
@@ -91,8 +85,9 @@ if (depth == 1) {
 	edgeTest <- na.omit(as.numeric(unlist(edgesSecond)))
 }
 
-#edgeTest <- na.omit(as.numeric(c(unlist(edgesFirst), unlist(edgesSecond))))
-
+timeDif <- proc.time() - ptm 
+write("Getting neighbours took: ", stderr())
+write(timeDif, stderr())
 
 minPositiveWeight <- min(edgeTest[edgeTest > 0])
 maxPositiveWeight <- max(edgeTest[edgeTest > 0])

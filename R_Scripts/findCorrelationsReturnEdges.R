@@ -15,8 +15,8 @@ for (i in 1:numberOfNeighbours) {
 }
 
 #write(paste(first, second, side, pValue), stderr())
-corMatrix <- dget(paste('corMatrix.', pValue, ".R", sep=""))
-degrees <- dget(paste('degrees.', pValue, ".R", sep=""))
+corMatrix <- readRDS(paste('corMatrix.', pValue, ".RData", sep=""))
+degrees <- readRDS(paste('degrees.', pValue, ".RData", sep=""))
 
 exclusions <- c()	
 neighbours <- list()

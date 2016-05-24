@@ -43,46 +43,47 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
         });*/
 
-        scope.cy.on('select', 'node', function(evt){
-            var node = evt.cyTarget;
-            var id = node.id();
-            console.log('tapped ' + id);
+        
+        // scope.cy.on('select', 'node', function(evt){
+        //     var node = evt.cyTarget;
+        //     var id = node.id();
+        //     console.log('tapped ' + id);
 
 
-            scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-                edge.addClass('highlighted');
-                edge.removeClass('faded');
-                edge.css({ 'line-color': 'magenta' });
-                /*else {
-                    edge.addClass('faded');
-                    edge.removeClass('highlighted');
-                    edge.css({ 'opacity': '0' });
-                }*/
-            });
-            scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-                edge.addClass('faded');
-                edge.removeClass('highlighted');
-                edge.css({ 'opacity': '0' });
-                /*else {
-                    edge.addClass('faded');
-                    edge.removeClass('highlighted');
-                    edge.css({ 'opacity': '0' });
-                }*/
-            });
+        //     scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+        //         edge.addClass('highlighted');
+        //         edge.removeClass('faded');
+        //         edge.css({ 'line-color': 'magenta' });
+        //         /*else {
+        //             edge.addClass('faded');
+        //             edge.removeClass('highlighted');
+        //             edge.css({ 'opacity': '0' });
+        //         }*/
+        //     });
+        //     scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+        //         edge.addClass('faded');
+        //         edge.removeClass('highlighted');
+        //         edge.css({ 'opacity': '0' });
+        //         /*else {
+        //             edge.addClass('faded');
+        //             edge.removeClass('highlighted');
+        //             edge.css({ 'opacity': '0' });
+        //         }*/
+        //     });
 
-            service.selectedItem = null;
-            console.log(node);
-        });
+        //     service.selectedItem = null;
+        //     console.log(node);
+        // });
 
         
-        scope.cy.on("unselect", 'node', function(evt) {
-            var node = evt.cyTarget;
-            var id = node.id();
+        // scope.cy.on("unselect", 'node', function(evt) {
+        //     var node = evt.cyTarget;
+        //     var id = node.id();
 
-            service.resetEdges(scope.cy);
-            console.log('tapped ' + id);
-            console.log(node);
-        });
+        //     service.resetEdges(scope.cy);
+        //     console.log('tapped ' + id);
+        //     console.log(node);
+        // });
     };
 
     service.getInteractingNodes = function(node, cy) {
