@@ -32,21 +32,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.selectedNeighbourGenes = [];
 
-
-        $scope.applyConfig = function(config, containerID) {
-            $scope.elemCopy = angular.copy(config.elements);
-            config.container = document.getElementById(containerID);
-            $scope.cy = cytoscape(config);
-            $scope.cy.fit($scope.cy.$("*"), 10);
-        }
-
-        $scope.changeDisplay = function() {
-            if ($scope.display == "Graph") {
-                $scope.display = "Self Loops";
-            } else {
-                $scope.display = "Graph";
-            }
-        };
+        $scope.resize = GraphConfigService.resetZoom;
 
         $scope.getSelfLoops = GraphConfigService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
@@ -54,17 +40,30 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
-        $scope.selectedItemChanged = function(gene, source) {
+        $scope.applyConfig = function(config, containerID) {
+            $scope.elemCopy = angular.copy(config.elements);
+            config.container = document.getElementById(containerID);
+            $scope.cy = cytoscape(config);
+            $scope.cy.fit($scope.cy.$("*"), 10);
+        };
+
+        $scope.changeDisplay = function() {
+            if ($scope.display == "Graph") {
+                $scope.display = "Tables";
+            } else {
+                $scope.display = "Graph";
+            }
+        };
+
+        $scope.inspectNeighbours = function(gene, source) {
             if (gene == null) {
                 return;
             }
 
-            if ($scope.selectedNeighbourGenes.indexOf(gene.value) < 0) {
-                $scope.selectedNeighbourGenes.push(gene.value);
+            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0) {
+                $scope.selectedNeighbourGenes.push(gene);
             }
         };
-
-        $scope.resize = GraphConfigService.resetZoom;
 
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {

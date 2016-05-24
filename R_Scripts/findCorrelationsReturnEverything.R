@@ -8,8 +8,6 @@ pValue <- args[2]
 numberOfNeighbours <- as.numeric(args[3])
 selectedGenes <- c()
 
-ptm <- proc.time()
-
 for (i in 1:numberOfNeighbours) {
     selectedGenes <- c(selectedGenes, as.character(args[3 + i]))
 }
@@ -24,21 +22,18 @@ resultDegrees <- list()
 edges <- list()
 edgeExclusion <- c()
 
-for (i in 1:length(selectedGenes)) {
-    exclusions <- c(exclusions, selectedGenes[i])
-    neighbours[[i]] = getNeighbourNames(corMatrix, selectedGenes[i], exclusions)
+neighbours[[1]] = selectedGenes
+resultDegrees[[1]] = getDegreesForNeighbourNames(degrees, neighbours[[1]])
+
+
+for (i in 2:length(selectedGenes) + 1) {
+    exclusions <- c(exclusions, selectedGenes[i-1])
+    neighbours[[i]] = getNeighbourNames(corMatrix, selectedGenes[i-1], exclusions)
     resultDegrees[[i]] = getDegreesForNeighbourNames(degrees, neighbours[[i]])
-    edges[[i]] <- createEdges(corMatrix, selectedGenes[i], edgeExclusion)
-    edgeExclusion <- selectedGenes[i]
+    edges[[i-1]] <- createEdges(corMatrix, selectedGenes[i-1], edgeExclusion)
+    edgeExclusion <- selectedGenes[i-1]
     exclusions <- c(exclusions, neighbours[[i]])
 }
-
-timeDif <- proc.time() - ptm 
-write("Significance Test Took: ", stderr())
-write(timeDif, stderr())
-
-write("edges length:", stderr())
-write(length(edges), stderr())
 
 result <- list(neighbours = neighbours, degrees = resultDegrees, edges = edges)
 cat(format(serializeJSON(result)))

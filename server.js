@@ -35,6 +35,7 @@ app.get('/gene-list', function(req, res) {
 
 app.post('/neighbour-general', function(req, res) {
     var argsString = "";
+    var selectedGeneNames = [];
     var argsArray = [];
     var selectedGenes = req.body.selectedGenes;
     var pValue = req.body.pValue;
@@ -53,11 +54,15 @@ app.post('/neighbour-general', function(req, res) {
         return;
     }
 
-    var initialColor = selectedGenes[0].endsWith("-E") ? "red" : "blue";
+    for (var i = 0; i < selectedGenes.length; i++) {
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
     numberOfGenes = selectedGenes.length;
 
     argsArray = [pValue, numberOfGenes];
-    argsArray = argsArray.concat(selectedGenes);
+    argsArray = argsArray.concat(selectedGeneNames);
     argsString = execUtils.createArgsStringFromArray(argsArray);
 
 
@@ -83,7 +88,7 @@ app.post('/neighbour-general', function(req, res) {
             var layout = null;
 
             for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i]], 'par' + i, 0, 0));
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].value], 'par' + i, 0, selectedGenes[i].object.degree));
             }
 
             if (degrees[0].attributes.names == null) {
@@ -127,7 +132,7 @@ app.post('/neighbour-general', function(req, res) {
 
             for (var i = 0; i < parsedEdges.length; i++) {
                 console.log(parsedEdges[i].value);
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i].value));
+                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i].value, i + 1));
             }
 
             sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -163,7 +168,8 @@ app.post('/neighbour-general', function(req, res) {
 app.post('/submatrix', function(req, res) {
     var argsString = "";
     var argsArray = [];
-    var genes = req.body.genes;
+    var selectedGeneNames = [];
+    var selectedGenes = req.body.selectedGenes;
     var pValue = req.body.pValue;
     var requestedLayout = req.body.layout;
     var minPositiveWeightFirst = req.body.minPositiveWeightFirst;
@@ -174,16 +180,20 @@ app.post('/submatrix', function(req, res) {
     var filterSecond = req.body.filterSecond;
     var depth = req.body.depth;
 
-    if (!(genes instanceof Array)) {
-        genes = [genes];
-    } else if (genes == null || genes == "" || genes == []) {
+    if (!(selectedGenes instanceof Array)) {
+        selectedGenes = [selectedGenes];
+    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
         res.json({ error: "Error" });
         return;
     }
     console.log(req.body);
 
-    argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, genes.length, depth];
-    argsArray = argsArray.concat(genes);
+    for (var i = 0; i < selectedGenes.length; i++) {
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, selectedGenes.length, depth];
+    argsArray = argsArray.concat(selectedGeneNames);
     argsString = execUtils.createArgsStringFromArray(argsArray);
 
     var child = exec("Rscript R_Scripts/getRelevantSubmatrixReturnEdges.R --args " + argsString, {
@@ -220,12 +230,14 @@ app.post('/submatrix', function(req, res) {
             var parentNodes = [];
             var allNodes = [];
             var edges = [];
+            var firstNeighbourInteractions = [];
+            var secondNeighbourInteractions = [];
             var elements = [];
             var config = null;
             var layout = null;
 
-            for (var i = 0; i < genes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([genes[i]], null, 0, 0)[0]);
+            for (var i = 0; i < selectedGenes.length; i++) {
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
                 allNodes.push(sourceNodes[i]);
             }
 
@@ -249,21 +261,25 @@ app.post('/submatrix', function(req, res) {
             }
 
             for (var i = 0; i < weightsFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value);
+                firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value, 1);
                 allNodes = allNodes.concat(firstNodes[i]);
             }
 
             for (var i = 0; i < weightsSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value);
+                secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value, 2);
                 allNodes = allNodes.concat(secondNodes[i]);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i].value));
+                var cytoscapeEdges = edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i].value, 1);
+                firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
+                edges = edges.concat(cytoscapeEdges);
             }
 
             for (var i = 0; i < parsedEdgesSecond.length; i++) {
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i].value));
+                var cytoscapeEdges = edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i].value, 2);
+                secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)
+                edges = edges.concat(cytoscapeEdges);
             }
 
             elements = elements.concat(edges);
@@ -291,6 +307,7 @@ app.post('/submatrix', function(req, res) {
             } else if (requestedLayout == 'clustered') {
                 for (var i = 0; i < sourceNodes.length; i++) {
                     layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
+                    //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
                 }
 
                 layout = layoutUtils.createPresetLayout();
@@ -307,71 +324,14 @@ app.post('/submatrix', function(req, res) {
             res.json({
                 config: config,
                 minNegativeWeight: minNegativeWeight,
-                maxPositiveWeight: maxPositiveWeight
+                maxPositiveWeight: maxPositiveWeight,
+                firstNeighbourInteractions: firstNeighbourInteractions,
+                secondNeighbourInteractions: secondNeighbourInteractions,
+                firstNeighbours: firstNodes,
+                secondNeighbours: secondNodes
             });
         });
 });
-
-/*  For now, xPattern and yPattern will simply be increments to add at every step of the loop
- */
-function createOverallConfig(originalElements, requestedLayout) {
-    var config = null;
-    var configLayout = null;
-
-    if (originalElements != null) {
-        var elements = originalElements.elements != null ? copyUtils.createElementsCopy(
-            originalElements.elements) : copyUtils.createElementsCopy(
-            originalElements);
-        config = configUtils.createConfig(elements);
-        if (requestedLayout == 'preset') {
-            elements.epiNodes = nodeUtils.addPositionsToNodes(elements.epiNodes, 100,
-                100,
-                0, 20);
-            elements.epiNodes = nodeUtils.addStyleToNodes(elements.epiNodes, 10, 10,
-                "left",
-                "center", "blue");
-
-            elements.stromaNodes = nodeUtils.addPositionsToNodes(elements.stromaNodes,
-                300,
-                100, 0,
-                20);
-            elements.stromaNodes = nodeUtils.addStyleToNodes(elements.stromaNodes, 10,
-                10,
-                "right",
-                "center",
-                "red");
-
-            configUtils.setConfigElements(config, elements);
-            configLayout = configUtils.createPresetLayout();
-            configUtils.setConfigLayout(config, configLayout);
-
-        } else if (requestedLayout == 'random') {
-            elements.epiParent = null;
-            elements.stromaParent = null;
-            configUtils.setConfigElements(config, elements);
-            configLayout = configUtils.createRandomLayout(elements.epiNodes.length + elements.stromaNodes.length);
-            configUtils.setConfigLayout(config, configLayout);
-            var epiColor = {
-                'selector': 'node[id$="-E"], node[id$="-Er"]',
-                'style': {
-                    'background-color': 'red'
-                }
-            };
-
-            var stromaColor = {
-                'selector': 'node[id$="-S"], node[id$="-sr"]',
-                'style': {
-                    'background-color': 'blue'
-                }
-            };
-
-            configUtils.addStyleToConfig(config, epiColor);
-            configUtils.addStyleToConfig(config, stromaColor);
-        }
-    }
-
-    return config;
-}
 
 function cacheGeneListForPValue(pValue, script) {
     var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
