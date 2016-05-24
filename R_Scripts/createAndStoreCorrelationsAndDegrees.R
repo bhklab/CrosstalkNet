@@ -12,7 +12,7 @@ load('TSLGenes_GeneSym.Rdata')
 # load('esetTS_ERNeg.RData')
 
 CorTES.LGenes <- cor(t(edataTE.ERNeg.LGenes),t(edataTS.ERNeg.LGenes))
-#CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
+CorTES.LGenes <- CorTES.LGenes[1:100, 1:100]
 
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
 TESLGenes.padj.FDR <- p.adjust(Signif.TESLGenes$p,method="fdr",length(Signif.TESLGenes$p)) # FDR Adjustment for multiple testing
@@ -64,15 +64,15 @@ write(timeDif, stderr())
 #degrees <- getDegrees(corMatrix)
 
 ptm <- proc.time()
-save(CorTESLGenes.FDRadj.001, filename='corMatrix.001.R')
-save(CorTESLGenes.FDRadj.01, filename='corMatrix.01.R')
-save(CorTESLGenes.FDRadj.05, filename='corMatrix.05.R')
-save(CorTESLGenes.FDRadj.1, filename='corMatrix.1.R')
+saveRDS(CorTESLGenes.FDRadj.001, file='corMatrix.001.RData')
+saveRDS(CorTESLGenes.FDRadj.01, file='corMatrix.01.RData')
+saveRDS(CorTESLGenes.FDRadj.05, file='corMatrix.05.RData')
+saveRDS(CorTESLGenes.FDRadj.1, file='corMatrix.1.RData')
 
-save(degrees.001, filename='degrees.001.R')
-save(degrees.01, filename='degrees.01.R')
-save(degrees.05, filename='degrees.05.R')
-save(degrees.1, filename='degrees.1.R')
+saveRDS(degrees.001, file='degrees.001.RData')
+saveRDS(degrees.01, file='degrees.01.RData')
+saveRDS(degrees.05, file='degrees.05.RData')
+saveRDS(degrees.1, file='degrees.1.RData')
 timeDif <- proc.time() - ptm 
 write("Serializing the data took: ", stderr())
 write(timeDif, stderr())

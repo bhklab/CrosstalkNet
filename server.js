@@ -316,6 +316,8 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             } else {
                 layout = configUtils.createRandomLayout();
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             }
 
             configUtils.setConfigElements(config, edges.concat(allNodes));

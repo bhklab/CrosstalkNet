@@ -54,21 +54,21 @@
             </md-card-title-text>
         </md-card-title>
         <md-card-content>
-                <table id="first-neighbours-table">
-                    <thead>
-                        <tr>
-                            <th> </th>
-                            <th ng-repeat="stroma in $parent.firstNeighbours.stroma">{{stroma.id()}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="epi in $parent.firstNeighbours.epi">
-                            <td class="row-name">{{epi.id()}}</td>
-                            <td ng-repeat="stroma in $parent.firstNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <md-button ng-click="exportTableToCSV('first')">Download Interactions</md-button>
+            <table id="first-neighbours-table">
+                <thead>
+                    <tr>
+                        <th> </th>
+                        <th ng-repeat="stroma in $parent.firstNeighbours.stroma">{{stroma.id()}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="epi in $parent.firstNeighbours.epi">
+                        <td class="row-name">{{epi.id()}}</td>
+                        <td ng-repeat="stroma in $parent.firstNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <md-button ng-click="exportTableToCSV('first')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-if="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
@@ -87,21 +87,21 @@
             </md-card-title-text>
         </md-card-title>
         <md-card-content>
-                <table id="second-neighbours-table">
-                    <thead>
-                        <tr>
-                            <th> </th>
-                            <th ng-repeat="stroma in $parent.secondNeighbours.stroma">{{stroma.id()}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="epi in $parent.secondNeighbours.epi">
-                            <td class="row-name">{{epi.id()}}</td>
-                            <td ng-repeat="stroma in $parent.secondNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
-                        </tr>
-                    </tbody>
-                <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
-            </div>
+            <table id="second-neighbours-table">
+                <thead>
+                    <tr>
+                        <th> </th>
+                        <th ng-repeat="stroma in $parent.secondNeighbours.stroma">{{stroma.id()}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="epi in $parent.secondNeighbours.epi">
+                        <td class="row-name">{{epi.id()}}</td>
+                        <td ng-repeat="stroma in $parent.secondNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-if="cy != null">
