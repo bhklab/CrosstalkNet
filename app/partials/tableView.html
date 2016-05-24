@@ -1,4 +1,4 @@
-<div ng-show="display == 'Self Loops'">
+<div ng-show="display == 'Tables'">
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -38,11 +38,11 @@
                 <br>Degree: {{gene.object.degree}}</div>
         </md-card-content>
     </md-card>
-    <md-card ng-if="cy != null && cy.edges() != null && cy.edges().length > 0">
+    <md-card ng-if="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=1]').length > 0">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
-                    <div flex><span class="md-headline">All Interactions</span></div>
+                    <div flex><span class="md-headline">First Neighbour Interactions</span></div>
                     <div flex style="position: relative;">
                         <md-input-container class="no-margin right-aligned">
                             <label>Filter Interactions</label>
@@ -50,15 +50,57 @@
                         </md-input-container>
                     </div>
                 </div>
-                <span class="md-subhead">Total: {{cy.edges().length}}</span>
+                <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=1]").length}}</span>
             </md-card-title-text>
         </md-card-title>
-        <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="elem in cy.edges() | interactionFilter : interactionSearch">
-                <div class="interaction-card">
-                    {{elem.source().id()}} with {{elem.target().id()}}
-                    <br> Strength: {{elem.data('weight')}}
+        <md-card-content>
+                <table id="first-neighbours-table">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th ng-repeat="stroma in $parent.firstNeighbours.stroma">{{stroma.id()}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="epi in $parent.firstNeighbours.epi">
+                            <td class="row-name">{{epi.id()}}</td>
+                            <td ng-repeat="stroma in $parent.firstNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <md-button ng-click="exportTableToCSV('first')">Download Interactions</md-button>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
+        <md-card-title>
+            <md-card-title-text>
+                <div layout="row">
+                    <div flex><span class="md-headline">Second Neighbour Interactions</span></div>
+                    <div flex style="position: relative;">
+                        <md-input-container class="no-margin right-aligned">
+                            <label>Filter Interactions</label>
+                            <input ng-model="interactionSearch">
+                        </md-input-container>
+                    </div>
                 </div>
+                <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=2]").length}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+                <table id="second-neighbours-table">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th ng-repeat="stroma in $parent.secondNeighbours.stroma">{{stroma.id()}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="epi in $parent.secondNeighbours.epi">
+                            <td class="row-name">{{epi.id()}}</td>
+                            <td ng-repeat="stroma in $parent.secondNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        </tr>
+                    </tbody>
+                <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
             </div>
         </md-card-content>
     </md-card>
@@ -77,16 +119,4 @@
             </div>
         </md-card-content>
     </md-card>
-    <!--<md-card>
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline">All Elements</span>
-                <span class="md-headline">Edges: {{edges}}</span>
-                <span class="md-headline">Nodes: {{nodes}}</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="elem in elemCopy">{{elem.data}}</div>
-        </md-card-content>
-    </md-card>-->
 </div>

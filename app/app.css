@@ -147,3 +147,23 @@ md-menu-content {
 .label-position {
     bottom: 60% !important;
 }
+
+td, th {
+    padding: 5px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+.row-name { 
+    font-weight: bold;
+}
+
+md-card-content {
+    overflow-x: auto !important;
+}
