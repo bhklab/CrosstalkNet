@@ -1,5 +1,6 @@
 <div ng-show="display == 'Tables'">
-    <md-card ng-if="cy != null">
+    <div ng-show="cy != null && cy.edges() != null>">{{cy.edges().length}}</div>
+    <!--<md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -11,14 +12,14 @@
                         </md-input-container>
                     </div>
                 </div>
-                <span class="md-subhead">Total: {{getSelfLoops($parent).length}}</span>
+                <span class="md-subhead">Total: {{$parent.selfLoops.length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="gene in getSelfLoops($parent) | filter: selfLoopSearch track by $index">{{gene}}</div>
+            <div flex="20" ng-repeat="gene in $parent.selfLoops | filter: selfLoopSearch track by $index">{{gene}}</div>
         </md-card-content>
     </md-card>
-    <md-card ng-if="neighbours.length > 0">
+    <md-card ng-show="neighbours.length > 0">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -38,7 +39,7 @@
                 <br>Degree: {{gene.object.degree}}</div>
         </md-card-content>
     </md-card>
-    <md-card ng-if="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=1]').length > 0">
+    <md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=1]').length > 0">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -71,7 +72,7 @@
             <md-button ng-click="exportTableToCSV('first')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
-    <md-card ng-if="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
+    <md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -104,6 +105,7 @@
             <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
+    <!--
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -118,5 +120,5 @@
                 </div>
             </div>
         </md-card-content>
-    </md-card>
+    </md-card>-->
 </div>

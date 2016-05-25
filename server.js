@@ -12,6 +12,7 @@ var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
 var layoutUtils = require('layoutUtils');
+var clientTableUtils = require('clientTableUtils');
 
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
@@ -232,6 +233,8 @@ app.post('/submatrix', function(req, res) {
             var edges = [];
             var firstNeighbourInteractions = [];
             var secondNeighbourInteractions = [];
+            var edgeDictionary = {};
+            var selfLoops = [];
             var elements = [];
             var config = null;
             var layout = null;
@@ -305,13 +308,25 @@ app.post('/submatrix', function(req, res) {
 
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
             } else if (requestedLayout == 'clustered') {
+                var largestClusterSize = 0;
+                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 12) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 12)
+
+                    if (clusterSize > largestClusterSize) {
+                        largestClusterSize = clusterSize;
+                    }
+                }
+
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 12, largestClusterSize);
                     //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
                 }
 
                 layout = layoutUtils.createPresetLayout();
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source)
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             } else {
@@ -322,6 +337,8 @@ app.post('/submatrix', function(req, res) {
 
             configUtils.setConfigElements(config, edges.concat(allNodes));
             configUtils.setConfigLayout(config, layout);
+            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+            selfLoops = clientTableUtils.getSelfLoops(edges);
 
             res.json({
                 config: config,
@@ -330,7 +347,9 @@ app.post('/submatrix', function(req, res) {
                 firstNeighbourInteractions: firstNeighbourInteractions,
                 secondNeighbourInteractions: secondNeighbourInteractions,
                 firstNeighbours: firstNodes,
-                secondNeighbours: secondNodes
+                secondNeighbours: secondNodes,
+                edgeDictionary: edgeDictionary,
+                selfLoops: selfLoops
             });
         });
 });
@@ -365,12 +384,14 @@ function cacheGeneListForPValue(pValue, script) {
 }
 
 function createOverallElements() {
-    var pValues = ["001", "01", "05", "1"];
+    /*var pValues = ["001", "01", "05", "1"];
     console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
         cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
-    }
+    }*/
+
+    cacheGeneListForPValue("05", "R_Scripts/getGeneList.R");
 }
 
 function initializeServer() {
