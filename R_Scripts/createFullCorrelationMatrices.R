@@ -31,13 +31,13 @@ rownames(CorTESLGenes.FDRadj.001) = ProbeGeneMap$GeneSymbol[match(rownames(CorTE
 colnames(CorTESLGenes.FDRadj.001) = ProbeGeneMap$GeneSymbol[match(colnames(CorTESLGenes.FDRadj.001), (ProbeGeneMap$EntrezGeneID))]
 
 rownames(CorTESLGenes.FDRadj.01) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.01), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTESLGenes.FDRadj.01) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.01), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.01) = ProbeGeneMap$GeneSymbol[match(colnames(CorTESLGenes.FDRadj.01), (ProbeGeneMap$EntrezGeneID))]
 
 rownames(CorTESLGenes.FDRadj.05) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.05), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTESLGenes.FDRadj.05) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.05), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.05) = ProbeGeneMap$GeneSymbol[match(colnames(CorTESLGenes.FDRadj.05), (ProbeGeneMap$EntrezGeneID))]
 
 rownames(CorTESLGenes.FDRadj.1) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.1), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTESLGenes.FDRadj.1) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.1), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.1) = ProbeGeneMap$GeneSymbol[match(colnames(CorTESLGenes.FDRadj.1), (ProbeGeneMap$EntrezGeneID))]
 
 CorTESLGenes.FDRadj.001 <- appendSideToMatrixNames(CorTESLGenes.FDRadj.001, 'E', 'row')
 CorTESLGenes.FDRadj.001 <- appendSideToMatrixNames(CorTESLGenes.FDRadj.001, 'S', 'col')
