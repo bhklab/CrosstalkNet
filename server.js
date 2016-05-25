@@ -384,14 +384,12 @@ function cacheGeneListForPValue(pValue, script) {
 }
 
 function createOverallElements() {
-    /*var pValues = ["001", "01", "05", "1"];
+    var pValues = ["001", "01", "05", "1"];
     console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
         cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
-    }*/
-
-    cacheGeneListForPValue("05", "R_Scripts/getGeneList.R");
+    }
 }
 
 function initializeServer() {

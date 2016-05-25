@@ -63,6 +63,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
+        $scope.setNeighbours = BasicDataService.setNeighbours;
 
         $scope.genesOfInterest = [];
         $scope.edges = 0;
@@ -133,8 +134,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.addGeneOfInterest = function(gene) {
             if (gene != null) {
-                //$scope.findGeneInGraph($scope.cy, gene.value);
-
                 if ($scope.genesOfInterest.indexOf(gene) < 0) {
                     $scope.genesOfInterest.push(gene);
                 }
@@ -201,8 +200,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     $scope.firstNeighbourInteractions = data.firstNeighbourInteractions;
                     $scope.secondNeighbourInteractions = data.secondNeighbourInteractions;
                     $scope.applyConfig(data.config, "cyMain", $scope);
-                    $scope.setNeighbours(1);
-                    $scope.setNeighbours(2);
+                    $scope.setNeighbours($scope, 1);
+                    $scope.setNeighbours($scope, 2);
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
 
@@ -237,52 +236,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
         };
 
-        $scope.setNeighbours = function(level) {
-            if (level == 1) {
-                $scope.firstNeighbours.epi = $scope.cy.filter(function(i, element) {
-                    if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('epi')) {
-                        return true;
-                    }
-
-                    return false;
-                });
-
-                $scope.firstNeighbours.stroma = $scope.cy.filter(function(i, element) {
-                    if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('stroma')) {
-                        return true;
-                    }
-
-                    return false;
-                });
-
-                /*
-                $scope.firstNeighbours.epi = $scope.firstNeighbours.epi.map(function(node) {
-                    return node.id();
-                });
-
-                $scope.firstNeighbours.stroma = $scope.firstNeighbours.stroma.map(function(node) {
-                    return node.id();
-                });*/
-
-            } else if (level == 2) {
-                $scope.secondNeighbours.epi = $scope.cy.filter(function(i, element) {
-                    if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('epi')) {
-                        return true;
-                    }
-
-                    return false;
-                });
-
-                $scope.secondNeighbours.stroma = $scope.cy.filter(function(i, element) {
-                    if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('stroma')) {
-                        return true;
-                    }
-
-                    return false;
-                });
-            }
-        };
-
         $scope.getInteraction = function(source, target) {
             var edge = null;
 
@@ -299,12 +252,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
-            if (source.id == null || target.id == null) {
-                return 0;
-            }
-
-            if ($scope.edgeDictionary[source.id()][target.id()] != null) {
-                return $scope.edgeDictionary[source.id()][target.id()];
+            if ($scope.edgeDictionary[source][target] != null) {
+                return $scope.edgeDictionary[source][target];
             } else {
                 return 0;
             }
@@ -312,6 +261,12 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.exportTableToCSV = function(level) {
             $("#" + level + "-neighbours-table").tableToCSV();
+        };
+
+        $scope.refreshGeneList = function() {
+            $scope.pValueActual = $scope.pValueDisplayed;
+
+            $scope.getGeneList();
         };
 
         $scope.getGeneList();
