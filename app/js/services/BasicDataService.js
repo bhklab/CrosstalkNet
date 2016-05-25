@@ -25,6 +25,23 @@ myModule.factory('BasicDataService', function($http) {
     service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
+    service.setNeighbours = setNeighbours;
+
+    function initializeStandardVariables(scope) {
+        scope.selectedItemFirst = null;
+        scope.selectedGOI = null;
+        scope.zoomGene = null;
+        scope.searchTextGOI = "";
+        scope.searchTextFirst = "";
+        scope.searchTextSecond = "";
+        scope.searchTextZoom = "";
+        scope.minPositiveWeight = 0;
+        scope.minNegativeWeight = 0;
+        scope.ctrl = "main";
+
+        scope.pValues = angular.copy(service.pValues);
+        scope.layouts = angular.copy(service.layouts);
+    }
 
     function loadDropdownOptions(cy, selectedGenes = null) {
         var genes = [];
@@ -106,6 +123,59 @@ myModule.factory('BasicDataService', function($http) {
 
         return result;
     }
+
+    function setNeighbours(scope, level) {
+        if (level == 1) {
+            scope.firstNeighbours.epi = scope.cy.filter(function(i, element) {
+                if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('epi')) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            scope.firstNeighbours.stroma = scope.cy.filter(function(i, element) {
+                if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('stroma')) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            scope.firstNeighbours.epi = scope.firstNeighbours.epi.map(function(node) {
+                return node.id();
+            });
+
+            scope.firstNeighbours.stroma = scope.firstNeighbours.stroma.map(function(node) {
+                return node.id();
+            });
+
+        } else if (level == 2) {
+            scope.secondNeighbours.epi = scope.cy.filter(function(i, element) {
+                if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('epi')) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            scope.secondNeighbours.stroma = scope.cy.filter(function(i, element) {
+                if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('stroma')) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            scope.secondNeighbours.epi = scope.secondNeighbours.epi.map(function(node) {
+                return node.id();
+            });
+
+            scope.secondNeighbours.stroma = scope.secondNeighbours.stroma.map(function(node) {
+                return node.id();
+            });
+        }
+    };
 
     return service;
 });
