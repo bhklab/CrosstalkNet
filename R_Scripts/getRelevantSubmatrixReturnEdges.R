@@ -15,10 +15,9 @@ numberOfGenes <- as.character(args[9])
 depth <- as.numeric(args[10])
 genesOfInterest <- c()
 
-ptm <- proc.time()
-corMatrixFirstNeighbours <- readRDS(paste('corMatrix.', pValue, ".RData", sep=""))
+corMatrixFirstNeighbours <- readRDS(paste('fullcorMatrix.', pValue, ".RData", sep=""))
 corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
-degrees <- readRDS(paste('degrees.', pValue, '.RData', sep=""))
+degrees <- readRDS(paste('fulldegrees.', pValue, '.RData', sep=""))
 
 if (weightFilterFirst == TRUE) {
 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -56,6 +55,8 @@ secondNeighbours <- list()
 resultDegreesSecond <- list()
 edgeExclusions <- c(genesOfInterest)
 
+ptm <- proc.time()
+
 if (length(firstNeighbours) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighbours)) {
 		secondNeighbours[[i]] = c(NA)
@@ -71,9 +72,10 @@ if (length(firstNeighbours) > 0 && depth == 2) {
 
 			exclusions <- c(exclusions, secondNeighbours[[i]])
 			edgeExclusions <- c(edgeExclusions, firstNeighbours[[i]][j])
+			exclusions <- unique(exclusions)
+			edgeExclusions <- unique(edgeExclusions)
 		}
 		
-		exclusions <- unique(exclusions)
 		resultDegreesSecond[[i]] = getDegreesForNeighbourNames(degrees, secondNeighbours[[i]])
 	}	
 }

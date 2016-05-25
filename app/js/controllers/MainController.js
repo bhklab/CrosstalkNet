@@ -59,9 +59,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
         $scope.applyConfig = GraphConfigService.applyConfig;
 
-        $scope.flattenNeighbours = BasicDataService.flattenNeighbours;
         $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-        $scope.getSelfLoops = BasicDataService.getSelfLoops;
         $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         $scope.querySearch = BasicDataService.querySearch;
@@ -96,6 +94,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.resize = GraphConfigService.resetZoom;
 
         $scope.edgeDictionary = {};
+        $scope.selfLoops = [];
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -204,7 +203,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     $scope.applyConfig(data.config, "cyMain", $scope);
                     $scope.setNeighbours(1);
                     $scope.setNeighbours(2);
-                    $scope.edgeDictionary = BasicDataService.createEdgeDictionary($scope.cy.edges());
+                    $scope.edgeDictionary = data.edgeDictionary;
+                    $scope.selfLoops = data.selfLoops;
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
                         $scope.correlationFilterFirst.min = data.minNegativeWeight;
@@ -255,6 +255,15 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     return false;
                 });
 
+                /*
+                $scope.firstNeighbours.epi = $scope.firstNeighbours.epi.map(function(node) {
+                    return node.id();
+                });
+
+                $scope.firstNeighbours.stroma = $scope.firstNeighbours.stroma.map(function(node) {
+                    return node.id();
+                });*/
+
             } else if (level == 2) {
                 $scope.secondNeighbours.epi = $scope.cy.filter(function(i, element) {
                     if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('epi')) {
@@ -290,6 +299,10 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
+            if (source.id == null || target.id == null) {
+                return 0;
+            }
+
             if ($scope.edgeDictionary[source.id()][target.id()] != null) {
                 return $scope.edgeDictionary[source.id()][target.id()];
             } else {

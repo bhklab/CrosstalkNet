@@ -7,7 +7,7 @@ ptm <- proc.time()
 
 load('esetTE_ERNeg.RData')
 load('esetTS_ERNeg.RData')
-
+ProbeGeneMap<-read.csv("028004_D_AA_20140813.txt",stringsAsFactors = F, sep = "\t")
 CorTES.LGenes <- cor(t(edataTE.ERNeg),t(edataTS.ERNeg))
 
 Signif.TESLGenes<-r.test(54,CorTES.LGenes)
@@ -26,6 +26,18 @@ CorTESLGenes.FDRadj.001[TESLGenes.padj.FDR>0.001] <- 0
 CorTESLGenes.FDRadj.01[TESLGenes.padj.FDR>0.01] <- 0 
 CorTESLGenes.FDRadj.05[TESLGenes.padj.FDR>0.05] <- 0
 CorTESLGenes.FDRadj.1[TESLGenes.padj.FDR>0.1] <- 0
+
+rownames(CorTESLGenes.FDRadj.001) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.001), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.001) = ProbeGeneMap$GeneSymbol[match(colnames(CorTESLGenes.FDRadj.001), (ProbeGeneMap$EntrezGeneID))]
+
+rownames(CorTESLGenes.FDRadj.01) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.01), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.01) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.01), (ProbeGeneMap$EntrezGeneID))]
+
+rownames(CorTESLGenes.FDRadj.05) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.05), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.05) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.05), (ProbeGeneMap$EntrezGeneID))]
+
+rownames(CorTESLGenes.FDRadj.1) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.1), (ProbeGeneMap$EntrezGeneID))]
+colnames(CorTESLGenes.FDRadj.1) = ProbeGeneMap$GeneSymbol[match(rownames(CorTESLGenes.FDRadj.1), (ProbeGeneMap$EntrezGeneID))]
 
 CorTESLGenes.FDRadj.001 <- appendSideToMatrixNames(CorTESLGenes.FDRadj.001, 'E', 'row')
 CorTESLGenes.FDRadj.001 <- appendSideToMatrixNames(CorTESLGenes.FDRadj.001, 'S', 'col')
