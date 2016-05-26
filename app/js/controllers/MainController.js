@@ -96,6 +96,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.edgeDictionary = {};
         $scope.selfLoops = [];
+        $scope.allVisibleGenes = [];
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -141,8 +142,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.locateGene = function(gene) {
-            $scope.findGeneInGraph($scope.cy, gene.id());
+            if (gene != null && gene != '') {
+                $scope.findGeneInGraph($scope, gene);    
+            }
         };
+
+        $scope.clearLocatedGene = function() {
+            GraphConfigService.clearLocatedGene($scope);
+        }
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
@@ -204,6 +211,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     $scope.setNeighbours($scope, 2);
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
+                    $scope.allVisibleGenes = $scope.getAllVisibleGenes();
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
                         $scope.correlationFilterFirst.min = data.minNegativeWeight;
@@ -252,7 +260,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
-            if ($scope.edgeDictionary[source][target] != null) {
+            if ($scope.edgeDictionary[source] != null && $scope.edgeDictionary[source][target] != null) {
                 return $scope.edgeDictionary[source][target];
             } else {
                 return 0;
@@ -268,6 +276,19 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
             $scope.getGeneList();
         };
+
+        $scope.getAllVisibleGenes = function() {
+            var result = [];
+            var nodes = $scope.cy.$('node');
+
+            for (var i = 0; i < nodes.length; i++) {
+                result.push(nodes[i].id());
+            }
+
+            return result;
+        };
+
+        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
 
         $scope.getGeneList();
     }

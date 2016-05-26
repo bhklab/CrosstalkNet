@@ -1,0 +1,15 @@
+<md-card ng-show="selectedEdge.source != null" class="edge-inspector">
+    <md-card-title>
+        <md-card-title-text>
+            <div layout="row">
+                <div flex><span class="md-headline">Edge Inspector</span></div>
+            </div>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div>Interactor #1: {{selectedEdge.source}}</div>
+        <div>Interactor #2: {{selectedEdge.target}}</div>
+        <div>Correlation: {{selectedEdge.weight}}</div>
+        <md-button ng-click="closeEdgeInspector($parent)">Close</md-button>
+    </md-card-content>
+</md-card>
