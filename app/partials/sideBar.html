@@ -1,4 +1,4 @@
-<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="true">
+<md-sidenav class="md-sidenav-left md-whiteframe-z3" md-component-id="left" md-is-locked-open="true">
     <md-toolbar class="header-background">
         <h1 class="md-toolbar-tools">Navigation</h1>
     </md-toolbar>
@@ -140,14 +140,15 @@
                 No states matching "{{searchTextFirst}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(item)" md-items="item in $parent.cy.nodes()" md-item-text="item.id()" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', $parent)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
-                <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{item.id()}}</span>
+                <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>
             <md-not-found>
                 No states matching "{{searchTextZoom}}" were found.
             </md-not-found>
         </md-autocomplete>
+        <md-button ng-click="clearLocatedGene()">Clear Located Gene</md-button>
         <div ng-if="$parent.ctrl == 'neighbour'">
             <md-list>
                 <md-list-item ng-repeat="gene in selectedNeighbourGenes">

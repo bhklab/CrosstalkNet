@@ -40,12 +40,15 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
 
-        $scope.applyConfig = function(config, containerID) {
-            $scope.elemCopy = angular.copy(config.elements);
-            config.container = document.getElementById(containerID);
-            $scope.cy = cytoscape(config);
-            $scope.cy.fit($scope.cy.$("*"), 10);
-        };
+
+        // $scope.applyConfig = function(config, containerID) {
+        //     $scope.elemCopy = angular.copy(config.elements);
+        //     config.container = document.getElementById(containerID);
+        //     $scope.cy = cytoscape(config);
+        //     $scope.cy.fit($scope.cy.$("*"), 10);
+        // };
+
+        $scope.applyConfig = GraphConfigService.applyConfig;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -60,7 +63,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
                 return;
             }
 
-            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0) {
+            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0 &&  $scope.neighbourLevelSelected == false) {
                 $scope.selectedNeighbourGenes.push(gene);
             }
         };
@@ -97,9 +100,11 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
             $scope.selectedNeighbourGenes.splice($scope.selectedNeighbourGenes.indexOf(gene), 1);
         };
 
+        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
+
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
-                $scope.applyConfig(newValue, "cyNeighbour");
+                $scope.applyConfig(newValue, "cyNeighbour", $scope);
                 $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
                 $scope.selectedNeighbourGenes = [GraphConfigService.firstSelectedGene];
             }
@@ -107,7 +112,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
 
         $scope.$watch('neighbourConfigs.secondDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
-                $scope.applyConfig(newValue, "cyNeighbour");
+                $scope.applyConfig(newValue, "cyNeighbour", $scope);
                 $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
             }
         });

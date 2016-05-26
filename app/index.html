@@ -64,10 +64,13 @@
                 <md-tab label="Main Graph">
                     <md-content ng-controller="MainController">
                         <section layout="row">
-                            <div ng-include="'partials/sideBar.html'">
+                            <div class="md-whiteframe-1dp" ng-include="'partials/sideBar.html'">
                             </div>
                             <md-content flex>
-                                <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cyMain"></div>
+                                <div ng-show="display == 'Graph'">
+                                    <div style="width: 100%; height:600px; background-color: white;" id="cyMain"></div>
+                                    <div ng-include="'partials/edgeInspectorTile.html'"></div>
+                                </div>
                                 <div ng-include="'partials/tableView.html'"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
@@ -80,7 +83,10 @@
                             <div ng-include="'partials/sideBar.html'">
                             </div>
                             <md-content flex>
-                                <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cyNeighbour"></div>
+                                <div>
+                                    <div ng-show="display == 'Graph'" style="width: 100%; height:600px; background-color: white;" id="cyNeighbour"></div>
+                                    <div ng-include="'partials/edgeInspectorTile.html'"></div>
+                                </div>
                                 <div ng-include="'partials/tableView.html'"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>

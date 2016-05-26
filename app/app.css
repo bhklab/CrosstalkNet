@@ -168,7 +168,24 @@ md-card-content {
     overflow-x: auto !important;
 }
 
+table-card-height {
+    max-height: 400px;
+    overflow-y: auto !important;
+}
 
+.edge-inspector {
+    width: 225px;
+}
+
+.card-title {
+    font-weight: bold;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.card-content {
+    font-size: 12px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 
 

@@ -80,7 +80,11 @@ myModule.factory('BasicDataService', function($http) {
     }
 
     function querySearch(query, source, scope) {
-        if (source == "first") {
+        if (source == "locate") {
+            var results = query ? scope.allVisibleGenes.filter(createFilterFor(query)) :
+                scope.allVisibleGenes,
+                deferred;
+        } else if (source == "first") {
             var results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
                 scope.firstNeighbourDropdownOptions,
                 deferred;
