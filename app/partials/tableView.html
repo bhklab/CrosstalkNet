@@ -85,6 +85,42 @@
             <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
+    <!-- Just for testing cytoscape
+    <md-card>
+        <md-card-title>
+            <md-card-title-text>
+                <div layout="row">
+                    <div flex><span class="md-headline">All Interactions</span></div>
+                    <div flex style="position: relative;">
+                        <md-input-container class="no-margin right-aligned">
+                            <label>Filter Interactions</label>
+                            <input ng-model="interactionSearch">
+                        </md-input-container>
+                    </div>
+                </div>
+                <span class="md-subhead">Total: {{cy.edges().length}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content class="table-card-height">
+            <table id="third-neighbours-table" md-no-ink>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Strength</th>
+                        <th>Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="edge in cy.edges()">
+                        <td class="row-name">{{edge.source().id()}}</td>
+                        <td class="row-name">{{edge.data('weight')}}</td>
+                        <td class="row-name">{{edge.target().id()}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <md-button ng-click="exportTableToCSV('third')">Download Interactions</md-button>
+        </md-card-content>
+    </md-card>
     <!--
     <md-card ng-if="cy != null">
         <md-card-title>

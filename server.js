@@ -325,12 +325,16 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 layout = layoutUtils.createPresetLayout();
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source)
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             } else {
-                layout = configUtils.createRandomLayout();
+                layout = layoutUtils.createRandomLayout(allNodes.length, 12);
+                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSource);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             }
