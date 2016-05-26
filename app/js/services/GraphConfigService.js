@@ -43,47 +43,58 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
         });*/
 
-        
-        // scope.cy.on('select', 'node', function(evt){
-        //     var node = evt.cyTarget;
-        //     var id = node.id();
-        //     console.log('tapped ' + id);
+
+        scope.cy.on('select', 'node', function(evt) {
+            var node = evt.cyTarget;
+            var id = node.id();
+            console.log('tapped ' + id);
 
 
-        //     scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-        //         edge.addClass('highlighted');
-        //         edge.removeClass('faded');
-        //         edge.css({ 'line-color': 'magenta' });
-        //         /*else {
-        //             edge.addClass('faded');
-        //             edge.removeClass('highlighted');
-        //             edge.css({ 'opacity': '0' });
-        //         }*/
-        //     });
-        //     scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-        //         edge.addClass('faded');
-        //         edge.removeClass('highlighted');
-        //         edge.css({ 'opacity': '0' });
-        //         /*else {
-        //             edge.addClass('faded');
-        //             edge.removeClass('highlighted');
-        //             edge.css({ 'opacity': '0' });
-        //         }*/
-        //     });
+            scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+                edge.addClass('highlighted');
+                edge.removeClass('faded');
+                edge.css({ 'line-color': 'magenta' });
+                /*else {
+                    edge.addClass('faded');
+                    edge.removeClass('highlighted');
+                    edge.css({ 'opacity': '0' });
+                }*/
+            });
+            scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
+                edge.addClass('faded');
+                edge.removeClass('highlighted');
+                edge.css({ 'opacity': '0' });
+                /*else {
+                    edge.addClass('faded');
+                    edge.removeClass('highlighted');
+                    edge.css({ 'opacity': '0' });
+                }*/
+            });
 
-        //     service.selectedItem = null;
-        //     console.log(node);
-        // });
+            service.selectedItem = null;
+            console.log(node);
+        });
 
-        
-        // scope.cy.on("unselect", 'node', function(evt) {
-        //     var node = evt.cyTarget;
-        //     var id = node.id();
+        scope.cy.on("tap", "edge", function(evt) {
+            var edge = evt.cyTarget;
+            scope.selectedEdge = { source: null, target: null, weight: null };
 
-        //     service.resetEdges(scope.cy);
-        //     console.log('tapped ' + id);
-        //     console.log(node);
-        // });
+            scope.$apply(function() {
+                scope.selectedEdge.source = edge.source().id();
+                scope.selectedEdge.target = edge.target().id();
+                scope.selectedEdge.weight = edge.data('weight');
+            });
+        });
+
+
+        scope.cy.on("unselect", 'node', function(evt) {
+            var node = evt.cyTarget;
+            var id = node.id();
+
+            service.resetEdges(scope.cy);
+            console.log('tapped ' + id);
+            console.log(node);
+        });
     };
 
     service.getInteractingNodes = function(node, cy) {
@@ -111,13 +122,42 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         return nodes;
     };
 
-    service.findGeneInGraph = function(cy, gene) {
-        var node = cy.$("#" + gene.toUpperCase());
+    service.findGeneInGraph = function(scope, gene) {
+        service.clearLocatedGene(scope);
+
+        var node = scope.cy.$("#" + gene.toUpperCase());
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
 
-        cy.fit(cy.$("#" + gene.toUpperCase()), 200);
+        // node.css({'height': '40px', 'width': '40px'});
+        // node.css({'background-color': 'pink'});
+        node.animate({
+            style: {
+                'background-color': '#76FF03'
+            },
+        }, { duration: 1000 });
+
+
+        scope.cy.zoom({
+            level: 1.5, // the zoom level
+            renderedPosition: { x: x, y: y }
+        });
+        scope.cy.center(node);
+
+        scope.currentlyZoomed = node;
+        //cy.fit(cy.$("#" + gene.toUpperCase()), 200);
         //cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
+    };
+
+    service.clearLocatedGene = function(scope) {
+        if (scope.currentlyZoomed != null) {
+            var color = scope.currentlyZoomed.hasClass('epi') ? 'red' : 'blue';
+            scope.currentlyZoomed.css({ 'background-color': color });
+        }
+    };
+
+    service.closeEdgeInspector = function(scope) {
+        scope.selectedEdge = {};
     };
 
     service.resetEdges = function(cy) {
