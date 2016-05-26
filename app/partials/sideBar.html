@@ -4,7 +4,7 @@
     </md-toolbar>
     <md-content layout-padding>
         <div ng-show="$parent.ctrl == 'main'" ng-disabled="$parent.GOIState != $parent.GOIStates.initial">
-            <md-autocomplete md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', $parent) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="0" placeholder="Locate Gene" ng-disabled="$parent.GOIState != $parent.GOIStates.initial">
+            <md-autocomplete md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', $parent) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" placeholder="Locate Gene" ng-disabled="$parent.GOIState != $parent.GOIStates.initial">
                 <md-item-template>
                     <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                 </md-item-template>
