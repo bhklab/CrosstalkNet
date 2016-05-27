@@ -131,12 +131,13 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
         // node.css({'height': '40px', 'width': '40px'});
         // node.css({'background-color': 'pink'});
-        node.animate({
-            style: {
-                'background-color': '#76FF03'
-            },
-        }, { duration: 1000 });
+        // node.animate({
+        //     style: {
+        //         'background-color': '#76FF03'
+        //     },
+        // }, { duration: 1000 });
 
+        node.addClass('located');
 
         scope.cy.zoom({
             level: 1.5, // the zoom level
@@ -150,9 +151,12 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     };
 
     service.clearLocatedGene = function(scope) {
+        // if (scope.currentlyZoomed != null) {
+        //     var color = scope.currentlyZoomed.hasClass('epi') ? 'red' : 'blue';
+        //     scope.currentlyZoomed.css({ 'background-color': color });
+        // }
         if (scope.currentlyZoomed != null) {
-            var color = scope.currentlyZoomed.hasClass('epi') ? 'red' : 'blue';
-            scope.currentlyZoomed.css({ 'background-color': color });
+            scope.currentlyZoomed.removeClass('located');
         }
     };
 
