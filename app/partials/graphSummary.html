@@ -1,0 +1,14 @@
+<md-card ng-show="cy != null" class="graph-summary">
+    <md-card-title>
+        <md-card-title-text>
+            <div layout="row">
+                <div flex><span class="md-headline">Graph Summary</span></div>
+            </div>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div class="md-subhead"># of Self Loops: {{$parent.selfLoops.length}}</div>
+        <div class="md-subhead"># of Total Interactions: {{cy.edges().length}}</div>
+        <div class="md-subhead"># of Total Genes: {{cy.nodes().not(':parent').length}}</div>
+    </md-card-content>
+</md-card>

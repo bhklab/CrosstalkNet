@@ -128,6 +128,16 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         var node = scope.cy.$("#" + gene.toUpperCase());
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
+        var allClasses = node[0]._private.classes;
+        var colorClass = '';
+
+        for (var cls in allClasses) {
+            if (cls.indexOf('node-color') >= 0) {
+                node.toggleClass(cls);
+                colorClass = cls;
+                break;
+            }
+        }
 
         // node.css({'height': '40px', 'width': '40px'});
         // node.css({'background-color': 'pink'});
@@ -137,7 +147,27 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         //     },
         // }, { duration: 1000 });
 
+
+        var jAni = node.animation({
+            style: {
+                'height': '40px',
+                'width': '40px'
+            },
+            duration: 1000
+        });
+
+        jAni
+            .play() // start
+            .promise('completed').then(function() { // on next completed
+                jAni
+                    .reverse() // switch animation direction
+                    .rewind() // optional but makes intent clear
+                    .play() // start again
+                ;
+            });
+
         node.addClass('located');
+
 
         scope.cy.zoom({
             level: 1.5, // the zoom level
@@ -145,7 +175,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });
         scope.cy.center(node);
 
-        scope.currentlyZoomed = node;
+        scope.currentlyZoomed = { node: node, styleClass: colorClass };
         //cy.fit(cy.$("#" + gene.toUpperCase()), 200);
         //cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
     };
@@ -156,8 +186,11 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         //     scope.currentlyZoomed.css({ 'background-color': color });
         // }
         if (scope.currentlyZoomed != null) {
-            scope.currentlyZoomed.removeClass('located');
+            scope.currentlyZoomed.node.removeClass('located');
+            scope.currentlyZoomed.node.toggleClass(scope.currentlyZoomed.styleClass);
         }
+
+        scope.currentlyZoomed = null;
     };
 
     service.closeEdgeInspector = function(scope) {
