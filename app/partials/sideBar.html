@@ -1,6 +1,13 @@
 <md-sidenav class="md-sidenav-left md-whiteframe-z3" md-component-id="left" md-is-locked-open="true">
-    <md-toolbar class="header-background">
-        <h1 class="md-toolbar-tools">Navigation</h1>
+    <md-toolbar class="header-background    ">
+        <div layout="row">
+            <div flex class="left-padded">Navigation</div>
+            <div flex style="position: relative;">
+                <md-switch ng-model="$parent.switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
+                    {{$parent.display}}
+                </md-switch>
+            </div>
+        </div>
     </md-toolbar>
     <md-content layout-padding>
         <div ng-show="$parent.ctrl == 'main'" ng-disabled="$parent.GOIState != $parent.GOIStates.initial">
@@ -89,14 +96,7 @@
             </fieldset>
         </div>
         <div layout="row">
-            <div flex="60">
-                <md-switch ng-model="$parent.switchModel" aria-label="Switch 1" ng-change="changeDisplay()">
-                    {{$parent.display}}
-                </md-switch>
-            </div>
-            <div flex="40">
-                <md-button ng-click="resize(cy)">Resize</md-button>
-            </div>
+            <md-button ng-click="resize(cy)">Resize</md-button>
         </div>
         <div>
             <md-input-container class="select">
