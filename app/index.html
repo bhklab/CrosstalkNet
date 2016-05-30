@@ -35,6 +35,7 @@
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
     <script src="js/filters/interactionFilter.js"></script>
+    <script src="js/directives/staticInclude.js"></script>
     <!--<script src="view2/view2.js"></script> -->
     <script src="components/version/version.js"></script>
     <script src="components/version/version-directive.js"></script>
@@ -73,7 +74,7 @@
 <!--                                    <div class="card-side-by-side" ng-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" ng-include="'partials/edgeInspectorTile.html'"></div>
                                 </div>
-                                <div ng-include="'partials/tableView.html'"></div>
+                                <div static-include="'partials/tableView.html'"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
