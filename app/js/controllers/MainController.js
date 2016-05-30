@@ -2,8 +2,8 @@
 
 angular.module('myApp.MainController', ['ngRoute']).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, $q,
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, $q,
         $timeout) {
         $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
@@ -279,7 +279,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.getAllVisibleGenes = function() {
             var result = [];
-            var nodes = $scope.cy.$('node');
+            var nodes = $scope.cy.$('node').not(':parent');
 
             for (var i = 0; i < nodes.length; i++) {
                 result.push(nodes[i].id());
@@ -289,6 +289,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
+        $scope.uploadFiles = FileUploadService.uploadFiles;
 
         $scope.getGeneList();
     }

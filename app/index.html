@@ -23,6 +23,7 @@
     <script type="text/javascript" src="bower_components/angular-aria/angular-aria.js"></script>
     <script type="text/javascript" src="bower_components/angular-animate/angular-animate.js"></script>
     <script type="text/javascript" src="bower_components/angular-material/angular-material.js"></script>
+    <script type="text/javascript" src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/tabletoCSV/dist/jquery.tabletoCSV.js"></script>
     <script src="app.js"></script>
@@ -32,6 +33,7 @@
     <script src="js/services/ExportService.js"></script>
     <script src="js/services/GraphConfigService.js"></script>
     <script src="js/services/RESTService.js"></script>
+    <script src="js/services/FileUploadService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
     <script src="js/filters/interactionFilter.js"></script>
@@ -50,7 +52,7 @@
                 <span ng-if="state == states.loadingFirst || state == states.loadingSecond || state == states.loading">Loading Data From Server...</span>
                 <span ng-if="state == states.loadingConfig">Initializing Graph...</span>
                 <span ng-if="state == states.initial || state == states.firstDropdown || state == states.secondDropdown">Displaying Graph for P-Value={{}}</span>
-                <md-progress-circular ng-show="state == states.loading || state == states.loadingFirst || state == states.  loadingSecond" md-mode="indeterminate"></md-progress-circular>
+                <md-progress-circular ng-show="state == states.loading || state == states.loadingFirst || state == states.loadingSecond" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="center-text" flex="33">
                 <span class="text-align-middle title-font">BHK Lab</span>
@@ -70,8 +72,12 @@
                                 <div ng-show="display == 'Graph'">
                                     <div style="width: 100%; height:600px; background-color: white;" id="cyMain"></div>
                                     <div class="card-side-by-side" ng-include="'partials/graphSummary.html'"></div>
-<!--                                    <div class="card-side-by-side" ng-include="'partials/legend.html'"></div>-->
+                                    <!--                                    <div class="card-side-by-side" ng-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" ng-include="'partials/edgeInspectorTile.html'"></div>
+                                    <h4>Upload on file select</h4>
+                                    <input type="file" ngf-select="uploadFiles($file, $invalidFiles, this)" ngf-max-height="1000" ngf-max-size="20MB">
+                                        Select File
+                                    </input>
                                 </div>
                                 <div ng-include="'partials/tableView.html'"></div>
                                 <!--<div>{{genes}}</div>-->

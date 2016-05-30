@@ -63,7 +63,7 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
                 return;
             }
 
-            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0 &&  $scope.neighbourLevelSelected == false) {
+            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0) {
                 $scope.selectedNeighbourGenes.push(gene);
             }
         };
