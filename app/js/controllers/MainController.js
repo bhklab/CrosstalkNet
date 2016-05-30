@@ -290,6 +290,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
 
-        $scope.getGeneList();
+        $scope.getGeneLis();
     }
 ]);
