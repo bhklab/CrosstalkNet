@@ -4,6 +4,7 @@
 angular.module('myApp', [
   'ngRoute',
   'ngMaterial',
+  'ngFileUpload',
   'myApp.MainController',
   'myApp.NeighbourController',
   'myApp.version', 

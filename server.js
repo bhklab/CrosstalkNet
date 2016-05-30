@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 var exec = require('child_process').exec;
 var async = require('async');
 var express = require('express');
@@ -13,6 +15,8 @@ var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
 var layoutUtils = require('layoutUtils');
 var clientTableUtils = require('clientTableUtils');
+var multiparty = require('connect-multiparty');
+var multipartyMiddleware = multiparty();
 
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
@@ -312,7 +316,7 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 12) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 12)
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 6) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 6)
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -320,7 +324,7 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 12, largestClusterSize);
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 6, largestClusterSize);
                     //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
                 }
 
@@ -356,6 +360,22 @@ app.post('/submatrix', function(req, res) {
                 selfLoops: selfLoops
             });
         });
+});
+
+app.post('/uploadMatrix', multipartyMiddleware, function(req, res) {
+    var file = req.files.file;
+    var data = req.body.data;
+    console.log(file.name);
+    console.log(file.type);
+    //console.log('file: %j', file);
+    console.log(req.body);
+
+    data = data.replace(/^data:;base64,/, "");
+
+    fs.writeFile('test.Rdata', data, 'base64',(err) => {
+        if (err) throw err;
+        console.log('It\'s saved!');
+    });
 });
 
 function cacheGeneListForPValue(pValue, script) {

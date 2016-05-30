@@ -32,6 +32,7 @@
 md-sidenav {
     width: inherit;
     max-width: 350px;
+    min-width: 350px;
 }
 
 .center-text {
@@ -88,7 +89,7 @@ md-input-container {
 }
 
 md-input-container.select {
-    margin: 0px !important;
+   ./* margin: 0px !important;*/
 }
 
 md-switch {
@@ -197,6 +198,10 @@ table-card-height {
 
 .card-side-by-side {
     display: inline-block;
+}
+
+md-autocomplete {
+    margin-bottom: 10px;
 }
 
 
