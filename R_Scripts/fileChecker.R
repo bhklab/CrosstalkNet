@@ -1,18 +1,42 @@
 library(jsonlite)
 
+setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
+source('helpers.R')
 setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts/User_Matrices')
+
 args <- commandArgs(trailingOnly = TRUE)
 fileName <- args[2]
 
+write('fileName:', stderr())
+write(fileName, stderr())
+
+corMatrix <- c()
+result <- list(returnCode = c(1,2), message = c(3,4))
 tryCatch(corMatrix <- readRDS(fileName),
-           warning = function(w) {cat(format(serializeJSON(w)))},
-           error = function(e) {cat(format(serializeJSON(e)))}) 
+           error = function(cond) {cat(format(serializeJSON(cond))); file.remove(fileName); quit()}) 
+
+#stop("stopping")
 rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
 
-if (all(rowNames == colNames)) {
-	cat(format(serializeJSON("Row and column names don't match")))
-} 
+
+write('fileName:', stderr())
+write(fileName, stderr())
 
 
-cat(format(serializeJSON("Good to go")))
+if (!is.null(rowNames) && !is.null(colNames) && all(rowNames == colNames)) {
+	cat(format(serializeJSON(list(returnCode = 0, message = "Good to go"))))	
+	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
+	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
+	degrees <- getDegrees(corMatrix);
+	saveRDS(corMatrix, fileName)
+	saveRDS(degrees, paste("degrees", fileName, sep="")
+
+} else {
+	cat(format(serializeJSON(list(returnCode = 1, message = "Row names and column names don't match"))))	
+	file.remove(fileName)
+}
+
+
+
+
