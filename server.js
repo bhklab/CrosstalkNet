@@ -377,6 +377,12 @@ app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
     });
 });
 
+app.get('/user-matrices', function(req, res) {
+    var fileNames = [];
+
+    fileNames = fs.readdirSync('R_Scripts/User_Matrices');
+});
+
 function checkFileIntegrity(req, res, file) {
     var child = exec("Rscript R_Scripts/fileChecker.R --args " + file.name, function(error, stdout, stderr) {
         console.log('stderr: ' + stderr);
