@@ -111,7 +111,12 @@ myModule.factory('BasicDataService', function($http) {
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(gene) {
-            return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);
+            if (gene.value != null) {
+                return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);    
+            } else {
+                return (angular.lowercase(gene).indexOf(lowercaseQuery) === 0);
+            }
+            
         };
     }
 

@@ -15,9 +15,9 @@ numberOfGenes <- as.character(args[9])
 depth <- as.numeric(args[10])
 genesOfInterest <- c()
 
-corMatrixFirstNeighbours <- readRDS(paste('corMatrix.', pValue, ".RData", sep=""))
+corMatrixFirstNeighbours <- readRDS(paste('Default_Matrices/corMatrix.', pValue, ".RData", sep=""))
 corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
-degrees <- readRDS(paste('degrees.', pValue, '.RData', sep=""))
+degrees <- readRDS(paste('Default_Matrices/degrees.', pValue, '.RData', sep=""))
 
 if (weightFilterFirst == TRUE) {
 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
