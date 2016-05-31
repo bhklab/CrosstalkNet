@@ -6,7 +6,7 @@ source('helpers.R')
 args <- commandArgs(trailingOnly = TRUE)
 pValue <- args[2]
 
-degrees <- readRDS(paste('Default_Matrices/degrees.', pValue, ".RData", sep=""))
+degrees <- readRDS(paste('Full_Matrices/fulldegrees.', pValue, ".RData", sep=""))
 
 output <- list(degrees = degrees)
 cat(format(serializeJSON(output)))

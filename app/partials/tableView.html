@@ -1,5 +1,5 @@
 <div ng-show="display == 'Tables'">
-<!--    <div ng-show="cy != null && cy.edges() != null">{{cy.edges().length}}</div>
+    <!--<div ng-show="cy != null && cy.edges() != null">{{cy.edges().length}}</div>
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -12,11 +12,11 @@
                         </md-input-container>
                     </div>
                 </div>
-                <span class="md-subhead">Total: {{$parent.selfLoops.length}}</span>
+                <span class="md-subhead">Total: {{selfLoops.length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="gene in $parent.selfLoops | filter: selfLoopSearch track by $index">{{gene}}</div>
+            <div flex="20" ng-repeat="gene in selfLoops | filter: selfLoopSearch track by $index">{{gene}}</div>
         </md-card-content>
     </md-card>
     <md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=1]').length > 0">
@@ -39,13 +39,13 @@
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="stroma in $parent.firstNeighbours.stroma">{{stroma}}</th>
+                        <th ng-repeat="stroma in firstNeighbours.stroma">{{stroma}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="epi in $parent.firstNeighbours.epi">
+                    <tr ng-repeat="epi in firstNeighbours.epi">
                         <td class="row-name">{{epi}}</td>
-                        <td ng-repeat="stroma in $parent.firstNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        <td ng-repeat="stroma in firstNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -72,20 +72,19 @@
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="stroma in $parent.secondNeighbours.stroma">{{stroma}}</th>
+                        <th ng-repeat="stroma in secondNeighbours.stroma">{{stroma}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="epi in $parent.secondNeighbours.epi">
+                    <tr ng-repeat="epi in secondNeighbours.epi">
                         <td class="row-name">{{epi}}</td>
-                        <td ng-repeat="stroma in $parent.secondNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        <td ng-repeat="stroma in secondNeighbours.stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
                     </tr>
                 </tbody>
             </table>
             <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
-    <!-- Just for testing cytoscape
     <md-card>
         <md-card-title>
             <md-card-title-text>
@@ -121,7 +120,6 @@
             <md-button ng-click="exportTableToCSV('third')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
-    <!--
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
