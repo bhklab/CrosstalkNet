@@ -143,7 +143,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.locateGene = function(gene) {
             if (gene != null && gene != '') {
-                $scope.findGeneInGraph($scope, gene);    
+                $scope.findGeneInGraph($scope, gene);
             }
         };
 
@@ -235,6 +235,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             RESTService.get('gene-list', { params: { pValue: $scope.pValueActual } })
                 .then(function(data) {
                     $scope.geneList = $scope.loadGeneListDropdownOptions(data.geneList);
+                });
+        };
+
+        $scope.getFileList = function() {
+            RESTService.get('available-matrices', { params: { pValue: $scope.pValueActual } })
+                .then(function(data) {
+                    $scope.fileList = $scope.loadGeneListDropdownOptions(data.fileList);
+
                 });
         };
 

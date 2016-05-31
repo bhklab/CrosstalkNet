@@ -79,6 +79,15 @@ myModule.factory('BasicDataService', function($http) {
         });
     }
 
+    function loadFileListDropdownOptions(fileList) {
+        return fileList.map(function(file) {
+            return {
+                value: file,
+                pValue: file.split(".")
+            };
+        });
+    }
+
     function querySearch(query, source, scope) {
         if (source == "locate") {
             var results = query ? scope.allVisibleGenes.filter(createFilterFor(query)) :

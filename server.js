@@ -29,13 +29,52 @@ app.use(bodyParser.json());
 
 app.get('/gene-list', function(req, res) {
     var pValue = req.query.pValue;
+    var fileName = req.query.fileName;
+    var geneList = [];
     console.log(pValue);
 
-    if (geneListCache[pValue] != null) {
-        res.json({ geneList: geneListCache[pValue] });
-    } else {
-        res.json({ error: "Could not get gene list for P Value:" + pValue });
-    }
+    var child = exec("Rscript R_Scripts/getGeneList.R" + script + " --args \"" + fileName + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            var allGenes = [];
+
+            var epiDegrees = parsedValue.value[0].value[0].value;
+            var stromaDegrees = parsedValue.value[0].value[1].value;
+
+            var epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
+            var stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
+
+            allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
+            allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
+
+            geneList = allGenes.map(function(gene) {
+                return {
+                    value: gene.name,
+                    display: gene.name + ' ' + gene.degree,
+                    object: gene
+                };
+            });
+
+            geneListCache[fileName] = geneList;
+
+            res.send({ geneList: geneList });
+        });
+
+    // if (geneListCache[pValue] != null) {
+    //     res.json({ geneList: geneListCache[pValue] });
+    // } else {
+    //     res.json({ error: "Could not get gene list for P Value:" + pValue });
+    // }
 });
 
 app.post('/neighbour-general', function(req, res) {
@@ -377,10 +416,30 @@ app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
     });
 });
 
-app.get('/user-matrices', function(req, res) {
+app.get('/available-matrices', function(req, res) {
     var fileNames = [];
+    var fileList = [];
+
+    fileNames = fs.readdirSync('R_Scripts/Default_Matrices');
+    fileList = fileNames.map(function(file) {
+        return {
+            fileName: file,
+            pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
+            path: "Default_Matrices/" + file 
+        };
+    });
 
     fileNames = fs.readdirSync('R_Scripts/User_Matrices');
+
+    fileList = fileList.concat(fileNames.map(function(file) {
+        return {
+            value: file,
+            pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
+            path: "User_Matrices/" + file 
+        };
+    }));
+
+    res.send({ fileList: fileList });
 });
 
 function checkFileIntegrity(req, res, file) {
