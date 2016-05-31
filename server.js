@@ -362,21 +362,37 @@ app.post('/submatrix', function(req, res) {
         });
 });
 
-app.post('/uploadMatrix', multipartyMiddleware, function(req, res) {
+app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
     var file = req.files.file;
     var data = req.body.data;
     console.log(file.name);
     console.log(file.type);
     //console.log('file: %j', file);
-    console.log(req.body);
 
     data = data.replace(/^data:;base64,/, "");
 
-    fs.writeFile('test.Rdata', data, 'base64',(err) => {
+    fs.writeFile('R_Scripts/User_Matrices/' + file.name, data, 'base64', (err) => {
         if (err) throw err;
-        console.log('It\'s saved!');
+        checkFileIntegrity(req, res, file);
     });
 });
+
+function checkFileIntegrity(req, res, file) {
+    var child = exec("Rscript R_Scripts/fileChecker.R --args " + file.name, function(error, stdout, stderr) {
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+        console.log(stdout);
+
+        var parsedValue = JSON.parse(stdout);
+        var status = parsedValue.value[0].value;
+        var message = parsedValue.value[1].value;
+
+        res.send({ fileStatus: message });
+    });
+}
 
 function cacheGeneListForPValue(pValue, script) {
     var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
