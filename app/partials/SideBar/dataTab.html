@@ -1,8 +1,16 @@
 <md-content class="md-padding">
     <md-input-container class="select">
         <label>P-Value</label>
-        <md-select ng-model="$parent.pValueDisplayed">
+        <md-select ng-model="pValueDisplayed">
             <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="value.value == '05'">
+                {{value.display}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+    <md-input-container class="select">
+        <label>P-Value</label>
+        <md-select ng-model="correlationFileDisplayed">
+            <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="0">
                 {{value.display}}
             </md-option>
         </md-select>
