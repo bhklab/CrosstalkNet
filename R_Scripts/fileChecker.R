@@ -15,14 +15,8 @@ result <- list(returnCode = c(1,2), message = c(3,4))
 tryCatch(corMatrix <- readRDS(fileName),
            error = function(cond) {cat(format(serializeJSON(cond))); file.remove(fileName); quit()}) 
 
-#stop("stopping")
 rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
-
-
-write('fileName:', stderr())
-write(fileName, stderr())
-
 
 if (!is.null(rowNames) && !is.null(colNames) && all(rowNames == colNames)) {
 	cat(format(serializeJSON(list(returnCode = 0, message = "Good to go"))))	

@@ -98,6 +98,9 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.selfLoops = [];
         $scope.allVisibleGenes = [];
 
+        $rootscope.correlationFileDisplayed = null;
+        $rootscope.correlationFileActual = null;
+
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
                 $scope.display = "Tables";
@@ -116,7 +119,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             RESTService.post('neighbour-general', {
                 selectedGenes: [item],
                 pValue: $scope.pValueActual,
-                layout: $scope.selectedLayout
+                layout: $scope.selectedLayout,
+                file: $rootscope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;
@@ -194,7 +198,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     filterFirst: filterFirst && filter,
                     filterSecond: filterSecond && filter,
                     layout: $scope.selectedLayout,
-                    depth: depth
+                    depth: depth,
+                    file: $rootscope.correlationFileActual
                 })
                 .then(function(data) {
                     if (data.config == null) {
@@ -232,17 +237,17 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getGeneList = function() {
-            RESTService.get('gene-list', { params: { pValue: $scope.pValueActual } })
+            RESTService.post('gene-list', { pValue: $scope.pValueActual, file: $rootscope.correlationFileActual })
                 .then(function(data) {
-                    $scope.geneList = $scope.loadGeneListDropdownOptions(data.geneList);
+                    $scope.geneList = data.geneList;
                 });
         };
 
         $scope.getFileList = function() {
             RESTService.get('available-matrices', { params: { pValue: $scope.pValueActual } })
                 .then(function(data) {
-                    $scope.fileList = $scope.loadGeneListDropdownOptions(data.fileList);
-
+                    $scope.fileList = data.fileList;
+                    //$scope.getGeneList()
                 });
         };
 
@@ -281,7 +286,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
 
         $scope.refreshGeneList = function() {
             $scope.pValueActual = $scope.pValueDisplayed;
-
+            $rootscope.correlationFileActual = JSON.parse($rootscope.correlationFileDisplayed);
             $scope.getGeneList();
         };
 
@@ -299,6 +304,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
         $scope.uploadFiles = FileUploadService.uploadFiles;
 
-        $scope.getGeneList();
+        //$scope.getGeneList();
+        $scope.getFileList();
     }
 ]);

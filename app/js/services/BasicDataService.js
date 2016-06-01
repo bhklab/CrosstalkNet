@@ -89,22 +89,33 @@ myModule.factory('BasicDataService', function($http) {
     }
 
     function querySearch(query, source, scope) {
+        var results = [];
+        var deferred;
+
         if (source == "locate") {
-            var results = query ? scope.allVisibleGenes.filter(createFilterFor(query)) :
-                scope.allVisibleGenes,
-                deferred;
+            if (scope.allVisibleGenes != null) {
+                results = query ? scope.allVisibleGenes.filter(createFilterFor(query)) :
+                    scope.allVisibleGenes,
+                    deferred;
+            }
         } else if (source == "first") {
-            var results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
-                scope.firstNeighbourDropdownOptions,
-                deferred;
+            if (scope.firstNeighbourDropdownOptions != null) {
+                results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
+                    scope.firstNeighbourDropdownOptions,
+                    deferred;
+            }
         } else if (source == "geneList") {
-            var results = query ? scope.geneList.filter(createFilterFor(query)) :
-                scope.geneList,
-                deferred;
+            if (scope.geneList != null) {
+                results = query ? scope.geneList.filter(createFilterFor(query)) :
+                    scope.geneList,
+                    deferred;
+            }
         } else {
-            var results = query ? scope.genesSecond.filter(createFilterFor(query)) :
-                scope.genesSecond,
-                deferred;
+            if (scope.genesSecond != null) {
+                results = query ? scope.genesSecond.filter(createFilterFor(query)) :
+                    scope.genesSecond,
+                    deferred;
+            }
         }
 
         if (self.simulateQuery) {
@@ -121,11 +132,11 @@ myModule.factory('BasicDataService', function($http) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(gene) {
             if (gene.value != null) {
-                return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);    
+                return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);
             } else {
                 return (angular.lowercase(gene).indexOf(lowercaseQuery) === 0);
             }
-            
+
         };
     }
 

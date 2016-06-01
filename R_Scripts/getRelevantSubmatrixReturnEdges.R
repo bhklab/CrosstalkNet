@@ -4,20 +4,39 @@ setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
 source('helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
-pValue <- as.character(args[2])
-minNegativeWeightFirst <- as.numeric(args[3])
-minPositiveWeightFirst <- as.numeric(args[4])
-minNegativeWeightSecond <- as.numeric(args[5])
-minPositiveWeightSecond <- as.numeric(args[6])
-weightFilterFirst <- as.logical(args[7])
-weightFilterSecond <- as.logical(args[8])
-numberOfGenes <- as.character(args[9])
-depth <- as.numeric(args[10])
-genesOfInterest <- c()
+# pValue <- as.character(args[2])
+# fileName <- args[3]
+# minNegativeWeightFirst <- as.numeric(args[4])
+# minPositiveWeightFirst <- as.numeric(args[5])
+# minNegativeWeightSecond <- as.numeric(args[6])
+# minPositiveWeightSecond <- as.numeric(args[7])
+# weightFilterFirst <- as.logical(args[8])
+# weightFilterSecond <- as.logical(args[9])
+# numberOfGenes <- as.character(args[10])
+# depth <- as.numeric(args[11])
+# genesOfInterest <- c()
 
-corMatrixFirstNeighbours <- readRDS(paste('Full_Matrices/fullcorMatrix.', pValue, ".RData", sep=""))
+settings <- fromJSON(args[2])
+pValue <- settings$pValue
+fileName <- settings$fileName
+path <- settings$path
+minNegativeWeightFirst <- settings$minNegativeWeightFirst
+minPositiveWeightFirst <- settings$minPositiveWeightFirst
+minNegativeWeightSecond <- settings$minNegativeWeightSecond
+minPositiveWeightSecond <- settings$minPositiveWeightSecond
+weightFilterFirst <- settings$weightFilterFirst
+weightFilterSecond <- settings$weightFilterSecond
+depth <- settings$depth
+genesOfInterest <- settings$genesOfInterest
+# corMatrixFirstNeighbours <- readRDS(paste('Full_Matrices/fullcorMatrix.', pValue, ".RData", sep=""))
+
+corMatrixFirstNeighbours <- readRDS(paste(path, fileName, sep=""))
 corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
-degrees <- readRDS(paste('Full_Matrices/fulldegrees.', pValue, '.RData', sep=""))
+if (pValue != "") {
+	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, '.RData', sep=""))
+} else {
+	degrees <- readRDS(paste(path, 'degrees', fileName, '.RData', sep=""))
+}
 
 if (weightFilterFirst == TRUE) {
 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -27,9 +46,9 @@ if (weightFilterSecond == TRUE) {
 	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
 } 
 
-for (x in 1:numberOfGenes) {
-	genesOfInterest <- c(genesOfInterest, as.character(args[10 + x]))
-}
+# for (x in 1:numberOfGenes) {
+# 	genesOfInterest <- c(genesOfInterest, as.character(args[10 + x]))
+# }
 
 maxNeighbours <- 3
 
