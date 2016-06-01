@@ -1,5 +1,4 @@
 const fs = require('fs');
-
 var exec = require('child_process').exec;
 var async = require('async');
 var express = require('express');
@@ -35,11 +34,6 @@ app.post('/gene-list', function(req, res) {
     args.fileName = file.fileName;
     args.path = file.path;
     var geneList = [];
-    console.log(args.pValue);
-    console.log(args.file);
-    console.log(file);
-    console.log(file.fileName);
-    console.log(file.pValue);
 
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
@@ -93,13 +87,11 @@ app.post('/neighbour-general', function(req, res) {
     var file = req.body.file;
     var argsString = "";
     var selectedGeneNames = [];
-    var argsArray = [];
     var selectedGenes = req.body.selectedGenes;
     args.pValue = file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
     var requestedLayout = req.body.layout;
-    var numberOfGenes = 0;
     var genesArg = "";
     console.log("selectedGenes:");
     console.log(selectedGenes);
@@ -118,11 +110,7 @@ app.post('/neighbour-general', function(req, res) {
     args.selectedGenes = selectedGeneNames;
 
     var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
-    numberOfGenes = selectedGenes.length;
 
-    // argsArray = [pValue, numberOfGenes];
-    // argsArray = argsArray.concat(selectedGeneNames);
-    // argsString = execUtils.createArgsStringFromArray(argsArray);
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
@@ -233,7 +221,7 @@ app.post('/submatrix', function(req, res) {
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
     var file = req.body.file;
-    args.pValue = req.body.pValue;
+    args.pValue = req.body.file.pValue;
     var requestedLayout = req.body.layout;
     args.fileName = file.fileName;
     args.path = file.path;
@@ -258,12 +246,6 @@ app.post('/submatrix', function(req, res) {
     }
 
     args.genesOfInterest = selectedGeneNames;
-
-
-
-    // argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, selectedGenes.length, depth];
-    // argsArray = argsArray.concat(selectedGeneNames);
-    // argsString = execUtils.createArgsStringFromArray(argsArray);
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 

@@ -1,8 +1,8 @@
 library(jsonlite)
 
-setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
+setwd('R_Scripts')
 source('helpers.R')
-setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts/User_Matrices')
+setwd('User_Matrices')
 
 args <- commandArgs(trailingOnly = TRUE)
 fileName <- args[2]

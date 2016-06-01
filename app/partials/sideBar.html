@@ -3,8 +3,8 @@
         <div layout="row">
             <div flex class="left-padded">Navigation</div>
             <div flex style="position: relative;">
-                <md-switch ng-model="$parent.switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
-                    {{$parent.display}}
+                <md-switch ng-model="switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
+                    {{display}}
                 </md-switch>
             </div>
         </div>
@@ -21,7 +21,7 @@
                 <div static-include="partials/SideBar/queryTab.html"></div>
             </md-tab>
         </md-tabs>
-        <div ng-if="$parent.ctrl == 'neighbour'">
+        <div ng-if="ctrl == 'neighbour'">
             <md-list>
                 <md-list-item ng-repeat="gene in selectedNeighbourGenes">
                     <md-menu>

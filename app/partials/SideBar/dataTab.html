@@ -1,21 +1,16 @@
 <md-content class="md-padding">
     <md-input-container class="select">
-        <label>P-Value</label>
-        <md-select ng-model="pValueDisplayed">
-            <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="value.value == '05'">
-                {{value.display}}
-            </md-option>
-        </md-select>
-    </md-input-container>
-    <md-input-container class="select">
-        <label>P-Value</label>
-        <md-select ng-model="$rootscope.correlationFileDisplayed">
+        <label>Select Matrix File</label>
+        <md-select ng-model="$root.correlationFileDisplayed">
             <md-option ng-repeat="file in fileList" value="{{file}}" ng-selected="0">
                 {{file.fileName}}
             </md-option>
         </md-select>
     </md-input-container>
     <md-button ng-click="refreshGeneList()">Refresh Genes</md-button>
-    Correlation File Displayed: {{correlationFileDisplayed}}
-    Correlation File Actual: {{correlationFileActual}}
+    <h4>Upload on file select</h4>
+    <input type="file" ngf-select="uploadFiles($file, $invalidFiles, this)" ngf-max-height="1000" ngf-max-size="20MB"> Select File
+    </input>
+    <!--Correlation File Displayed: {{$root.correlationFileDisplayed}}
+    Correlation File Actual: {{$root.correlationFileActual}}-->
 </md-content>
