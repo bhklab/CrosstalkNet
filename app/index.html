@@ -45,7 +45,6 @@
     </body>
     <!--<script type="text/javascript" src="ctyodemo.js"></script>-->
 </head>
-
 <body md-no-ink>
     <md-toolbar class="header-background">
         <div layout="row">
@@ -75,10 +74,6 @@
                                     <div class="card-side-by-side" ng-include="'partials/graphSummary.html'"></div>
                                     <!--                                    <div class="card-side-by-side" ng-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" ng-include="'partials/edgeInspectorTile.html'"></div>
-                                    <h4>Upload on file select</h4>
-                                    <input type="file" ngf-select="uploadFiles($file, $invalidFiles, this)" ngf-max-height="1000" ngf-max-size="20MB">
-                                        Select File
-                                    </input>
                                 </div>
                                 <div static-include="partials/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
@@ -110,5 +105,4 @@
         </md-content>
     </div>
 </body>
-
 </html>

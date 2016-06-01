@@ -20,8 +20,6 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
             second: 0
         }
         $rootScope.state = $rootScope.states.initial;
-        $scope.pValueDisplayed = $scope.pValues[2].value;
-        $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
         $scope.selfLoops = [];
         $scope.selfLoopsCount = 0;
@@ -81,7 +79,6 @@ angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourCo
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
             RESTService.post('neighbour-general', {
-                pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.selectedNeighbourGenes
             }).then(function(data) {

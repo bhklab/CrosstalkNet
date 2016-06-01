@@ -5,7 +5,7 @@
     <div>
         <md-input-container class="select">
             <label>Layout</label>
-            <md-select ng-model="$parent.selectedLayout">
+            <md-select ng-model="selectedLayout">
                 <md-option ng-repeat="layout in layouts" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
                     {{layout.display}}
                 </md-option>
