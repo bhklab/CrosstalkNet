@@ -9,11 +9,13 @@
     </md-input-container>
     <md-input-container class="select">
         <label>P-Value</label>
-        <md-select ng-model="correlationFileDisplayed">
-            <md-option ng-repeat="value in pValues" value="{{value.value}}" ng-selected="0">
-                {{value.display}}
+        <md-select ng-model="$rootscope.correlationFileDisplayed">
+            <md-option ng-repeat="file in fileList" value="{{file}}" ng-selected="0">
+                {{file.fileName}}
             </md-option>
         </md-select>
     </md-input-container>
     <md-button ng-click="refreshGeneList()">Refresh Genes</md-button>
+    Correlation File Displayed: {{correlationFileDisplayed}}
+    Correlation File Actual: {{correlationFileActual}}
 </md-content>
