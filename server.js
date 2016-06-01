@@ -27,13 +27,24 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get('/gene-list', function(req, res) {
-    var pValue = req.query.pValue;
-    var fileName = req.query.fileName;
+app.post('/gene-list', function(req, res) {
+    var args = {pValue: null, fileName : null};
+    var argsString = "";
+    var file = req.body.file;
+    args.pValue = file.pValue;
+    args.fileName = file.fileName;
+    args.path = file.path;
     var geneList = [];
-    console.log(pValue);
+    console.log(args.pValue);
+    console.log(args.file);
+    console.log(file);
+    console.log(file.fileName);
+    console.log(file.pValue);
 
-    var child = exec("Rscript R_Scripts/getGeneList.R" + script + " --args \"" + fileName + "\"", {
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/getGeneList.R  --args " + argsString, {
             maxBuffer: 1024 *
                 50000
         },
@@ -65,7 +76,7 @@ app.get('/gene-list', function(req, res) {
                 };
             });
 
-            geneListCache[fileName] = geneList;
+            geneListCache[file.fileName] = geneList;
 
             res.send({ geneList: geneList });
         });
@@ -78,18 +89,20 @@ app.get('/gene-list', function(req, res) {
 });
 
 app.post('/neighbour-general', function(req, res) {
+    var args = {};
+    var file = req.body.file;
     var argsString = "";
     var selectedGeneNames = [];
     var argsArray = [];
     var selectedGenes = req.body.selectedGenes;
-    var pValue = req.body.pValue;
+    args.pValue = file.pValue;
+    args.fileName = file.fileName;
+    args.path = file.path;
     var requestedLayout = req.body.layout;
     var numberOfGenes = 0;
     var genesArg = "";
     console.log("selectedGenes:");
     console.log(selectedGenes);
-    console.log("pValue: ")
-    console.log(pValue);
 
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
@@ -102,12 +115,16 @@ app.post('/neighbour-general', function(req, res) {
         selectedGeneNames.push(selectedGenes[i].value);
     }
 
+    args.selectedGenes = selectedGeneNames;
+
     var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
     numberOfGenes = selectedGenes.length;
 
-    argsArray = [pValue, numberOfGenes];
-    argsArray = argsArray.concat(selectedGeneNames);
-    argsString = execUtils.createArgsStringFromArray(argsArray);
+    // argsArray = [pValue, numberOfGenes];
+    // argsArray = argsArray.concat(selectedGeneNames);
+    // argsString = execUtils.createArgsStringFromArray(argsArray);
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
 
 
     var child = exec("Rscript R_scripts/findCorrelationsReturnEdges.R --args " + argsString, { maxBuffer: 1024 * 50000 },
@@ -210,19 +227,23 @@ app.post('/neighbour-general', function(req, res) {
 });
 
 app.post('/submatrix', function(req, res) {
+    var args = {};
     var argsString = "";
     var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
-    var pValue = req.body.pValue;
+    var file = req.body.file;
+    args.pValue = req.body.pValue;
     var requestedLayout = req.body.layout;
-    var minPositiveWeightFirst = req.body.minPositiveWeightFirst;
-    var minNegativeWeightFirst = req.body.minNegativeWeightFirst;
-    var minPositiveWeightSecond = req.body.minPositiveWeightSecond;
-    var minNegativeWeightSecond = req.body.minNegativeWeightSecond;
-    var filterFirst = req.body.filterFirst;
-    var filterSecond = req.body.filterSecond;
-    var depth = req.body.depth;
+    args.fileName = file.fileName;
+    args.path = file.path;
+    args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
+    args.minNegativeWeightFirst = req.body.minNegativeWeightFirst;
+    args.minPositiveWeightSecond = req.body.minPositiveWeightSecond;
+    args.minNegativeWeightSecond = req.body.minNegativeWeightSecond;
+    args.weightFilterFirst = req.body.filterFirst;
+    args.weightFilterSecond = req.body.filterSecond;
+    args.depth = req.body.depth;
 
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
@@ -236,9 +257,15 @@ app.post('/submatrix', function(req, res) {
         selectedGeneNames.push(selectedGenes[i].value);
     }
 
-    argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, selectedGenes.length, depth];
-    argsArray = argsArray.concat(selectedGeneNames);
-    argsString = execUtils.createArgsStringFromArray(argsArray);
+    args.genesOfInterest = selectedGeneNames;
+
+
+
+    // argsArray = [pValue, minNegativeWeightFirst, minPositiveWeightFirst, minNegativeWeightSecond, minPositiveWeightSecond, filterFirst, filterSecond, selectedGenes.length, depth];
+    // argsArray = argsArray.concat(selectedGeneNames);
+    // argsString = execUtils.createArgsStringFromArray(argsArray);
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
 
     var child = exec("Rscript R_Scripts/getRelevantSubmatrixReturnEdges.R --args " + argsString, {
             maxBuffer: 1024 *
@@ -419,13 +446,14 @@ app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
 app.get('/available-matrices', function(req, res) {
     var fileNames = [];
     var fileList = [];
+    var result = [];
 
-    fileNames = fs.readdirSync('R_Scripts/Default_Matrices');
+    fileNames = fs.readdirSync('R_Scripts/Full_Matrices');
     fileList = fileNames.map(function(file) {
         return {
             fileName: file,
             pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
-            path: "Default_Matrices/" + file 
+            path: "Full_Matrices/"
         };
     });
 
@@ -433,13 +461,19 @@ app.get('/available-matrices', function(req, res) {
 
     fileList = fileList.concat(fileNames.map(function(file) {
         return {
-            value: file,
+            fileName: file,
             pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
-            path: "User_Matrices/" + file 
+            path: "User_Matrices/"
         };
     }));
 
-    res.send({ fileList: fileList });
+    for (var i = 0; i < fileList.length; i++) {
+        if (fileList[i].fileName.indexOf('degree') < 0) {
+            result.push(fileList[i]);
+        }
+    }
+
+    res.send({ fileList: result });
 });
 
 function checkFileIntegrity(req, res, file) {
@@ -460,7 +494,13 @@ function checkFileIntegrity(req, res, file) {
 }
 
 function cacheGeneListForPValue(pValue, script) {
-    var child = exec("Rscript " + script + " --args \"" + pValue + "\"", {
+    var args = {};
+    var argsString = "";
+    args.pValue = pValue;
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+    console.log(argsString);
+    var child = exec("Rscript " + script + " --args " + argsString, {
             maxBuffer: 1024 *
                 50000
         },
@@ -493,7 +533,7 @@ function createOverallElements() {
     console.log("Creating overall elements");
 
     for (var i = 0; i < pValues.length; i++) {
-        cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
+        //cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
     }
 }
 
