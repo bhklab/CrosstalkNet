@@ -1,6 +1,6 @@
 library(jsonlite)
 
-setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
+setwd('R_Scripts')
 source('helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -24,14 +24,23 @@ minNegativeWeightFirst <- settings$minNegativeWeightFirst
 minPositiveWeightFirst <- settings$minPositiveWeightFirst
 minNegativeWeightSecond <- settings$minNegativeWeightSecond
 minPositiveWeightSecond <- settings$minPositiveWeightSecond
-weightFilterFirst <- settings$weightFilterFirst
-weightFilterSecond <- settings$weightFilterSecond
+weightFilterFirst <- as.logical(settings$weightFilterFirst)
+weightFilterSecond <- as.logical(settings$weightFilterSecond)
 depth <- settings$depth
 genesOfInterest <- settings$genesOfInterest
 # corMatrixFirstNeighbours <- readRDS(paste('Full_Matrices/fullcorMatrix.', pValue, ".RData", sep=""))
 
 corMatrixFirstNeighbours <- readRDS(paste(path, fileName, sep=""))
-corMatrixSecondNeighbours <- corMatrixFirstNeighbours 
+write("Finished Reading Matrix", stderr())
+if (depth > 1) {
+	write("Copying Matrix", stderr())
+	corMatrixSecondNeighbours <- corMatrixFirstNeighbours 	
+	write("Finished copying Matrix", stderr())
+}
+
+write("Memory usage", stderr())
+write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
+
 if (pValue != "") {
 	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, '.RData', sep=""))
 } else {
@@ -39,10 +48,33 @@ if (pValue != "") {
 }
 
 if (weightFilterFirst == TRUE) {
-	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
+	if (is.na(minNegativeWeightFirst)|| is.nan(minNegativeWeightFirst)) {
+        corMatrixFirstNeighbours[corMatrixFirstNeighbours < 0] = 0
+        minNegativeWeightFirst <- 0
+    } 
+
+    write("Memory usage", stderr())
+	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
+
+    if (is.na(minPositiveWeightFirst) || is.nan(minPositiveWeightFirst)) {
+        corMatrixFirstNeighbours[corMatrixFirstNeighbours > 0] = 0
+        minPositiveWeightFirst <- 0
+    }
+
+    write("Memory usage", stderr())
+	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
+
+    corMatrixFirstNeighbours[corMatrixFirstNeighbours >= minNegativeWeightFirst & corMatrixFirstNeighbours < 0] = 0      
+    corMatrixFirstNeighbours[corMatrixFirstNeighbours <= minPositiveWeightFirst & corMatrixFirstNeighbours > 0] = 0  
+
+    write("Memory usage", stderr())
+	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
+
+	#corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
 }
 
 if (weightFilterSecond == TRUE) {
+	write("Bad!", stderr())
 	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
 } 
 
@@ -68,6 +100,9 @@ for (i in 1:length(genesOfInterest)) {
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
     exclusions <- c(exclusions, firstNeighbours[[i]])
 }
+
+write("Memory usage", stderr())
+write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 
 edgesSecond <- list()
 secondNeighbours <- list()
@@ -116,6 +151,9 @@ maxPositiveWeight <- max(edgeTest[edgeTest > 0])
 #Min negative weight means the negative weight with that smallest magnitude, not value
 minNegativeWeight <- min(edgeTest[edgeTest < 0])
 maxNegativeWeight <- max(edgeTest[edgeTest < 0])
+
+write("Memory usage", stderr())
+write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 
 resultDegrees <- list(first = resultDegreesFirst, second = resultDegreesSecond)
 neighbours <- list(first = firstNeighbours, second = secondNeighbours)

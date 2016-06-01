@@ -1,7 +1,7 @@
 library(jsonlite)
 library(psych)
 
-setwd('C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts')
+setwd('R_Scripts')
 source('helpers.R')
 
 ptm <- proc.time()

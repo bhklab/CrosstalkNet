@@ -27,8 +27,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         }
         $rootScope.state = $rootScope.states.initial;
 
-        $scope.pValueDisplayed = $scope.pValues[2].value;
-        $scope.pValueActual = $scope.pValues[2].value;
         $scope.totalInteractions = null;
 
         $scope.display = "Graph";
@@ -98,8 +96,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         $scope.selfLoops = [];
         $scope.allVisibleGenes = [];
 
-        $rootscope.correlationFileDisplayed = null;
-        $rootscope.correlationFileActual = null;
+        $rootScope.correlationFileDisplayed = null;
+        $rootScope.correlationFileActual = null;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -118,9 +116,8 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             $rootScope.selectedTab = 1;
             RESTService.post('neighbour-general', {
                 selectedGenes: [item],
-                pValue: $scope.pValueActual,
                 layout: $scope.selectedLayout,
-                file: $rootscope.correlationFileActual
+                file: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;
@@ -181,7 +178,6 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             }
 
             RESTService.post("submatrix", {
-                    pValue: $scope.pValueActual,
                     selectedGenes: $scope.genesOfInterest,
                     minNegativeWeightFirst: $scope.correlationFilterFirst.negativeFilter ==
                         null || !$scope.correlationFilterFirst.negativeEnabled ?
@@ -199,7 +195,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     filterSecond: filterSecond && filter,
                     layout: $scope.selectedLayout,
                     depth: depth,
-                    file: $rootscope.correlationFileActual
+                    file: $rootScope.correlationFileActual
                 })
                 .then(function(data) {
                     if (data.config == null) {
@@ -237,14 +233,14 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getGeneList = function() {
-            RESTService.post('gene-list', { pValue: $scope.pValueActual, file: $rootscope.correlationFileActual })
+            RESTService.post('gene-list', {file: $rootScope.correlationFileActual })
                 .then(function(data) {
                     $scope.geneList = data.geneList;
                 });
         };
 
         $scope.getFileList = function() {
-            RESTService.get('available-matrices', { params: { pValue: $scope.pValueActual } })
+            RESTService.get('available-matrices')
                 .then(function(data) {
                     $scope.fileList = data.fileList;
                     //$scope.getGeneList()
@@ -285,8 +281,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.refreshGeneList = function() {
-            $scope.pValueActual = $scope.pValueDisplayed;
-            $rootscope.correlationFileActual = JSON.parse($rootscope.correlationFileDisplayed);
+            $rootScope.correlationFileActual = JSON.parse($rootScope.correlationFileDisplayed);
             $scope.getGeneList();
         };
 
