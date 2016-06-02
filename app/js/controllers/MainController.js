@@ -2,9 +2,9 @@
 
 angular.module('myApp.MainController', []).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, $q,
-        $timeout) {
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'SharedService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, SharedService,
+        $q, $timeout) {
         $rootScope.selectedTab = 0;
         $scope.selectedItemFirst = null;
         $scope.selectedGOI = null;
@@ -46,8 +46,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             positiveEnabled: false
         };
 
-        $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel)
-
+        $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
         $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
 
         $scope.negativeFilterEnabled = false;
@@ -236,7 +235,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.getGeneList = function() {
             $rootScope.state = $rootScope.states.gettingGeneList;
-            RESTService.post('gene-list', {file: $rootScope.correlationFileActual })
+            RESTService.post('gene-list', { file: $rootScope.correlationFileActual })
                 .then(function(data) {
                     $scope.geneList = data.geneList;
                     $rootScope.state = $rootScope.states.initial;
