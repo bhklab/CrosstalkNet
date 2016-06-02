@@ -17,7 +17,6 @@ weightFilterFirst <- as.logical(settings$weightFilterFirst)
 weightFilterSecond <- as.logical(settings$weightFilterSecond)
 depth <- settings$depth
 genesOfInterest <- settings$genesOfInterest
-# corMatrixFirstNeighbours <- readRDS(paste('Full_Matrices/fullcorMatrix.', pValue, ".RData", sep=""))
 
 corMatrixFirstNeighbours <- readRDS(paste(path, fileName, sep=""))
 write("Finished Reading Matrix", stderr())
@@ -37,49 +36,13 @@ if (pValue != "") {
 }
 
 if (weightFilterFirst == TRUE) {
-	lessThanZero <- corMatrixFirstNeighbours < 0
-	greaterThanZero <- corMatrixFirstNeighbours > 0
-	invisible(gc())
-	greaterThanEqualToMinNeg <- corMatrixFirstNeighbours >= minNegativeWeightFirst
-	invisible(gc())
-	lessThanEqualToMinPos <- corMatrixFirstNeighbours <= minPositiveWeightFirst
-	invisible(gc())
-	if (is.na(minNegativeWeightFirst)|| is.nan(minNegativeWeightFirst)) {
-        corMatrixFirstNeighbours[lessThanZero] = 0
-        minNegativeWeightFirst <- 0
-    } 
-
-    write("Memory usage", stderr())
-	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
-
-    if (is.na(minPositiveWeightFirst) || is.nan(minPositiveWeightFirst)) {
-        corMatrixFirstNeighbours[greaterThanZero] = 0
-        minPositiveWeightFirst <- 0
-    }
-
-    invisible(gc())
-
-    write("Memory usage", stderr())
-	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
-
-    corMatrixFirstNeighbours[greaterThanEqualToMinNeg & lessThanZero] = 0      
-    invisible(gc())
-    corMatrixFirstNeighbours[lessThanEqualToMinPos & greaterThanZero] = 0  
-
-    write("Memory usage", stderr())
-	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
-
-	#corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
+	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
 }
 
 if (weightFilterSecond == TRUE) {
 	write("Bad!", stderr())
 	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
 } 
-
-# for (x in 1:numberOfGenes) {
-# 	genesOfInterest <- c(genesOfInterest, as.character(args[10 + x]))
-# }
 
 maxNeighbours <- 3
 
@@ -159,6 +122,5 @@ neighbours <- list(first = firstNeighbours, second = secondNeighbours)
 edges <- list(first = edgesFirst, second = edgesSecond)
 
 output <- list(neighbours = neighbours, degrees = resultDegrees, edges = edges, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight, minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight)
-#output <- list(firstNeighbours = firstNeighbours, resultDegreesFirst = resultDegreesFirst, secondNeighbours = secondNeighbours, resultDegreesSecond = resultDegreesSecond, edges = edges, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
 
 cat(format(serializeJSON(output)))
