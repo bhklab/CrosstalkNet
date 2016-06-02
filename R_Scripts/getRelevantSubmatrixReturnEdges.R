@@ -38,7 +38,6 @@ if (pValue != "") {
 
 if (weightFilterFirst == TRUE) {
 	lessThanZero <- corMatrixFirstNeighbours < 0
-	invisible(gc())
 	greaterThanZero <- corMatrixFirstNeighbours > 0
 	invisible(gc())
 	greaterThanEqualToMinNeg <- corMatrixFirstNeighbours >= minNegativeWeightFirst

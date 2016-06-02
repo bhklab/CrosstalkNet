@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.post('/gene-list', function(req, res) {
-    var args = {pValue: null, fileName : null};
+    var args = { pValue: null, fileName: null };
     var argsString = "";
     var file = req.body.file;
     args.pValue = file.pValue;
@@ -426,6 +426,12 @@ app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
 });
 
 app.get('/available-matrices', function(req, res) {
+    var result = getAvailableMatrices();
+
+    res.send({ fileList: result });
+});
+
+function getAvailableMatrices() {
     var fileNames = [];
     var fileList = [];
     var result = [];
@@ -444,7 +450,7 @@ app.get('/available-matrices', function(req, res) {
     fileList = fileList.concat(fileNames.map(function(file) {
         return {
             fileName: file,
-            pValue: "",//file.split(".").length > 2 ? file.split(".")[1] : "",
+            pValue: "", //file.split(".").length > 2 ? file.split(".")[1] : "",
             path: "User_Matrices/"
         };
     }));
@@ -455,8 +461,8 @@ app.get('/available-matrices', function(req, res) {
         }
     }
 
-    res.send({ fileList: result });
-});
+    return result;
+}
 
 function checkFileIntegrity(req, res, file) {
     var child = exec("Rscript R_Scripts/fileChecker.R --args " + file.name, function(error, stdout, stderr) {
@@ -470,8 +476,9 @@ function checkFileIntegrity(req, res, file) {
         var parsedValue = JSON.parse(stdout);
         var status = parsedValue.value[0].value;
         var message = parsedValue.value[1].value;
+        var fileList = getAvailableMatrices();
 
-        res.send({ fileStatus: message });
+        res.send({ fileStatus: message, fileList: fileList });
     });
 }
 

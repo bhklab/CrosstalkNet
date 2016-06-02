@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.MainController', ['ngRoute']).controller('MainController', ['$scope',
+angular.module('myApp.MainController', []).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', '$q', '$timeout',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, $q,
@@ -160,6 +160,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
             var filterFirst = false;
             var filterSecond = false;
             var depth = 1;
+            $rootScope.state = $rootScope.states.loading;
 
             if ($scope.GOIState == $scope.GOIStates.filterFirst) {
                 if (filter == false) {
@@ -213,6 +214,7 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
                     $scope.allVisibleGenes = $scope.getAllVisibleGenes();
+                    $rootScope.state = $rootScope.states.showingGraph;
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
                         $scope.correlationFilterFirst.min = data.minNegativeWeight;
@@ -233,9 +235,11 @@ angular.module('myApp.MainController', ['ngRoute']).controller('MainController',
         };
 
         $scope.getGeneList = function() {
+            $rootScope.state = $rootScope.states.gettingGeneList;
             RESTService.post('gene-list', {file: $rootScope.correlationFileActual })
                 .then(function(data) {
                     $scope.geneList = data.geneList;
+                    $rootScope.state = $rootScope.states.initial;
                 });
         };
 

@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp");
-myModule.factory('FileUploadService', function($http, Upload) {
+myModule.factory('FileUploadService', function($http, $timeout, Upload) {
     var service = {};
 
     service.uploadFiles = function(file, errFiles, scope) {
@@ -19,7 +19,8 @@ myModule.factory('FileUploadService', function($http, Upload) {
 
                 file.upload.then(function(response) {
                     $timeout(function() {
-                        alert(response);
+                        scope.fileList = response.data.fileList;
+                        alert(response.data.fileStatus[0]);
                     });
                 }, function(response) {
                     if (response.status > 0)
