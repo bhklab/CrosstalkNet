@@ -15,9 +15,8 @@ path <- settings$path
 if (pValue != "") {
 	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, ".RData", sep=""))	
 } else {
-	degrees <- readRDS(paste('degrees', fileName, sep=""))	
+	degrees <- readRDS(paste(path, 'degrees', fileName, sep=""))	
 }
-
 
 output <- list(degrees = degrees)
 cat(format(serializeJSON(output)))

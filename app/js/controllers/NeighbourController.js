@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.NeighbourController', ['ngRoute']).controller('NeighbourController', [
+angular.module('myApp.NeighbourController', []).controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', '$q', '$timeout',

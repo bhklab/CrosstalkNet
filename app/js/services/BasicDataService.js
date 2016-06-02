@@ -9,7 +9,9 @@ myModule.factory('BasicDataService', function($http) {
         loadingFirst: 3,
         loadingSecond: 4,
         loading: 5,
-        loadingConfig: 6
+        loadingConfig: 6,
+        showingGraph: 7,
+        gettingGeneList: 8
     };
 
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },

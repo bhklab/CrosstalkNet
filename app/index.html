@@ -8,12 +8,10 @@
     <title>My AngularJS App</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css" />
-    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css" />
+
     <link rel="stylesheet" href="bower_components/qtip2/jquery.qtip.css" />
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="app.css" />
-    <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
     <!-- Cytoscape Web JS API (needed to reference org.cytoscapeweb.Visualization) -->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/cytoscape/dist/cytoscape.js"></script>
@@ -49,10 +47,12 @@
     <md-toolbar class="header-background">
         <div layout="row">
             <div class="" flex="40">Status:
-                <span ng-if="state == states.loadingFirst || state == states.loadingSecond || state == states.loading">Loading Data From Server...</span>
+                <span ng-if="state == states.initial">Waiting for User to Query...</span>
                 <span ng-if="state == states.loadingConfig">Initializing Graph...</span>
-                <span ng-if="state == states.initial || state == states.firstDropdown || state == states.secondDropdown">Displaying Graph for P-Value={{}}</span>
-                <md-progress-circular ng-show="state == states.loading || state == states.loadingFirst || state == states.loadingSecond" md-mode="indeterminate"></md-progress-circular>
+                <span ng-if="state == states.showingGraph">Displaying Graph...</span>
+                <span ng-if="state == states.gettingGeneList">Getting Gene List...</span>
+                <span ng-if="state == states.loading">Getting Graph from Server...</span>
+                <md-progress-circular ng-show="state == states.loading" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="center-text" flex="33">
                 <span class="text-align-middle title-font">BHK Lab</span>
@@ -95,10 +95,6 @@
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
-                    </md-content>
-                </md-tab>
-                <md-tab label="three">
-                    <md-content class="md-padding">
                     </md-content>
                 </md-tab>
             </md-tabs>
