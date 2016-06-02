@@ -80,7 +80,8 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $rootScope.state = $rootScope.states.loadingSecond;
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
-                selectedGenes: $scope.selectedNeighbourGenes
+                selectedGenes: $scope.selectedNeighbourGenes,
+                file: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;

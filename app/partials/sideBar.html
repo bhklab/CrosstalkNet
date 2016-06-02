@@ -21,24 +21,5 @@
                 <div static-include="partials/SideBar/queryTab.html"></div>
             </md-tab>
         </md-tabs>
-        <div ng-if="ctrl == 'neighbour'">
-            <md-list>
-                <md-list-item ng-repeat="gene in selectedNeighbourGenes">
-                    <md-menu>
-                        <md-button ng-click="$last && $mdOpenMenu($event)">
-                            {{gene.display}}
-                        </md-button>
-                        <md-menu-content width="6">
-                            <md-menu-item ng-repeat="item in [1]">
-                                <md-button ng-click="removeGene(gene)">
-                                    Remove Gene
-                                </md-button>
-                            </md-menu-item>
-                        </md-menu-content>
-                    </md-menu>
-                </md-list-item>
-            </md-list>
-            <md-button ng-click="getConfigForSelectedNeighbours()">Get Data</md-button>
-        </div>
     </md-content>
 </md-sidenav>
