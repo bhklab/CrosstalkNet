@@ -4,17 +4,6 @@ setwd('R_Scripts')
 source('helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
-# pValue <- as.character(args[2])
-# fileName <- args[3]
-# minNegativeWeightFirst <- as.numeric(args[4])
-# minPositiveWeightFirst <- as.numeric(args[5])
-# minNegativeWeightSecond <- as.numeric(args[6])
-# minPositiveWeightSecond <- as.numeric(args[7])
-# weightFilterFirst <- as.logical(args[8])
-# weightFilterSecond <- as.logical(args[9])
-# numberOfGenes <- as.character(args[10])
-# depth <- as.numeric(args[11])
-# genesOfInterest <- c()
 
 settings <- fromJSON(args[2])
 pValue <- settings$pValue
@@ -44,12 +33,20 @@ write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 if (pValue != "") {
 	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, '.RData', sep=""))
 } else {
-	degrees <- readRDS(paste(path, 'degrees', fileName, '.RData', sep=""))
+	degrees <- readRDS(paste(path, 'degrees', fileName, sep=""))
 }
 
 if (weightFilterFirst == TRUE) {
+	lessThanZero <- corMatrixFirstNeighbours < 0
+	invisible(gc())
+	greaterThanZero <- corMatrixFirstNeighbours > 0
+	invisible(gc())
+	greaterThanEqualToMinNeg <- corMatrixFirstNeighbours >= minNegativeWeightFirst
+	invisible(gc())
+	lessThanEqualToMinPos <- corMatrixFirstNeighbours <= minPositiveWeightFirst
+	invisible(gc())
 	if (is.na(minNegativeWeightFirst)|| is.nan(minNegativeWeightFirst)) {
-        corMatrixFirstNeighbours[corMatrixFirstNeighbours < 0] = 0
+        corMatrixFirstNeighbours[lessThanZero] = 0
         minNegativeWeightFirst <- 0
     } 
 
@@ -57,15 +54,18 @@ if (weightFilterFirst == TRUE) {
 	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 
     if (is.na(minPositiveWeightFirst) || is.nan(minPositiveWeightFirst)) {
-        corMatrixFirstNeighbours[corMatrixFirstNeighbours > 0] = 0
+        corMatrixFirstNeighbours[greaterThanZero] = 0
         minPositiveWeightFirst <- 0
     }
+
+    invisible(gc())
 
     write("Memory usage", stderr())
 	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 
-    corMatrixFirstNeighbours[corMatrixFirstNeighbours >= minNegativeWeightFirst & corMatrixFirstNeighbours < 0] = 0      
-    corMatrixFirstNeighbours[corMatrixFirstNeighbours <= minPositiveWeightFirst & corMatrixFirstNeighbours > 0] = 0  
+    corMatrixFirstNeighbours[greaterThanEqualToMinNeg & lessThanZero] = 0      
+    invisible(gc())
+    corMatrixFirstNeighbours[lessThanEqualToMinPos & greaterThanZero] = 0  
 
     write("Memory usage", stderr())
 	write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())

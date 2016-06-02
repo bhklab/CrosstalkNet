@@ -444,7 +444,7 @@ app.get('/available-matrices', function(req, res) {
     fileList = fileList.concat(fileNames.map(function(file) {
         return {
             fileName: file,
-            pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
+            pValue: "",//file.split(".").length > 2 ? file.split(".")[1] : "",
             path: "User_Matrices/"
         };
     }));

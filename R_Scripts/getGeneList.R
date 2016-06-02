@@ -15,7 +15,7 @@ path <- settings$path
 if (pValue != "") {
 	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, ".RData", sep=""))	
 } else {
-	degrees <- readRDS(paste('degrees', fileName, ".RData", sep=""))	
+	degrees <- readRDS(paste('degrees', fileName, sep=""))	
 }
 
 
