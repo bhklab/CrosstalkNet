@@ -212,7 +212,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                     $scope.setNeighbours($scope, 2);
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
-                    $scope.allVisibleGenes = $scope.getAllVisibleGenes();
+                    $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                     $rootScope.state = $rootScope.states.showingGraph;
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
@@ -285,19 +285,13 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.refreshGeneList = function() {
             $rootScope.correlationFileActual = JSON.parse($rootScope.correlationFileDisplayed);
+            $scope.removeGenesOfInterest();
+            $scope.resetInputFields();
+            $scope.GOIState = $scope.GOIStates.initial;
             $scope.getGeneList();
         };
 
-        $scope.getAllVisibleGenes = function() {
-            var result = [];
-            var nodes = $scope.cy.$('node').not(':parent');
-
-            for (var i = 0; i < nodes.length; i++) {
-                result.push(nodes[i].id());
-            }
-
-            return result;
-        };
+        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
         $scope.uploadFiles = FileUploadService.uploadFiles;
