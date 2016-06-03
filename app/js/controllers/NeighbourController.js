@@ -10,6 +10,8 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $scope.searchTextFirst = "";
         $scope.searchTextSecond = "";
         $scope.ctrl = "neighbour";
+        $scope.zoomGene = null;
+        $scope.searchTextZoom = null;
 
         $rootScope.states = angular.copy(BasicDataService.states);
         $scope.pValues = angular.copy(BasicDataService.pValues);
@@ -37,6 +39,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $scope.querySearch = BasicDataService.querySearch;
         $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
         $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
+        $scope.locateGeneInGraph = GraphConfigService.locateGeneInGraph;
 
 
         // $scope.applyConfig = function(config, containerID) {
@@ -47,6 +50,12 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         // };
 
         $scope.applyConfig = GraphConfigService.applyConfig;
+
+        $scope.locateGene = function(gene) {
+            if (gene != null && gene != '') {
+                $scope.findGeneInGraph($scope, gene);
+            }
+        };
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -76,6 +85,10 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $scope.neighbours = null;
         };
 
+        $scope.clearLocatedGene = function() {
+            GraphConfigService.clearLocatedGene($scope);
+        }
+
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
             RESTService.post('neighbour-general', {
@@ -88,7 +101,8 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 $scope.neighbours = angular.copy($scope.genesSecond);
                 GraphConfigService.neighbourConfigs.secondDropdownConfig = angular
                     .copy(data.config);
-                $rootScope.state = $rootScope.states.secondDropdown;
+                $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
+                $rootScope.state = $rootScope.states.displayingGraph;
             });
         };
 
@@ -99,10 +113,13 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         };
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
+        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
         $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour", $scope);
+                $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
                 $scope.selectedNeighbourGenes = [GraphConfigService.firstSelectedGene];
             }
@@ -113,6 +130,12 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 $scope.applyConfig(newValue, "cyNeighbour", $scope);
                 $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
             }
+        });
+
+        $rootScope.$watch('correlationFileActual', function() {
+            $scope.selectedNeighbourGenes = [];
+            $scope.resetInputFields();
+            $scope.neighbours = [];
         });
     }
 ]);

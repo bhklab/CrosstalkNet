@@ -129,16 +129,17 @@ app.post('/neighbour-general', function(req, res) {
             var parsedEdges = parsedValue.value[2].value;
 
             var sourceNodes = [];
-            var nodes = {};
+            var nodes = [];
             var parentNodes = [];
             var edges = [];
             var elements = [];
             var config = null;
             var layout = null;
 
-            for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].value], 'par' + i, 0, selectedGenes[i].object.degree));
-            }
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree));
+            // for (var i = 0; i < selectedGenes.length; i++) {
+            //     sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].value], 'par' + i, 0, selectedGenes[i].object.degree));
+            // }
 
             if (degrees[0].attributes.names == null) {
                 sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -159,56 +160,103 @@ app.post('/neighbour-general', function(req, res) {
                 return;
             }
 
-            for (var i = 0; i < weights.length; i++) {
-                nodes["" + i] = nodeUtils.createNodes(weights[i].value, "par" + (i + 1), 0, degrees[i].value);
-            }
-
-            for (var i = 0; i < selectedGenes.length + 1; i++) {
-                if (i < 1) {
-                    parentNodes.push({
-                        data: {
-                            id: "par" + i
-                        }
-                    });
-                } else if (nodes["" + (i - 1)].length > 0) {
-                    parentNodes.push({
-                        data: {
-                            id: "par" + i
-                        }
-                    });
-                }
-            }
-
             for (var i = 0; i < parsedEdges.length; i++) {
                 console.log(parsedEdges[i].value);
                 edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i].value, i + 1));
             }
 
-            sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                100, 0, 0);
-            sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                "left",
-                "center",
-                initialColor);
+            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                    100, 0, 0);
+                sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                    "left",
+                    "center",
+                    initialColor);
 
-            elements = elements.concat(parentNodes);
-            elements = elements.concat(edges);
-            elements.push(sourceNodes[0][0]);
+                for (var i = 0; i < weights.length; i++) {
+                    nodes.push(nodeUtils.createNodes(weights[i].value, "par" + (i + 1), 0, degrees[i].value));
+                }
 
-            i = 1;
-            for (nodeCollection in nodes) {
-                initialColor = initialColor == "red" ? "blue" : "red";
-                nodes[nodeCollection] = nodeUtils.addPositionsToNodes(nodes[nodeCollection], 400 * i, 100, 0, 20);
-                nodes[nodeCollection] = nodeUtils.addStyleToNodes(nodes[nodeCollection], 10, 10, "center", "top", initialColor);
-                elements = elements.concat(nodes[nodeCollection]);
-                i++;
+                for (var i = 0; i < selectedGenes.length + 1; i++) {
+                    if (i < 1) {
+                        parentNodes.push({
+                            data: {
+                                id: "par" + i
+                            }
+                        });
+                    } else if (nodes["" + (i - 1)].length > 0) {
+                        parentNodes.push({
+                            data: {
+                                id: "par" + i
+                            }
+                        });
+                    }
+                }
+
+                i = 1;
+                for (var j = 0; j < nodes.length; j++) {
+                    initialColor = initialColor == "red" ? "blue" : "red";
+                    nodes[j] = nodeUtils.addPositionsToNodes(nodes[j], 400 * i, 100, 0, 20);
+                    nodes[j] = nodeUtils.addStyleToNodes(nodes[j], 10, 10, "center", "top", initialColor);
+                    elements = elements.concat(nodes[j]);
+                    i++;
+                }
+                elements = elements.concat(parentNodes);
+                elements = elements.concat(edges);
+                elements.push(sourceNodes[0][0]);
+
+                layout = layoutUtils.createPresetLayout();
+                config = configUtils.createConfig();
+
+                configUtils.setConfigElements(config, elements);
+                configUtils.setConfigLayout(config, layout);
+
+                for (prop in styleUtils.bipartiteStyles.epi) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
+                }
+
+                for (prop in styleUtils.bipartiteStyles.stroma) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
+                }
+
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+            } else if (requestedLayout == 'clustered') {
+
+            } else {
+                for (var i = 0; i < weights.length; i++) {
+                    nodes = nodes.concat(nodeUtils.createNodes(weights[i].value, null, 0, degrees[i].value));
+                }
+
+                for (var i = 0; i < nodes.length; i++) {
+                    if (selectedGeneNames.indexOf(nodes[i].data.id) >= 0) {
+                        nodeUtils.addClassToNodes(nodes[i], "sourceNode");
+                        console.log("Added source node to: " + nodes[i].data.id);
+                    }
+                }
+
+                config = configUtils.createConfig();
+                layout = layoutUtils.createRandomLayout(nodes.length, 12);
+
+                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+
+                elements = elements.concat(nodes);
+                elements = elements.concat(edges);
+                elements.push(sourceNodes[0][0]);
+
+                console.log("sourceNodes: %j", sourceNodes);
+
+
+
+                configUtils.setConfigElements(config, elements);
+                configUtils.setConfigLayout(config, layout);
+
             }
-
-            config = configUtils.createConfig();
-            layout = configUtils.createPresetLayout();
-
-            configUtils.setConfigElements(config, elements);
-            configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
         });
@@ -385,7 +433,8 @@ app.post('/submatrix', function(req, res) {
                 layout = layoutUtils.createRandomLayout(allNodes.length, 12);
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSource);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
