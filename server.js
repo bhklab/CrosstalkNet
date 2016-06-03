@@ -310,6 +310,7 @@ app.post('/submatrix', function(req, res) {
             }
 
             var parsedValue = JSON.parse(stdout);
+            console.log(parsedValue);
             var weights = parsedValue.value[0].value;
             var degrees = parsedValue.value[1].value;
             var parsedEdges = parsedValue.value[2].value;
