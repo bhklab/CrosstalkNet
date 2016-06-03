@@ -23,7 +23,7 @@ write(rowNames, stderr())
 write('colNames', stderr())
 write(colNames, stderr())
 
-if (!is.null(rowNames) && !is.null(colNames) && all(rowNames == colNames)) {
+if (!is.na(rowNames) && !is.na(colNames) && all(rowNames == colNames)) {
 	write('if:', stderr())
 		
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')

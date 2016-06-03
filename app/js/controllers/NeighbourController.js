@@ -131,5 +131,11 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
             }
         });
+
+        $rootScope.$watch('correlationFileActual', function() {
+            $scope.selectedNeighbourGenes = [];
+            $scope.resetInputFields();
+            $scope.neighbours = [];
+        });
     }
 ]);
