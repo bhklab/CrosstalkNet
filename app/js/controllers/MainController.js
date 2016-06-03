@@ -285,6 +285,9 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.refreshGeneList = function() {
             $rootScope.correlationFileActual = JSON.parse($rootScope.correlationFileDisplayed);
+            $scope.removeGenesOfInterest();
+            $scope.resetInputFields();
+            $scope.GOIState = $scope.GOIStates.initial;
             $scope.getGeneList();
         };
 
