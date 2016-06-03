@@ -213,6 +213,18 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         cy.json({ elements: originalElements });
     };
 
+
+    service.getAllVisibleGenes = function(scope) {
+        var result = [];
+        var nodes = scope.cy.$('node').not(':parent');
+
+        for (var i = 0; i < nodes.length; i++) {
+            result.push(nodes[i].id());
+        }
+
+        return result;
+    };
+
     service.createLargeWeaveGraph = function() {
         var elements = [];
 
