@@ -250,6 +250,13 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                 });
         };
 
+        $scope.getOverallMatrixStats = function() {
+            RESTService.post('overall-matrix-stats', { file: $rootScope.correlationFileActual }).then(function(data) {
+                $scope.overallMatrixStats = data.overallMatrixStats;
+                console.log(data);
+            });
+        };
+
         $scope.resetGeneSelection = function() {
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
@@ -289,6 +296,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $scope.resetInputFields();
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.getGeneList();
+            $scope.getOverallMatrixStats();
         };
 
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
