@@ -504,8 +504,8 @@ app.post('/overall-matrix-stats', function(req, res) {
             var overallMatrixStats = {};
             var parsedValue = JSON.parse(stdout);
             
-            overallMatrixStats.selfLoops = parsedValue.value[0].value;
-            overallMatrixStats.significantInteractions = parsedValue.value[1].value;
+            overallMatrixStats.selfLoops = parsedValue.value[0].value[0];
+            overallMatrixStats.significantInteractions = parsedValue.value[1].value[0];
             //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;
 
             console.log("parsedValue: ");
