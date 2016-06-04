@@ -481,6 +481,39 @@ app.get('/available-matrices', function(req, res) {
     res.send({ fileList: result });
 });
 
+app.post('/overall-matrix-stats', function(req, res) {
+    var args = {};
+    var file = req.body.file;
+    args.fileName = file.fileName;
+    args.path = file.path;
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/getOverallMatrixStats.R  --args " + argsString, {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var overallMatrixStats = {};
+            var parsedValue = JSON.parse(stdout);
+            
+            overallMatrixStats.selfLoops = parsedValue.value[0].value;
+            overallMatrixStats.significantInteractions = parsedValue.value[1].value;
+            //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;
+
+            console.log("parsedValue: ");
+            console.log("%j", parsedValue);
+            res.send({ overallMatrixStats: overallMatrixStats });
+        });
+});
+
 function getAvailableMatrices() {
     var fileNames = [];
     var fileList = [];
