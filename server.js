@@ -82,7 +82,7 @@ app.post('/gene-list', function(req, res) {
     // }
 });
 
-app.post('/neighbour-general', function(req, res) {
+app.post('/neighbour-general-new', function(req, res) {
     var args = {};
     var file = req.body.file;
     var argsString = "";
@@ -93,8 +93,6 @@ app.post('/neighbour-general', function(req, res) {
     args.path = file.path;
     var requestedLayout = req.body.layout;
     var genesArg = "";
-    console.log("selectedGenes:");
-    console.log(selectedGenes);
 
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
@@ -114,8 +112,7 @@ app.post('/neighbour-general', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-
-    var child = exec("Rscript R_scripts/findCorrelationsReturnEdges.R --args " + argsString, { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_scripts/findCorrelationsReturnNodes.R --args " + argsString, { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             console.log('stderr: ' + stderr);
 
@@ -124,9 +121,8 @@ app.post('/neighbour-general', function(req, res) {
             }
 
             var parsedValue = JSON.parse(stdout);
-            var weights = parsedValue.value[0].value;
-            var degrees = parsedValue.value[1].value;
-            var parsedEdges = parsedValue.value[2].value;
+            var parsedNodes = parsedValue.nodes
+            var parsedEdges = parsedValue.edges;
 
             var sourceNodes = [];
             var nodes = [];
@@ -137,14 +133,11 @@ app.post('/neighbour-general', function(req, res) {
             var layout = null;
 
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree));
-            // for (var i = 0; i < selectedGenes.length; i++) {
-            //     sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].value], 'par' + i, 0, selectedGenes[i].object.degree));
-            // }
 
-            if (degrees[0].attributes.names == null) {
-                sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+            if (parsedNodes.length == null) {
+                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
-                sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
                     "left",
                     "center",
                     "blue");
@@ -160,22 +153,16 @@ app.post('/neighbour-general', function(req, res) {
                 return;
             }
 
-            for (var i = 0; i < parsedEdges.length; i++) {
-                console.log(parsedEdges[i].value);
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i].value, i + 1));
-            }
+            edges = edgeUtils.createEdgesFromREdgesFinal(parsedEdges);
+            nodes = nodeUtils.createNodesFromRNodes(parsedNodes);
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
-                sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
                     "left",
                     "center",
                     initialColor);
-
-                for (var i = 0; i < weights.length; i++) {
-                    nodes.push(nodeUtils.createNodes(weights[i].value, "par" + (i + 1), 0, degrees[i].value));
-                }
 
                 for (var i = 0; i < selectedGenes.length + 1; i++) {
                     if (i < 1) {
@@ -184,7 +171,7 @@ app.post('/neighbour-general', function(req, res) {
                                 id: "par" + i
                             }
                         });
-                    } else if (nodes["" + (i - 1)].length > 0) {
+                    } else { //if (nodes["" + (i - 1)].length > 0) {
                         parentNodes.push({
                             data: {
                                 id: "par" + i
@@ -193,14 +180,19 @@ app.post('/neighbour-general', function(req, res) {
                     }
                 }
 
-                i = 1;
+                var yIncrement = 0;
+                
                 for (var j = 0; j < nodes.length; j++) {
-                    initialColor = initialColor == "red" ? "blue" : "red";
-                    nodes[j] = nodeUtils.addPositionsToNodes(nodes[j], 400 * i, 100, 0, 20);
-                    nodes[j] = nodeUtils.addStyleToNodes(nodes[j], 10, 10, "center", "top", initialColor);
+                    if (j > 0 && nodes[j - 1].data.neighbourLevel == nodes[j].data.neighbourLevel) {
+                        yIncrement++;
+                    } else {
+                        yIncrement = 0;
+                    }
+
+                    nodeUtils.addPositionsToNodes(nodes[j], 400 * nodes[j].data.neighbourLevel, 100, 0, 20 * yIncrement);
                     elements = elements.concat(nodes[j]);
-                    i++;
                 }
+
                 elements = elements.concat(parentNodes);
                 elements = elements.concat(edges);
                 elements.push(sourceNodes[0][0]);
@@ -220,17 +212,10 @@ app.post('/neighbour-general', function(req, res) {
                 }
 
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-            } else if (requestedLayout == 'clustered') {
-
             } else {
-                for (var i = 0; i < weights.length; i++) {
-                    nodes = nodes.concat(nodeUtils.createNodes(weights[i].value, null, 0, degrees[i].value));
-                }
-
                 for (var i = 0; i < nodes.length; i++) {
-                    if (selectedGeneNames.indexOf(nodes[i].data.id) >= 0) {
+                    if (nodes[i].data.isSource) {
                         nodeUtils.addClassToNodes(nodes[i], "sourceNode");
-                        console.log("Added source node to: " + nodes[i].data.id);
                     }
                 }
 
@@ -249,13 +234,8 @@ app.post('/neighbour-general', function(req, res) {
                 elements = elements.concat(edges);
                 elements.push(sourceNodes[0][0]);
 
-                console.log("sourceNodes: %j", sourceNodes);
-
-
-
                 configUtils.setConfigElements(config, elements);
                 configUtils.setConfigLayout(config, layout);
-
             }
 
             res.json({ config: config });
@@ -346,9 +326,9 @@ app.post('/submatrix', function(req, res) {
             }
 
             if (false) { //degreesFirst[0].attributes.names == null) {
-                sourceNodes[0] = nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
-                sourceNodes[0] = nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
                     "left",
                     "center",
                     "blue");
@@ -503,7 +483,7 @@ app.post('/overall-matrix-stats', function(req, res) {
 
             var overallMatrixStats = {};
             var parsedValue = JSON.parse(stdout);
-            
+
             overallMatrixStats.selfLoops = parsedValue.value[0].value[0];
             overallMatrixStats.significantInteractions = parsedValue.value[1].value[0];
             //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;

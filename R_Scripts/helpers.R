@@ -28,14 +28,6 @@ removeUnnecessaryGenes <- function(corMatrix, epiDegrees, stromaDegrees) {
     }
 
     result <- result[-indices, -indices]
-
-
-    # for (index in 1:nrow(corMatrix)) {
-    #     if (epiDegrees[index] == 0 && stromaDegrees[index] == 0) {
-    #         result <- result[, -index]
-    #         result <- result[-index, ]
-    #     }
-    # }
     
     result
 }
@@ -192,3 +184,59 @@ createEdges <- function(corMatrix, gene, exclusion) {
 
     edges
 }
+
+createEdgesDF <- function(corMatrix, gene, exclusion) {
+    edges <- data.frame(source = character(0), target = character(0), weight = numeric(0), stringsAsFactors = FALSE)
+
+    if (length(gene) == 0 || is.na(gene)) {
+        return(edges)
+    }
+
+    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+        
+
+        neighbours <- corMatrix[gene, neighboursNames]
+        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
+    } else {
+        neighboursNames <- names(which(corMatrix[, gene] != 0))
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+
+        neighbours <- corMatrix[neighboursNames, gene]
+        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
+    }
+
+    if (length(neighbours) == 0) {
+        return(edges)
+    }
+
+    for (i in 1:length(neighbours)) {       
+        edges[i, "source"] <- gene
+        edges[i, "target"] <- names(neighbours[i])
+        edges[i, "weight"] <- neighbours[i]
+    }
+
+    edges
+}
+
+getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
+    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
+    neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
+    result <- data.frame(name = character(0), degree = integer(0), level = integer(0), isSource = logical(0), stringsAsFactors = FALSE)
+
+    for (i in 1:length(neighboursNames)) {
+        result[i, "name"] <- neighboursNames[i]
+        result[i, "degree"] <- neighboursDegrees[i]
+        result[i, "level"] <- level
+
+        if (result[i, "name"] %in% selectedGenes) {
+            result[i, "isSource"] <- TRUE 
+        } else {
+            result[i, "isSource"] <- FALSE
+        }
+    }
+
+    result
+}
+

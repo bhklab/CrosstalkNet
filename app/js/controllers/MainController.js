@@ -113,7 +113,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
             GraphConfigService.firstSelectedGene = item;
             $rootScope.selectedTab = 1;
-            RESTService.post('neighbour-general', {
+            RESTService.post('neighbour-general-new', {
                 selectedGenes: [item],
                 layout: $scope.selectedLayout,
                 file: $rootScope.correlationFileActual

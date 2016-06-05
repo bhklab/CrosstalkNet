@@ -91,7 +91,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
 
         $scope.getConfigForSelectedNeighbours = function() {
             $rootScope.state = $rootScope.states.loadingSecond;
-            RESTService.post('neighbour-general', {
+            RESTService.post('neighbour-general-new', {
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.selectedNeighbourGenes,
                 file: $rootScope.correlationFileActual
