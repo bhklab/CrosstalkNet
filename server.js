@@ -82,7 +82,7 @@ app.post('/gene-list', function(req, res) {
     // }
 });
 
-app.post('/neighbour-general-new', function(req, res) {
+app.post('/neighbour-general', function(req, res) {
     var args = {};
     var file = req.body.file;
     var argsString = "";
@@ -112,7 +112,7 @@ app.post('/neighbour-general-new', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_scripts/findCorrelationsReturnNodes.R --args " + argsString, { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_scripts/neighbourExplorer.R --args " + argsString, { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             console.log('stderr: ' + stderr);
 
@@ -153,8 +153,8 @@ app.post('/neighbour-general-new', function(req, res) {
                 return;
             }
 
-            edges = edgeUtils.createEdgesFromREdgesFinal(parsedEdges);
-            nodes = nodeUtils.createNodesFromRNodes(parsedNodes);
+            edges = edgeUtils.createEdgesFromREdgesFinal(parsedEdges, 0);
+            nodes = nodeUtils.createNodesFromRNodes(parsedNodes, true);
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -181,7 +181,7 @@ app.post('/neighbour-general-new', function(req, res) {
                 }
 
                 var yIncrement = 0;
-                
+
                 for (var j = 0; j < nodes.length; j++) {
                     if (j > 0 && nodes[j - 1].data.neighbourLevel == nodes[j].data.neighbourLevel) {
                         yIncrement++;
@@ -190,18 +190,12 @@ app.post('/neighbour-general-new', function(req, res) {
                     }
 
                     nodeUtils.addPositionsToNodes(nodes[j], 400 * nodes[j].data.neighbourLevel, 100, 0, 20 * yIncrement);
-                    elements = elements.concat(nodes[j]);
                 }
 
                 elements = elements.concat(parentNodes);
-                elements = elements.concat(edges);
-                elements.push(sourceNodes[0][0]);
 
                 layout = layoutUtils.createPresetLayout();
                 config = configUtils.createConfig();
-
-                configUtils.setConfigElements(config, elements);
-                configUtils.setConfigLayout(config, layout);
 
                 for (prop in styleUtils.bipartiteStyles.epi) {
                     configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
@@ -229,14 +223,14 @@ app.post('/neighbour-general-new', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-
-                elements = elements.concat(nodes);
-                elements = elements.concat(edges);
-                elements.push(sourceNodes[0][0]);
-
-                configUtils.setConfigElements(config, elements);
-                configUtils.setConfigLayout(config, layout);
             }
+
+            elements = elements.concat(nodes);
+            elements = elements.concat(edges);
+            elements.push(sourceNodes[0][0]);
+
+            configUtils.setConfigElements(config, elements);
+            configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
         });
@@ -432,6 +426,192 @@ app.post('/submatrix', function(req, res) {
                 maxPositiveWeight: maxPositiveWeight,
                 firstNeighbourInteractions: firstNeighbourInteractions,
                 secondNeighbourInteractions: secondNeighbourInteractions,
+                firstNeighbours: firstNodes,
+                secondNeighbours: secondNodes,
+                edgeDictionary: edgeDictionary,
+                selfLoops: selfLoops
+            });
+        });
+});
+
+app.post('/submatrix-new', function(req, res) {
+    var args = {};
+    var argsString = "";
+    var argsArray = [];
+    var selectedGeneNames = [];
+    var selectedGenes = req.body.selectedGenes;
+    var file = req.body.file;
+    args.pValue = req.body.file.pValue;
+    var requestedLayout = req.body.layout;
+    args.fileName = file.fileName;
+    args.path = file.path;
+    args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
+    args.minNegativeWeightFirst = req.body.minNegativeWeightFirst;
+    args.minPositiveWeightSecond = req.body.minPositiveWeightSecond;
+    args.minNegativeWeightSecond = req.body.minNegativeWeightSecond;
+    args.weightFilterFirst = req.body.filterFirst;
+    args.weightFilterSecond = req.body.filterSecond;
+    args.depth = req.body.depth;
+
+    if (!(selectedGenes instanceof Array)) {
+        selectedGenes = [selectedGenes];
+    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        res.json({ error: "Error" });
+        return;
+    }
+    console.log(req.body);
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    args.genesOfInterest = selectedGeneNames;
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/submatrix.R --args " + argsString, {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            console.log(parsedValue);
+
+            var parsedNodesFirst = parsedValue.neighboursNodes.first;
+            var parsedNodesSecond = parsedValue.neighboursNodes.second;
+
+            var parsedEdgesFirst = parsedValue.edges.first;
+            var parsedEdgesSecond = parsedValue.edges.second;
+
+            var minNegativeWeight = parsedValue.minNegativeWeight;
+            var maxPositiveWeight = parsedValue.maxPositiveWeight;
+
+            var sourceNodes = [];
+            var firstNodes = [];
+            var secondNodes = [];
+            var parentNodes = [];
+            var allNodes = [];
+            var edges = [];
+            var firstNeighbourInteractions = [];
+            var secondNeighbourInteractions = [];
+            var edgeDictionary = {};
+            var selfLoops = [];
+            var elements = [];
+            var config = null;
+            var layout = null;
+
+            for (var i = 0; i < selectedGenes.length; i++) {
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
+                allNodes.push(sourceNodes[i]);
+            }
+
+            if (false) { //degreesFirst[0].attributes.names == null) {
+                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                    100, 0, 0);
+                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                    "left",
+                    "center",
+                    "blue");
+                elements.push(sourceNodes[0][0]);
+
+                config = configUtils.createConfig();
+                layout = configUtils.createPresetLayout();
+
+                configUtils.setConfigElements(config, elements);
+                configUtils.setConfigLayout(config, layout);
+
+                res.json({ config: config });
+                return;
+            }
+
+            for (var i = 0; i < parsedNodesFirst.length; i++) {
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
+                allNodes = allNodes.concat(firstNodes[i]);
+            }
+
+            for (var i = 0; i < parsedNodesSecond.length; i++) {
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], false);
+                allNodes = allNodes.concat(secondNodes[i]);
+            }
+
+            var cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst, 1);
+            firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
+            cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond, 2);
+            secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)
+            edges = edges.concat(firstNeighbourInteractions);
+            edges = edges.concat(secondNeighbourInteractions);
+
+            elements = elements.concat(edges);
+            config = configUtils.createConfig();
+
+            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                allNodes.push({
+                    data: { id: "epi" }
+                });
+                allNodes.push({
+                    data: { id: "stroma" }
+                });
+                layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
+                layout = layoutUtils.createPresetLayout();
+
+                for (prop in styleUtils.bipartiteStyles.epi) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
+                }
+
+                for (prop in styleUtils.bipartiteStyles.stroma) {
+                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
+                }
+
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+            } else if (requestedLayout == 'clustered') {
+                var largestClusterSize = 0;
+                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 6) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 6)
+
+                    if (clusterSize > largestClusterSize) {
+                        largestClusterSize = clusterSize;
+                    }
+                }
+
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 6, largestClusterSize);
+                    //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
+                }
+
+                layout = layoutUtils.createPresetLayout();
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+            } else {
+                layout = layoutUtils.createRandomLayout(allNodes.length, 12);
+                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
+                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+            }
+
+            configUtils.setConfigElements(config, edges.concat(allNodes));
+            configUtils.setConfigLayout(config, layout);
+            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+            selfLoops = clientTableUtils.getSelfLoops(edges);
+
+            res.json({
+                config: config,
+                minNegativeWeight: minNegativeWeight,
+                maxPositiveWeight: maxPositiveWeight,
                 firstNeighbours: firstNodes,
                 secondNeighbours: secondNodes,
                 edgeDictionary: edgeDictionary,

@@ -1,3 +1,5 @@
+source('dataModels.R')
+
 getDegrees <- function(corMatrix) {
     deg.row <- as.numeric() 
     for(k in 1:nrow(corMatrix)){
@@ -186,7 +188,7 @@ createEdges <- function(corMatrix, gene, exclusion) {
 }
 
 createEdgesDF <- function(corMatrix, gene, exclusion) {
-    edges <- data.frame(source = character(0), target = character(0), weight = numeric(0), stringsAsFactors = FALSE)
+    edges <- createEmptyEdges()
 
     if (length(gene) == 0 || is.na(gene)) {
         return(edges)
@@ -221,22 +223,33 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
 }
 
 getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
+    write("gene", stderr())
+    write(gene, stderr())
+    write(class(gene), stderr())
+
     neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
-    result <- data.frame(name = character(0), degree = integer(0), level = integer(0), isSource = logical(0), stringsAsFactors = FALSE)
+    nodes <- createEmptyNodes()
+
+    if (length(neighboursNames) < 1) {
+        return(nodes)
+    }
 
     for (i in 1:length(neighboursNames)) {
-        result[i, "name"] <- neighboursNames[i]
-        result[i, "degree"] <- neighboursDegrees[i]
-        result[i, "level"] <- level
+        write("name", stderr())
+        nodes[i, "name"] <- neighboursNames[i]
+        write("degree", stderr())
+        nodes[i, "degree"] <- neighboursDegrees[i]
+        write("level", stderr())
+        nodes[i, "level"] <- level
 
-        if (result[i, "name"] %in% selectedGenes) {
-            result[i, "isSource"] <- TRUE 
+        if (nodes[i, "name"] %in% selectedGenes) {
+            nodes[i, "isSource"] <- TRUE 
         } else {
-            result[i, "isSource"] <- FALSE
+            nodes[i, "isSource"] <- FALSE
         }
     }
 
-    result
+    nodes
 }
 
