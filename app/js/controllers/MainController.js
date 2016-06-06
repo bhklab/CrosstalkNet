@@ -154,7 +154,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $rootScope.state = $rootScope.states.gettingGeneList;
             RESTService.post('gene-list', { file: $rootScope.correlationFileActual })
                 .then(function(data) {
-                    $scope.geneList = data.geneList;
+                    $rootScope.geneList = data.geneList;
                     $rootScope.state = $rootScope.states.initial;
                 });
         };

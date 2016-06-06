@@ -37,15 +37,6 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 }
             }
         };
-        $scope.inspectNeighbours = function(gene, source) {
-            if (gene == null) {
-                return;
-            }
-
-            if ($scope.genesOfInterest.indexOf(gene) < 0) {
-                $scope.genesOfInterest.push(gene);
-            }
-        };
 
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {
@@ -71,8 +62,10 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 console.log(data);
                 $rootScope.state = $rootScope.states.loadingConfig;
                 $scope.neighbours = angular.copy($scope.genesSecond);
-                GraphConfigService.neighbourConfigs.secondDropdownConfig = angular
-                    .copy(data.config);
+                $scope.applyConfig(data.config, "cyNeighbour", $scope);
+                // Only use the following method if the final selected node does not generate any new nodes. 
+                // Even if it does we might end up having issue though
+                $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope.cy, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $rootScope.state = $rootScope.states.displayingGraph;
             });
@@ -87,22 +80,6 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
-
-        $scope.$watch('neighbourConfigs.firstDropdownConfig', function(newValue, oldValue) {
-            if (newValue != null) {
-                $scope.applyConfig(newValue, "cyNeighbour", $scope);
-                $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.genesOfInterest);
-                $scope.genesOfInterest = [GraphConfigService.firstSelectedGene];
-            }
-        });
-
-        $scope.$watch('neighbourConfigs.secondDropdownConfig', function(newValue, oldValue) {
-            if (newValue != null) {
-                $scope.applyConfig(newValue, "cyNeighbour", $scope);
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.genesOfInterest);
-            }
-        });
 
         $rootScope.$watch('correlationFileActual', function() {
             $scope.genesOfInterest = [];
