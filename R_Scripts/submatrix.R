@@ -76,12 +76,11 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 
 			if (j > 1) {
 				secondNeighboursNodes[[i]] = rbind(secondNeighboursNodes[[i]], nodesToAdd)		
-				edgesSecond = rbind(edgesSecond, edgesToAdd)
 			} else {
 				secondNeighboursNodes[[i]] = nodesToAdd
-				edgesSecond = edgesToAdd
 			}
 
+			edgesSecond = rbind(edgesSecond, edgesToAdd)
 			exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
