@@ -20,7 +20,7 @@ myModule.factory('FileUploadService', function($http, $timeout, Upload) {
                 file.upload.then(function(response) {
                     $timeout(function() {
                         scope.fileList = response.data.fileList;
-                        alert(response.data.fileStatus[0]);
+                        alert(response.data.fileStatus);
                     });
                 }, function(response) {
                     if (response.status > 0)
