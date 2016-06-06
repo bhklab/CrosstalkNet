@@ -1,4 +1,5 @@
 const fs = require('fs');
+//var opencpu = require('opencpu');
 var exec = require('child_process').exec;
 var async = require('async');
 var express = require('express');
@@ -587,8 +588,23 @@ function createAndStoreCorrelationsAndDegrees(callback) {
     });
 }
 
+function testOpenCPU() {
+    opencpu.rCall("/library/stats/R/rnorm/json", {
+        n: 42,
+        mean: 10,
+        sd: 10
+    }, function(err, data) {
+        if (!err) {
+            console.log(data.length); // => 42
+        } else {
+            console.log("opencpu call failed.");
+        }
+    });
+}
+
 app.listen(5000, function() {
     console.log("Listening on port 5000");
-    console.log("Initializing data and config")
+    console.log("Initializing data and config");
+    //testOpenCPU();
     initializeServer();
 });
