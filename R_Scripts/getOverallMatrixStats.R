@@ -14,4 +14,4 @@ corMatrix <- readRDS(paste(path, fileName, sep=""))
 selfLoops <- length(which(diag(corMatrix) != 0))
 significantInteractions <- length(which(corMatrix != 0))
 
-cat(format(serializeJSON(list(selfLoops = selfLoops, significantInteractions = significantInteractions))))
+cat(format(toJSON(list(selfLoops = selfLoops, significantInteractions = significantInteractions), auto_unbox = TRUE)))

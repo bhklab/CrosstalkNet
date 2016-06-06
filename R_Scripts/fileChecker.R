@@ -12,31 +12,22 @@ write(fileName, stderr())
 
 corMatrix <- c()
 tryCatch(corMatrix <- readRDS(fileName),
-           error = function(cond) {cat(format(serializeJSON(list(returnCode = 1, message = "Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix.")))) ; write("failed read", stderr()); file.remove(fileName); quit()}) 
+           error = function(cond) {cat(format(toJSON(list(status = 1, message = "Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix."), auto_unbox = TRUE))) ; write("failed read", stderr()); file.remove(fileName); quit()}) 
 
 rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
 
-write('passed rowNames', stderr())
-write('rowNames', stderr())
-write(rowNames, stderr())
-write('colNames', stderr())
-write(colNames, stderr())
-
-if (!is.na(rowNames) && !is.na(colNames) && all(rowNames == colNames)) {
-	write('if:', stderr())
-		
+if (!is.na(rowNames) && !is.na(colNames) && all(rowNames == colNames)) {		
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
 	degrees <- getDegrees(corMatrix);
 	saveRDS(corMatrix, fileName)
 	saveRDS(degrees, paste("degrees", fileName, sep=""))
-	cat(format(serializeJSON(list(returnCode = 0, message = "File upload successful! You can now choose your file from the dropdown."))))
+	cat(format(toJSON(list(status = 0, message = "File upload successful! You can now choose your file from the dropdown."), auto_unbox = TRUE)))
 
 } else {
-	write('else:', stderr())
 	file.remove(fileName)
-	cat(format(serializeJSON(list(returnCode = 1, message = "File upload failed. Row names and column names don't match"))))	
+	cat(format(toJSON(list(status = 1, message = "File upload failed. Row names and column names don't match"), auto_unbox = TRUE)))	
 }
 
 
