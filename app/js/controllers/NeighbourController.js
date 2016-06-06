@@ -12,7 +12,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
 
         InitializationService.initializeCommonVariables($scope);
 
-        $scope.selectedNeighbourGenes = [];
+        $scope.genesOfInterest = [];
 
         $scope.applyConfig = GraphConfigService.applyConfig;
 
@@ -30,13 +30,20 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             }
         };
 
+        $scope.addGeneOfInterest = function(gene) {
+            if (gene != null) {
+                if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                    $scope.genesOfInterest.push(gene);
+                }
+            }
+        };
         $scope.inspectNeighbours = function(gene, source) {
             if (gene == null) {
                 return;
             }
 
-            if ($scope.selectedNeighbourGenes.indexOf(gene) < 0) {
-                $scope.selectedNeighbourGenes.push(gene);
+            if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                $scope.genesOfInterest.push(gene);
             }
         };
 
@@ -58,7 +65,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $rootScope.state = $rootScope.states.loadingSecond;
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
-                selectedGenes: $scope.selectedNeighbourGenes,
+                selectedGenes: $scope.genesOfInterest,
                 file: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
@@ -74,7 +81,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
 
         $scope.removeGene = function(gene) {
-            $scope.selectedNeighbourGenes.splice($scope.selectedNeighbourGenes.indexOf(gene), 1);
+            $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
         };
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
@@ -85,20 +92,20 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour", $scope);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
-                $scope.selectedNeighbourGenes = [GraphConfigService.firstSelectedGene];
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.genesOfInterest);
+                $scope.genesOfInterest = [GraphConfigService.firstSelectedGene];
             }
         });
 
         $scope.$watch('neighbourConfigs.secondDropdownConfig', function(newValue, oldValue) {
             if (newValue != null) {
                 $scope.applyConfig(newValue, "cyNeighbour", $scope);
-                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.selectedNeighbourGenes);
+                $scope.genesSecond = $scope.loadDropdownOptions($scope.cy, $scope.genesOfInterest);
             }
         });
 
         $rootScope.$watch('correlationFileActual', function() {
-            $scope.selectedNeighbourGenes = [];
+            $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
         });
