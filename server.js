@@ -38,7 +38,7 @@ app.post('/gene-list', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/getGeneList.R  --args " + argsString, {
+    var child = exec("Rscript R_Scripts/getGeneList.R --args " + argsString, {
             maxBuffer: 1024 *
                 50000
         },
@@ -53,11 +53,11 @@ app.post('/gene-list', function(req, res) {
             var parsedValue = JSON.parse(stdout);
             var allGenes = [];
 
-            var epiDegrees = parsedValue.value[0].value[0].value;
-            var stromaDegrees = parsedValue.value[0].value[1].value;
+            var epiDegrees = parsedValue.epiDegrees;
+            var stromaDegrees = parsedValue.stromaDegrees;
 
-            var epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
-            var stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
+            var epiGeneNames = parsedValue.epiDegreesNames;
+            var stromaGeneNames = parsedValue.stromaDegreesNames;
 
             allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
             allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
@@ -74,12 +74,6 @@ app.post('/gene-list', function(req, res) {
 
             res.send({ geneList: geneList });
         });
-
-    // if (geneListCache[pValue] != null) {
-    //     res.json({ geneList: geneListCache[pValue] });
-    // } else {
-    //     res.json({ error: "Could not get gene list for P Value:" + pValue });
-    // }
 });
 
 app.post('/neighbour-general', function(req, res) {
@@ -233,204 +227,6 @@ app.post('/neighbour-general', function(req, res) {
             configUtils.setConfigLayout(config, layout);
 
             res.json({ config: config });
-        });
-});
-
-app.post('/submatrix', function(req, res) {
-    var args = {};
-    var argsString = "";
-    var argsArray = [];
-    var selectedGeneNames = [];
-    var selectedGenes = req.body.selectedGenes;
-    var file = req.body.file;
-    args.pValue = req.body.file.pValue;
-    var requestedLayout = req.body.layout;
-    args.fileName = file.fileName;
-    args.path = file.path;
-    args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
-    args.minNegativeWeightFirst = req.body.minNegativeWeightFirst;
-    args.minPositiveWeightSecond = req.body.minPositiveWeightSecond;
-    args.minNegativeWeightSecond = req.body.minNegativeWeightSecond;
-    args.weightFilterFirst = req.body.filterFirst;
-    args.weightFilterSecond = req.body.filterSecond;
-    args.depth = req.body.depth;
-
-    if (!(selectedGenes instanceof Array)) {
-        selectedGenes = [selectedGenes];
-    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Error" });
-        return;
-    }
-    console.log(req.body);
-
-    for (var i = 0; i < selectedGenes.length; i++) {
-        selectedGeneNames.push(selectedGenes[i].value);
-    }
-
-    args.genesOfInterest = selectedGeneNames;
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-
-    var child = exec("Rscript R_Scripts/getRelevantSubmatrixReturnEdges.R --args " + argsString, {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var parsedValue = JSON.parse(stdout);
-            console.log(parsedValue);
-            var weights = parsedValue.value[0].value;
-            var degrees = parsedValue.value[1].value;
-            var parsedEdges = parsedValue.value[2].value;
-
-            var weightsFirst = weights[0].value;
-            var weightsSecond = weights[1].value;
-
-            var degreesFirst = degrees[0].value;
-            var degreesSecond = degrees[1].value;
-
-            var parsedEdgesFirst = parsedEdges[0].value;
-            var parsedEdgesSecond = parsedEdges[1].value;
-            var minNegativeWeight = parsedValue.value[3].value[0];
-            var maxPositiveWeight = parsedValue.value[6].value[0];
-
-            var sourceNodes = [];
-            var firstNodes = [];
-            var secondNodes = [];
-            var parentNodes = [];
-            var allNodes = [];
-            var edges = [];
-            var firstNeighbourInteractions = [];
-            var secondNeighbourInteractions = [];
-            var edgeDictionary = {};
-            var selfLoops = [];
-            var elements = [];
-            var config = null;
-            var layout = null;
-
-            for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
-                allNodes.push(sourceNodes[i]);
-            }
-
-            if (false) { //degreesFirst[0].attributes.names == null) {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
-                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                    "left",
-                    "center",
-                    "blue");
-                elements.push(sourceNodes[0][0]);
-
-                config = configUtils.createConfig();
-                layout = configUtils.createPresetLayout();
-
-                configUtils.setConfigElements(config, elements);
-                configUtils.setConfigLayout(config, layout);
-
-                res.json({ config: config });
-                return;
-            }
-
-            for (var i = 0; i < weightsFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodes(weightsFirst[i].value, null, 0, degreesFirst[i].value, 1);
-                allNodes = allNodes.concat(firstNodes[i]);
-            }
-
-            for (var i = 0; i < weightsSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodes(weightsSecond[i].value, null, 0, degreesSecond[i].value, 2);
-                allNodes = allNodes.concat(secondNodes[i]);
-            }
-
-            for (var i = 0; i < parsedEdgesFirst.length; i++) {
-                var cytoscapeEdges = edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i].value, 1);
-                firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
-                edges = edges.concat(cytoscapeEdges);
-            }
-
-            for (var i = 0; i < parsedEdgesSecond.length; i++) {
-                var cytoscapeEdges = edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i].value, 2);
-                secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)
-                edges = edges.concat(cytoscapeEdges);
-            }
-
-            elements = elements.concat(edges);
-            config = configUtils.createConfig();
-
-            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                allNodes.push({
-                    data: { id: "epi" }
-                });
-                allNodes.push({
-                    data: { id: "stroma" }
-                });
-                layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
-                layout = layoutUtils.createPresetLayout();
-
-                for (prop in styleUtils.bipartiteStyles.epi) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
-                }
-
-                for (prop in styleUtils.bipartiteStyles.stroma) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
-                }
-
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
-            } else if (requestedLayout == 'clustered') {
-                var largestClusterSize = 0;
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
-
-                for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 6) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 6)
-
-                    if (clusterSize > largestClusterSize) {
-                        largestClusterSize = clusterSize;
-                    }
-                }
-
-                for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 6, largestClusterSize);
-                    //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
-                }
-
-                layout = layoutUtils.createPresetLayout();
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-            } else {
-                layout = layoutUtils.createRandomLayout(allNodes.length, 12);
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-            }
-
-            configUtils.setConfigElements(config, edges.concat(allNodes));
-            configUtils.setConfigLayout(config, layout);
-            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
-            selfLoops = clientTableUtils.getSelfLoops(edges);
-
-            res.json({
-                config: config,
-                minNegativeWeight: minNegativeWeight,
-                maxPositiveWeight: maxPositiveWeight,
-                firstNeighbourInteractions: firstNeighbourInteractions,
-                secondNeighbourInteractions: secondNeighbourInteractions,
-                firstNeighbours: firstNodes,
-                secondNeighbours: secondNodes,
-                edgeDictionary: edgeDictionary,
-                selfLoops: selfLoops
-            });
         });
 });
 
@@ -664,8 +460,8 @@ app.post('/overall-matrix-stats', function(req, res) {
             var overallMatrixStats = {};
             var parsedValue = JSON.parse(stdout);
 
-            overallMatrixStats.selfLoops = parsedValue.value[0].value[0];
-            overallMatrixStats.significantInteractions = parsedValue.value[1].value[0];
+            overallMatrixStats.selfLoops = parsedValue.selfLoops;
+            overallMatrixStats.significantInteractions = parsedValue.significantInteractions;
             //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;
 
             console.log("parsedValue: ");
@@ -717,8 +513,8 @@ function checkFileIntegrity(req, res, file) {
         console.log(stdout);
 
         var parsedValue = JSON.parse(stdout);
-        var status = parsedValue.value[0].value;
-        var message = parsedValue.value[1].value;
+        var status = parsedValue.status;
+        var message = parsedValue.message;
         var fileList = getAvailableMatrices();
 
         res.send({ fileStatus: message, fileList: fileList });
