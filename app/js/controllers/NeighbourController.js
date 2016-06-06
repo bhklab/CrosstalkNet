@@ -3,51 +3,16 @@
 angular.module('myApp.NeighbourController', []).controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, $q, $timeout) {
+    'GraphConfigService', 'BasicDataService', 'InitializationService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, $q, $timeout) {
         $rootScope.selectedTab = 0;
-        $scope.selectedItemFirst = null;
-        $scope.searchTextFirst = "";
-        $scope.searchTextSecond = "";
-        $scope.ctrl = "neighbour";
-        $scope.zoomGene = null;
-        $scope.searchTextZoom = null;
-
-        $rootScope.states = angular.copy(BasicDataService.states);
-        $scope.pValues = angular.copy(BasicDataService.pValues);
-        $scope.layouts = angular.copy(BasicDataService.layouts);
-
-        $scope.minDegree = {
-            first: 0,
-            second: 0
-        }
         $rootScope.state = $rootScope.states.initial;
-        $scope.totalInteractions = null;
-        $scope.selfLoops = [];
-        $scope.selfLoopsCount = 0;
+        $rootScope.states = angular.copy(BasicDataService.states);
+        $scope.ctrl = "neighbour";
 
-        $scope.display = "Graph";
-        $scope.switchModel = false;
-        $scope.selectedLayout = $scope.layouts[1].value;
+        InitializationService.initializeCommonVariables($scope);
 
         $scope.selectedNeighbourGenes = [];
-
-        $scope.resize = GraphConfigService.resetZoom;
-
-        $scope.getSelfLoops = GraphConfigService.getSelfLoops;
-        $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
-        $scope.querySearch = BasicDataService.querySearch;
-        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
-        $scope.locateGeneInGraph = GraphConfigService.locateGeneInGraph;
-
-
-        // $scope.applyConfig = function(config, containerID) {
-        //     $scope.elemCopy = angular.copy(config.elements);
-        //     config.container = document.getElementById(containerID);
-        //     $scope.cy = cytoscape(config);
-        //     $scope.cy.fit($scope.cy.$("*"), 10);
-        // };
 
         $scope.applyConfig = GraphConfigService.applyConfig;
 

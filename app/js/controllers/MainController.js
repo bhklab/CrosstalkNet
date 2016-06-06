@@ -2,101 +2,18 @@
 
 angular.module('myApp.MainController', []).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'SharedService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, SharedService,
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService,
         $q, $timeout) {
         $rootScope.selectedTab = 0;
-        $scope.selectedItemFirst = null;
-        $scope.selectedGOI = null;
-        $scope.zoomGene = null;
-        $scope.searchTextGOI = "";
-        $scope.searchTextFirst = "";
-        $scope.searchTextSecond = "";
-        $scope.searchTextZoom = "";
-        $scope.minPositiveWeight = 0;
-        $scope.minNegativeWeight = 0;
-        $scope.ctrl = "main";
-
-        $rootScope.states = angular.copy(BasicDataService.states);
-        $scope.pValues = angular.copy(BasicDataService.pValues);
-        $scope.layouts = angular.copy(BasicDataService.layouts);
-
-        $scope.minDegree = {
-            first: 0,
-            second: 0
-        }
-        $rootScope.state = $rootScope.states.initial;
-
-        $scope.totalInteractions = null;
-
-        $scope.display = "Graph";
-        $scope.switchModel = false;
-
-        $scope.selectedLayout = $scope.layouts[0].value;
-
-        $scope.sliderMinWeightNegative = -1;
-        $scope.sliderMaxWeightPositive = 1;
-
-        $scope.correlationFilterModel = {
-            min: -1,
-            max: 1,
-            negativeFilter: 0,
-            positiveFilter: 0,
-            negativeEnabled: false,
-            positiveEnabled: false
-        };
-
-        $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
-        $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
-
-        $scope.negativeFilterEnabled = false;
-        $scope.positiveFilterEnabled = false;
-
-        $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
-        $scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
-        $scope.applyConfig = GraphConfigService.applyConfig;
-
-        $scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-        $scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
-        $scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
-        $scope.querySearch = BasicDataService.querySearch;
-        $scope.setNeighbours = BasicDataService.setNeighbours;
-
-        $scope.genesOfInterest = [];
-        $scope.edges = 0;
-        $scope.nodes = 0;
-        $scope.displaySecondNeighbours = true;
-
-        $scope.GOIStates = {
-            initial: 0,
-            filterFirst: 1,
-            getSecondNeighbours: 2,
-            filterSecond: 3
-        };
-
-        $scope.GOIState = $scope.GOIStates.initial;
-
-        $scope.firstNeighbourInteractions = [];
-        $scope.secondNeighbourInteractions = [];
-
-        $scope.firstNeighbours = {
-            epi: [],
-            stroma: []
-        };
-
-        $scope.secondNeighbours = {
-            epi: [],
-            stroma: []
-        };
-
-        $scope.resize = GraphConfigService.resetZoom;
-
-        $scope.edgeDictionary = {};
-        $scope.selfLoops = [];
-        $scope.allVisibleGenes = [];
-
         $rootScope.correlationFileDisplayed = null;
         $rootScope.correlationFileActual = null;
+        $rootScope.states = angular.copy(BasicDataService.states);
+        $rootScope.state = $rootScope.states.initial;
+
+        $scope.ctrl = "main";
+        InitializationService.initializeCommonVariables($scope);
+
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
