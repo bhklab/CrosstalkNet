@@ -55,6 +55,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
         scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
         scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
+        scope.loadNeighbourDropdownOptions = BasicDataService.loadNeighbourDropdownOptions;
         scope.querySearch = BasicDataService.querySearch;
         scope.setNeighbours = BasicDataService.setNeighbours;
 
