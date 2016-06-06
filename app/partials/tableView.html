@@ -120,19 +120,4 @@
             <md-button ng-click="exportTableToCSV('third')">Download Interactions</md-button>
         </md-card-content>
     </md-card>-->
-    <md-card ng-if="cy != null">
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline">Degree Cutoff Interactions</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content layout="row" layout-wrap>
-            <div flex="20" ng-repeat="node in getNodesWithMinDegree($parent)">
-                <div class="interaction-card">
-                    {{node.id()}} - {{node.data('degree')}}
-                    <span ng-repeat="child in getInteractingNodes(node, cy)">{{child.id()}} </span>
-                </div>
-            </div>
-        </md-card-content>
-    </md-card>
 </div>
