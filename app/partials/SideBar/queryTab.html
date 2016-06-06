@@ -96,7 +96,7 @@
     <div ng-if="ctrl == 'neighbour'">
         Selected Path
         <md-list>
-            <md-list-item ng-repeat="gene in selectedNeighbourGenes">
+            <md-list-item ng-repeat="gene in genesOfInterest">
                 <md-menu>
                     <md-button ng-click="$last && $mdOpenMenu($event)">
                         {{gene.display}}
