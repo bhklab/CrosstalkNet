@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp");
-myModule.factory('BasicDataService', function($http) {
+myModule.factory('BasicDataService', function($http, $rootScope) {
     var service = {};
 
     service.states = {
@@ -25,6 +25,7 @@ myModule.factory('BasicDataService', function($http) {
 
     service.loadDropdownOptions = loadDropdownOptions;
     service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
+    service.loadNeighbourDropdownOptions = loadNeighbourDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
     service.setNeighbours = setNeighbours;
@@ -60,6 +61,23 @@ myModule.factory('BasicDataService', function($http) {
         cy.nodes().not(parentContainers + parents + selectedGenesStr).forEach(function(
             node) {
             genes.push(node.data());
+        });
+
+        return genes.map(function(gene) {
+            return {
+                value: gene.id,
+                display: gene.id + ' ' + gene.degree,
+                object: gene
+            };
+        });
+    }
+
+    function loadNeighbourDropdownOptions(cy, selectedGenes) {
+        var genes = [];
+
+        cy.edges("[source='" + selectedGenes[selectedGenes.length -1].value + "']").forEach(function(
+            edge) {
+            genes.push(edge.target().data());
         });
 
         return genes.map(function(gene) {
@@ -108,8 +126,8 @@ myModule.factory('BasicDataService', function($http) {
             }
         } else if (source == "geneList") {
             if (scope.geneList != null) {
-                results = query ? scope.geneList.filter(createFilterFor(query)) :
-                    scope.geneList,
+                results = query ? $rootScope.geneList.filter(createFilterFor(query)) :
+                    $rootScope.geneList,
                     deferred;
             }
         } else {

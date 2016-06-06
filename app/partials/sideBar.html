@@ -14,11 +14,12 @@
             <md-tab label="Styling">
                 <div static-include="partials/SideBar/layoutTab.html"></div>
             </md-tab>
-            <md-tab label="Data" class="md-padding">
+            <md-tab ng-if="ctrl == 'main'" label="Data" class="md-padding">
                 <div static-include="partials/SideBar/dataTab.html"></div>
             </md-tab>
             <md-tab label="Query" class="md-padding">
-                <div static-include="partials/SideBar/queryTab.html"></div>
+                <div ng-show="ctrl == 'main'" static-include="partials/SideBar/query/main.html"></div>
+                <div ng-show="ctrl == 'neighbour'" static-include="partials/SideBar/query/neighbour.html"></div>
             </md-tab>
         </md-tabs>
     </md-content>
