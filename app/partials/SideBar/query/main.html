@@ -42,7 +42,8 @@
                 <md-button ng-click="removeGenesOfInterest()" ng-disabled="GOIState != GOIStates.initial || genesOfInterest.length == 0">Remove All</md-button>
             </div>
             <div flex>
-                <md-button style="float: right;" ng-click="getRelevantGenes(false)" ng-disabled="GOIState >= GOIStates.getSecondNeighbours || genesOfInterest.length == 0">Get {{GOIState == GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button style="float: right;" ng-click="getRelevantGenes(false)" ng-show="GOIState < GOIStates.getSecondNeighbours" ng-disabled="GOIState >= GOIStates.getSecondNeighbours || genesOfInterest.length == 0">Get {{GOIState == GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button style="float: right;" ng-click="returnToFirstNeighboursFilter()" ng-show="GOIState >= GOIStates.getSecondNeighbours">Back to <br>First Neighbours</md-button>
             </div>
         </div>
         <md-button ng-click="getRelevantGenes(true)" ng-disabled="GOIState == GOIStates.initial">Filter</md-button>
