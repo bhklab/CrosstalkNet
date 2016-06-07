@@ -22,14 +22,16 @@ if (pValue != "") {
 exclusions <- c()	
 edges <- createEmptyEdges()
 edgeExclusion <- c()
-nodes <- createEmptyNodes()
+#nodes <- createEmptyNodes()
+nodes <- list()
 
 for (i in 1:length(selectedGenes)) {
     exclusions <- c(exclusions, selectedGenes[i])
     nodesToAdd <- getNeighboursNodes(corMatrix, degrees, selectedGenes[i], exclusions, i, selectedGenes)
-    nodes <- rbind(nodes, nodesToAdd)
+    nodes[[i]] <- nodesToAdd
     edges <- rbind(edges, createEdgesDF(corMatrix, selectedGenes[i], edgeExclusion))
-    edgeExclusion <- selectedGenes[i]
+    #edgeExclusion <- selectedGenes[i]
+    edgeExclusion <- c(edgeExclusion, selectedGenes[i])
     exclusions <- c(exclusions, nodesToAdd$name)
 }
 

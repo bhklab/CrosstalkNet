@@ -149,7 +149,13 @@ app.post('/neighbour-general', function(req, res) {
             }
 
             edges = edgeUtils.createEdgesFromREdgesFinal(parsedEdges, 0);
-            nodes = nodeUtils.createNodesFromRNodes(parsedNodes, true);
+
+            for (var i = 0; i < parsedNodes.length; i++) {
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
+            }
+
+            console.log(nodes);
+
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -166,7 +172,7 @@ app.post('/neighbour-general', function(req, res) {
                                 id: "par" + i
                             }
                         });
-                    } else { //if (nodes["" + (i - 1)].length > 0) {
+                    } else if (nodes[i - 1].length > 0) { //if (nodes["" + (i - 1)].length > 0) {
                         parentNodes.push({
                             data: {
                                 id: "par" + i
@@ -178,13 +184,7 @@ app.post('/neighbour-general', function(req, res) {
                 var yIncrement = 0;
 
                 for (var j = 0; j < nodes.length; j++) {
-                    if (j > 0 && nodes[j - 1].data.neighbourLevel == nodes[j].data.neighbourLevel) {
-                        yIncrement++;
-                    } else {
-                        yIncrement = 0;
-                    }
-
-                    nodeUtils.addPositionsToNodes(nodes[j], 400 * nodes[j].data.neighbourLevel, 100, 0, 20 * yIncrement);
+                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 20);
                 }
 
                 elements = elements.concat(parentNodes);
@@ -203,8 +203,10 @@ app.post('/neighbour-general', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
             } else {
                 for (var i = 0; i < nodes.length; i++) {
-                    if (nodes[i].data.isSource) {
-                        nodeUtils.addClassToNodes(nodes[i], "sourceNode");
+                    for (var j = 0; j < nodes[i].length; j++) {
+                        if (nodes[i][j].data.isSource) {
+                            nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
+                        }
                     }
                 }
 
@@ -220,7 +222,7 @@ app.post('/neighbour-general', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             }
 
-            elements = elements.concat(nodes);
+            elements = elements.concat([].concat.apply([], nodes));
             elements = elements.concat(edges);
             elements.push(sourceNodes[0][0]);
 
