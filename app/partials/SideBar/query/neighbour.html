@@ -1,0 +1,53 @@
+<md-content class="md-padding">
+    <div ng-show="ctrl == 'neighbour'">
+        <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchTextFirst, genesOfInterest.length > 0 ? 'second' : 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="genesOfInterest.length > 0 ? 0 : 2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
+            <md-item-template>
+                <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
+            </md-item-template>
+            <md-not-found>
+                No states matching "{{searchTextFirst}}" were found.
+            </md-not-found>
+        </md-autocomplete>
+    </div>
+    <div ng-if="ctrl == 'neighbour'">
+        Selected Path
+        <md-list>
+            <md-list-item ng-repeat="gene in genesOfInterest">
+                <md-menu>
+                    <md-button ng-click="$last && $mdOpenMenu($event)">
+                        {{gene.display}}
+                    </md-button>
+                    <md-menu-content width="6">
+                        <md-menu-item ng-repeat="item in [1]">
+                            <md-button ng-click="removeGene(gene)">
+                                Remove Gene
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </md-list-item>
+        </md-list>
+        <md-button ng-click="getConfigForSelectedNeighbours()">Get Data</md-button>
+    </div>
+    <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-item-template>
+            <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
+        </md-item-template>
+        <md-not-found>
+            No states matching "{{searchTextZoom}}" were found.
+        </md-not-found>
+    </md-autocomplete>
+    <md-button ng-click="clearLocatedGene()">Clear Located Gene</md-button>
+    <div ng-if="geneList.length > 0" layout-wrap>
+        <div flex="100" layout layout-align="center center">
+            <span class="md-body-1">Min Degree</span>
+        </div>
+        <div layout="row">
+            <md-slider flex min="0" max="800" ng-model="minDegree.first" aria-label="red" id="min-degree-first" class>
+            </md-slider>
+            <div flex="20" layout layout-align="center center">
+                <input flex type="number" ng-model="minDegree.first" aria-label="red" aria-controls="min-degree-first">
+            </div>
+        </div>
+    </div>
+</md-content>
