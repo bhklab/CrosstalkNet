@@ -9,3 +9,9 @@ createEmptyEdges <- function() {
 
 	edges
 }
+
+createEmptyPaths <- function() {
+	paths <- data.frame(firstEdge = numeric(0), intermediateGene = character(0), secondEdge <- numeric(0), stringsAsFactors = FALSE)
+
+	paths
+}

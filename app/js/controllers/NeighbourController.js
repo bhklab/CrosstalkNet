@@ -13,6 +13,13 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         InitializationService.initializeCommonVariables($scope);
 
         $scope.genesOfInterest = [];
+        $scope.pathExplorerSource = null;
+        $scope.pathExplorerTarget = null;
+
+        $scope.pathExplorerTextSource = null;
+        $scope.pathExplorerTextTarget = null;
+
+        $scope.allPaths = null;
 
         $scope.applyConfig = GraphConfigService.applyConfig;
 
@@ -34,6 +41,16 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             if (gene != null) {
                 if ($scope.genesOfInterest.indexOf(gene) < 0) {
                     $scope.genesOfInterest.push(gene);
+                }
+            }
+        };
+
+        $scope.setPathExplorerGene = function(gene, which) {
+            if (gene != null) {
+                if (which == 'source') {
+                    $scope.pathExplorerSource = gene;
+                } else {
+                    $scope.pathExplorerTarget = gene;
                 }
             }
         };
@@ -68,6 +85,20 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                 $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope.cy, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $rootScope.state = $rootScope.states.displayingGraph;
+            });
+        };
+
+        $scope.getAllPaths = function() {
+            $rootScope.state = $rootScope.states.loading;
+            $scope.pathTarget = $scope.pathExplorerTarget.value;
+            $scope.pathSource = $scope.pathExplorerSource.value;
+            RESTService.post('get-all-paths', {
+                target: $scope.pathExplorerTarget.value,
+                source: $scope.pathExplorerSource.value,
+                file: $rootScope.correlationFileActual
+            }).then(function(data) {
+                console.log(data);
+                $scope.allPaths = data.paths;
             });
         };
 
