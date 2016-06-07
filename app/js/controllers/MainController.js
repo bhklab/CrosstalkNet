@@ -203,8 +203,8 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             }
         };
 
-        $scope.exportTableToCSV = function(level) {
-            $("#" + level + "-neighbours-table").tableToCSV();
+        $scope.exportTableToCSV = function(tableID) {
+            $("#" + tableID).tableToCSV();
         };
 
         $scope.refreshGeneList = function() {
