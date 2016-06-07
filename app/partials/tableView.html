@@ -85,6 +85,19 @@
             <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
+    <md-card ng-if="allPaths != null">
+        <md-card-title>
+            <md-card-title-text>
+                <div layout="row">
+                    <div flex><span class="md-headline">All Paths Between x and y</span></div>
+                </div>
+                <span class="md-subhead">Total: {{allPaths.length}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <div ng-repeat="path in allPaths">{{pathSource}} ---{{path.firstEdge}}--- {{path.intermediateNode}} {{path.secondEdge != null ? '---' + path.secondEdge + '---' : ''}} {{pathTarget}}</div>
+        </md-card-content>
+    </md-card>
     <!--<md-card>
         <md-card-title>
             <md-card-title-text>

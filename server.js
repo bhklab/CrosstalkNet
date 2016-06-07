@@ -419,6 +419,43 @@ app.post('/submatrix-new', function(req, res) {
         });
 });
 
+app.post('/get-all-paths', function(req, res) {
+    var args = {};
+    var argsString = "";
+    var argsArray = [];
+    var file = req.body.file;
+    var source = req.body.source;
+    var target = req.body.target;
+
+
+    args.source = source;
+    args.target = target;
+    args.fileName = file.fileName;
+    args.path = file.path;
+
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/getAllPaths.R --args " + argsString, {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        if (stderr != null) {
+            console.log(stderr);
+        }
+
+        var parsedValue = JSON.parse(stdout);
+        var paths = parsedValue.paths;
+
+        res.send({ paths: paths });
+    });
+
+});
+
 app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
     var file = req.files.file;
     var data = req.body.data;
