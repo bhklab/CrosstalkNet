@@ -216,6 +216,10 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $scope.getOverallMatrixStats();
         };
 
+        $scope.returnToFirstNeighboursFilter = function() {
+            $scope.GOIState = $scope.GOIStates.filterFirst;
+        };
+
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
