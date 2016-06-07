@@ -49,7 +49,7 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button ng-click="exportTableToCSV('first')">Download Interactions</md-button>
+            <md-button ng-click="exportTableToCSV('first-neighbours-table')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
@@ -82,20 +82,41 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button ng-click="exportTableToCSV('second')">Download Interactions</md-button>
+            <md-button ng-click="exportTableToCSV('second-neighbours-table')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-if="allPaths != null">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
-                    <div flex><span class="md-headline">All Paths Between x and y</span></div>
+                    <div flex><span class="md-headline">All Paths Between {{pathSource}} and {{pathTarget}}</span></div>
                 </div>
                 <span class="md-subhead">Total: {{allPaths.length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content>
-            <div ng-repeat="path in allPaths">{{pathSource}} ---{{path.firstEdge}}--- {{path.intermediateNode}} {{path.secondEdge != null ? '---' + path.secondEdge + '---' : ''}} {{pathTarget}}</div>
+            <table id="all-paths-table" ng-if="allPaths.length > 0">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Correlation</th>
+                        <th ng-if="allPaths[0].intermediateNode != null">Intermediate Gene</th>
+                        <th ng-if="allPaths[0].intermediateNode != null">Correlation</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="path in allPaths">
+                        <td>{{pathSource}}</td>
+                        <td>{{path.firstEdge}}</td>
+                        <td ng-if="allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                        <td ng-if="allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
+                        <td>{{pathTarget}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <md-button ng-click="exportTableToCSV('all-paths-table')">Download Interactions</md-button>
+            <!--<div ng-repeat="path in allPaths">{{pathSource}} ---{{path.firstEdge}}--- {{path.intermediateNode}} {{path.secondEdge != null ? '---' + path.secondEdge + '---' : ''}} {{pathTarget}}</div>-->
         </md-card-content>
     </md-card>
     <!--<md-card>

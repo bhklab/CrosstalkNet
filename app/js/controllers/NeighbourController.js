@@ -108,6 +108,10 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
         };
 
+        $scope.exportTableToCSV = function(tableID) {
+            $("#" + tableID).tableToCSV();
+        };
+
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
