@@ -17,7 +17,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     service.tabs.main.data = angular.copy(service.dataModel);
     service.tabs.neighbour.data = angular.copy(service.dataModel);
 
-    service.neighbourConfigs = { firstDropdownConfig: null, secondDropdownConfig: null };
     service.firstSelectedGene = null;
 
     service.applyConfig = function(config, containerID, scope) {
