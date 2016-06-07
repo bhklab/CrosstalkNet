@@ -6,7 +6,6 @@ angular.module('myApp', [
   'ngFileUpload',
   'myApp.MainController',
   'myApp.NeighbourController',
-  'myApp.version', 
   'myApp.filters'
 ]);
 
