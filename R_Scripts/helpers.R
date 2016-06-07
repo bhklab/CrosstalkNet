@@ -253,3 +253,7 @@ getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selec
     nodes
 }
 
+getGeneSuffix <- function(gene) {
+    tolower(substr(gene, nchar(gene)-1, nchar(gene)))
+}
+
