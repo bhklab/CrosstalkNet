@@ -18,6 +18,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
         $scope.uploadFiles = FileUploadService.uploadFiles;
         $scope.config = null;
         $scope.needsRedraw = false;
+        $scope.tabIndex = 0;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -233,6 +234,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.getGeneList();
             $scope.getOverallMatrixStats();
+            $scope.tabIndex = 1;
         };
 
         $scope.returnToFirstNeighboursFilter = function() {
