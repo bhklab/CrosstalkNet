@@ -659,6 +659,10 @@ function testOpenCPU() {
     });
 }
 
+app.all('*', function(req, res) { 
+  res.redirect({error: "Please send a valid query."}); 
+});
+
 app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
