@@ -2,8 +2,8 @@
 
 angular.module('myApp.MainController', []).controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService,
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService,
         $q, $timeout) {
         $rootScope.selectedTab = 0;
         $rootScope.correlationFileDisplayed = null;
@@ -13,7 +13,11 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.ctrl = "main";
         InitializationService.initializeCommonVariables($scope);
-
+        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
+        $scope.uploadFiles = FileUploadService.uploadFiles;
+        $scope.config = null;
+        $scope.needsRedraw = false;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -76,7 +80,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             var filterFirst = false;
             var filterSecond = false;
             var depth = 1;
-            $rootScope.state = $rootScope.states.loading;
+            $rootScope.state = $rootScope.states.loadingGraph;
 
             if ($scope.GOIState == $scope.GOIStates.filterFirst) {
                 if (filter == false) {
@@ -115,7 +119,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                     file: $rootScope.correlationFileActual
                 })
                 .then(function(data) {
-                    if (data.config == null) {
+                    if (!ValidationService.checkServerResponse(data)) {
                         return;
                     }
 
@@ -124,6 +128,9 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                     $scope.totalInteractions = data.totalInteractions;
                     $scope.firstNeighbourInteractions = data.firstNeighbourInteractions;
                     $scope.secondNeighbourInteractions = data.secondNeighbourInteractions;
+                    if ($scope.display == "Tables") {
+                        $scope.needsRedraw = true;
+                    }
                     $scope.applyConfig(data.config, "cyMain", $scope);
                     $scope.setNeighbours($scope, 1);
                     $scope.setNeighbours($scope, 2);
@@ -154,6 +161,10 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $rootScope.state = $rootScope.states.gettingGeneList;
             RESTService.post('gene-list', { file: $rootScope.correlationFileActual })
                 .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        return;
+                    }
+
                     $rootScope.geneList = data.geneList;
                     $rootScope.state = $rootScope.states.initial;
                 });
@@ -162,6 +173,10 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
         $scope.getFileList = function() {
             RESTService.get('available-matrices')
                 .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        return;
+                    }
+
                     $scope.fileList = data.fileList;
                     //$scope.getGeneList()
                 });
@@ -169,6 +184,10 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.getOverallMatrixStats = function() {
             RESTService.post('overall-matrix-stats', { file: $rootScope.correlationFileActual }).then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    return;
+                }
+
                 $scope.overallMatrixStats = data.overallMatrixStats;
                 console.log(data);
             });
@@ -220,12 +239,19 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $scope.GOIState = $scope.GOIStates.filterFirst;
         };
 
-        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        $scope.$watch('display', function(newValue, oldValue) {
+            if (newValue == 'Graph') {
+                $timeout(function() {
+                    if ($scope.config != null) {
+                        $scope.cy.resize();
+                        $scope.needsRedraw = false;
+                        $scope.applyConfig($scope.config, "cyMain", $scope);
+                    }
+                }, 250);
 
-        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
-        $scope.uploadFiles = FileUploadService.uploadFiles;
+            }
+        });
 
-        //$scope.getGeneList();
         $scope.getFileList();
     }
 ]);

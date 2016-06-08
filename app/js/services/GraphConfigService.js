@@ -27,47 +27,31 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
         scope.nodes = scope.cy.nodes().length;
         scope.edges = scope.cy.edges().length;
+        scope.config = config;
 
         scope.cy.fit(scope.cy.$("*"), 10);
-
-        /*
-        service.cy.on("zoom", function() {
-            service.$evalAsync(function() {
-                if service.cy.zoom() < 0.25) {
-                    service.cy.elements = topLevelElements;
-                } else {
-
-                }
-                service.zoom = service.cy.zoom();
-            });
-        });*/
-
 
         scope.cy.on('select', 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
             console.log('tapped ' + id);
 
+            var edges = scope.cy.edges("[source='" + id + "'], [target='" + id + "']");
 
-            scope.cy.edges("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-                edge.addClass('highlighted');
-                edge.removeClass('faded');
-                edge.css({ 'line-color': 'magenta' });
-                /*else {
-                    edge.addClass('faded');
-                    edge.removeClass('highlighted');
-                    edge.css({ 'opacity': '0' });
-                }*/
+            scope.cy.batch(function() {
+                for (var i = edges.length - 1; i >= 0; i--) {
+                    edges[i].addClass('highlighted-edge');
+                    edges[i].removeClass('faded-edge');
+                }
             });
-            scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']").forEach(function(edge) {
-                edge.addClass('faded');
-                edge.removeClass('highlighted');
-                edge.css({ 'opacity': '0' });
-                /*else {
-                    edge.addClass('faded');
-                    edge.removeClass('highlighted');
-                    edge.css({ 'opacity': '0' });
-                }*/
+
+            edges = scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']");
+
+            scope.cy.batch(function() {
+                for (var i = edges.length - 1; i >= 0; i--) {
+                    edges[i].addClass('faded-edge');
+                    edges[i].removeClass('highlighted-edge');
+                }
             });
 
             service.selectedItem = null;
@@ -138,15 +122,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             }
         }
 
-        // node.css({'height': '40px', 'width': '40px'});
-        // node.css({'background-color': 'pink'});
-        // node.animate({
-        //     style: {
-        //         'background-color': '#76FF03'
-        //     },
-        // }, { duration: 1000 });
-
-
         var jAni = node.animation({
             style: {
                 'height': '40px',
@@ -156,12 +131,12 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });
 
         jAni
-            .play() // start
-            .promise('completed').then(function() { // on next completed
+            .play()
+            .promise('completed').then(function() {
                 jAni
-                    .reverse() // switch animation direction
-                    .rewind() // optional but makes intent clear
-                    .play() // start again
+                    .reverse()
+                    .rewind() 
+                    .play()
                 ;
             });
 
@@ -175,15 +150,9 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         scope.cy.center(node);
 
         scope.currentlyZoomed = { node: node, styleClass: colorClass };
-        //cy.fit(cy.$("#" + gene.toUpperCase()), 200);
-        //cy.zoom({ level: 1.5, renderedPosition: { x: x, y: y } });
     };
 
     service.clearLocatedGene = function(scope) {
-        // if (scope.currentlyZoomed != null) {
-        //     var color = scope.currentlyZoomed.hasClass('epi') ? 'red' : 'blue';
-        //     scope.currentlyZoomed.css({ 'background-color': color });
-        // }
         if (scope.currentlyZoomed != null) {
             scope.currentlyZoomed.node.removeClass('located');
             scope.currentlyZoomed.node.toggleClass(scope.currentlyZoomed.styleClass);
@@ -197,19 +166,25 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     };
 
     service.resetEdges = function(cy) {
-        cy.edges().forEach(function(edge) {
-            edge.css({ 'line-color': 'black' });
-            edge.css({ 'opacity': '1' });
+        var edges = cy.edges();
+
+        cy.batch(function() {
+            for (var i = edges.length - 1; i >= 0; i--) {
+                edges[i].removeClass('highlighted-edge');
+                edges[i].removeClass('faded-edge');
+            }
         });
     };
 
     service.resetZoom = function(cy) {
         service.resetNodes(cy);
-        cy.fit(cy.$("*"), 10);
+        if (cy != null) {
+            cy.fit(cy.$("*"), 10);
+        }
     };
 
     service.resetNodes = function(cy, originalElements) {
-        cy.json({ elements: originalElements });
+        //cy.json({ elements: originalElements });
     };
 
 
@@ -333,8 +308,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             shape: 'TRIANGLE'
         })
     };
-
-
 
     return service;
 });

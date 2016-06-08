@@ -33,6 +33,7 @@
     <script src="js/services/RESTService.js"></script>
     <script src="js/services/FileUploadService.js"></script>
     <script src="js/services/InitializationService.js"></script>
+    <script src="js/services/ValidationService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
     <script src="js/filters/interactionFilter.js"></script>
@@ -44,11 +45,7 @@
     <md-toolbar class=" md-primary md-hue-3">
         <div layout="row">
             <div class="" flex="40">Status:
-                <span ng-if="state == states.initial">Waiting for User to Query...</span>
-                <span ng-if="state == states.loadingConfig">Initializing Graph...</span>
-                <span ng-if="state == states.showingGraph">Displaying Graph...</span>
-                <span ng-if="state == states.gettingGeneList">Getting Gene List...</span>
-                <span ng-if="state == states.loading">Getting Graph from Server...</span>
+                <span>{{state.text}}</span>
                 <md-progress-circular ng-show="state == states.loading" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="center-text" flex="33">

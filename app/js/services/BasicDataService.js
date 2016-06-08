@@ -3,15 +3,13 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     var service = {};
 
     service.states = {
-        initial: 0,
-        firstDropdown: 1,
-        secondDropdown: 2,
-        loadingFirst: 3,
-        loadingSecond: 4,
-        loading: 5,
-        loadingConfig: 6,
-        showingGraph: 7,
-        gettingGeneList: 8
+        initial: {id: 0, text: "Waiting for user to query..."},
+        loadingGraph: {id: 1, text: "Getting graph from server..."},
+        loadingConfig: {id: 2, text: "Initializing graph..."},
+        showingGraph: {id: 3, text: "Graph finished"},
+        gettingGeneList: {id: 4, text: "Getting gene list..."},
+        gettingAllPaths: {id: 5, text: "Getting all paths between source and target genes..."},
+        finishedGettingAllPaths: {id: 6, text: "All paths have been obtained"}
     };
 
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
