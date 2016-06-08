@@ -39,7 +39,7 @@ app.post('/gene-list', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/getGeneList.R --args " + argsString, {
+    var child = exec("Rscript R_Scripts/getGeneList.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },
@@ -83,11 +83,17 @@ app.post('/neighbour-general', function(req, res) {
     var argsString = "";
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
+    var requestedLayout = req.body.layout;
+    var genesArg = "";
+
+    if (file == null || file.path == null || file.fileName == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
     args.pValue = file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
-    var requestedLayout = req.body.layout;
-    var genesArg = "";
 
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
@@ -107,7 +113,7 @@ app.post('/neighbour-general', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_scripts/neighbourExplorer.R --args " + argsString, { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_scripts/neighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             console.log('stderr: ' + stderr);
 
@@ -240,8 +246,14 @@ app.post('/submatrix-new', function(req, res) {
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
     var file = req.body.file;
-    args.pValue = req.body.file.pValue;
     var requestedLayout = req.body.layout;
+
+    if (file == null || file.path == null || file.fileName == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
+    args.pValue = req.body.file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
     args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
@@ -258,6 +270,7 @@ app.post('/submatrix-new', function(req, res) {
         res.json({ error: "Error" });
         return;
     }
+
     console.log(req.body);
 
     for (var i = 0; i < selectedGenes.length; i++) {
@@ -268,7 +281,7 @@ app.post('/submatrix-new', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/submatrix.R --args " + argsString, {
+    var child = exec("Rscript R_Scripts/submatrix.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },
@@ -427,6 +440,11 @@ app.post('/get-all-paths', function(req, res) {
     var source = req.body.source;
     var target = req.body.target;
 
+    console.log(file);
+    if (file == null || file.path == null || file.fileName == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
 
     args.source = source;
     args.target = target;
@@ -436,7 +454,7 @@ app.post('/get-all-paths', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/getAllPaths.R --args " + argsString, {
+    var child = exec("Rscript R_Scripts/getAllPaths.R --args \"" + argsString + "\"", {
         maxBuffer: 1024 *
             50000
     }, function(error, stdout, stderr) {
@@ -485,7 +503,7 @@ app.post('/overall-matrix-stats', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/getOverallMatrixStats.R  --args " + argsString, {
+    var child = exec("Rscript R_Scripts/getOverallMatrixStats.R  --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },
