@@ -3,8 +3,9 @@
 angular.module('myApp.NeighbourController', []).controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, $q, $timeout) {
+    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService,
+        $q, $timeout) {
         $rootScope.selectedTab = 0;
         $rootScope.state = $rootScope.states.initial;
         $rootScope.states = angular.copy(BasicDataService.states);
@@ -20,7 +21,9 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $scope.pathExplorerTextTarget = null;
 
         $scope.allPaths = null;
+        $scope.config = null;
 
+        $scope.needsRedraw = false;
         $scope.applyConfig = GraphConfigService.applyConfig;
 
         $scope.locateGene = function(gene) {
@@ -70,26 +73,40 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         }
 
         $scope.getConfigForSelectedNeighbours = function() {
-            $rootScope.state = $rootScope.states.loadingSecond;
+            $rootScope.state = $rootScope.states.loadingGraph;
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.genesOfInterest,
                 file: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
+
+                if (!ValidationService.checkServerResponse(data)) {
+                    return;
+                }
+
                 $rootScope.state = $rootScope.states.loadingConfig;
                 $scope.neighbours = angular.copy($scope.genesSecond);
+                if ($scope.display == "Tables") {
+                    $scope.needsRedraw = true;
+                }
                 $scope.applyConfig(data.config, "cyNeighbour", $scope);
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
                 $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope.cy, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
-                $rootScope.state = $rootScope.states.displayingGraph;
+                $rootScope.state = $rootScope.states.showingGraph;
             });
         };
 
         $scope.getAllPaths = function() {
-            $rootScope.state = $rootScope.states.loading;
+            if ($scope.pathExplorerTarget == null || $scope.pathExplorerSource == null) {
+                alert("Please select a source and target gene.");
+                return;
+            }
+
+            $rootScope.state = $rootScope.states.gettingAllPaths;
+            $scope.allPaths = [];
             $scope.pathTarget = $scope.pathExplorerTarget.value;
             $scope.pathSource = $scope.pathExplorerSource.value;
             RESTService.post('get-all-paths', {
@@ -99,6 +116,9 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             }).then(function(data) {
                 console.log(data);
                 $scope.allPaths = data.paths;
+                $rootScope.state = $rootScope.states.finishedGettingAllPaths;
+                $scope.display = "Tables";
+                $scope.switchModel = true;
             });
         };
 
@@ -120,6 +140,19 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
+        });
+
+        $scope.$watch('display', function(newValue, oldValue) {
+            if (newValue == 'Graph') {
+                $timeout(function() {
+                    if ($scope.config != null) {
+                        $scope.cy.resize(); 
+                        $scope.needsRedraw = false;
+                        $scope.applyConfig($scope.config, "cyNeighbour", $scope);
+                    }
+                }, 250);
+
+            }
         });
     }
 ]);

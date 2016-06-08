@@ -98,7 +98,7 @@ app.post('/neighbour-general', function(req, res) {
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
     } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Error" });
+        res.json({ error: "Please select a gene." });
         return;
     }
 
@@ -267,7 +267,7 @@ app.post('/submatrix-new', function(req, res) {
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
     } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Error" });
+        res.json({ error: "Please select at least 1 gene of interest." });
         return;
     }
 
