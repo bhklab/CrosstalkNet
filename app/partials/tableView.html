@@ -1,5 +1,4 @@
 <div ng-show="display == 'Tables'">
-    <div ng-show="cy != null && cy.edges() != null">{{cy.edges().length}}</div>
     <md-card ng-if="cy != null">
         <md-card-title>
             <md-card-title-text>
@@ -49,7 +48,7 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button ng-click="exportTableToCSV('first-neighbours-table')">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="exportTableToCSV('first-neighbours-table')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=2]').length > 0">
@@ -82,7 +81,7 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button ng-click="exportTableToCSV('second-neighbours-table')">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="exportTableToCSV('second-neighbours-table')">Download Interactions</md-button>
         </md-card-content>
     </md-card>
     <md-card ng-if="allPaths != null">
@@ -115,7 +114,7 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button ng-click="exportTableToCSV('all-paths-table')">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="exportTableToCSV('all-paths-table')">Download Interactions</md-button>
             <!--<div ng-repeat="path in allPaths">{{pathSource}} ---{{path.firstEdge}}--- {{path.intermediateNode}} {{path.secondEdge != null ? '---' + path.secondEdge + '---' : ''}} {{pathTarget}}</div>-->
         </md-card-content>
     </md-card>

@@ -1,23 +1,26 @@
-<md-content class="md-padding">
-    <div ng-show="ctrl == 'neighbour'">
-        <md-autocomplete md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="inspectNeighbours(item, 'first')" md-items="item in querySearch(searchTextFirst, ctrl == 'neighbour' ? 'second' : 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
-            <md-item-template>
-                <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
-            </md-item-template>
-            <md-not-found>
-                No states matching "{{searchTextFirst}}" were found.
-            </md-not-found>
-        </md-autocomplete>
-    </div>
-    <div ng-show="ctrl == 'main'" ng-disabled="GOIState != GOIStates.initial">
-        <md-autocomplete md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" placeholder="Choose Genes" ng-disabled="GOIState != GOIStates.initial">
-            <md-item-template>
-                <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
-            </md-item-template>
-            <md-not-found>
-                No states matching "{{searchTextFirst}}" were found.
-            </md-not-found>
-        </md-autocomplete>
+<md-content>
+    <div ng-show="ctrl == 'main'" ng-disabled="GOIState != GOIStates.initial" class="md-padding">
+        <div>
+            <md-tooltip ng-if="GOIState != GOIStates.initial" md-direction="right">
+                Click Reset Genes To Add More Genes
+            </md-tooltip>
+            <md-autocomplete md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" placeholder="Choose Genes" ng-disabled="GOIState != GOIStates.initial">
+                <md-item-template>
+                    <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
+                </md-item-template>
+                <md-not-found>
+                    No states matching "{{searchTextFirst}}" were found.
+                </md-not-found>
+            </md-autocomplete>
+        </div>
+        <div layout="row">
+            <div flex="40">
+                <md-button class="md-raised md-primary" ng-click="removeGenesOfInterest()" ng-disabled="GOIState != GOIStates.initial || genesOfInterest.length == 0">Remove All</md-button>
+            </div>
+            <div flex="60">
+                <md-button class="md-raised md-primary" ng-click="resetGeneSelection()" ng-disabled="GOIState == GOIStates.initial">Reset Gene Selection</md-button>
+            </div>
+        </div>
         <div>
             <span class="md-subhead">Selected Genes:</span>
             <md-list class="selected-genes-list">
@@ -38,16 +41,16 @@
             </md-list>
         </div>
         <div layout="row">
-            <div flex>
-                <md-button ng-click="removeGenesOfInterest()" ng-disabled="GOIState != GOIStates.initial || genesOfInterest.length == 0">Remove All</md-button>
+            <div flex="40">
+                <md-button class="md-raised md-primary" ng-click="getRelevantGenes(true)" ng-disabled="GOIState == GOIStates.initial">Filter</md-button>
             </div>
-            <div flex>
-                <md-button style="float: right;" ng-click="getRelevantGenes(false)" ng-show="GOIState < GOIStates.getSecondNeighbours" ng-disabled="GOIState >= GOIStates.getSecondNeighbours || genesOfInterest.length == 0">Get {{GOIState == GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
-                <md-button style="float: right;" ng-click="returnToFirstNeighboursFilter()" ng-show="GOIState >= GOIStates.getSecondNeighbours">Back to <br>First Neighbours</md-button>
+            <div flex="60">
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="getRelevantGenes(false)" ng-show="GOIState < GOIStates.getSecondNeighbours" ng-disabled="GOIState >= GOIStates.getSecondNeighbours || genesOfInterest.length == 0">Get {{GOIState == GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="returnToFirstNeighboursFilter()" ng-show="GOIState >= GOIStates.getSecondNeighbours">Back to
+                    <br>First Neighbours
+                </md-button>
             </div>
         </div>
-        <md-button ng-click="getRelevantGenes(true)" ng-disabled="GOIState == GOIStates.initial">Filter</md-button>
-        <md-button ng-click="resetGeneSelection()" ng-disabled="GOIState == GOIStates.initial">Reset Gene Selection</md-button>
         <fieldset ng-disabled="GOIState != GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
             <legend class="fieldset-legend">First Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
@@ -95,36 +98,24 @@
             </div>
         </fieldset>
     </div>
-    <div ng-if="ctrl == 'neighbour'">
-        Selected Path
-        <md-list>
-            <md-list-item ng-repeat="gene in genesOfInterest">
-                <md-menu>
-                    <md-button ng-click="$last && $mdOpenMenu($event)">
-                        {{gene.display}}
-                    </md-button>
-                    <md-menu-content width="6">
-                        <md-menu-item ng-repeat="item in [1]">
-                            <md-button ng-click="removeGene(gene)">
-                                Remove Gene
-                            </md-button>
-                        </md-menu-item>
-                    </md-menu-content>
-                </md-menu>
-            </md-list-item>
-        </md-list>
-        <md-button ng-click="getConfigForSelectedNeighbours()">Get Data</md-button>
+    <md-divider></md-divider>
+    <div class="md-padding">
+        <h2 class="md-subhead">Gene Locator</h2>
+        <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+            <md-item-template>
+                <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
+            </md-item-template>
+            <md-not-found>
+                No states matching "{{searchTextZoom}}" were found.
+            </md-not-found>
+        </md-autocomplete>
+        <md-button class="md-raised md-primary" ng-click="clearLocatedGene()">
+            <md-tooltip md-direction="right">
+                Click Reset Genes To Add More Genes
+            </md-tooltip>Clear Located Gene
+        </md-button>
     </div>
-    <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
-        <md-item-template>
-            <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
-        </md-item-template>
-        <md-not-found>
-            No states matching "{{searchTextZoom}}" were found.
-        </md-not-found>
-    </md-autocomplete>
-    <md-button ng-click="clearLocatedGene()">Clear Located Gene</md-button>
-    <div ng-if="geneList.length > 0" layout-wrap>
+    <div ng-if="geneList.length > 0" layout-wrap class="md-padding">
         <div flex="100" layout layout-align="center center">
             <span class="md-body-1">Min Degree</span>
         </div>
