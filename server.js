@@ -1,6 +1,7 @@
 const fs = require('fs');
-//var opencpu = require('opencpu');
+var opencpu = require('opencpu');
 var exec = require('child_process').exec;
+var child_process = require('child_process');
 var async = require('async');
 var express = require('express');
 var cors = require('cors');
@@ -646,21 +647,61 @@ function createAndStoreCorrelationsAndDegrees(callback) {
 }
 
 function testOpenCPU() {
-    opencpu.rCall("/library/stats/R/rnorm/json", {
-        n: 42,
-        mean: 10,
-        sd: 10
+    opencpu.rCall("/library/testpackage/R/getOverallMatrixStats", {
+        fileName: "fullcorMatrix.1.Rdata",
+        path: "C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts/"
     }, function(err, data) {
         if (!err) {
             console.log(data.length); // => 42
         } else {
             console.log("opencpu call failed.");
         }
+
+        console.log(err)
     });
 }
 
-app.all('*', function(req, res) { 
-  res.redirect({error: "Please send a valid query."}); 
+function testInteractiveShell() {
+    // var ps = child_process.spawn('R');
+
+    // ps.stdout.on("data", function(data) {
+    //     console.log(data);
+    // });
+
+    // console.log(ps);
+
+    // ps.stdout.pipe(process.stdout);
+    // ps.stdin.write('1+1');
+    // ps.stdin.end();
+
+    const ls = child_process.spawn('R', ['--no-save']);
+
+    /*
+    ls.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+        ls.stdin.write('1+1');
+        ls.stdin.end();
+    });
+
+    ls.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`);
+    });
+
+    ls.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });*/
+
+
+    ls.stdout.pipe(process.stdout);
+    ls.stdin.write('1+1\n');
+    ls.stdin.write('2+2\n');
+    ls.stdin.write('3+3\n');
+
+
+}
+
+app.all('*', function(req, res) {
+    res.redirect({ error: "Please send a valid query." });
 });
 
 app.listen(5000, function() {
@@ -668,4 +709,5 @@ app.listen(5000, function() {
     console.log("Initializing data and config");
     //testOpenCPU();
     initializeServer();
+    testInteractiveShell();
 });
