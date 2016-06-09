@@ -99,7 +99,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                 depth = 2;
             }
 
-            RESTService.post("submatrix-new", {
+            RESTService.post("submatrix", {
                     selectedGenes: $scope.genesOfInterest,
                     minNegativeWeightFirst: $scope.correlationFilterFirst.negativeFilter ==
                         null || !$scope.correlationFilterFirst.negativeEnabled ?
