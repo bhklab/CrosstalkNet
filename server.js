@@ -16,6 +16,7 @@ var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
 var layoutUtils = require('layoutUtils');
 var clientTableUtils = require('clientTableUtils');
+var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 var multipartyMiddleware = multiparty();
 
@@ -240,7 +241,7 @@ app.post('/neighbour-general', function(req, res) {
         });
 });
 
-app.post('/submatrix-new', function(req, res) {
+app.post('/submatrix', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
@@ -323,25 +324,6 @@ app.post('/submatrix-new', function(req, res) {
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
                 allNodes.push(sourceNodes[i]);
-            }
-
-            if (false) { //degreesFirst[0].attributes.names == null) {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
-                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                    "left",
-                    "center",
-                    "blue");
-                elements.push(sourceNodes[0][0]);
-
-                config = configUtils.createConfig();
-                layout = configUtils.createPresetLayout();
-
-                configUtils.setConfigElements(config, elements);
-                configUtils.setConfigLayout(config, layout);
-
-                res.json({ config: config });
-                return;
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
@@ -578,41 +560,6 @@ function checkFileIntegrity(req, res, file) {
 
         res.send({ fileStatus: message, fileList: fileList });
     });
-}
-
-function cacheGeneListForPValue(pValue, script) {
-    var args = {};
-    var argsString = "";
-    args.pValue = pValue;
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-    console.log(argsString);
-    var child = exec("Rscript " + script + " --args " + argsString, {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var parsedValue = JSON.parse(stdout);
-            var allGenes = [];
-
-            var epiDegrees = parsedValue.value[0].value[0].value;
-            var stromaDegrees = parsedValue.value[0].value[1].value;
-
-            var epiGeneNames = parsedValue.value[0].value[0].attributes.names.value;
-            var stromaGeneNames = parsedValue.value[0].value[1].attributes.names.value;
-
-            allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
-            allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
-
-            geneListCache[pValue] = allGenes;
-        });
 }
 
 function createOverallElements() {
