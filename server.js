@@ -1,5 +1,5 @@
 const fs = require('fs');
-var opencpu = require('opencpu');
+//var opencpu = require('opencpu');
 var exec = require('child_process').exec;
 var child_process = require('child_process');
 var async = require('async');
@@ -709,5 +709,5 @@ app.listen(5000, function() {
     console.log("Initializing data and config");
     //testOpenCPU();
     initializeServer();
-    testInteractiveShell();
+    //testInteractiveShell();
 });
