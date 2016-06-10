@@ -1,4 +1,5 @@
 library(jsonlite)
+library(Matrix)
 
 setwd('R_Scripts')
 source('helpers.R')
@@ -14,6 +15,10 @@ corMatrix <- c()
 tryCatch(corMatrix <- readRDS(fileName),
            error = function(cond) {cat(format(toJSON(list(status = 1, message = "Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix."), auto_unbox = TRUE))) ; write("failed read", stderr()); file.remove(fileName); quit()}) 
 
+write("nrow", stderr())
+write(nrow(corMatrix), stderr())
+write("ncol", stderr())
+write(ncol(corMatrix), stderr())
 rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
 
