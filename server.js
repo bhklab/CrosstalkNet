@@ -18,7 +18,6 @@ var layoutUtils = require('layoutUtils');
 var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
-var multipartyMiddleware = multiparty();
 
 var geneListCache = { "001": null, "01": null, "05": null, "1": null };
 var initialConfig = null;
@@ -457,7 +456,7 @@ app.post('/get-all-paths', function(req, res) {
 
 });
 
-app.post('/upload-matrix', multipartyMiddleware, function(req, res) {
+app.post('/upload-matrix', multiparty({maxFieldsSize: 15 *1024 *1024}), function(req, res) {
     var file = req.files.file;
     var data = req.body.data;
     console.log(file.name);
@@ -505,8 +504,8 @@ app.post('/overall-matrix-stats', function(req, res) {
             overallMatrixStats.significantInteractions = parsedValue.significantInteractions;
             //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;
 
-            console.log("parsedValue: ");
-            console.log("%j", parsedValue);
+            //console.log("parsedValue: ");
+            //console.log("%j", parsedValue);
             res.send({ overallMatrixStats: overallMatrixStats });
         });
 });
