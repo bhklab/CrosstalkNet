@@ -1,4 +1,5 @@
 source('dataModels.R')
+library(Matrix)
 
 getDegrees <- function(corMatrix) {
     deg.row <- as.numeric() 
@@ -65,10 +66,10 @@ appendSideToMatrixNames <- function(corMatrix, side, rowOrCol) {
 #we selected in the dropdown was A, then the node we selected in the second dropdown was F. The exclusion will be
 #A since we don't want to duplicate A in the third panel. 
 getNeighbours <- function(corMatrix, gene, exclusion) {
-    write('Gene: ', stderr())
-    write(gene, stderr())
-    write('exclusions: ', stderr())
-    write(exclusion, stderr())
+    #write('Gene: ', stderr())
+    #write(gene, stderr())
+    #write('exclusions: ', stderr())
+    #write(exclusion, stderr())
     if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
@@ -76,8 +77,8 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
         neighbours <- corMatrix[gene, neighboursNames]
         names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
 
-                write('neighbours: ', stderr())
-        write(neighbours, stderr())
+                #write('neighbours: ', stderr())
+        #write(neighbours, stderr())
     } else {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
         neighboursNames <- setdiff(neighboursNames, exclusion)
@@ -91,8 +92,8 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
 
 getDegreesForNeighbours <- function(degrees, neighbours) {
     first <- names(neighbours[1])
-    write('first: ', stderr())
-    write(first, stderr())
+    #write('first: ', stderr())
+    #write(first, stderr())
 
     if (length(neighbours) < 1) {
         return(integer())
@@ -102,8 +103,8 @@ getDegreesForNeighbours <- function(degrees, neighbours) {
         resultDegrees <- degrees$epiDegree[names(neighbours)]
     } else {
         resultDegrees <- degrees$stromaDegree[names(neighbours)]
-                        write('neighbours: ', stderr())
-        write(neighbours, stderr())
+                        #write('neighbours: ', stderr())
+        #write(neighbours, stderr())
     }
 
     resultDegrees
@@ -138,8 +139,8 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
 
 getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
     first <- neighbourNames[1]
-    # write('first: ', stderr())
-    # write(first, stderr())
+    # #write('first: ', stderr())
+    # #write(first, stderr())
 
     if (length(neighbourNames) < 1 || is.na(first)) {
         return(integer())
@@ -223,9 +224,9 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
 }
 
 getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
-    write("gene", stderr())
-    write(gene, stderr())
-    write(class(gene), stderr())
+    #write("gene", stderr())
+    #write(gene, stderr())
+    #write(class(gene), stderr())
 
     neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
@@ -236,11 +237,11 @@ getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selec
     }
 
     for (i in 1:length(neighboursNames)) {
-        write("name", stderr())
+        #write("name", stderr())
         nodes[i, "name"] <- neighboursNames[i]
-        write("degree", stderr())
+        #write("degree", stderr())
         nodes[i, "degree"] <- neighboursDegrees[i]
-        write("level", stderr())
+        #write("level", stderr())
         nodes[i, "level"] <- level
 
         if (nodes[i, "name"] %in% selectedGenes) {

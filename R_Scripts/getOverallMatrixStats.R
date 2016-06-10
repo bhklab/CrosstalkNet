@@ -1,4 +1,5 @@
 library(jsonlite)
+library(Matrix)
 
 setwd('R_Scripts')
 source('helpers.R')
@@ -11,7 +12,12 @@ path <- settings$path
 
 corMatrix <- readRDS(paste(path, fileName, sep=""))
 
-selfLoops <- length(which(diag(corMatrix) != 0))
+if (!(is.matrix(corMatrix))) {
+	selfLoops <- length(which(Matrix::diag(corMatrix) != 0))	
+} else {
+	selfLoops <- length(which(diag(corMatrix) != 0))	
+}
+
 significantInteractions <- length(which(corMatrix != 0))
 
 cat(format(toJSON(list(selfLoops = selfLoops, significantInteractions = significantInteractions), auto_unbox = TRUE)))
