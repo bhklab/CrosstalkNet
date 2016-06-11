@@ -225,7 +225,7 @@ app.post('/neighbour-general', function(req, res) {
                 }
 
                 config = configUtils.createConfig();
-                layout = layoutUtils.createRandomLayout(nodes.length, 12);
+                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, 12);
 
                 nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);

@@ -88,6 +88,7 @@ angular.module('myApp.PathExistenceController', []).controller('PathExistenceCon
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
+            $scope.allPaths = null;
         });
 
         // $scope.$watch('display', function(newValue, oldValue) {

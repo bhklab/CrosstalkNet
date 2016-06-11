@@ -124,6 +124,10 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
+            if ($scope.cy) {
+                $scope.cy.destroy();
+            }
+            $scope.cy = null;
         });
 
         $scope.$watch('display', function(newValue, oldValue) {

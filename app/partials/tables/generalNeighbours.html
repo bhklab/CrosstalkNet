@@ -1,5 +1,4 @@
 <div ng-repeat="x in [] | range:neighbours.length-1">
-    {{x}}
     <md-card ng-show="cy != null && cy.edges() != null ">
         <md-card-title>
             <md-card-title-text>
@@ -14,9 +13,9 @@
                 </div>
                 <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
             </md-card-title-text>
-        </md-card-title>n
+        </md-card-title>
         <md-card-content class="table-card-height">
-            <table id="first-neighbours-table">
+            <table id="{{ctrl + '-neighbours-table-' + x}}">
                 <thead>
                     <tr>
                         <th> </th>
@@ -30,7 +29,7 @@
                     </tr>
                 </tbody>
             </table>
-            <md-button class="md-raised md-primary" ng-click="exportTableToCSV('first-neighbours-table')">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="exportTableToCSV(ctrl + '-neighbours-table-' + x)">Download Interactions</md-button>
         </md-card-content>
     </md-card>
 </div>
