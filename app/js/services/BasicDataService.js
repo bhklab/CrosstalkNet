@@ -175,39 +175,12 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         var neighbours = [];
 
         for (var i = 1; i <= highestLevel; i++) {
-            var temp = { epi: [], stroma: [] };
-            temp = getNeighboursFromEdges(scope, i);
-            /*
-            if (isExplorer) {
-                var epi = getNeighboursForLevelInteractionExplorer(scope, i, "epi");
-                var stroma = getNeighboursForLevelInteractionExplorer(scope, i, "stroma");
-            } else {
-                var epi = getNeighboursForLevel(scope, i, "epi");
-                var stroma = getNeighboursForLevel(scope, i, "stroma");
-            }
-            temp.epi = epi;
-            temp.stroma = stroma;*/
+            var temp = getNeighboursFromEdges(scope, i);
 
             neighbours.push(temp);
         }
 
         scope.neighbours = neighbours;
-    }
-
-    function getNeighboursForLevel(scope, level, side) {
-        var result = scope.cy.filter(function(i, element) {
-            if (element.isNode() && (element.data('neighbourLevel') == level || level == 1 && element.data('neighbourLevel') == -1 || (level > 1 && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == level - 1))) && element.hasClass(side)) {
-                return true;
-            }
-
-            return false;
-        });
-
-        result = result.map(function(node) {
-            return node.id();
-        });
-
-        return result;
     }
 
     function getNeighboursFromEdges(scope, level) {
@@ -234,22 +207,6 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         neighbours.stroma = Array.from(neighbours.stroma);
 
         return neighbours;
-    }
-
-    function getNeighboursForLevelInteractionExplorer(scope, level, side) {
-        var result = scope.cy.filter(function(i, element) {
-            if (element.isNode() && (element.data('neighbourLevel') == level) && element.hasClass(side)) {
-                return true;
-            }
-
-            return false;
-        });
-
-        result = result.map(function(node) {
-            return node.id();
-        });
-
-        return result;
     }
 
     return service;

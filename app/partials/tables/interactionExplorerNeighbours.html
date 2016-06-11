@@ -11,7 +11,7 @@
                         </md-input-container>
                     </div>
                 </div>
-                <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                <span class="md-subhead">Total: {{x > 0 ? cy.edges("[neighbourLevel=" + (x + 1) + "]").length + 1 : cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
             </md-card-title-text>
         </md-card-title>n
         <md-card-content class="table-card-height">
@@ -19,13 +19,13 @@
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="neighbour in neighbours[x].stroma.concat(neighbours[x].epi)">{{neighbour}}</th>
+                        <th ng-repeat="stroma in neighbours[x].stroma">{{stroma}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="row-name">{{genesOfInterest[x].value}}</td>
-                        <td ng-repeat="neighbour in neighbours[x].stroma.concat(neighbours[x].epi)">{{getInteractionViaDictionary(genesOfInterest[x].value, neighbour)}}</td>
+                    <tr ng-repeat="epi in neighbours[x].epi">
+                        <td class="row-name">{{epi}}</td>
+                        <td ng-repeat="stroma in neighbours[x].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
                     </tr>
                 </tbody>
             </table>
