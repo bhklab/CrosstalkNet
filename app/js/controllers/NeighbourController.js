@@ -48,16 +48,6 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             }
         };
 
-        $scope.setPathExplorerGene = function(gene, which) {
-            if (gene != null) {
-                if (which == 'source') {
-                    $scope.pathExplorerSource = gene;
-                } else {
-                    $scope.pathExplorerTarget = gene;
-                }
-            }
-        };
-
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {
                 $(this).val('');
@@ -73,6 +63,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         }
 
         $scope.getConfigForSelectedNeighbours = function() {
+            var level = $scope.genesOfInterest.length;
             $rootScope.state = $rootScope.states.loadingGraph;
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
@@ -91,34 +82,17 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
                     $scope.needsRedraw = true;
                 }
                 $scope.applyConfig(data.config, "cyNeighbour", $scope);
+                $scope.selfLoops = data.selfLoops;
+                $scope.edgeDictionary = data.edgeDictionary;
+
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
                 $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope.cy, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $rootScope.state = $rootScope.states.showingGraph;
-            });
-        };
 
-        $scope.getAllPaths = function() {
-            if ($scope.pathExplorerTarget == null || $scope.pathExplorerSource == null) {
-                alert("Please select a source and target gene.");
-                return;
-            }
+                $scope.setNeighboursGeneral($scope, level, true);
 
-            $rootScope.state = $rootScope.states.gettingAllPaths;
-            $scope.allPaths = [];
-            $scope.pathTarget = $scope.pathExplorerTarget.value;
-            $scope.pathSource = $scope.pathExplorerSource.value;
-            RESTService.post('get-all-paths', {
-                target: $scope.pathExplorerTarget.value,
-                source: $scope.pathExplorerSource.value,
-                file: $rootScope.correlationFileActual
-            }).then(function(data) {
-                console.log(data);
-                $scope.allPaths = data.paths;
-                $rootScope.state = $rootScope.states.finishedGettingAllPaths;
-                $scope.display = "Tables";
-                $scope.switchModel = true;
             });
         };
 
@@ -130,6 +104,16 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
 
         $scope.exportTableToCSV = function(tableID) {
             $("#" + tableID).tableToCSV();
+        };
+
+        $scope.getInteractionViaDictionary = function(source, target) {
+            if ($scope.edgeDictionary[source] != null && $scope.edgeDictionary[source][target] != null) {
+                return $scope.edgeDictionary[source][target];
+            } else if ($scope.edgeDictionary[target] != null && $scope.edgeDictionary[target][source] != null) {
+                return $scope.edgeDictionary[target][source];
+            } else {
+                return 0;
+            }
         };
 
         $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
@@ -146,7 +130,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
             if (newValue == 'Graph') {
                 $timeout(function() {
                     if ($scope.config != null) {
-                        $scope.cy.resize(); 
+                        $scope.cy.resize();
                         $scope.needsRedraw = false;
                         $scope.applyConfig($scope.config, "cyNeighbour", $scope);
                     }

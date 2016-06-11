@@ -3,13 +3,13 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     var service = {};
 
     service.states = {
-        initial: {id: 0, text: "Waiting for user to query..."},
-        loadingGraph: {id: 1, text: "Getting graph from server..."},
-        loadingConfig: {id: 2, text: "Initializing graph..."},
-        showingGraph: {id: 3, text: "Graph finished"},
-        gettingGeneList: {id: 4, text: "Getting gene list..."},
-        gettingAllPaths: {id: 5, text: "Getting all paths between source and target genes..."},
-        finishedGettingAllPaths: {id: 6, text: "All paths have been obtained"}
+        initial: { id: 0, text: "Waiting for user to query..." },
+        loadingGraph: { id: 1, text: "Getting graph from server..." },
+        loadingConfig: { id: 2, text: "Initializing graph..." },
+        showingGraph: { id: 3, text: "Graph finished" },
+        gettingGeneList: { id: 4, text: "Getting gene list..." },
+        gettingAllPaths: { id: 5, text: "Getting all paths between source and target genes..." },
+        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" }
     };
 
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
@@ -26,7 +26,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     service.loadNeighbourDropdownOptions = loadNeighbourDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
-    service.setNeighbours = setNeighbours;
+    service.setNeighboursGeneral = setNeighboursGeneral;
 
     function initializeStandardVariables(scope) {
         scope.selectedItemFirst = null;
@@ -73,7 +73,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     function loadNeighbourDropdownOptions(cy, selectedGenes) {
         var genes = [];
 
-        cy.edges("[source='" + selectedGenes[selectedGenes.length -1].value + "']").forEach(function(
+        cy.edges("[source='" + selectedGenes[selectedGenes.length - 1].value + "']").forEach(function(
             edge) {
             genes.push(edge.target().data());
         });
@@ -123,7 +123,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
                     deferred;
             }
         } else if (source == "geneList") {
-            if (scope.geneList != null) {
+            if ($rootScope.geneList != null) {
                 results = query ? $rootScope.geneList.filter(createFilterFor(query)) :
                     $rootScope.geneList,
                     deferred;
@@ -171,58 +171,86 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         return result;
     }
 
-    function setNeighbours(scope, level) {
-        if (level == 1) {
-            scope.firstNeighbours.epi = scope.cy.filter(function(i, element) {
-                if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('epi')) {
-                    return true;
-                }
+    function setNeighboursGeneral(scope, highestLevel, isExplorer) {
+        var neighbours = [];
 
-                return false;
-            });
+        for (var i = 1; i <= highestLevel; i++) {
+            var temp = { epi: [], stroma: [] };
+            temp = getNeighboursFromEdges(scope, i);
+            /*
+            if (isExplorer) {
+                var epi = getNeighboursForLevelInteractionExplorer(scope, i, "epi");
+                var stroma = getNeighboursForLevelInteractionExplorer(scope, i, "stroma");
+            } else {
+                var epi = getNeighboursForLevel(scope, i, "epi");
+                var stroma = getNeighboursForLevel(scope, i, "stroma");
+            }
+            temp.epi = epi;
+            temp.stroma = stroma;*/
 
-            scope.firstNeighbours.stroma = scope.cy.filter(function(i, element) {
-                if (element.isNode() && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == -1) && element.hasClass('stroma')) {
-                    return true;
-                }
-
-                return false;
-            });
-
-            scope.firstNeighbours.epi = scope.firstNeighbours.epi.map(function(node) {
-                return node.id();
-            });
-
-            scope.firstNeighbours.stroma = scope.firstNeighbours.stroma.map(function(node) {
-                return node.id();
-            });
-
-        } else if (level == 2) {
-            scope.secondNeighbours.epi = scope.cy.filter(function(i, element) {
-                if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('epi')) {
-                    return true;
-                }
-
-                return false;
-            });
-
-            scope.secondNeighbours.stroma = scope.cy.filter(function(i, element) {
-                if (element.isNode() && element.data('neighbourLevel') >= 1 && element.hasClass('stroma')) {
-                    return true;
-                }
-
-                return false;
-            });
-
-            scope.secondNeighbours.epi = scope.secondNeighbours.epi.map(function(node) {
-                return node.id();
-            });
-
-            scope.secondNeighbours.stroma = scope.secondNeighbours.stroma.map(function(node) {
-                return node.id();
-            });
+            neighbours.push(temp);
         }
-    };
+
+        scope.neighbours = neighbours;
+    }
+
+    function getNeighboursForLevel(scope, level, side) {
+        var result = scope.cy.filter(function(i, element) {
+            if (element.isNode() && (element.data('neighbourLevel') == level || level == 1 && element.data('neighbourLevel') == -1 || (level > 1 && (element.data('neighbourLevel') == level || element.data('neighbourLevel') == level - 1))) && element.hasClass(side)) {
+                return true;
+            }
+
+            return false;
+        });
+
+        result = result.map(function(node) {
+            return node.id();
+        });
+
+        return result;
+    }
+
+    function getNeighboursFromEdges(scope, level) {
+        var neighbours = { epi: new Set(), stroma: new Set() };
+        var edges = scope.cy.filter(function(i, element) {
+            if (element.isEdge() && element.data('neighbourLevel') == level) {
+                return true;
+            }
+
+            return false;
+        });
+
+        for (var i = 0; i < edges.length; i++) {
+            if (edges[i].data('source').endsWith("-E")) {
+                neighbours.epi.add(edges[i].data('source'));
+                neighbours.stroma.add(edges[i].data('target'));
+            } else {
+                neighbours.epi.add(edges[i].data('target'));
+                neighbours.stroma.add(edges[i].data('source'));
+            }
+        }
+
+        neighbours.epi = Array.from(neighbours.epi);
+        neighbours.stroma = Array.from(neighbours.stroma);
+
+        return neighbours;
+    }
+
+    function getNeighboursForLevelInteractionExplorer(scope, level, side) {
+        var result = scope.cy.filter(function(i, element) {
+            if (element.isNode() && (element.data('neighbourLevel') == level) && element.hasClass(side)) {
+                return true;
+            }
+
+            return false;
+        });
+
+        result = result.map(function(node) {
+            return node.id();
+        });
+
+        return result;
+    }
 
     return service;
 });

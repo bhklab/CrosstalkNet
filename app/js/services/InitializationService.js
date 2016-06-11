@@ -57,7 +57,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
         scope.loadNeighbourDropdownOptions = BasicDataService.loadNeighbourDropdownOptions;
         scope.querySearch = BasicDataService.querySearch;
-        scope.setNeighbours = BasicDataService.setNeighbours;
+        scope.setNeighboursGeneral = BasicDataService.setNeighboursGeneral;
 
         scope.genesOfInterest = [];
         scope.edges = 0;

@@ -1,0 +1,33 @@
+<md-card ng-show="cy != null && cy.edges() != null && cy.edges('[neighbourLevel=' + $index + ']').length > 0">
+    <md-card-title>
+        <md-card-title-text>
+            <div layout="row">
+                <div flex><span class="md-headline">First Neighbour Interactions</span></div>
+                <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Interactions</label>
+                        <input ng-model="interactionSearch">
+                    </md-input-container>
+                </div>
+            </div>
+            <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + $index + "]").length}}</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content class="table-card-height">
+        <table id="first-neighbours-table">
+            <thead>
+                <tr>
+                    <th> </th>
+                    <th ng-repeat="stroma in neighbours[$index].stroma">{{stroma}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="epi in neighbours[$index].epi">
+                    <td class="row-name">{{epi}}</td>
+                    <td ng-repeat="stroma in neighbours[$index].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <md-button class="md-raised md-primary" ng-click="exportTableToCSV('first-neighbours-table')">Download Interactions</md-button>
+    </md-card-content>
+</md-card>

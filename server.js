@@ -126,6 +126,7 @@ app.post('/neighbour-general', function(req, res) {
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
 
+            var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
             var parentNodes = [];
@@ -133,8 +134,9 @@ app.post('/neighbour-general', function(req, res) {
             var elements = [];
             var config = null;
             var layout = null;
+            var edgeDictionary = {};
 
-            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree));
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
 
             if (parsedNodes.length == null) {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
@@ -155,13 +157,18 @@ app.post('/neighbour-general', function(req, res) {
                 return;
             }
 
-            edges = edgeUtils.createEdgesFromREdgesFinal(parsedEdges, 0);
+            for (var i = 0; i < parsedEdges.length; i++) {
+                edges = edges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdges[i], i + 1));
+                //interactionsTableList.push()
+            }
+
+            console.log(edges);
 
             for (var i = 0; i < parsedNodes.length; i++) {
                 nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
             }
 
-            console.log(nodes);
+            //console.log(nodes);
 
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
@@ -233,10 +240,18 @@ app.post('/neighbour-general', function(req, res) {
             elements = elements.concat(edges);
             elements.push(sourceNodes[0][0]);
 
+
             configUtils.setConfigElements(config, elements);
             configUtils.setConfigLayout(config, layout);
 
-            res.json({ config: config });
+            selfLoops = clientTableUtils.getSelfLoops(edges);
+            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+
+            res.json({
+                config: config,
+                selfLoops: selfLoops,
+                edgeDictionary: edgeDictionary
+            });
         });
 });
 
@@ -295,7 +310,7 @@ app.post('/submatrix', function(req, res) {
             }
 
             var parsedValue = JSON.parse(stdout);
-            console.log(parsedValue);
+            //console.log(parsedValue);
 
             var parsedNodesFirst = parsedValue.neighboursNodes.first;
             var parsedNodesSecond = parsedValue.neighboursNodes.second;
@@ -456,7 +471,7 @@ app.post('/get-all-paths', function(req, res) {
 
 });
 
-app.post('/upload-matrix', multiparty({maxFieldsSize: 15 *1024 *1024}), function(req, res) {
+app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), function(req, res) {
     var file = req.files.file;
     var data = req.body.data;
     console.log(file.name);

@@ -133,8 +133,9 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                         $scope.needsRedraw = true;
                     }
                     $scope.applyConfig(data.config, "cyMain", $scope);
-                    $scope.setNeighbours($scope, 1);
-                    $scope.setNeighbours($scope, 2);
+                    // $scope.setNeighbours($scope, 1);
+                    // $scope.setNeighbours($scope, 2);
+
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
                     $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
@@ -151,6 +152,8 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
                     } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
                         $scope.GOIState = $scope.GOIStates.filterSecond;
                     }
+
+                    $scope.setNeighboursGeneral($scope, depth, false);
                 });
         };
 
