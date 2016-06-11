@@ -8,7 +8,6 @@
     <title>Crosstalk Net</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <link rel="stylesheet" href="bower_components/qtip2/jquery.qtip.css" />
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="app.css" />
@@ -27,6 +26,7 @@
     <script src="app.js"></script>
     <script src="js/controllers/MainController.js"></script>
     <script src="js/controllers/NeighbourController.js"></script>
+    <script src="js/controllers/PathExistenceController.js"></script>
     <script src="js/services/BasicDataService.js"></script>
     <script src="js/services/ExportService.js"></script>
     <script src="js/services/GraphConfigService.js"></script>
@@ -36,11 +36,14 @@
     <script src="js/services/ValidationService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
+    <script src="js/filters/rangeFilter.js"></script>
+    <script src="js/filters/ordinalFilter.js"></script>
     <script src="js/filters/interactionFilter.js"></script>
     <script src="js/directives/staticInclude.js"></script>
     </body>
     <!--<script type="text/javascript" src="ctyodemo.js"></script>-->
 </head>
+
 <body md-no-ink>
     <md-toolbar class=" md-primary md-hue-3">
         <div layout="row">
@@ -92,8 +95,25 @@
                         </section>
                     </md-content>
                 </md-tab>
+                <md-tab label="Path Existence Viewer">
+                    <md-content ng-controller="PathExistenceController">
+                        <section layout="row">
+                            <div static-include="partials/sideBar.html">
+                            </div>
+                            <md-content flex>
+                                <div>
+                                    <div ng-show="display == 'Graph'" style="width: 100%; height:800px; background-color: white;" id="cyNeighbour"></div>
+                                    <div static-include="partials/edgeInspectorTile.html"></div>
+                                </div>
+                                <div static-include="partials/tableView.html"></div>
+                                <!--<div>{{genes}}</div>-->
+                            </md-content>
+                        </section>
+                    </md-content>
+                </md-tab>
             </md-tabs>
         </md-content>
     </div>
 </body>
+
 </html>
