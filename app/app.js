@@ -6,6 +6,7 @@ angular.module('myApp', [
   'ngFileUpload',
   'myApp.MainController',
   'myApp.NeighbourController',
+  'myApp.PathExistenceController',
   'myApp.filters'
 ]).config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
