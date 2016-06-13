@@ -20,21 +20,6 @@ getDegrees <- function(corMatrix) {
     result <- list(epiDegree = deg.row, stromaDegree = deg.col)
 }
 
-removeUnnecessaryGenes <- function(corMatrix, epiDegrees, stromaDegrees) {
-    result <- corMatrix
-    indices <- c()
-
-    for (index in 1:nrow(corMatrix)) {
-        if (length(which(corMatrix[index,] == 0)) && length(which(corMatrix[, index] == 0))) {
-            indices <- c(indices, index)
-        }
-    }
-
-    result <- result[-indices, -indices]
-    
-    result
-}
-
 filterCorrelationsByWeight <- function(weights, minNegativeWeight, minPositiveWeight) {
     if (is.na(minNegativeWeight)|| is.nan(minNegativeWeight)) {
         weights[weights < 0] = 0
@@ -46,8 +31,8 @@ filterCorrelationsByWeight <- function(weights, minNegativeWeight, minPositiveWe
         minPositiveWeight <- 0
     }
 
-    weights[weights >= minNegativeWeight & weights < 0] = 0      
-    weights[weights <= minPositiveWeight & weights > 0] = 0  
+    weights[weights > minNegativeWeight & weights < 0] = 0      
+    weights[weights < minPositiveWeight & weights > 0] = 0  
 
     weights
 }
@@ -155,39 +140,6 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
     resultDegrees
 }
 
-createEdges <- function(corMatrix, gene, exclusion) {
-    edges <- list()
-
-    if (length(gene) == 0 || is.na(gene)) {
-        return(edges)
-    }
-
-    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
-        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
-        neighboursNames <- setdiff(neighboursNames, exclusion)
-        
-
-        neighbours <- corMatrix[gene, neighboursNames]
-        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
-    } else {
-        neighboursNames <- names(which(corMatrix[, gene] != 0))
-        neighboursNames <- setdiff(neighboursNames, exclusion)
-
-        neighbours <- corMatrix[neighboursNames, gene]
-        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
-    }
-
-    if (length(neighbours) == 0) {
-        return(edges)
-    }
-
-    for (i in 1:length(neighbours)) {       
-        edges[[i]] <- list(gene, names(neighbours[i]), neighbours[i])
-    }
-
-    edges
-}
-
 createEdgesDF <- function(corMatrix, gene, exclusion) {
     edges <- createEmptyEdges()
 
@@ -214,7 +166,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
         return(edges)
     }
 
-    #neighbours <-  tail(sort(abs(neighbours)), 20)
+    neighbours <-  tail(sort(abs(neighbours)), 30)
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[i])
@@ -283,3 +235,39 @@ getGeneSuffix <- function(gene) {
     tolower(substr(gene, nchar(gene)-1, nchar(gene)))
 }
 
+filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
+    if (is.na(minNegativeWeight)|| is.nan(minNegativeWeight)) {
+        temp <- -which(edges$weight < 0)
+        if (length(temp) > 0) {
+            edges <- edges[temp,]        
+        }  
+        
+        
+        write("minNegativeWeight!!!!!!!!!!", stderr())
+        minNegativeWeight <- 0
+    } 
+
+    if (is.na(minPositiveWeight) || is.nan(minPositiveWeight)) {
+        temp <- -which(edges$weight > 0)
+        if (length(temp) > 0) {
+            edges <- edges[temp,]        
+        }
+
+        
+        write("minPositiveWeight!!!!!!!!!!", stderr())
+        minPositiveWeight <- 0
+    }
+
+    temp <- -which(edges$weight >= minNegativeWeight & edges$weight < 0)
+    if (length(temp) > 0) {
+        edges <- edges[temp,]        
+    }
+    
+
+    temp <- -which(edges$weight <= minPositiveWeight & edges$weight > 0)
+    if (length(temp) > 0) {
+        edges <- edges[temp, ]                
+    }
+
+    edges
+}

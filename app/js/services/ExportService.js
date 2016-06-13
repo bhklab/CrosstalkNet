@@ -3,6 +3,8 @@ myModule.factory('ExportService', function($http) {
     var service = {};
 
     service.exportTableToCSV = exportTableToCSV;
+    service.exportNeighboursToCSV = exportNeighboursToCSV;
+
     function exportTableToCSV($table, filename) {
         var $headers = $table.find('tr:has(th)'),
             $rows = $table.find('tr:has(td)')
@@ -54,6 +56,39 @@ myModule.factory('ExportService', function($http) {
                 $text = $col.text();
             return $text.replace('"', '""'); // escape double quotes
         }
+    }
+
+    function exportNeighboursToCSV(scope, index, filename) {
+        var neighbours = scope.neighbours[index];
+        var rowDelim = "\r\n";
+        var colDelim = ",";
+        var csv = "";
+        var header = colDelim + neighbours.stroma.join();
+        csv += header;
+        csv += rowDelim;
+
+        for (var i = 0; i < neighbours.epi.length; i++) {
+            var temp = [];
+            temp.push(neighbours.epi[i]);
+            for (var j = 0; j < neighbours.stroma.length; j++) {
+                
+                //temp += colDelim;
+                temp.push(scope.getInteractionViaDictionary(neighbours.epi[i], neighbours.stroma[j]));
+            }
+
+            csv += temp.join();
+            //csv += temp;
+            csv += rowDelim;
+        }
+
+        var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+        var link = document.createElement("a");
+        link.setAttribute("href", csvData);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click(); // This w
+        document.body.removeChild(link);
     }
 
     return service;
