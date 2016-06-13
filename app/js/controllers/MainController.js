@@ -20,6 +20,8 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
         $scope.needsRedraw = false;
         $scope.tabIndex = 0;
 
+        $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
                 $scope.display = "Tables";
