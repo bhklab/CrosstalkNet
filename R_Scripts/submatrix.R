@@ -71,6 +71,8 @@ secondNeighboursNodes <- list()
 if (length(firstNeighboursNodes) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighboursNodes)) {
 		secondNeighboursNodes[[i]] = createEmptyNodes()
+		nodesToAdd = createEmptyNodes()
+		edgesToAdd <- createEmptyEdges()
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
 			#nodesToAdd <- getNeighboursNodes(corMatrixSecondNeighbours, degrees, firstNeighboursNodes[[i]][j,]$name, exclusions, 2, genesOfInterest)
@@ -82,7 +84,8 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 			# 	secondNeighboursNodes[[i]] = nodesToAdd
 			# }
 
-			#exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
+			nodesToAdd <- rbind(nodesToAdd, getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesToAdd, 2, genesOfInterest, exclusions))
+			exclusions <- c(exclusions, edgesToAdd$target)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
 		
@@ -90,8 +93,9 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		#exclusions <- unique(exclusions)
 		edgeExclusions <- unique(edgeExclusions)
 
-		secondNeighboursNodes[[i]] = getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesSecond[[i]], 2, genesOfInterest, exclusions)
-		exclusions <- c(exclusions, secondNeighboursNodes[[i]]$target)
+		secondNeighboursNodes[[i]] = nodesToAdd#getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesSecond[[i]], 2, genesOfInterest, exclusions)
+		exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
+		exclusions <- unique(exclusions)
 	}	
 }
 

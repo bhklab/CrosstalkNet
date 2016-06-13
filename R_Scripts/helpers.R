@@ -214,7 +214,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
         return(edges)
     }
 
-    neighbours <-  tail(sort(abs(neighbours)), 20)
+    #neighbours <-  tail(sort(abs(neighbours)), 20)
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[i])
@@ -257,7 +257,7 @@ getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, select
     neighboursNames <- setdiff(neighboursNames, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, edges$target)
 
-    if (length(edges) < 1) {
+    if (length(neighboursNames) < 1) {
         return(nodes)
     }
 
