@@ -29,7 +29,7 @@ for (i in 1:length(selectedGenes)) {
     exclusions <- c(exclusions, selectedGenes[i])
     nodesToAdd <- getNeighboursNodes(corMatrix, degrees, selectedGenes[i], exclusions, i, selectedGenes)
     nodes[[i]] <- nodesToAdd
-    edges[[i]] <- createEdgesDF(corMatrix, selectedGenes[i], edgeExclusion)
+    edges[[i]] <- createEdgesDF(corMatrix, selectedGenes[i], edgeExclusion, 0)
     #edgeExclusion <- selectedGenes[i]
     edgeExclusion <- c(edgeExclusion, selectedGenes[i])
     exclusions <- c(exclusions, nodesToAdd$name)

@@ -29,16 +29,6 @@ if (pValue != "") {
 	degrees <- readRDS(paste(path, 'degrees', fileName, sep=""))
 }
 
-# if (weightFilterFirst == TRUE) {
-# 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
-# }
-
-# if (weightFilterSecond == TRUE) {
-# 	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
-# } 
-
-maxNeighbours <- 3
-
 exclusions <- genesOfInterest
 firstNeighboursNodes <- list()
 edgesFirst <- list()
@@ -50,7 +40,7 @@ k <- 0
 edgeExclusions <- c()
 
 for (i in 1:length(genesOfInterest)) {
-    edgesToAdd <- createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions)
+    edgesToAdd <- createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions, 0)
 
     if (weightFilterFirst == TRUE) {
     	edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -76,7 +66,7 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
 			ptm <- proc.time()
-			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions))
+			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30))
 			if (weightFilterSecond == TRUE) {
 				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
 			}
