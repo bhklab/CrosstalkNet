@@ -214,7 +214,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
         return(edges)
     }
 
-    #neighbours <-  tail(sort(abs(neighbours)), 20)
+    neighbours <-  tail(sort(abs(neighbours)), 20)
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[i])
@@ -225,17 +225,39 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
 }
 
 getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
-    #write("gene", stderr())
-    #write(gene, stderr())
-    #write(class(gene), stderr())
-
-    #neighbours <- getNeighbours(corMatrix, gene, exclusion)
-    #neighbours <- tail(sort(abs(neighbours)), 20)
-    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)#names(neighbours)
+    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
     nodes <- createEmptyNodes()
 
     if (length(neighboursNames) < 1) {
+        return(nodes)
+    }
+
+    for (i in 1:length(neighboursNames)) {
+        #write("name", stderr())
+        nodes[i, "name"] <- neighboursNames[i]
+        #write("degree", stderr())
+        nodes[i, "degree"] <- neighboursDegrees[i]
+        #write("level", stderr())
+        nodes[i, "level"] <- level
+
+        if (nodes[i, "name"] %in% selectedGenes) {
+            nodes[i, "isSource"] <- TRUE 
+        } else {
+            nodes[i, "isSource"] <- FALSE
+        }
+    }
+
+    nodes
+}
+
+getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, selectedGenes, exclusion) {
+    nodes <- createEmptyNodes()
+    neighboursNames <- edges$target
+    neighboursNames <- setdiff(neighboursNames, exclusion)
+    neighboursDegrees <- getDegreesForNeighbourNames(degrees, edges$target)
+
+    if (length(edges) < 1) {
         return(nodes)
     }
 

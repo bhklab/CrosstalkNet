@@ -11,11 +11,11 @@
                         </md-input-container>
                     </div>
                 </div>
-                <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                <!--<span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>-->
             </md-card-title-text>
         </md-card-title>
         <md-card-content class="table-card-height">
-            <!--<table id="{{ctrl + '-neighbours-table-' + x}}">
+            <table id="{{ctrl + '-neighbours-table-' + x}}">
                 <thead>
                     <tr>
                         <th> </th>
@@ -30,6 +30,7 @@
                 </tbody>
             </table>
             <!-- exact table from live demo -->
+            <!--
             <md-table-container>
                 <table id="{{ctrl + '-neighbours-table-' + x}}" md-table>
                     <thead md-head>
@@ -46,7 +47,7 @@
                     </tbody>
                 </table>
             </md-table-container>
-            <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{neighbours[x].epi.length}}"></md-table-pagination>
+            <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{neighbours[x].epi.length}}"></md-table-pagination>-->
             <md-button class="md-raised md-primary" ng-click="exportTableToCSV(ctrl + '-neighbours-table-' + x)">Download Interactions</md-button>
         </md-card-content>
     </md-card>
