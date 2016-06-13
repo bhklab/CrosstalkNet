@@ -366,6 +366,9 @@ app.post('/submatrix', function(req, res) {
 
             secondNeighbourInteractions = cytoscapeEdges;
 
+            console.log("Length of all nodes: " + allNodes.length);
+            console.log("Length of all edges: " + (firstNeighbourInteractions.length + secondNeighbourInteractions.length));
+
             /*var cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst, 1);
             firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
             cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond, 2);
