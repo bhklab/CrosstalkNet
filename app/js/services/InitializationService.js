@@ -91,6 +91,11 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         scope.edgeDictionary = {};
         scope.selfLoops = [];
         scope.allVisibleGenes = [];
+
+        scope.query = {
+            limit: 5,
+            page: 1
+        };
     }
 
     return service;

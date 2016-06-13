@@ -20,6 +20,7 @@
     "qtip2": "~2.2.1",
     "tabletoCSV": "~0.1.0",
     "angular-mocks": "~1.4.0",
-    "html5-boilerplate": "~5.2.0"
+    "html5-boilerplate": "~5.2.0",
+    "angular-material-data-table": "^0.10.9"
   }
 }

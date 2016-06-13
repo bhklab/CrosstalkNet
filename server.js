@@ -327,6 +327,7 @@ app.post('/submatrix', function(req, res) {
             var parentNodes = [];
             var allNodes = [];
             var edges = [];
+            var cytoscapeEdges = [];
             var firstNeighbourInteractions = [];
             var secondNeighbourInteractions = [];
             var edgeDictionary = {};
@@ -350,10 +351,25 @@ app.post('/submatrix', function(req, res) {
                 allNodes = allNodes.concat(secondNodes[i]);
             }
 
-            var cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst, 1);
+            for (var i = 0; i < parsedEdgesFirst.length; i++) {
+                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst[i], 1));
+                //interactionsTableList.push()
+            }
+
+            firstNeighbourInteractions = cytoscapeEdges;
+            cytoscapeEdges = [];
+
+            for (var i = 0; i < parsedEdgesSecond.length; i++) {
+                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond[i], 2));
+                //interactionsTableList.push()
+            }
+
+            secondNeighbourInteractions = cytoscapeEdges;
+
+            /*var cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst, 1);
             firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
             cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond, 2);
-            secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)
+            secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)*/
             edges = edges.concat(firstNeighbourInteractions);
             edges = edges.concat(secondNeighbourInteractions);
 
