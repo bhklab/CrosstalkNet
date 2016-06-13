@@ -140,7 +140,7 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
     resultDegrees
 }
 
-createEdgesDF <- function(corMatrix, gene, exclusion) {
+createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
     edges <- createEmptyEdges()
 
     if (length(gene) == 0 || is.na(gene)) {
@@ -166,7 +166,10 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
         return(edges)
     }
 
-    neighbours <-  tail(sort(abs(neighbours)), 30)
+    if (limit > 0) {
+        neighbours <-  tail(sort(abs(neighbours)), limit)
+    }
+    
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[i])
