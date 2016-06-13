@@ -15,7 +15,7 @@
             </md-card-title-text>
         </md-card-title>
         <md-card-content class="table-card-height">
-            <table id="{{ctrl + '-neighbours-table-' + x}}">
+            <!--<table id="{{ctrl + '-neighbours-table-' + x}}">
                 <thead>
                     <tr>
                         <th> </th>
@@ -29,6 +29,24 @@
                     </tr>
                 </tbody>
             </table>
+            <!-- exact table from live demo -->
+            <md-table-container>
+                <table id="{{ctrl + '-neighbours-table-' + x}}" md-table>
+                    <thead md-head>
+                        <tr md-row>
+                            <th md-column></th>
+                            <th md-column ng-repeat="stroma in neighbours[x].stroma"><span>{{stroma}}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody md-body>
+                        <tr md-row ng-repeat="epi in neighbours[x].epi | limitTo: query.limit: (query.page - 1) * query.limit"">
+                            <td md-cell>{{epi}}</td>
+                            <td md-cell ng-repeat="stroma in neighbours[x].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-table-container>
+            <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{neighbours[x].epi.length}}"></md-table-pagination>
             <md-button class="md-raised md-primary" ng-click="exportTableToCSV(ctrl + '-neighbours-table-' + x)">Download Interactions</md-button>
         </md-card-content>
     </md-card>

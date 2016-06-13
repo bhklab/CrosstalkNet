@@ -214,6 +214,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion) {
         return(edges)
     }
 
+    #neighbours <-  tail(sort(abs(neighbours)), 20)
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[i])
@@ -228,7 +229,9 @@ getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selec
     #write(gene, stderr())
     #write(class(gene), stderr())
 
-    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
+    #neighbours <- getNeighbours(corMatrix, gene, exclusion)
+    #neighbours <- tail(sort(abs(neighbours)), 20)
+    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)#names(neighbours)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
     nodes <- createEmptyNodes()
 

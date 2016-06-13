@@ -4,6 +4,7 @@
 angular.module('myApp', [
   'ngMaterial',
   'ngFileUpload',
+  'md.data.table',
   'myApp.MainController',
   'myApp.NeighbourController',
   'myApp.PathExistenceController',

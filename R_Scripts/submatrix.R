@@ -47,8 +47,8 @@ maxNeighbours <- 3
 
 exclusions <- genesOfInterest
 firstNeighboursNodes <- list()
-edgesFirst <- createEmptyEdges()
-edgesSecond <- createEmptyEdges()
+edgesFirst <- list()
+edgesSecond <- list()
 
 k <- 0
 edgeExclusions <- c()
@@ -57,7 +57,8 @@ for (i in 1:length(genesOfInterest)) {
     #exclusions = c(exclusions, genesOfInterest[i]) This is not needed for epi stroma. Might come in useful for epi-epi or stroma-stroma though.
     nodesToAdd <- getNeighboursNodes(corMatrixFirstNeighbours, degrees, genesOfInterest[i], exclusions, 1, genesOfInterest)
     firstNeighboursNodes[[i]] <- nodesToAdd
-    edgesFirst <- rbind(edgesFirst, createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions))
+    edgesToAdd <- createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions)
+    edgesFirst[[i]] <- edgesToAdd[order(edgesToAdd$weight),]
 
     k <- i
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
@@ -72,7 +73,7 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
 			nodesToAdd <- getNeighboursNodes(corMatrixSecondNeighbours, degrees, firstNeighboursNodes[[i]][j,]$name, exclusions, 2, genesOfInterest)
-			edgesToAdd <- createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions)
+			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions))
 
 			if (j > 1) {
 				secondNeighboursNodes[[i]] = rbind(secondNeighboursNodes[[i]], nodesToAdd)		
@@ -80,11 +81,11 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 				secondNeighboursNodes[[i]] = nodesToAdd
 			}
 
-			edgesSecond = rbind(edgesSecond, edgesToAdd)
 			exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
 		
+		edgesSecond[[i]] = edgesToAdd[order(edgesToAdd$weight),]
 		exclusions <- unique(exclusions)
 		edgeExclusions <- unique(edgeExclusions)
 	}	
