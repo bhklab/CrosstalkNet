@@ -9,25 +9,19 @@ settings <- fromJSON(args[2])
 pValue <- settings$pValue
 fileName <- settings$fileName
 path <- settings$path
-minNegativeWeightFirst <- settings$minNegativeWeightFirst
-minPositiveWeightFirst <- settings$minPositiveWeightFirst
-minNegativeWeightSecond <- settings$minNegativeWeightSecond
-minPositiveWeightSecond <- settings$minPositiveWeightSecond
+minNegativeWeightFirst <- as.numeric(settings$minNegativeWeightFirst)
+minPositiveWeightFirst <- as.numeric(settings$minPositiveWeightFirst)
+minNegativeWeightSecond <- as.numeric(settings$minNegativeWeightSecond)
+minPositiveWeightSecond <- as.numeric(settings$minPositiveWeightSecond)
 weightFilterFirst <- as.logical(settings$weightFilterFirst)
 weightFilterSecond <- as.logical(settings$weightFilterSecond)
 depth <- settings$depth
 genesOfInterest <- settings$genesOfInterest
 
 corMatrixFirstNeighbours <- readRDS(paste(path, fileName, sep=""))
-write("Finished Reading Matrix", stderr())
 if (depth > 1) {
-	write("Copying Matrix", stderr())
 	corMatrixSecondNeighbours <- corMatrixFirstNeighbours 	
-	write("Finished copying Matrix", stderr())
 }
-
-write("Memory usage", stderr())
-write(sort( sapply(ls(),function(x){object.size(get(x))})), stderr())
 
 if (pValue != "") {
 	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, '.RData', sep=""))
@@ -35,13 +29,13 @@ if (pValue != "") {
 	degrees <- readRDS(paste(path, 'degrees', fileName, sep=""))
 }
 
-if (weightFilterFirst == TRUE) {
-	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
-}
+# if (weightFilterFirst == TRUE) {
+# 	corMatrixFirstNeighbours <- filterCorrelationsByWeight(corMatrixFirstNeighbours, minNegativeWeightFirst, minPositiveWeightFirst)
+# }
 
-if (weightFilterSecond == TRUE) {
-	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
-} 
+# if (weightFilterSecond == TRUE) {
+# 	corMatrixSecondNeighbours <- filterCorrelationsByWeight(corMatrixSecondNeighbours, minNegativeWeightSecond, minPositiveWeightSecond)
+# } 
 
 maxNeighbours <- 3
 
@@ -49,21 +43,27 @@ exclusions <- genesOfInterest
 firstNeighboursNodes <- list()
 edgesFirst <- list()
 edgesSecond <- list()
+edgeTestFirst <- c()
+edgeTestSecond <- c()
 
 k <- 0
 edgeExclusions <- c()
 
 for (i in 1:length(genesOfInterest)) {
-    #exclusions = c(exclusions, genesOfInterest[i]) This is not needed for epi stroma. Might come in useful for epi-epi or stroma-stroma though.
-    #nodesToAdd <- getNeighboursNodes(corMatrixFirstNeighbours, degrees, genesOfInterest[i], exclusions, 1, genesOfInterest)
     edgesToAdd <- createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions)
-    edgesFirst[[i]] <- edgesToAdd[order(edgesToAdd$weight),]
+
+    if (weightFilterFirst == TRUE) {
+    	edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightFirst, minPositiveWeightFirst)
+    }
+
+    edgesFirst[[i]] <- edgesToAdd
     nodesToAdd <- getNeighboursNodesFromEdges(corMatrixFirstNeighbours, degrees, edgesFirst[[i]], 1, genesOfInterest, exclusions)
     firstNeighboursNodes[[i]] <- nodesToAdd
 
     k <- i
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
     exclusions <- c(exclusions, nodesToAdd$name)
+    edgeTestFirst <- c(edgeTestFirst, edgesFirst[[i]]$weight)
 }
 
 secondNeighboursNodes <- list()
@@ -75,35 +75,37 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		edgesToAdd <- createEmptyEdges()
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
-			#nodesToAdd <- getNeighboursNodes(corMatrixSecondNeighbours, degrees, firstNeighboursNodes[[i]][j,]$name, exclusions, 2, genesOfInterest)
+			ptm <- proc.time()
 			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions))
+			if (weightFilterSecond == TRUE) {
+				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
+			}
+			timeDif <- proc.time() - ptm 
+			write("Creating edges took: ", stderr())
+			write(timeDif, stderr())
 
-			# if (j > 1) {
-			# 	secondNeighboursNodes[[i]] = rbind(secondNeighboursNodes[[i]], nodesToAdd)		
-			# } else {
-			# 	secondNeighboursNodes[[i]] = nodesToAdd
-			# }
-
+			ptm <- proc.time()
 			nodesToAdd <- rbind(nodesToAdd, getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesToAdd, 2, genesOfInterest, exclusions))
+			timeDif <- proc.time() - ptm 
+			write("Creating nodes took: ", stderr())
+			write(timeDif, stderr())
 			exclusions <- c(exclusions, edgesToAdd$target)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
 		
-		edgesSecond[[i]] = edgesToAdd#[order(edgesToAdd$weight),]
-		#exclusions <- unique(exclusions)
+		edgesSecond[[i]] = edgesToAdd
 		edgeExclusions <- unique(edgeExclusions)
-
-		secondNeighboursNodes[[i]] = nodesToAdd#getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesSecond[[i]], 2, genesOfInterest, exclusions)
+		secondNeighboursNodes[[i]] = nodesToAdd
 		exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
 		exclusions <- unique(exclusions)
+		edgeTestSecond <- c(edgeTestSecond, edgesSecond[[i]]$weight)
 	}	
 }
 
-totalInteractions <- 0#length(which((weights)!=0))
 if (depth == 1) {
-	edgeTest <- edgesFirst$weight
+	edgeTest <- edgeTestFirst
 } else if (depth == 2) {
-	edgeTest <- edgesSecond$weight
+	edgeTest <- edgeTestSecond
 }
 
 minPositiveWeight <- min(edgeTest[edgeTest > 0])
