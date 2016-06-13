@@ -55,10 +55,11 @@ edgeExclusions <- c()
 
 for (i in 1:length(genesOfInterest)) {
     #exclusions = c(exclusions, genesOfInterest[i]) This is not needed for epi stroma. Might come in useful for epi-epi or stroma-stroma though.
-    nodesToAdd <- getNeighboursNodes(corMatrixFirstNeighbours, degrees, genesOfInterest[i], exclusions, 1, genesOfInterest)
-    firstNeighboursNodes[[i]] <- nodesToAdd
+    #nodesToAdd <- getNeighboursNodes(corMatrixFirstNeighbours, degrees, genesOfInterest[i], exclusions, 1, genesOfInterest)
     edgesToAdd <- createEdgesDF(corMatrixFirstNeighbours, genesOfInterest[i], edgeExclusions)
     edgesFirst[[i]] <- edgesToAdd[order(edgesToAdd$weight),]
+    nodesToAdd <- getNeighboursNodesFromEdges(corMatrixFirstNeighbours, degrees, edgesFirst[[i]], 1, genesOfInterest, exclusions)
+    firstNeighboursNodes[[i]] <- nodesToAdd
 
     k <- i
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
@@ -72,22 +73,25 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		secondNeighboursNodes[[i]] = createEmptyNodes()
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
-			nodesToAdd <- getNeighboursNodes(corMatrixSecondNeighbours, degrees, firstNeighboursNodes[[i]][j,]$name, exclusions, 2, genesOfInterest)
+			#nodesToAdd <- getNeighboursNodes(corMatrixSecondNeighbours, degrees, firstNeighboursNodes[[i]][j,]$name, exclusions, 2, genesOfInterest)
 			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions))
 
-			if (j > 1) {
-				secondNeighboursNodes[[i]] = rbind(secondNeighboursNodes[[i]], nodesToAdd)		
-			} else {
-				secondNeighboursNodes[[i]] = nodesToAdd
-			}
+			# if (j > 1) {
+			# 	secondNeighboursNodes[[i]] = rbind(secondNeighboursNodes[[i]], nodesToAdd)		
+			# } else {
+			# 	secondNeighboursNodes[[i]] = nodesToAdd
+			# }
 
-			exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
+			#exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
 		
-		edgesSecond[[i]] = edgesToAdd[order(edgesToAdd$weight),]
-		exclusions <- unique(exclusions)
+		edgesSecond[[i]] = edgesToAdd#[order(edgesToAdd$weight),]
+		#exclusions <- unique(exclusions)
 		edgeExclusions <- unique(edgeExclusions)
+
+		secondNeighboursNodes[[i]] = getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesSecond[[i]], 2, genesOfInterest, exclusions)
+		exclusions <- c(exclusions, secondNeighboursNodes[[i]]$target)
 	}	
 }
 
