@@ -16,10 +16,14 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
     ];
 
-    service.layouts = [{ display: "Bipartite", value: "preset" }, {
+    service.layouts = { main: null, interactionExplorer: null };
+    service.layouts.main = [{ display: "Bipartite", value: "preset" }, {
         display: "Concentric",
         value: "clustered"
     }, { display: "Random", value: "random" }];
+
+    service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
+
 
     service.loadDropdownOptions = loadDropdownOptions;
     service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
