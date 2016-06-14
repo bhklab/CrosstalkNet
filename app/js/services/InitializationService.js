@@ -28,7 +28,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         scope.display = "Graph";
         scope.switchModel = false;
 
-        scope.selectedLayout = scope.layouts[0].value;
+        scope.selectedLayout = scope.layouts.main[0].value;
 
         scope.sliderMinWeightNegative = -1;
         scope.sliderMaxWeightPositive = 1;

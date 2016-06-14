@@ -324,6 +324,13 @@ app.post('/submatrix', function(req, res) {
             var maxNegativeWeight = parsedValue.maxNegativeWeight;
             var minPositiveWeight = parsedValue.minPositiveWeight;
 
+            var minNegativeWeightOverall = parsedValue.minNegativeWeightOverall;
+            var maxPositiveWeightOverall = parsedValue.maxPositiveWeightOverall;
+
+            var maxNegativeWeightOverall = parsedValue.maxNegativeWeightOverall;
+            var minPositiveWeightOverall = parsedValue.minPositiveWeightOverall;
+
+
             var sourceNodes = [];
             var firstNodes = [];
             var secondNodes = [];
@@ -341,11 +348,11 @@ app.post('/submatrix', function(req, res) {
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
-            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeight, maxNegativeWeight);
-            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeight, maxNegativeWeight);
+            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
+            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
 
-            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeight, maxPositiveWeight);
-            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeight, maxPositiveWeight);
+            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
+            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
