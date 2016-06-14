@@ -74,6 +74,8 @@
                                     <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
+                                    <div>{{cy.edges()[0].mapData('weight', 0, 100, '1px', '20px')}}</div>
+                                    <div>{{cy.edges()[0].mapData('weight', 0, 100, red, blue)}}</div>
                                 </div>
                                 <div static-include="partials/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->

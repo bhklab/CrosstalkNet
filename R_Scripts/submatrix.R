@@ -104,6 +104,12 @@ maxPositiveWeight <- max(edgeTest[edgeTest > 0])
 minNegativeWeight <- min(edgeTest[edgeTest < 0])
 maxNegativeWeight <- max(edgeTest[edgeTest < 0])
 
+if (is.na(minPositiveWeight) || is.nan(minPositiveWeight)) { minPositiveWeight = 0 }
+if (is.na(maxPositiveWeight) || is.nan(maxPositiveWeight)) { maxPositiveWeight = 0 }
+
+if (is.na(minNegativeWeight) || is.nan(minNegativeWeight)) { minNegativeWeight = 0 }
+if (is.na(maxNegativeWeight) || is.nan(maxNegativeWeight)) { maxNegativeWeight = 0 }
+
 neighboursNodes <- list(first = firstNeighboursNodes, second = secondNeighboursNodes)
 edges <- list(first = edgesFirst, second = edgesSecond)
 
