@@ -341,11 +341,11 @@ app.post('/submatrix', function(req, res) {
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
-            edgeStyleNegative.width = styleUtils.getDynamicWidth('weight', minNegativeWeight, maxNegativeWeight);
-            edgeStyleNegative['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeight, maxNegativeWeight);
+            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeight, maxNegativeWeight);
+            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeight, maxNegativeWeight);
 
-            edgeStylePositive.width = styleUtils.getDynamicWidth('weight', minPositiveWeight, maxPositiveWeight);
-            edgeStylePositive['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeight, maxPositiveWeight);
+            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeight, maxPositiveWeight);
+            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeight, maxPositiveWeight);
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
