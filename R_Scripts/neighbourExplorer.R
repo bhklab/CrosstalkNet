@@ -24,6 +24,7 @@ edges <- list()
 edgeExclusion <- c()
 #nodes <- createEmptyNodes()
 nodes <- list()
+edgeTest <- c()
 
 for (i in 1:length(selectedGenes)) {
     exclusions <- c(exclusions, selectedGenes[i])
@@ -33,7 +34,10 @@ for (i in 1:length(selectedGenes)) {
     #edgeExclusion <- selectedGenes[i]
     edgeExclusion <- c(edgeExclusion, selectedGenes[i])
     exclusions <- c(exclusions, nodesToAdd$name)
+    edgeTest <- c(edgeTest, edges[[i]]$weight)
 }
 
-result <- list(nodes = nodes, edges = edges)
+
+minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
+result <- list(nodes = nodes, edges = edges, minMaxWeightOverall = minMaxWeightOverall)
 cat(format(toJSON(result)))

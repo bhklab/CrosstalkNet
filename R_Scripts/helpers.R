@@ -274,3 +274,21 @@ filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
 
     edges
 }
+
+getMinMaxWeightValues <- function(weights) {
+    minPositiveWeight <- min(weights[weights > 0])
+    maxPositiveWeight <- max(weights[weights > 0])
+
+    minNegativeWeight <- min(weights[weights < 0])
+    maxNegativeWeight <- max(weights[weights < 0])
+
+    if (is.na(minPositiveWeight) || is.nan(minPositiveWeight) || is.infinite(minPositiveWeight)) { minPositiveWeight = 0 }
+    if (is.na(maxPositiveWeight) || is.nan(maxPositiveWeight) || is.infinite(maxPositiveWeight)) { maxPositiveWeight = 1 }
+
+    if (is.na(minNegativeWeight) || is.nan(minNegativeWeight) || is.infinite(minNegativeWeight)) { minNegativeWeight = -1 }
+    if (is.na(maxNegativeWeight) || is.nan(maxNegativeWeight) || is.infinite(maxNegativeWeight)) { maxNegativeWeight = 0 }
+
+    result <- list(minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
+    result
+}
+    
