@@ -78,6 +78,29 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             console.log('tapped ' + id);
             console.log(node);
         });
+
+        scope.cy.nodes().not(':parent').forEach(function(n) {
+            var g = n.data('id').slice(0, -2);
+            n.qtip({
+                content: [{
+                    name: 'GeneCard',
+                    url: 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + g
+                }].map(function(link) {
+                    return '<a target="_blank" href="' + link.url + '">' + link.name + '</a>';
+                }).join('<br />\n'),
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                },
+                style: {
+                    classes: 'qtip-bootstrap',
+                    tip: {
+                        width: 16,
+                        height: 8
+                    }
+                }
+            });
+        });
     };
 
     service.getInteractingNodes = function(node, cy) {
@@ -135,9 +158,8 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             .promise('completed').then(function() {
                 jAni
                     .reverse()
-                    .rewind() 
-                    .play()
-                ;
+                    .rewind()
+                    .play();
             });
 
         node.addClass('located');

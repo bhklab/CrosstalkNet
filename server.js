@@ -176,14 +176,9 @@ app.post('/neighbour-general', function(req, res) {
                 //interactionsTableList.push()
             }
 
-            console.log(edges);
-
             for (var i = 0; i < parsedNodes.length; i++) {
                 nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
             }
-
-            //console.log(nodes);
-
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
