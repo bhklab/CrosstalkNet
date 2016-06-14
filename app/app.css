@@ -213,6 +213,15 @@ md-divider {
     margin-left: 0px;
 }
 
+table.md-table {
+    width: inherit !important;
+}
+
+table.md-table th.md-column {
+    font-size: inherit !important;
+    color: black !important;
+}
+
 /* Disable animations*/
 
 .md-ripple-container, .md-ripple-placed {

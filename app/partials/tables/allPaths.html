@@ -8,27 +8,26 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
-        <table id="all-paths-table" ng-if="allPaths.length > 0">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Correlation</th>
-                    <th ng-if="allPaths[0].intermediateNode != null">Intermediate Gene</th>
-                    <th ng-if="allPaths[0].intermediateNode != null">Correlation</th>
-                    <th>Destination</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="path in allPaths">
-                    <td>{{pathSource}}</td>
-                    <td>{{path.firstEdge}}</td>
-                    <td ng-if="allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
-                    <td ng-if="allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
-                    <td>{{pathTarget}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <md-table-container>
+            <table id="all-paths-table" md-table>
+                <thead md-head md-order="myOrder">
+                    <th md-column>Source</th>
+                    <th md-column md-column md-order-by="firstEdge" md-numeric>Correlation</th>
+                    <th ng-if="allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
+                    <th ng-if="allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
+                    <th md-column>Destination</th>
+                </thead>
+                <tbody md-body>
+                    <tr ng-repeat="path in allPaths | orderBy: myOrder">
+                        <td md-cell>{{pathSource}}</td>
+                        <td md-cell>{{path.firstEdge}}</td>
+                        <td md-cell ng-if="allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                        <td md-cell ng-if="allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
+                        <td md-cell>{{pathTarget}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-table-container>
         <md-button class="md-raised md-primary" ng-click="exportTableToCSV('all-paths-table')">Download Interactions</md-button>
-        <!--<div ng-repeat="path in allPaths">{{pathSource}} ---{{path.firstEdge}}--- {{path.intermediateNode}} {{path.secondEdge != null ? '---' + path.secondEdge + '---' : ''}} {{pathTarget}}</div>-->
     </md-card-content>
 </md-card>
