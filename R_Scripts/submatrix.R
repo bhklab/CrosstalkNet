@@ -98,36 +98,13 @@ if (depth == 1) {
 	edgeTest <- edgeTestSecond
 }
 
-
-
-
-minPositiveWeight <- min(edgeTest[edgeTest > 0])
-maxPositiveWeight <- max(edgeTest[edgeTest > 0])
-
-minNegativeWeight <- min(edgeTest[edgeTest < 0])
-maxNegativeWeight <- max(edgeTest[edgeTest < 0])
-
+minMaxWeightDepth <- getMinMaxWeightValues(edgeTest)
 edgeTest <- c(edgeTestFirst, edgeTestSecond)
-
-minPositiveWeightOverall <- min(edgeTest[edgeTest > 0])
-maxPositiveWeightOverall <- max(edgeTest[edgeTest > 0])
-
-minNegativeWeightOverall <- min(edgeTest[edgeTest < 0])
-maxNegativeWeightOverall <- max(edgeTest[edgeTest < 0])
-
-
-if (is.na(minPositiveWeight) || is.nan(minPositiveWeight) || is.infinite(minPositiveWeight)) { minPositiveWeight = 0 }
-if (is.na(maxPositiveWeight) || is.nan(maxPositiveWeight) || is.infinite(maxPositiveWeight)) { maxPositiveWeight = 1 }
-
-if (is.na(minNegativeWeight) || is.nan(minNegativeWeight) || is.infinite(minNegativeWeight)) { minNegativeWeight = 1 }
-if (is.na(maxNegativeWeight) || is.nan(maxNegativeWeight) || is.infinite(maxNegativeWeight)) { maxNegativeWeight = 0 }
+minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
 
 neighboursNodes <- list(first = firstNeighboursNodes, second = secondNeighboursNodes)
 edges <- list(first = edgesFirst, second = edgesSecond)
 
-output <- list(neighboursNodes = neighboursNodes, edges = edges,
- minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight, minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight,
- minNegativeWeightOverall = minNegativeWeightOverall, maxNegativeWeightOverall = maxNegativeWeightOverall, minPositiveWeightOverall = minPositiveWeightOverall
- , maxPositiveWeightOverall = maxPositiveWeightOverall)
+output <- list(neighboursNodes = neighboursNodes, edges = edges, minMaxWeightDepth = minMaxWeightDepth, minMaxWeightOverall = minMaxWeightOverall)
 
 cat(format(toJSON(output, auto_unbox = TRUE)))

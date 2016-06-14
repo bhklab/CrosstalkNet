@@ -126,6 +126,12 @@ app.post('/neighbour-general', function(req, res) {
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
 
+            var minNegativeWeightOverall = parsedValue.minMaxWeightOverall.minNegativeWeight;
+            var maxPositiveWeightOverall = parsedValue.minMaxWeightOverall.maxPositiveWeight;
+
+            var maxNegativeWeightOverall = parsedValue.minMaxWeightOverall.maxNegativeWeight;
+            var minPositiveWeightOverall = parsedValue.minMaxWeightOverall.minPositiveWeight;
+
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
@@ -135,6 +141,14 @@ app.post('/neighbour-general', function(req, res) {
             var config = null;
             var layout = null;
             var edgeDictionary = {};
+            var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
+            var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
+
+            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
+            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
+
+            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
+            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
 
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
 
@@ -240,7 +254,8 @@ app.post('/neighbour-general', function(req, res) {
             elements = elements.concat(edges);
             elements.push(sourceNodes[0][0]);
 
-
+            configUtils.addStyleToConfig(config, edgeStyleNegative);
+            configUtils.addStyleToConfig(config, edgeStylePositive);
             configUtils.setConfigElements(config, elements);
             configUtils.setConfigLayout(config, layout);
 
@@ -318,18 +333,20 @@ app.post('/submatrix', function(req, res) {
             var parsedEdgesFirst = parsedValue.edges.first;
             var parsedEdgesSecond = parsedValue.edges.second;
 
-            var minNegativeWeight = parsedValue.minNegativeWeight;
-            var maxPositiveWeight = parsedValue.maxPositiveWeight;
+            var minNegativeWeight = parsedValue.minMaxWeightDepth.minNegativeWeight;
+            var maxPositiveWeight = parsedValue.minMaxWeightDepth.maxPositiveWeight;
 
-            var maxNegativeWeight = parsedValue.maxNegativeWeight;
-            var minPositiveWeight = parsedValue.minPositiveWeight;
+            var maxNegativeWeight = parsedValue.minMaxWeightDepth.maxNegativeWeight;
+            var minPositiveWeight = parsedValue.minMaxWeightDepth.minPositiveWeight;
 
-            var minNegativeWeightOverall = parsedValue.minNegativeWeightOverall;
-            var maxPositiveWeightOverall = parsedValue.maxPositiveWeightOverall;
+            console.log(parsedValue.minMaxWeightDepth);
+            console.log(parsedValue.minMaxWeightOverall);
 
-            var maxNegativeWeightOverall = parsedValue.maxNegativeWeightOverall;
-            var minPositiveWeightOverall = parsedValue.minPositiveWeightOverall;
+            var minNegativeWeightOverall = parsedValue.minMaxWeightOverall.minNegativeWeight;
+            var maxPositiveWeightOverall = parsedValue.minMaxWeightOverall.maxPositiveWeight;
 
+            var maxNegativeWeightOverall = parsedValue.minMaxWeightOverall.maxNegativeWeight;
+            var minPositiveWeightOverall = parsedValue.minMaxWeightOverall.minPositiveWeight;
 
             var sourceNodes = [];
             var firstNodes = [];
