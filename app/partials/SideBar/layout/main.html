@@ -1,0 +1,17 @@
+<md-content class="md-padding">
+    <div layout="row">
+        <div flex>
+            <md-input-container class="select">
+                <label>Layout</label>
+                <md-select ng-change="getRelevantGenes(true)" ng-model="selectedLayout">
+                    <md-option ng-repeat="layout in layouts.main" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
+                        {{layout.display}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+        <div flex>
+            <md-button ng-click="resize(cy)">Resize</md-button>
+        </div>
+    </div>
+</md-content>
