@@ -321,6 +321,9 @@ app.post('/submatrix', function(req, res) {
             var minNegativeWeight = parsedValue.minNegativeWeight;
             var maxPositiveWeight = parsedValue.maxPositiveWeight;
 
+            var maxNegativeWeight = parsedValue.maxNegativeWeight;
+            var minPositiveWeight = parsedValue.minPositiveWeight;
+
             var sourceNodes = [];
             var firstNodes = [];
             var secondNodes = [];
@@ -335,6 +338,14 @@ app.post('/submatrix', function(req, res) {
             var elements = [];
             var config = null;
             var layout = null;
+            var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
+            var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
+
+            edgeStyleNegative.width = styleUtils.getDynamicWidth('weight', minNegativeWeight, maxNegativeWeight);
+            edgeStyleNegative['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeight, maxNegativeWeight);
+
+            edgeStylePositive.width = styleUtils.getDynamicWidth('weight', minPositiveWeight, maxPositiveWeight);
+            edgeStylePositive['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeight, maxPositiveWeight);
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
@@ -431,6 +442,9 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             }
 
+
+            configUtils.addStyleToConfig(config, edgeStyleNegative);
+            configUtils.addStyleToConfig(config, edgeStylePositive);
             configUtils.setConfigElements(config, edges.concat(allNodes));
             configUtils.setConfigLayout(config, layout);
             edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
