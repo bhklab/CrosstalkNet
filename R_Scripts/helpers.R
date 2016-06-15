@@ -230,4 +230,27 @@ getMinMaxWeightValues <- function(weights) {
     result <- list(minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
     result
 }
-    
+getNeighbours <- function(corMatrix, gene, exclusion) {
+    #write('Gene: ', stderr())
+    #write(gene, stderr())
+    #write('exclusions: ', stderr())
+    #write(exclusion, stderr())
+    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+
+        neighbours <- corMatrix[gene, neighboursNames]
+        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
+
+                #write('neighbours: ', stderr())
+        #write(neighbours, stderr())
+    } else {
+        neighboursNames <- names(which(corMatrix[, gene] != 0))
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+
+        neighbours <- corMatrix[neighboursNames, gene]
+        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
+    }
+
+    neighbours
+}
