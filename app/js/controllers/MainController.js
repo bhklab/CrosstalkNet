@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.MainController', []).controller('MainController', ['$scope',
+controllers.controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', '$q', '$timeout',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService,
@@ -21,6 +21,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
         $scope.tabIndex = 0;
 
         $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+        $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -230,10 +231,6 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             } else {
                 return 0;
             }
-        };
-
-        $scope.exportTableToCSV = function(tableID) {
-            $("#" + tableID).tableToCSV();
         };
 
         $scope.refreshGeneList = function() {

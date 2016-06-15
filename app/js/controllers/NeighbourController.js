@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.NeighbourController', []).controller('NeighbourController', [
+controllers.controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
@@ -100,10 +100,6 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
 
         $scope.removeGene = function(gene) {
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
-        };
-
-        $scope.exportTableToCSV = function(tableID) {
-            $("#" + tableID).tableToCSV();
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
