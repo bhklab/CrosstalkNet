@@ -191,7 +191,7 @@ app.post('/neighbour-general', function(req, res) {
                 var yIncrement = 0;
 
                 for (var j = 0; j < nodes.length; j++) {
-                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 20);
+                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
                 }
 
                 elements = elements.concat(parentNodes);
@@ -208,6 +208,8 @@ app.post('/neighbour-general', function(req, res) {
                 }
 
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             } else {
                 for (var i = 0; i < nodes.length; i++) {
                     for (var j = 0; j < nodes[i].length; j++) {
@@ -227,6 +229,8 @@ app.post('/neighbour-general', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             }
 
             elements = elements.concat([].concat.apply([], nodes));
@@ -422,6 +426,8 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             }
 
             configUtils.addStyleToConfig(config, edgeStyleNegative);

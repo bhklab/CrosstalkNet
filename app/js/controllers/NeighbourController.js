@@ -123,6 +123,7 @@ angular.module('myApp.NeighbourController', []).controller('NeighbourController'
         $rootScope.$watch('correlationFileActual', function() {
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
+            $scope.allVisibleGenes = [];
             $scope.neighbours = [];
             if ($scope.cy) {
                 $scope.cy.destroy();
