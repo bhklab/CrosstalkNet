@@ -63,9 +63,9 @@ totalTimeNodes <- c(0,0,0,0,0)
 snt <- proc.time()
 if (length(firstNeighboursNodes) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighboursNodes)) {
-		secondNeighboursNodes[[i]] = createEmptyNodes()
-		nodesToAdd = createEmptyNodes()
-		edgesToAdd <- createEmptyEdges()
+		secondNeighboursNodes[[i]] = createEmptyNodes(0)
+		nodesToAdd = createEmptyNodes(0)
+		edgesToAdd <- createEmptyEdges(0)
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
 			ptm <- proc.time()
