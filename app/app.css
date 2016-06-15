@@ -222,6 +222,11 @@ table.md-table th.md-column {
     color: black !important;
 }
 
+.float-bottom {
+    position: absolute;
+    bottom: 0px;
+}
+
 /* Disable animations*/
 
 .md-ripple-container, .md-ripple-placed {
