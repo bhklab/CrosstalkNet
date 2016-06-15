@@ -1,11 +1,11 @@
-createEmptyNodes <- function() {
-	nodes <- data.frame(name = character(0), degree = integer(0), level = integer(0), isSource = logical(0), stringsAsFactors = FALSE)
+createEmptyNodes <- function(amount) {
+	nodes <- data.frame(name = character(amount), degree = integer(amount), level = integer(amount), isSource = logical(amount), stringsAsFactors = FALSE)
 
 	nodes
 }
 
-createEmptyEdges <- function() {
-	edges <- data.frame(source = character(0), target = character(0), weight = numeric(0), stringsAsFactors = FALSE)
+createEmptyEdges <- function(amount) {
+	edges <- data.frame(source = character(amount), target = character(amount), weight = numeric(amount), stringsAsFactors = FALSE)
 
 	edges
 }

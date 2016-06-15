@@ -141,7 +141,7 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
 }
 
 createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
-    edges <- createEmptyEdges()
+    edges <- createEmptyEdges(0)
 
     if (length(gene) == 0 || is.na(gene)) {
         return(edges)
@@ -167,8 +167,10 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
     }
 
     if (limit > 0) {
-        neighbours <-  tail(sort(abs(neighbours)), limit)
+        #neighbours <- tail(sort(abs(neighbours)), limit)
     }
+
+    edges <- createEmptyEdges(length(neighbours))
     
     for (i in 1:length(neighbours)) {       
         edges[i, "source"] <- gene
@@ -182,7 +184,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
 getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
     neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
-    nodes <- createEmptyNodes()
+    nodes <- createEmptyNodes(lenght(neighboursNames))
 
     if (length(neighboursNames) < 1) {
         return(nodes)
@@ -207,10 +209,10 @@ getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selec
 }
 
 getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, selectedGenes, exclusion) {
-    nodes <- createEmptyNodes()
     neighboursNames <- edges$target
     neighboursNames <- setdiff(neighboursNames, exclusion)
-    neighboursDegrees <- getDegreesForNeighbourNames(degrees, edges$target)
+    neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
+    nodes <- createEmptyNodes(length(neighboursNames))
 
     if (length(neighboursNames) < 1) {
         return(nodes)
@@ -245,8 +247,6 @@ filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
             edges <- edges[temp,]        
         }  
         
-        
-        write("minNegativeWeight!!!!!!!!!!", stderr())
         minNegativeWeight <- 0
     } 
 
@@ -256,8 +256,6 @@ filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
             edges <- edges[temp,]        
         }
 
-        
-        write("minPositiveWeight!!!!!!!!!!", stderr())
         minPositiveWeight <- 0
     }
 
