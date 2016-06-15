@@ -243,6 +243,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $scope.resetFilters();
             $scope.overallMatrixStats = null;
             $scope.GOIState = $scope.GOIStates.initial;
+            $scope.allVisibleGenes = [];
             $scope.getGeneList();
             $scope.getOverallMatrixStats();
             $scope.tabIndex = 1;
