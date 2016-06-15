@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp");
-myModule.factory('ExportService', function($http) {
+myModule.factory('ExportService', function($http, $filter) {
     var service = {};
 
     service.exportTableToCSV = exportTableToCSV;
@@ -58,7 +58,8 @@ myModule.factory('ExportService', function($http) {
         }
     }
 
-    function exportNeighboursToCSV(scope, index, filename) {
+    function exportNeighboursToCSV(scope, index) {
+        var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
         var neighbours = scope.neighbours[index];
         var rowDelim = "\r\n";
         var colDelim = ",";
@@ -84,7 +85,7 @@ myModule.factory('ExportService', function($http) {
         var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
         var link = document.createElement("a");
         link.setAttribute("href", csvData);
-        link.setAttribute("download", "my_data.csv");
+        link.setAttribute("download", fileName);
         document.body.appendChild(link); // Required for FF
 
         link.click(); // This w
