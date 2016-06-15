@@ -201,6 +201,10 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
 
         $scope.resetGeneSelection = function() {
             $scope.GOIState = $scope.GOIStates.initial;
+            $scope.resetFilters();
+        };
+
+        $scope.resetFilters = function() {
             $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
             $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
         };
@@ -236,6 +240,7 @@ angular.module('myApp.MainController', []).controller('MainController', ['$scope
             $rootScope.correlationFileActual = JSON.parse($rootScope.correlationFileDisplayed);
             $scope.removeGenesOfInterest();
             $scope.resetInputFields();
+            $scope.resetFilters();
             $scope.overallMatrixStats = null;
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.getGeneList();
