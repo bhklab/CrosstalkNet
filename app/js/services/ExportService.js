@@ -4,6 +4,7 @@ myModule.factory('ExportService', function($http, $filter) {
 
     service.exportTableToCSV = exportTableToCSV;
     service.exportNeighboursToCSV = exportNeighboursToCSV;
+    service.exportGraphToPNG = exportGraphToPNG;
 
     function exportTableToCSV($table, filename) {
         var $headers = $table.find('tr:has(th)'),
@@ -90,6 +91,21 @@ myModule.factory('ExportService', function($http, $filter) {
 
         link.click(); // This w
         document.body.removeChild(link);
+    }
+
+    function exportGraphToPNG(scope) {
+        var png64 = scope.cy.png();
+
+        //var pngData = 'data:image/png;base64,' + encodeURIComponent(png64);
+
+        var link = document.createElement("a");
+        link.setAttribute("href", png64);
+        link.setAttribute("download", "bless.png");
+        document.body.appendChild(link); // Required for FF
+
+        link.click(); // This w
+        document.body.removeChild(link);
+
     }
 
     return service;
