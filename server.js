@@ -338,7 +338,7 @@ app.post('/submatrix', function(req, res) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
                 allNodes.push(sourceNodes[i]);
             }
-            
+
             for (var i = 0; i < parsedNodesFirst.length; i++) {
                 firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
                 allNodes = allNodes.concat(firstNodes[i]);
@@ -395,7 +395,7 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 6) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 6)
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 10) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 10)
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -403,7 +403,7 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 6, largestClusterSize);
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 10, largestClusterSize);
                 }
 
                 layout = layoutUtils.createPresetLayout();
@@ -411,8 +411,10 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.source);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
+                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             } else {
-                layout = layoutUtils.createRandomLayout(allNodes.length, 12);
+                layout = layoutUtils.createRandomLayout(allNodes.length, 20);
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
