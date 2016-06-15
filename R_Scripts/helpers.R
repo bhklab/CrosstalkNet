@@ -47,65 +47,6 @@ appendSideToMatrixNames <- function(corMatrix, side, rowOrCol) {
     corMatrix
 }
 
-#Say that we are calling this function in order to obtain second neighbours. Say that the first node 
-#we selected in the dropdown was A, then the node we selected in the second dropdown was F. The exclusion will be
-#A since we don't want to duplicate A in the third panel. 
-getNeighbours <- function(corMatrix, gene, exclusion) {
-    #write('Gene: ', stderr())
-    #write(gene, stderr())
-    #write('exclusions: ', stderr())
-    #write(exclusion, stderr())
-    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
-        neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
-        neighboursNames <- setdiff(neighboursNames, exclusion)
-
-        neighbours <- corMatrix[gene, neighboursNames]
-        names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
-
-                #write('neighbours: ', stderr())
-        #write(neighbours, stderr())
-    } else {
-        neighboursNames <- names(which(corMatrix[, gene] != 0))
-        neighboursNames <- setdiff(neighboursNames, exclusion)
-
-        neighbours <- corMatrix[neighboursNames, gene]
-        names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
-    }
-
-    neighbours
-}
-
-getDegreesForNeighbours <- function(degrees, neighbours) {
-    first <- names(neighbours[1])
-    #write('first: ', stderr())
-    #write(first, stderr())
-
-    if (length(neighbours) < 1) {
-        return(integer())
-    }
-
-    if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
-        resultDegrees <- degrees$epiDegree[names(neighbours)]
-    } else {
-        resultDegrees <- degrees$stromaDegree[names(neighbours)]
-                        #write('neighbours: ', stderr())
-        #write(neighbours, stderr())
-    }
-
-    resultDegrees
-}
-
-getExclusions <- function(exclusions, i, selectedGenes) {
-    if (i == 1) {
-        exclusions[[i]] = c(NA)
-    } else {
-        index <- seq(from=i-1, to=1, by=-2)
-        exclusions[[i]] = selectedGenes[index]
-    }
-
-    exclusions
-}
-
 #methods for new and standard approach of creating graphs
 getNeighbourNames <- function(corMatrix, gene, exclusion) {
     if (length(gene) == 0 || is.na(gene)) {
@@ -184,7 +125,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
 getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
     neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
     neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
-    nodes <- createEmptyNodes(lenght(neighboursNames))
+    nodes <- createEmptyNodes(length(neighboursNames))
 
     if (length(neighboursNames) < 1) {
         return(nodes)

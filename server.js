@@ -19,11 +19,6 @@ var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 
-var geneListCache = { "001": null, "01": null, "05": null, "1": null };
-var initialConfig = null;
-var initialElements = { "001": null, "01": null, "05": null, "1": null };
-var selfLoopGeneNames = { "001": null, "01": null, "05": null, "1": null };
-
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -71,8 +66,6 @@ app.post('/gene-list', function(req, res) {
                     object: gene
                 };
             });
-
-            geneListCache[file.fileName] = geneList;
 
             res.send({ geneList: geneList });
         });
@@ -126,12 +119,6 @@ app.post('/neighbour-general', function(req, res) {
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
 
-            var minNegativeWeightOverall = parsedValue.minMaxWeightOverall.minNegativeWeight;
-            var maxPositiveWeightOverall = parsedValue.minMaxWeightOverall.maxPositiveWeight;
-
-            var maxNegativeWeightOverall = parsedValue.minMaxWeightOverall.maxNegativeWeight;
-            var minPositiveWeightOverall = parsedValue.minMaxWeightOverall.minPositiveWeight;
-
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
@@ -144,11 +131,8 @@ app.post('/neighbour-general', function(req, res) {
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
-            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
-            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
-
-            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
-            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
+            var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
+            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
 
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
 
@@ -195,7 +179,7 @@ app.post('/neighbour-general', function(req, res) {
                                 id: "par" + i
                             }
                         });
-                    } else if (nodes[i - 1].length > 0) { //if (nodes["" + (i - 1)].length > 0) {
+                    } else if (nodes[i - 1].length > 0) {
                         parentNodes.push({
                             data: {
                                 id: "par" + i
@@ -328,21 +312,6 @@ app.post('/submatrix', function(req, res) {
             var parsedEdgesFirst = parsedValue.edges.first;
             var parsedEdgesSecond = parsedValue.edges.second;
 
-            var minNegativeWeight = parsedValue.minMaxWeightDepth.minNegativeWeight;
-            var maxPositiveWeight = parsedValue.minMaxWeightDepth.maxPositiveWeight;
-
-            var maxNegativeWeight = parsedValue.minMaxWeightDepth.maxNegativeWeight;
-            var minPositiveWeight = parsedValue.minMaxWeightDepth.minPositiveWeight;
-
-            console.log(parsedValue.minMaxWeightDepth);
-            console.log(parsedValue.minMaxWeightOverall);
-
-            var minNegativeWeightOverall = parsedValue.minMaxWeightOverall.minNegativeWeight;
-            var maxPositiveWeightOverall = parsedValue.minMaxWeightOverall.maxPositiveWeight;
-
-            var maxNegativeWeightOverall = parsedValue.minMaxWeightOverall.maxNegativeWeight;
-            var minPositiveWeightOverall = parsedValue.minMaxWeightOverall.minPositiveWeight;
-
             var sourceNodes = [];
             var firstNodes = [];
             var secondNodes = [];
@@ -360,17 +329,16 @@ app.post('/submatrix', function(req, res) {
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
-            edgeStyleNegative.style.width = styleUtils.getDynamicWidth('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
-            edgeStyleNegative.style['line-color'] = styleUtils.getDynamicLineColor('weight', minNegativeWeightOverall, maxNegativeWeightOverall);
+            var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
+            var depthWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightDepth);
 
-            edgeStylePositive.style.width = styleUtils.getDynamicWidth('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
-            edgeStylePositive.style['line-color'] = styleUtils.getDynamicLineColor('weight', minPositiveWeightOverall, maxPositiveWeightOverall);
+            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
                 allNodes.push(sourceNodes[i]);
             }
-
+            
             for (var i = 0; i < parsedNodesFirst.length; i++) {
                 firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
                 allNodes = allNodes.concat(firstNodes[i]);
@@ -383,7 +351,6 @@ app.post('/submatrix', function(req, res) {
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
                 cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst[i], 1));
-                //interactionsTableList.push()
             }
 
             firstNeighbourInteractions = cytoscapeEdges;
@@ -391,7 +358,6 @@ app.post('/submatrix', function(req, res) {
 
             for (var i = 0; i < parsedEdgesSecond.length; i++) {
                 cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond[i], 2));
-                //interactionsTableList.push()
             }
 
             secondNeighbourInteractions = cytoscapeEdges;
@@ -399,10 +365,6 @@ app.post('/submatrix', function(req, res) {
             console.log("Length of all nodes: " + allNodes.length);
             console.log("Length of all edges: " + (firstNeighbourInteractions.length + secondNeighbourInteractions.length));
 
-            /*var cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst, 1);
-            firstNeighbourInteractions = firstNeighbourInteractions.concat(cytoscapeEdges)
-            cytoscapeEdges = edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond, 2);
-            secondNeighbourInteractions = secondNeighbourInteractions.concat(cytoscapeEdges)*/
             edges = edges.concat(firstNeighbourInteractions);
             edges = edges.concat(secondNeighbourInteractions);
 
@@ -442,7 +404,6 @@ app.post('/submatrix', function(req, res) {
 
                 for (var i = 0; i < sourceNodes.length; i++) {
                     layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 6, largestClusterSize);
-                    //layoutUtils.positionNodesSpiral(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length);
                 }
 
                 layout = layoutUtils.createPresetLayout();
@@ -461,7 +422,6 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
             }
 
-
             configUtils.addStyleToConfig(config, edgeStyleNegative);
             configUtils.addStyleToConfig(config, edgeStylePositive);
             configUtils.setConfigElements(config, edges.concat(allNodes));
@@ -471,8 +431,8 @@ app.post('/submatrix', function(req, res) {
 
             res.json({
                 config: config,
-                minNegativeWeight: minNegativeWeight,
-                maxPositiveWeight: maxPositiveWeight,
+                minNegativeWeight: depthWeights.minNegative,
+                maxPositiveWeight: depthWeights.maxPositive,
                 firstNeighbours: firstNodes,
                 secondNeighbours: secondNodes,
                 edgeDictionary: edgeDictionary,
@@ -528,7 +488,6 @@ app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), func
     var data = req.body.data;
     console.log(file.name);
     console.log(file.type);
-    //console.log('file: %j', file);
 
     data = data.replace(/^data:;base64,/, "");
 
@@ -569,10 +528,6 @@ app.post('/overall-matrix-stats', function(req, res) {
 
             overallMatrixStats.selfLoops = parsedValue.selfLoops;
             overallMatrixStats.significantInteractions = parsedValue.significantInteractions;
-            //overallMatrixStats.significantInteractions = parsedValue.value[0].value[1].value;
-
-            //console.log("parsedValue: ");
-            //console.log("%j", parsedValue);
             res.send({ overallMatrixStats: overallMatrixStats });
         });
 });
@@ -628,91 +583,6 @@ function checkFileIntegrity(req, res, file) {
     });
 }
 
-function createOverallElements() {
-    var pValues = ["001", "01", "05", "1"];
-    console.log("Creating overall elements");
-
-    for (var i = 0; i < pValues.length; i++) {
-        //cacheGeneListForPValue(pValues[i], "R_Scripts/getGeneList.R");
-    }
-}
-
-function initializeServer() {
-    createAndStoreCorrelationsAndDegrees(createOverallElements);
-}
-
-function createAndStoreCorrelationsAndDegrees(callback) {
-    var child = exec("Rscript R_Scripts/createAndStoreCorrelationsAndDegrees.R", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        //console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-
-        console.log("Done creating and storing degrees");
-
-        callback();
-    });
-}
-
-function testOpenCPU() {
-    opencpu.rCall("/library/testpackage/R/getOverallMatrixStats", {
-        fileName: "fullcorMatrix.1.Rdata",
-        path: "C:/Users/alexp/Documents/EpiStroma/EpiStroma-webapp/R_Scripts/"
-    }, function(err, data) {
-        if (!err) {
-            console.log(data.length); // => 42
-        } else {
-            console.log("opencpu call failed.");
-        }
-
-        console.log(err)
-    });
-}
-
-function testInteractiveShell() {
-    // var ps = child_process.spawn('R');
-
-    // ps.stdout.on("data", function(data) {
-    //     console.log(data);
-    // });
-
-    // console.log(ps);
-
-    // ps.stdout.pipe(process.stdout);
-    // ps.stdin.write('1+1');
-    // ps.stdin.end();
-
-    const ls = child_process.spawn('R', ['--no-save']);
-
-    /*
-    ls.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-        ls.stdin.write('1+1');
-        ls.stdin.end();
-    });
-
-    ls.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    ls.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });*/
-
-
-    ls.stdout.pipe(process.stdout);
-    ls.stdin.write('1+1\n');
-    ls.stdin.write('2+2\n');
-    ls.stdin.write('3+3\n');
-
-
-}
-
 app.all('*', function(req, res) {
     res.redirect({ error: "Please send a valid query." });
 });
@@ -720,7 +590,4 @@ app.all('*', function(req, res) {
 app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
-    //testOpenCPU();
-    initializeServer();
-    //testInteractiveShell();
 });
