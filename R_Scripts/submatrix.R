@@ -60,7 +60,6 @@ secondNeighboursNodes <- list()
 totalTimeEdges <- c(0,0,0,0,0)
 totalTimeNodes <- c(0,0,0,0,0)
 
-snt <- proc.time()
 if (length(firstNeighboursNodes) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighboursNodes)) {
 		secondNeighboursNodes[[i]] = createEmptyNodes(0)
@@ -68,19 +67,12 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		edgesToAdd <- createEmptyEdges(0)
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
-			ptm <- proc.time()
 			edgesToAdd <- rbind(edgesToAdd, createEdgesDF(corMatrixSecondNeighbours, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30))
 			if (weightFilterSecond == TRUE) {
 				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
 			}
 
-			timeDif <- proc.time() - ptm 
-			totalTimeEdges <- totalTimeEdges + timeDif
-
-			ptm <- proc.time()
 			nodesToAdd <- rbind(nodesToAdd, getNeighboursNodesFromEdges(corMatrixSecondNeighbours, degrees, edgesToAdd, 2, genesOfInterest, exclusions))
-			timeDif <- proc.time() - ptm 
-			totalTimeNodes <- totalTimeNodes + timeDif
 
 			exclusions <- c(exclusions, edgesToAdd$target)
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
@@ -94,17 +86,6 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		edgeTestSecond <- c(edgeTestSecond, edgesSecond[[i]]$weight)
 	}	
 }
-
-timeDif <- proc.time() - snt
-
-write("Creating edges took: ", stderr())
-write(totalTimeEdges, stderr())
-
-write("Creating nodes took: ", stderr())
-write(totalTimeNodes, stderr())
-
-write("Creating second neighbours took", stderr())
-write(timeDif, stderr())
 
 if (depth == 1) {
 	edgeTest <- edgeTestFirst
