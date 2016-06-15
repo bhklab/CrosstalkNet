@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.PathExistenceController', []).controller('PathExistenceController', [
+controllers.controller('PathExistenceController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
@@ -21,12 +21,6 @@ angular.module('myApp.PathExistenceController', []).controller('PathExistenceCon
 
         $scope.allPaths = null;
 
-        $scope.locateGene = function(gene) {
-            if (gene != null && gene != '') {
-                $scope.findGeneInGraph($scope, gene);
-            }
-        };
-
         $scope.setPathExplorerGene = function(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
@@ -41,14 +35,6 @@ angular.module('myApp.PathExistenceController', []).controller('PathExistenceCon
             $("md-autocomplete input").each(function() {
                 $(this).val('');
             });
-        };
-
-        $scope.resetAllData = function() {
-            $scope.neighbours = null;
-        };
-
-        $scope.clearLocatedGene = function() {
-            GraphConfigService.clearLocatedGene($scope);
         };
 
         $scope.getAllPaths = function() {
@@ -74,34 +60,11 @@ angular.module('myApp.PathExistenceController', []).controller('PathExistenceCon
             });
         };
 
-        $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
-
-        $scope.exportTableToCSV = function(tableID) {
-            $("#" + tableID).tableToCSV();
-        };
-
-        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
-        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
-        $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
-
         $rootScope.$watch('correlationFileActual', function() {
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
             $scope.allPaths = null;
         });
-
-        // $scope.$watch('display', function(newValue, oldValue) {
-        //     if (newValue == 'Graph') {
-        //         $timeout(function() {
-        //             if ($scope.config != null) {
-        //                 $scope.cy.resize(); 
-        //                 $scope.needsRedraw = false;
-        //                 $scope.applyConfig($scope.config, "cyNeighbour", $scope);
-        //             }
-        //         }, 250);
-
-        //     }
-        // });
     }
 ]);

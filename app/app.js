@@ -5,9 +5,7 @@ angular.module('myApp', [
   'ngMaterial',
   'ngFileUpload',
   'md.data.table',
-  'myApp.MainController',
-  'myApp.NeighbourController',
-  'myApp.PathExistenceController',
+  'myApp.controllers',
   'myApp.filters'
 ]).config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
@@ -21,3 +19,4 @@ angular.module('myApp', [
 });
 
 var filters = angular.module('myApp.filters', []);
+var controllers = angular.module('myApp.controllers', []);
