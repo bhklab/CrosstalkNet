@@ -3,7 +3,7 @@
         <div layout="row">
             <div flex class="left-padded">Navigation</div>
             <div flex style="position: relative;">
-                <md-switch ng-model="switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
+                <md-switch ng-if="ctrl != 'pathExistence'" ng-model="switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
                     {{display}}
                 </md-switch>
             </div>
