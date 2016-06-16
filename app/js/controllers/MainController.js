@@ -78,6 +78,11 @@ controllers.controller('MainController', ['$scope',
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
+            $scope.resetInputFields();
+            $scope.resetFilters();
+            if ($scope.cy) {
+                $scope.cy.destroy();
+            }
         };
 
         $scope.getRelevantGenes = function(filter) {
@@ -116,6 +121,8 @@ controllers.controller('MainController', ['$scope',
                     minPositiveWeightSecond: $scope.correlationFilterSecond.positiveFilter ==
                         null || !$scope.correlationFilterSecond.positiveEnabled ?
                         "NA" : $scope.correlationFilterSecond.positiveFilter,
+                    selectedFilterFirst: { negative: $scope.correlationFilterFirst.negativeEnabled, positive: $scope.correlationFilterFirst.positiveEnabled },
+                    selectedFilterSecond: { negative: $scope.correlationFilterSecond.negativeEnabled, positive: $scope.correlationFilterSecond.positiveEnabled },
                     filterFirst: filterFirst && filter,
                     filterSecond: filterSecond && filter,
                     layout: $scope.selectedLayout,
@@ -252,6 +259,7 @@ controllers.controller('MainController', ['$scope',
 
         $scope.returnToFirstNeighboursFilter = function() {
             $scope.GOIState = $scope.GOIStates.filterFirst;
+            $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
         };
 
         $scope.$watch('display', function(newValue, oldValue) {

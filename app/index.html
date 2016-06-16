@@ -76,6 +76,7 @@
                                     <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
+                                    <md-button style="float: right;" class="md-primary md-raised" ng-click="exportGraphToPNG(this)">Export Graph</md-button>
                                 </div>
                                 <div static-include="partials/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
@@ -93,6 +94,7 @@
                                     <div ng-show="display == 'Graph'" style="width: 100%; height:800px; background-color: white;" id="cyNeighbour"></div>
                                     <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
+                                    <md-button style="float: right;" class="md-primary md-raised" ng-click="exportGraphToPNG(this)">Export Graph</md-button>
                                 </div>
                                 <div static-include="partials/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
