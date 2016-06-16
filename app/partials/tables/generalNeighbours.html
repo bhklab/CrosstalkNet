@@ -19,12 +19,12 @@
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="stroma in neighbours[x].stroma">{{stroma}}</th>
+                        <th ng-repeat="stroma in neighbours[x].stroma">{{stroma | suffixTrim}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="epi in neighbours[x].epi">
-                        <td class="row-name">{{epi}}</td>
+                        <td class="row-name">{{epi | suffixTrim}}</td>
                         <td ng-repeat="stroma in neighbours[x].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
                     </tr>
                 </tbody>
