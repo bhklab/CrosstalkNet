@@ -39,9 +39,9 @@ filterCorrelationsByWeight <- function(weights, minNegativeWeight, minPositiveWe
 
 appendSideToMatrixNames <- function(corMatrix, side, rowOrCol) {
     if (rowOrCol == 'row') {
-        rownames(corMatrix) <- paste(rownames(corMatrix), side, sep="-")
+        rownames(corMatrix) <- toupper(paste(rownames(corMatrix), side, sep="-"))
     } else {
-        colnames(corMatrix) <- paste(colnames(corMatrix), side, sep="-")
+        colnames(corMatrix) <- toupper(paste(colnames(corMatrix), side, sep="-"))
     }
 
     corMatrix

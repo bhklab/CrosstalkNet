@@ -71,7 +71,7 @@ myModule.factory('ExportService', function($http, $filter) {
 
         for (var i = 0; i < neighbours.epi.length; i++) {
             var temp = [];
-            temp.push(neighbours.epi[i]);
+            temp.push($filter('suffixTrim')(neighbours.epi[i]));
             for (var j = 0; j < neighbours.stroma.length; j++) {
                 
                 //temp += colDelim;
