@@ -247,6 +247,18 @@ md-dialog.md-transition-in {
     transform: none;
 }
 
+/* Scrollbar fix for mac */
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
 /*Disable transition for fading in menu items dialog.*/
 .md-open-menu-container.md-active > md-menu-content > * {
     opacity: 1;

@@ -15,6 +15,7 @@ var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
 var layoutUtils = require('layoutUtils');
+var validationUtils = require('validationUtils');
 var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
@@ -267,6 +268,41 @@ app.post('/submatrix', function(req, res) {
         res.send({ error: "Please specify a file name" });
         return;
     }
+
+    var filterValidationRes = validationUtils.validateFilters(req.body);
+    if (filterValidationRes.error) {
+        res.send(filterValidationRes);
+        return;
+    }
+
+    // if (req.body.minPositiveWeightFirst != "NA"  || ( req.body.minPositiveWeightFirst == "NA" && req.body.selectedFilterFirst.positive)) {
+    //     if (!(validationUtils.isNumeric(req.body.minPositiveWeightFirst) && validationUtils.isPositive(req.body.minPositiveWeightFirst))) {
+    //         res.send({ error: "First neighbours positive filter must be a positive number and not exceed the specified highest value" });
+    //         return;
+    //     }
+    // }
+
+    // if (req.body.minNegativeWeightFirst != "NA" || ( req.body.minNegativeWeightFirst == "NA" && req.body.selectedFilterFirst.negative)) {
+    //     if (!(validationUtils.isNumeric(req.body.minNegativeWeightFirst) && validationUtils.isNegative(req.body.minNegativeWeightFirst))) {
+    //         res.send({ error: "First neighbours negative filter must be a negative number and not exceed the specified lowest value" });
+    //         return;
+    //     }
+    // }
+
+    // if (req.body.minPositiveWeightSecond != "NA" || ( req.body.minPositiveWeightSecond == "NA" && req.body.selectedFilterSecond.positive)) {
+    //     if (!(validationUtils.isNumeric(req.body.minPositiveWeightSecond) && validationUtils.isPositive(req.body.minPositiveWeightSecond))) {
+    //         res.send({ error: "Second neighbours positive filter must be a positive number and not exceed the specified highest value" });
+    //         return;
+    //     }
+    // }
+
+    // if (req.body.minNegativeWeightSecond != "NA" || ( req.body.minNegativeWeightSecond == "NA" && req.body.selectedFilterSecond.negative)) {
+    //     if (!(validationUtils.isNumeric(req.body.minNegativeWeightSecond) && validationUtils.isNegative(req.body.minNegativeWeightSecond))) {
+    //         res.send({ error: "Second neighbours negative filter must be a negative number and not exceed the specified lowest value" });
+    //         return;
+    //     }
+    // }
+
 
     args.pValue = req.body.file.pValue;
     args.fileName = file.fileName;
