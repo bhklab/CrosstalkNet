@@ -222,7 +222,7 @@ app.post('/neighbour-general', function(req, res) {
                 }
 
                 config = configUtils.createConfig();
-                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, 12);
+                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
 
                 nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
@@ -274,35 +274,6 @@ app.post('/submatrix', function(req, res) {
         res.send(filterValidationRes);
         return;
     }
-
-    // if (req.body.minPositiveWeightFirst != "NA"  || ( req.body.minPositiveWeightFirst == "NA" && req.body.selectedFilterFirst.positive)) {
-    //     if (!(validationUtils.isNumeric(req.body.minPositiveWeightFirst) && validationUtils.isPositive(req.body.minPositiveWeightFirst))) {
-    //         res.send({ error: "First neighbours positive filter must be a positive number and not exceed the specified highest value" });
-    //         return;
-    //     }
-    // }
-
-    // if (req.body.minNegativeWeightFirst != "NA" || ( req.body.minNegativeWeightFirst == "NA" && req.body.selectedFilterFirst.negative)) {
-    //     if (!(validationUtils.isNumeric(req.body.minNegativeWeightFirst) && validationUtils.isNegative(req.body.minNegativeWeightFirst))) {
-    //         res.send({ error: "First neighbours negative filter must be a negative number and not exceed the specified lowest value" });
-    //         return;
-    //     }
-    // }
-
-    // if (req.body.minPositiveWeightSecond != "NA" || ( req.body.minPositiveWeightSecond == "NA" && req.body.selectedFilterSecond.positive)) {
-    //     if (!(validationUtils.isNumeric(req.body.minPositiveWeightSecond) && validationUtils.isPositive(req.body.minPositiveWeightSecond))) {
-    //         res.send({ error: "Second neighbours positive filter must be a positive number and not exceed the specified highest value" });
-    //         return;
-    //     }
-    // }
-
-    // if (req.body.minNegativeWeightSecond != "NA" || ( req.body.minNegativeWeightSecond == "NA" && req.body.selectedFilterSecond.negative)) {
-    //     if (!(validationUtils.isNumeric(req.body.minNegativeWeightSecond) && validationUtils.isNegative(req.body.minNegativeWeightSecond))) {
-    //         res.send({ error: "Second neighbours negative filter must be a negative number and not exceed the specified lowest value" });
-    //         return;
-    //     }
-    // }
-
 
     args.pValue = req.body.file.pValue;
     args.fileName = file.fileName;
@@ -436,8 +407,8 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, nodeUtils.nodeSizes.medium / 2) 
-                                    + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, nodeUtils.nodeSizes.medium / 2);
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) 
+                                    + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -445,7 +416,7 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, nodeUtils.nodeSizes.medium / 2, largestClusterSize);
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
                 }
 
                 layout = layoutUtils.createPresetLayout();
@@ -456,7 +427,7 @@ app.post('/submatrix', function(req, res) {
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
                 configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             } else {
-                layout = layoutUtils.createRandomLayout(allNodes.length, 20);
+                layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
                 configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
