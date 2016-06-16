@@ -400,7 +400,8 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, 10) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, 10)
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, nodeUtils.nodeSizes.medium / 2) 
+                                    + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, nodeUtils.nodeSizes.medium / 2);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -408,7 +409,7 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, 10, largestClusterSize);
+                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, nodeUtils.nodeSizes.medium / 2, largestClusterSize);
                 }
 
                 layout = layoutUtils.createPresetLayout();
