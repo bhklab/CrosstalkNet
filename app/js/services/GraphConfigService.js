@@ -83,10 +83,17 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             var g = n.data('id').slice(0, -2);
             n.qtip({
                 content: [{
+                    name: 'Inspector',
+                    url: g
+                }, {
                     name: 'GeneCard',
                     url: 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + g
                 }].map(function(link) {
-                    return '<a target="_blank" href="' + link.url + '">' + link.name + '</a>';
+                    if (link.name != "Inspector") {
+                        return '<a target="_blank" href="' + link.url + '">' + link.name + '</a>';
+                    } else {
+                        return '<div>' + link.url + '</div>'
+                    }
                 }).join('<br />\n'),
                 position: {
                     my: 'top center',
