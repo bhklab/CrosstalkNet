@@ -167,10 +167,11 @@ app.post('/neighbour-general', function(req, res) {
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
-                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                    "left",
-                    "center",
-                    initialColor);
+                // nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
+                //     "center",
+                //     "center",
+                //     initialColor);
+                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
 
                 for (var i = 0; i < selectedGenes.length + 1; i++) {
                     if (i < 1) {
