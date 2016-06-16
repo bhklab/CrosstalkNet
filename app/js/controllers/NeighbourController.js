@@ -3,8 +3,8 @@
 controllers.controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService,
+    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, ExportService,
         $q, $timeout) {
         $rootScope.selectedTab = 0;
         $rootScope.state = $rootScope.states.initial;
@@ -25,6 +25,9 @@ controllers.controller('NeighbourController', [
 
         $scope.needsRedraw = false;
         $scope.applyConfig = GraphConfigService.applyConfig;
+
+        $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+        $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         $scope.locateGene = function(gene) {
             if (gene != null && gene != '') {

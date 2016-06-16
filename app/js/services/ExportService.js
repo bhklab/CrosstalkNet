@@ -94,13 +94,18 @@ myModule.factory('ExportService', function($http, $filter) {
     }
 
     function exportGraphToPNG(scope) {
+        if (scope.cy == null) {
+            return;
+        }
+
+        var fileName = "graph" + Date.now() + ".png";
         var png64 = scope.cy.png();
 
         //var pngData = 'data:image/png;base64,' + encodeURIComponent(png64);
 
         var link = document.createElement("a");
         link.setAttribute("href", png64);
-        link.setAttribute("download", "bless.png");
+        link.setAttribute("download", fileName);
         document.body.appendChild(link); // Required for FF
 
         link.click(); // This w
