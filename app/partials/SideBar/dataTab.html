@@ -10,4 +10,12 @@
     <h4>Upload on file select</h4>
     <input type="file" ngf-select="uploadFiles($file, $invalidFiles, this)" ngf-max-height="1000" ngf-max-size="20MB">
     </input>
+    <md-divider></md-divider>
+    <div ng-if="!tokenSet">
+        <md-input-container>
+            <label>Title</label>
+            <input ng-model="user.password">
+        </md-input-container>
+        <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+    </div>
 </md-content>
