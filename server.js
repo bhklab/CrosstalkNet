@@ -15,16 +15,58 @@ var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
 var execUtils = require('execUtils');
 var layoutUtils = require('layoutUtils');
+var authenticationUtils = require('authenticationUtils');
 var validationUtils = require('validationUtils');
 var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
+var jwt = require('jsonwebtoken');
+var crypto = require('crypto');
 
 var availableMatrices = {};
 
+app.set('secret', authenticationUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+
+// app.all('*', function(req, res) {
+//     res.redirect({ error: "Please send a valid query." });
+// });
+
+app.use(function(req, res, next) {
+    console.log(req.body);
+    if (req.body.token == null) {
+        if (req.body.password == null) {
+            res.send({ error: "Failed to authenticate." });
+        } else {
+            if (authenticationUtils.passwords.indexOf(req.body.password) >= 0) {
+                var token = jwt.sign({foo: 'bar'}, app.get('secret'), {
+                    expiresIn: '2000000' // expires in 24 hours
+                });
+
+                // return the information including token as JSON
+                res.json({
+                    success: true,
+                    message: 'Enjoy your token!',
+                    token: token
+                });
+            }
+        }
+    } else {
+        jwt.verify(req.body.token, app.get('secret'), function(err, decoded) {
+            if (err) {
+                console.log(err);
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+    }
+});
 
 app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
@@ -521,7 +563,7 @@ app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), func
     });
 });
 
-app.get('/available-matrices', function(req, res) {
+app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
     var fileNames = [];
 
@@ -635,10 +677,6 @@ function initializeAvaialbleMatrices() {
 
     availableMatrices = result;
 }
-
-app.all('*', function(req, res) {
-    res.redirect({ error: "Please send a valid query." });
-});
 
 app.listen(5000, function() {
     console.log("Listening on port 5000");

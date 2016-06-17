@@ -2,9 +2,9 @@
 
 controllers.controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', '$q', '$timeout',
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', '$q', '$timeout', '$cookies',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService,
-        $q, $timeout) {
+        $q, $timeout, $cookies) {
         $rootScope.selectedTab = 0;
         $rootScope.correlationFileDisplayed = null;
         $rootScope.correlationFileActual = null;
@@ -22,6 +22,9 @@ controllers.controller('MainController', ['$scope',
 
         $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
+
+        $scope.tokenSet = false;
+        $scope.user = { password: null, token: null };
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -164,7 +167,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.getFileList = function() {
-            RESTService.get('available-matrices')
+            RESTService.post('available-matrices', {})
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -254,6 +257,30 @@ controllers.controller('MainController', ['$scope',
             }
         });
 
-        $scope.getFileList();
+        //$scope.getFileList();
+
+        $scope.checkToken = function() {
+            if ($cookies.get('token') != null) {
+                $scope.tokenSet = true;
+                $scope.getFileList();
+            }
+        };
+
+        $scope.login = function() {
+            RESTService.post('login', { password: $scope.user.password })
+                .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        return;
+                    }
+
+                    $scope.tokenSet = true;
+                    $cookies.put('token', data.token);
+                    $scope.getFileList();
+                });
+        };
+        $cookies.put('token', null);
+
+
+       // $scope.checkToken();
     }
 ]);
