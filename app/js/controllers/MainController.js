@@ -31,27 +31,6 @@ controllers.controller('MainController', ['$scope',
             }
         };
 
-        $scope.inspectNeighbours = function(item, source) {
-            if (item == null) {
-                return;
-            }
-
-            GraphConfigService.firstSelectedGene = item;
-            $rootScope.selectedTab = 1;
-            RESTService.post('neighbour-general', {
-                selectedGenes: [item],
-                layout: $scope.selectedLayout,
-                file: $rootScope.correlationFileActual
-            }).then(function(data) {
-                console.log(data);
-                $rootScope.state = $rootScope.states.loadingConfig;
-                $scope.neighbours = angular.copy($scope.genesSecond);
-                GraphConfigService.neighbourConfigs.firstDropdownConfig =
-                    angular.copy(data.config);
-                $rootScope.state = $rootScope.states.firstDropdown;
-            });
-        };
-
         $scope.resetInputFields = function() {
             $("md-autocomplete input").each(function() {
                 $(this).val('');
@@ -127,7 +106,7 @@ controllers.controller('MainController', ['$scope',
                     filterSecond: filterSecond && filter,
                     layout: $scope.selectedLayout,
                     depth: depth,
-                    file: $rootScope.correlationFileActual
+                    fileName: $rootScope.correlationFileActual
                 })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
@@ -173,7 +152,7 @@ controllers.controller('MainController', ['$scope',
 
         $scope.getGeneList = function() {
             $rootScope.state = $rootScope.states.gettingGeneList;
-            RESTService.post('gene-list', { file: $rootScope.correlationFileActual })
+            RESTService.post('gene-list', { fileName: $rootScope.correlationFileActual })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -197,7 +176,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.getOverallMatrixStats = function() {
-            RESTService.post('overall-matrix-stats', { file: $rootScope.correlationFileActual }).then(function(data) {
+            RESTService.post('overall-matrix-stats', { fileName: $rootScope.correlationFileActual }).then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
                     return;
                 }
@@ -241,7 +220,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.refreshGeneList = function() {
-            $rootScope.correlationFileActual = JSON.parse($rootScope.correlationFileDisplayed);
+            $rootScope.correlationFileActual = $rootScope.correlationFileDisplayed;
             $scope.removeGenesOfInterest();
             $scope.resetInputFields();
             $scope.resetFilters();

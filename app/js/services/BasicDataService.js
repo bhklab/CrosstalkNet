@@ -9,7 +9,10 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         showingGraph: { id: 3, text: "Graph finished" },
         gettingGeneList: { id: 4, text: "Getting gene list..." },
         gettingAllPaths: { id: 5, text: "Getting all paths between source and target genes..." },
-        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" }
+        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" },
+        uploadingFile: { id: 7, text: "Uploading file to server..." },
+        finishedUploadingFile: { id: 8, text: "Successfully uploaded file to server" },
+        failedUploadingFile: { id: 9, text: "Failed to upload file to server" },
     };
 
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
@@ -104,8 +107,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     function loadFileListDropdownOptions(fileList) {
         return fileList.map(function(file) {
             return {
-                value: file,
-                pValue: file.split(".")
+                value: file
             };
         });
     }
