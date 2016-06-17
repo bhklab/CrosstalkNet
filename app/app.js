@@ -3,6 +3,7 @@
 // Declare app level module which depends on views, and components
 angular.module('myApp', [
   'ngMaterial',
+  'ngCookies',
   'ngFileUpload',
   'md.data.table',
   'myApp.controllers',
