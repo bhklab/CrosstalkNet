@@ -20,6 +20,8 @@ var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 
+var availableMatrices = {};
+
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -27,7 +29,14 @@ app.use(bodyParser.json());
 app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
     var argsString = "";
-    var file = req.body.file;
+    var fileName = req.body.fileName;
+    var file = matchSelectedFile(fileName);
+
+    if (file == null || file.path == null || file.fileName == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
     args.pValue = file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
@@ -74,7 +83,8 @@ app.post('/gene-list', function(req, res) {
 
 app.post('/neighbour-general', function(req, res) {
     var args = {};
-    var file = req.body.file;
+    var fileName = req.body.fileName;
+    var file = matchSelectedFile(fileName);
     var argsString = "";
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
@@ -168,10 +178,7 @@ app.post('/neighbour-general', function(req, res) {
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
                     100, 0, 0);
-                // nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                //     "center",
-                //     "center",
-                //     initialColor);
+
                 nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
 
                 for (var i = 0; i < selectedGenes.length + 1; i++) {
@@ -261,7 +268,8 @@ app.post('/submatrix', function(req, res) {
     var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
-    var file = req.body.file;
+    var fileName = req.body.fileName;
+    var file = matchSelectedFile(fileName);
     var requestedLayout = req.body.layout;
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -275,7 +283,7 @@ app.post('/submatrix', function(req, res) {
         return;
     }
 
-    args.pValue = req.body.file.pValue;
+    args.pValue = file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
     args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
@@ -407,8 +415,7 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) 
-                                    + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
+                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -462,11 +469,11 @@ app.post('/get-all-paths', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
-    var file = req.body.file;
+    var fileName = req.body.fileName;
+    var file = matchSelectedFile(fileName);
     var source = req.body.source;
     var target = req.body.target;
 
-    console.log(file);
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });
         return;
@@ -516,13 +523,26 @@ app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), func
 
 app.get('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
+    var fileNames = [];
 
-    res.send({ fileList: result });
+    availableMatrices = result;
+    fileNames = availableMatrices.map(function(file) {
+        return file.fileName
+    });
+
+    res.send({ fileList: fileNames });
 });
 
 app.post('/overall-matrix-stats', function(req, res) {
     var args = {};
-    var file = req.body.file;
+    var fileName = req.body.fileName;
+    var file = matchSelectedFile(fileName);
+
+    if (file == null || file.path == null || file.fileName == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
     args.fileName = file.fileName;
     args.path = file.path;
     argsString = JSON.stringify(args);
@@ -596,8 +616,24 @@ function checkFileIntegrity(req, res, file) {
         var message = parsedValue.message;
         var fileList = getAvailableMatrices();
 
-        res.send({ fileStatus: message, fileList: fileList });
+        res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
     });
+}
+
+function matchSelectedFile(fileName) {
+    for (var i = 0; i < availableMatrices.length; i++) {
+        if (availableMatrices[i].fileName == fileName) {
+            return availableMatrices[i];
+        }
+    }
+
+    return null;
+}
+
+function initializeAvaialbleMatrices() {
+    var result = getAvailableMatrices();
+
+    availableMatrices = result;
 }
 
 app.all('*', function(req, res) {
@@ -607,4 +643,6 @@ app.all('*', function(req, res) {
 app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
+
+    initializeAvaialbleMatrices();
 });

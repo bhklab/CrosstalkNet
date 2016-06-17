@@ -3,7 +3,7 @@
         <label>Select Matrix File</label>
         <md-select ng-change="refreshGeneList()" ng-model="$root.correlationFileDisplayed">
             <md-option ng-repeat="file in fileList" value="{{file}}" ng-selected="0">
-                {{file.fileName}}
+                {{file}}
             </md-option>
         </md-select>
     </md-input-container>

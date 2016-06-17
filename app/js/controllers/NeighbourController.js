@@ -71,7 +71,7 @@ controllers.controller('NeighbourController', [
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.genesOfInterest,
-                file: $rootScope.correlationFileActual
+                fileName: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
 

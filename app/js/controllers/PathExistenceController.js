@@ -50,7 +50,7 @@ controllers.controller('PathExistenceController', [
             RESTService.post('get-all-paths', {
                 target: $scope.pathExplorerTarget.value,
                 source: $scope.pathExplorerSource.value,
-                file: $rootScope.correlationFileActual
+                fileName: $rootScope.correlationFileActual
             }).then(function(data) {
                 console.log(data);
                 $scope.allPaths = data.paths;
