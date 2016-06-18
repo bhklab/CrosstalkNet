@@ -22,14 +22,21 @@ var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
 var crypto = require('crypto');
+var mongoose = require('mongoose');
+var User = require('user');
+var databaseConfigUtils = require('databaseConfigUtils');
+
+mongoose.connect(databaseConfigUtils.database);
 
 var availableMatrices = {};
 
-app.set('secret', authenticationUtils.secret);
+app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+
+//app.use(express.static('app'));
 
 // app.all('*', function(req, res) {
 //     res.redirect({ error: "Please send a valid query." });
@@ -38,24 +45,57 @@ app.use(bodyParser.json());
 app.use(function(req, res, next) {
     console.log(req.body);
     if (req.body.token == null) {
-        if (req.body.password == null) {
+        if (req.body.user.name == null) {
             res.send({ error: "Failed to authenticate." });
         } else {
-            if (authenticationUtils.passwords.indexOf(req.body.password) >= 0) {
-                var token = jwt.sign({foo: 'bar'}, app.get('secret'), {
-                    expiresIn: '2000000' // expires in 24 hours
-                });
+            User.findOne({
+                name: req.body.user.name
+            }, function(err, user) {
 
-                // return the information including token as JSON
-                res.json({
-                    success: true,
-                    message: 'Enjoy your token!',
-                    token: token
-                });
-            }
+                if (err) throw err;
+
+                if (!user) {
+                    res.json({ success: false, message: 'Authentication failed. User not found.' });
+                } else if (user) {
+
+                    // check if password matches
+                    if (user.password != req.body.user.password) {
+                        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+                    } else {
+
+                        // if user is found and password is right
+                        // create a token
+                        var token = jwt.sign(user, app.get('superSecret'), {
+                            expiresIn: '2000000h' // expires in 24 hours
+                        });
+
+                        // return the information including token as JSON
+                        res.json({
+                            success: true,
+                            message: 'Enjoy your token!',
+                            token: token
+                        });
+                    }
+
+                }
+
+            });
+
+            // if (authenticationUtils.passwords.indexOf(req.body.password) >= 0) {
+            //     var token = jwt.sign({ foo: 'bar' }, app.get('secret'), {
+            //         expiresIn: '0' // expires in 24 hours
+            //     });
+
+            //     // return the information including token as JSON
+            //     res.json({
+            //         success: true,
+            //         message: 'Enjoy your token!',
+            //         token: token
+            //     });
+            // }
         }
     } else {
-        jwt.verify(req.body.token, app.get('secret'), function(err, decoded) {
+        jwt.verify(req.body.token, app.get('superSecret'), function(err, decoded) {
             if (err) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
@@ -678,9 +718,35 @@ function initializeAvaialbleMatrices() {
     availableMatrices = result;
 }
 
+function createSampleUser() {
+    var nick = new User({
+        name: 'Nick Cerminara',
+        password: 'password',
+        admin: true
+    });
+
+    // save the sample user
+    nick.save(function(err) {
+        if (err) throw err;
+
+        console.log('User saved successfully');
+        // res.json({ success: true });
+    });
+}
+
+// app.get('/', function(req, res){
+// // check if the user's credentials are saved in a cookie //
+//     res.render('/login/index.html');
+// });
+
+// app.all('*', function(req, res) {
+//     res.sendFile(__dirname + '/app/index.html');
+// });
+
 app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
 
     initializeAvaialbleMatrices();
+    //createSampleUser();
 });
