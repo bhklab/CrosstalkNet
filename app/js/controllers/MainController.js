@@ -24,7 +24,7 @@ controllers.controller('MainController', ['$scope',
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         $scope.tokenSet = false;
-        $scope.user = { password: null, token: null };
+        $scope.user = { name: null, password: null, token: null };
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -260,14 +260,14 @@ controllers.controller('MainController', ['$scope',
         //$scope.getFileList();
 
         $scope.checkToken = function() {
-            if ($cookies.get('token') != null) {
+            if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
                 $scope.tokenSet = true;
                 $scope.getFileList();
             }
         };
 
         $scope.login = function() {
-            RESTService.post('login', { password: $scope.user.password })
+            RESTService.post('login', { user: $scope.user })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -278,7 +278,8 @@ controllers.controller('MainController', ['$scope',
                     $scope.getFileList();
                 });
         };
-        $cookies.put('token', null);
+        $cookies.remove('token');
+        //$scope.getFileList();
 
 
        // $scope.checkToken();
