@@ -21,10 +21,10 @@ var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-var crypto = require('crypto');
 var mongoose = require('mongoose');
 var User = require('user');
 var databaseConfigUtils = require('databaseConfigUtils');
+var bcrypt = require('bcrypt');
 
 mongoose.connect(databaseConfigUtils.database);
 
@@ -45,7 +45,7 @@ app.use(bodyParser.json());
 app.use(function(req, res, next) {
     console.log(req.body);
     if (req.body.token == null) {
-        if (req.body.user.name == null) {
+        if (req.body.user == null) {
             res.send({ error: "Failed to authenticate." });
         } else {
             User.findOne({
@@ -59,7 +59,7 @@ app.use(function(req, res, next) {
                 } else if (user) {
 
                     // check if password matches
-                    if (user.password != req.body.user.password) {
+                    if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                         res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                     } else {
 
@@ -719,9 +719,11 @@ function initializeAvaialbleMatrices() {
 }
 
 function createSampleUser() {
+    var salt = bcrypt.genSaltSync(3);
+    var password = bcrypt.hashSync('8Y$yz2+XG9%9TtM<', salt);
     var nick = new User({
-        name: 'Nick Cerminara',
-        password: 'password',
+        name: 'Benjamin',
+        password: password,
         admin: true
     });
 
@@ -733,15 +735,6 @@ function createSampleUser() {
         // res.json({ success: true });
     });
 }
-
-// app.get('/', function(req, res){
-// // check if the user's credentials are saved in a cookie //
-//     res.render('/login/index.html');
-// });
-
-// app.all('*', function(req, res) {
-//     res.sendFile(__dirname + '/app/index.html');
-// });
 
 app.listen(5000, function() {
     console.log("Listening on port 5000");
