@@ -1,4 +1,6 @@
 bower_components
+database
+database/*
 node_modules/* 
 !node_modules/*.js
 R_Scripts/028004_D_AA_20140813.txt
