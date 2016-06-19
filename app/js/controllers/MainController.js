@@ -257,8 +257,6 @@ controllers.controller('MainController', ['$scope',
             }
         });
 
-        //$scope.getFileList();
-
         $scope.checkToken = function() {
             if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
                 $scope.tokenSet = true;
@@ -273,15 +271,16 @@ controllers.controller('MainController', ['$scope',
                         return;
                     }
 
+                    var now = new Date();
+                    var exp = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
+
                     $scope.tokenSet = true;
-                    $cookies.put('token', data.token);
+                    $cookies.put('token', data.token, {expires: exp});
                     $scope.getFileList();
                 });
         };
-        $cookies.remove('token');
-        //$scope.getFileList();
+        //$cookies.remove('token');
 
-
-       // $scope.checkToken();
+        $scope.checkToken();
     }
 ]);
