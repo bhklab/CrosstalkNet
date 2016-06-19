@@ -7,7 +7,11 @@ myModule.factory('ValidationService', function($http, $rootScope) {
         if (data.error) {
             alert(data.error);
             return false;
-        } else {
+        } else if (data.success == false) {
+            alert(data.message);
+            return false;    
+        }
+        else {
             return true;
         }
     }
