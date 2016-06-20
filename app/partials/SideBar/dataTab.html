@@ -12,14 +12,7 @@
     </input>
     <md-divider></md-divider>
     <div ng-if="!tokenSet">
-        <md-input-container>
-            <label>User</label>
-            <input ng-model="user.name">
-        </md-input-container>
-        <md-input-container>
-            <label>Password</label>
-            <input ng-model="user.password">
-        </md-input-container>
-        <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+        <md-button class="md-raised md-primary" ng-click="showLoginDialog();">Login</md-button>
+        {{validationData.tokenSet}}
     </div>
 </md-content>
