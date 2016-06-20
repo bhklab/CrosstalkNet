@@ -656,14 +656,14 @@ function getAvailableMatrices() {
     var fileList = [];
     var result = [];
 
-    fileNames = fs.readdirSync('R_Scripts/Full_Matrices');
-    fileList = fileNames.map(function(file) {
-        return {
-            fileName: file,
-            pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
-            path: "Full_Matrices/"
-        };
-    });
+    // fileNames = fs.readdirSync('R_Scripts/Full_Matrices');
+    // fileList = fileNames.map(function(file) {
+    //     return {
+    //         fileName: file,
+    //         pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
+    //         path: "Full_Matrices/"
+    //     };
+    // });
 
     fileNames = fs.readdirSync('R_Scripts/User_Matrices');
 
