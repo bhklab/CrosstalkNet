@@ -21,12 +21,12 @@ var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-var mongoose = require('mongoose');
-var User = require('user');
+// var mongoose = require('mongoose');
+// var User = require('user');
 var databaseConfigUtils = require('databaseConfigUtils');
 var bcrypt = require('bcrypt');
 
-mongoose.connect(databaseConfigUtils.database);
+//mongoose.connect(databaseConfigUtils.database);
 
 var availableMatrices = {};
 
@@ -35,64 +35,40 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
-//app.use(express.static('app'));
-
-// app.all('*', function(req, res) {
-//     res.redirect({ error: "Please send a valid query." });
-// });
-
 app.use(function(req, res, next) {
     console.log(req.body);
     if (req.body.token == null) {
         if (req.body.user == null) {
             res.send({ error: "Failed to authenticate." });
         } else {
-            User.findOne({
-                name: req.body.user.name
-            }, function(err, user) {
+            authenticationUtils.getUser(req.body.user.name,
+                function(user) {
+                    if (!user) {
+                        res.json({ success: false, message: 'Authentication failed. User not found.' });
+                    } else if (user) {
 
-                if (err) throw err;
+                        // check if password matches
+                        if (!bcrypt.compareSync(req.body.user.password, user.password)) {
+                            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+                        } else {
 
-                if (!user) {
-                    res.json({ success: false, message: 'Authentication failed. User not found.' });
-                } else if (user) {
+                            // if user is found and password is right
+                            // create a token
+                            var token = jwt.sign(user, app.get('superSecret'), {
+                                expiresIn: '168h' // expires in 24 hours
+                            });
 
-                    // check if password matches
-                    if (!bcrypt.compareSync(req.body.user.password, user.password)) {
-                        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-                    } else {
+                            // return the information including token as JSON
+                            res.json({
+                                success: true,
+                                message: 'Enjoy your token!',
+                                token: token
+                            });
+                        }
 
-                        // if user is found and password is right
-                        // create a token
-                        var token = jwt.sign(user, app.get('superSecret'), {
-                            expiresIn: '2000000h' // expires in 24 hours
-                        });
-
-                        // return the information including token as JSON
-                        res.json({
-                            success: true,
-                            message: 'Enjoy your token!',
-                            token: token
-                        });
                     }
 
-                }
-
-            });
-
-            // if (authenticationUtils.passwords.indexOf(req.body.password) >= 0) {
-            //     var token = jwt.sign({ foo: 'bar' }, app.get('secret'), {
-            //         expiresIn: '0' // expires in 24 hours
-            //     });
-
-            //     // return the information including token as JSON
-            //     res.json({
-            //         success: true,
-            //         message: 'Enjoy your token!',
-            //         token: token
-            //     });
-            // }
+                });
         }
     } else {
         jwt.verify(req.body.token, app.get('superSecret'), function(err, decoded) {
@@ -106,6 +82,13 @@ app.use(function(req, res, next) {
             }
         });
     }
+});
+
+app.post('/login', function(req, res) {
+    res.json({
+        success: true,
+        message: 'Token Validated!'
+    });
 });
 
 app.post('/gene-list', function(req, res) {

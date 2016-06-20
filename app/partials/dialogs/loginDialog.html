@@ -1,0 +1,28 @@
+<md-dialog aria-label="Login Dialog">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Login</h2>
+                
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-input-container style="margin-top: 5px;">
+                    <label>User</label>
+                    <input ng-model="ctrl.parent.user.name">
+                </md-input-container>
+                <br>
+                <md-input-container style="margin-top: 5px;">
+                    <label>Password</label>
+                    <input type="password" ng-model="ctrl.parent.user.password">
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button class="md-raised md-primary" ng-click="ctrl.parent.login()">
+                Login
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
