@@ -9,7 +9,7 @@ myModule.factory('ValidationService', function($http, $rootScope) {
             return false;
         } else if (data.success == false) {
             alert(data.message);
-            return false;    
+            $rootScope.tokenSet = false;
         }
         else {
             return true;
