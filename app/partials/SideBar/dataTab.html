@@ -7,12 +7,4 @@
             </md-option>
         </md-select>
     </md-input-container>
-    <h4>Upload on file select</h4>
-    <input type="file" ngf-select="uploadFiles($file, $invalidFiles, this)" ngf-max-height="1000" ngf-max-size="20MB">
-    </input>
-    <md-divider></md-divider>
-    <div ng-if="!tokenSet">
-        <md-button class="md-raised md-primary" ng-click="showLoginDialog();">Login</md-button>
-        {{validationData.tokenSet}}
-    </div>
 </md-content>
