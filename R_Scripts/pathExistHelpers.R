@@ -9,6 +9,10 @@ findAllPaths <- function(source, target, corMatrix) {
 	if (getGeneSuffix(source) == getGeneSuffix(target)) {
 		neighbours <- getNeighbours(corMatrix, source, c())
 
+		if (length(neighbours) < 1) {
+			return(paths)
+		}
+
 		for (i in 1:length(neighbours)) {
 			secondLevelNeighbours <- getNeighbours(corMatrix, names(neighbours[i]), c())
 			if (target %in% names(secondLevelNeighbours)) {
@@ -20,6 +24,10 @@ findAllPaths <- function(source, target, corMatrix) {
 		}
 	} else {
 		neighbours <- getNeighbours(corMatrix, source, c())
+
+		if (length(neighbours) < 1) {
+			return(paths)
+		}
 
 		if (target %in% names(neighbours)) {
 			paths[1, ]$firstEdge <- neighbours[target]

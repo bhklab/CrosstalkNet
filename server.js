@@ -572,19 +572,19 @@ app.post('/get-all-paths', function(req, res) {
 
 });
 
-app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), function(req, res) {
-    var file = req.files.file;
-    var data = req.body.data;
-    console.log(file.name);
-    console.log(file.type);
+// app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), function(req, res) {
+//     var file = req.files.file;
+//     var data = req.body.data;
+//     console.log(file.name);
+//     console.log(file.type);
 
-    data = data.replace(/^data:;base64,/, "");
+//     data = data.replace(/^data:;base64,/, "");
 
-    fs.writeFile('R_Scripts/User_Matrices/' + file.name, data, 'base64', (err) => {
-        if (err) throw err;
-        checkFileIntegrity(req, res, file);
-    });
-});
+//     fs.writeFile('R_Scripts/User_Matrices/' + file.name, data, 'base64', (err) => {
+//         if (err) throw err;
+//         checkFileIntegrity(req, res, file);
+//     });
+// });
 
 app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
