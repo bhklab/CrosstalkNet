@@ -65,7 +65,9 @@ myModule.factory('ExportService', function($http, $filter) {
         var rowDelim = "\r\n";
         var colDelim = ",";
         var csv = "";
-        var header = colDelim + neighbours.stroma.join();
+        var header = colDelim + neighbours.stroma.map(function(s) {
+            return $filter('suffixTrim')(s);
+        }).join();
         csv += header;
         csv += rowDelim;
 
@@ -73,7 +75,7 @@ myModule.factory('ExportService', function($http, $filter) {
             var temp = [];
             temp.push($filter('suffixTrim')(neighbours.epi[i]));
             for (var j = 0; j < neighbours.stroma.length; j++) {
-                
+
                 //temp += colDelim;
                 temp.push(scope.getInteractionViaDictionary(neighbours.epi[i], neighbours.stroma[j]));
             }
