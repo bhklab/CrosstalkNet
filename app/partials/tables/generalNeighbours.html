@@ -4,12 +4,13 @@
             <md-card-title-text>
                 <div layout="row">
                     <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions</span></div>
-                    <div flex style="position: relative;">
-                        <md-input-container class="no-margin right-aligned">
-                            <label>Filter Interactions</label>
-                            <input ng-model="interactionSearch">
-                        </md-input-container>
-                    </div>
+                <!-- <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Interactions</label>
+                        <input ng-model="interactionSearch">
+                    </md-input-container>
+                </div>
+                 -->
                 </div>
                 <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
             </md-card-title-text>
