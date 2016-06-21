@@ -1,5 +1,4 @@
 const fs = require('fs');
-//var opencpu = require('opencpu');
 var exec = require('child_process').exec;
 var child_process = require('child_process');
 var async = require('async');
@@ -96,6 +95,7 @@ app.post('/gene-list', function(req, res) {
     var argsString = "";
     var fileName = req.body.fileName;
     var file = matchSelectedFile(fileName);
+    var geneList = [];
 
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });
@@ -105,7 +105,6 @@ app.post('/gene-list', function(req, res) {
     args.pValue = file.pValue;
     args.fileName = file.fileName;
     args.path = file.path;
-    var geneList = [];
 
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
@@ -161,10 +160,6 @@ app.post('/neighbour-general', function(req, res) {
         return;
     }
 
-    args.pValue = file.pValue;
-    args.fileName = file.fileName;
-    args.path = file.path;
-
     if (!(selectedGenes instanceof Array)) {
         selectedGenes = [selectedGenes];
     } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
@@ -176,9 +171,10 @@ app.post('/neighbour-general', function(req, res) {
         selectedGeneNames.push(selectedGenes[i].value);
     }
 
+    args.pValue = file.pValue;
+    args.fileName = file.fileName;
+    args.path = file.path;
     args.selectedGenes = selectedGeneNames;
-
-    var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
 
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
@@ -190,6 +186,8 @@ app.post('/neighbour-general', function(req, res) {
             if (error != null) {
                 console.log('error: ' + error);
             }
+
+            var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
 
             var parsedValue = JSON.parse(stdout);
             var parsedNodes = parsedValue.nodes
@@ -273,17 +271,8 @@ app.post('/neighbour-general', function(req, res) {
                 layout = layoutUtils.createPresetLayout();
                 config = configUtils.createConfig();
 
-                for (prop in styleUtils.bipartiteStyles.epi) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
-                }
-
-                for (prop in styleUtils.bipartiteStyles.stroma) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
-                }
-
+                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
             } else {
                 for (var i = 0; i < nodes.length; i++) {
                     for (var j = 0; j < nodes[i].length; j++) {
@@ -297,14 +286,7 @@ app.post('/neighbour-general', function(req, res) {
                 layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
 
                 nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
+                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
             }
 
             elements = elements.concat([].concat.apply([], nodes));
@@ -336,16 +318,28 @@ app.post('/submatrix', function(req, res) {
     var fileName = req.body.fileName;
     var file = matchSelectedFile(fileName);
     var requestedLayout = req.body.layout;
+    var filterValidationRes = validationUtils.validateFilters(req.body);
+    console.log(req.body);
 
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });
         return;
     }
 
-    var filterValidationRes = validationUtils.validateFilters(req.body);
     if (filterValidationRes.error) {
         res.send(filterValidationRes);
         return;
+    }
+
+    if (!(selectedGenes instanceof Array)) {
+        selectedGenes = [selectedGenes];
+    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        res.json({ error: "Please select at least 1 gene of interest." });
+        return;
+    }
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        selectedGeneNames.push(selectedGenes[i].value);
     }
 
     args.pValue = file.pValue;
@@ -359,19 +353,6 @@ app.post('/submatrix', function(req, res) {
     args.weightFilterSecond = req.body.filterSecond;
     args.depth = req.body.depth;
 
-    if (!(selectedGenes instanceof Array)) {
-        selectedGenes = [selectedGenes];
-    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select at least 1 gene of interest." });
-        return;
-    }
-
-    console.log(req.body);
-
-    for (var i = 0; i < selectedGenes.length; i++) {
-        selectedGeneNames.push(selectedGenes[i].value);
-    }
-
     args.genesOfInterest = selectedGeneNames;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
@@ -381,7 +362,6 @@ app.post('/submatrix', function(req, res) {
                 50000
         },
         function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
 
             if (error != null) {
@@ -389,7 +369,6 @@ app.post('/submatrix', function(req, res) {
             }
 
             var parsedValue = JSON.parse(stdout);
-            //console.log(parsedValue);
 
             var parsedNodesFirst = parsedValue.neighboursNodes.first;
             var parsedNodesSecond = parsedValue.neighboursNodes.second;
@@ -466,14 +445,7 @@ app.post('/submatrix', function(req, res) {
                 layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
                 layout = layoutUtils.createPresetLayout();
 
-                for (prop in styleUtils.bipartiteStyles.epi) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi[prop]);
-                }
-
-                for (prop in styleUtils.bipartiteStyles.stroma) {
-                    configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma[prop]);
-                }
-
+                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
             } else if (requestedLayout == 'clustered') {
                 var largestClusterSize = 0;
@@ -492,23 +464,11 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 layout = layoutUtils.createPresetLayout();
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.source);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
+                configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
             } else {
                 layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceEpi);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.stripedSourceStroma);
-                configUtils.addStyleToConfig(config, styleUtils.randomStyles.labelBackground);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.nodeColor);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.epi.labelPlacement);
-                configUtils.addStyleToConfig(config, styleUtils.bipartiteStyles.stroma.labelPlacement);
+                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
             }
 
             configUtils.addStyleToConfig(config, edgeStyleNegative);
