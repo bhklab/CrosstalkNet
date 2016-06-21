@@ -557,15 +557,19 @@ function getAvailableMatrices() {
     var fileList = [];
     var result = [];
 
-    fileNames = fs.readdirSync('R_Scripts/User_Matrices');
+    var directories = ['Normal', 'Tumor', 'Delta'];
 
-    fileList = fileList.concat(fileNames.map(function(file) {
-        return {
-            fileName: file,
-            pValue: "",
-            path: "User_Matrices/"
-        };
-    }));
+    for (var i = 0; i < directories.length; i++) {
+        fileNames = fs.readdirSync('R_Scripts/User_Matrices/' + directories[i]);
+
+        fileList = fileList.concat(fileNames.map(function(file) {
+            return {
+                fileName: file,
+                pValue: "",
+                path: "User_Matrices/" + directories[i] + "/"
+            };
+        }));
+    }
 
     for (var i = 0; i < fileList.length; i++) {
         if (fileList[i].fileName.indexOf('degree') < 0) {
