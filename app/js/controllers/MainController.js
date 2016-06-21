@@ -7,8 +7,9 @@ controllers.controller('MainController', ['$scope',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
-        $rootScope.correlationFileDisplayed = null;
-        $rootScope.correlationFileActual = null;
+        $rootScope.correlationFilesDisplayed = { nonDelta: null, delta: null };
+        $rootScope.correlationFilesActual = { nonDelta: null, delta: null };
+        $rootScope.geneLists = { nonDelta: null, delta: null };
         $rootScope.states = angular.copy(BasicDataService.states);
         $rootScope.state = $rootScope.states.initial;
 
@@ -26,6 +27,10 @@ controllers.controller('MainController', ['$scope',
 
         $rootScope.tokenSet = false;
         $scope.user = { name: null, password: null, token: null };
+
+        $scope.init = function(whichController) {
+            $scope.whichController = whichController;
+        };
 
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
@@ -110,7 +115,7 @@ controllers.controller('MainController', ['$scope',
                     filterSecond: filterSecond && filter,
                     layout: $scope.selectedLayout,
                     depth: depth,
-                    fileName: $rootScope.correlationFileActual
+                    fileName: $rootScope.correlationFilesActual[$scope.whichController]
                 })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
@@ -125,7 +130,7 @@ controllers.controller('MainController', ['$scope',
                     if ($scope.display == "Tables") {
                         $scope.needsRedraw = true;
                     }
-                    $scope.applyConfig(data.config, "cyMain", $scope);
+                    $scope.applyConfig(data.config, "cyMain" + $scope.whichController, $scope);
 
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
@@ -154,7 +159,7 @@ controllers.controller('MainController', ['$scope',
 
         $scope.getGeneList = function() {
             $rootScope.state = $rootScope.states.gettingGeneList;
-            RESTService.post('gene-list', { fileName: $rootScope.correlationFileActual })
+            RESTService.post('gene-list', { fileName: $rootScope.correlationFilesActual[$scope.whichController] })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -177,7 +182,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.getOverallMatrixStats = function() {
-            RESTService.post('overall-matrix-stats', { fileName: $rootScope.correlationFileActual }).then(function(data) {
+            RESTService.post('overall-matrix-stats', { fileName: $rootScope.correlationFilesActual[$scope.whichController] }).then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
                     return;
                 }
@@ -221,7 +226,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.refreshGeneList = function() {
-            $rootScope.correlationFileActual = $rootScope.correlationFileDisplayed;
+            $rootScope.correlationFilesActual[$scope.whichController] = $rootScope.correlationFilesDisplayed[$scope.whichController];
             $scope.removeGenesOfInterest();
             $scope.resetInputFields();
             $scope.resetFilters();
@@ -312,6 +317,8 @@ controllers.controller('MainController', ['$scope',
             $mdDialog.hide(answer);
         };
 
-        $scope.checkToken();
+        if ($scope.whichController == 'nonDelta') {
+            $scope.checkToken();
+        }
     }
 ]);

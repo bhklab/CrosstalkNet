@@ -6,9 +6,6 @@ controllers.controller('NeighbourController', [
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', '$q', '$timeout',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, ExportService,
         $q, $timeout) {
-        $rootScope.selectedTab = 0;
-        $rootScope.state = $rootScope.states.initial;
-        $rootScope.states = angular.copy(BasicDataService.states);
         $scope.ctrl = "neighbour";
 
         InitializationService.initializeCommonVariables($scope);
@@ -28,6 +25,10 @@ controllers.controller('NeighbourController', [
 
         $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
+
+        $scope.init = function(whichController) {
+            $scope.whichController = whichController;
+        };
 
         $scope.locateGene = function(gene) {
             if (gene != null && gene != '') {
@@ -71,7 +72,7 @@ controllers.controller('NeighbourController', [
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.genesOfInterest,
-                fileName: $rootScope.correlationFileActual
+                fileName: $rootScope.correlationFilesActual[$scope.whichController]
             }).then(function(data) {
                 console.log(data);
 
@@ -84,7 +85,7 @@ controllers.controller('NeighbourController', [
                 if ($scope.display == "Tables") {
                     $scope.needsRedraw = true;
                 }
-                $scope.applyConfig(data.config, "cyNeighbour", $scope);
+                $scope.applyConfig(data.config, "cyNeighbour" + $scope.whichController, $scope);
                 $scope.selfLoops = data.selfLoops;
                 $scope.edgeDictionary = data.edgeDictionary;
 
@@ -119,7 +120,7 @@ controllers.controller('NeighbourController', [
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
-        $rootScope.$watch('correlationFileActual', function() {
+        $rootScope.$watch('correlationFilesActual[whichController]', function() {
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.allVisibleGenes = [];

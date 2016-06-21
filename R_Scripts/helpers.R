@@ -53,7 +53,7 @@ getNeighbourNames <- function(corMatrix, gene, exclusion) {
         return(character())
     }
 
-    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+    if (getGeneSuffix(gene) == '-e') {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
     } else {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
@@ -72,7 +72,7 @@ getDegreesForNeighbourNames <- function(degrees, neighbourNames) {
         return(integer())
     }
 
-    if (tolower(substr(first, nchar(first)-1, nchar(first))) == '-e') {
+    if (getGeneSuffix(first) == '-e') {
         resultDegrees <- degrees$epiDegree[na.omit(neighbourNames)]
     } else {
         resultDegrees <- degrees$stromaDegree[na.omit(neighbourNames)]
@@ -88,7 +88,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
         return(edges)
     }
 
-    if (tolower(substr(gene, nchar(gene)-1, nchar(gene))) == '-e') {
+    if (getGeneSuffix(gene) == '-e') {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
         
