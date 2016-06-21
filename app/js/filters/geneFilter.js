@@ -7,12 +7,7 @@ filters.filter('geneFilter', function() {
         }
 
         filtered = genes.$('.' + side);
-/*
-        angular.forEach(genes, function(gene) {
-            if (gene.data.parent == side) {
-                filtered.push(gene);
-            }
-        });*/
+
         return filtered;
     };
 });
