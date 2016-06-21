@@ -55,7 +55,7 @@
             <legend class="fieldset-legend">First Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
                 <div flex="50">
-                    <md-input-container class="md-icon-float md-icon-right md-block">
+                    <md-input-container class="md-icon-float md-icon-right md-block md-input-has-value">
                         <label class="label-position">Min Negative Correlation | Lowest: {{correlationFilterFirst.min}}</label>
                         <input ng-model="correlationFilterFirst.negativeFilter" min="{{correlationFilterFirst.min}}" max="0" type="number" step="0.001">
                     </md-input-container>

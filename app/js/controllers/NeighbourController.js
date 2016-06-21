@@ -90,7 +90,7 @@ controllers.controller('NeighbourController', [
 
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
-                $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope.cy, $scope.genesOfInterest);
+                $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $rootScope.state = $rootScope.states.showingGraph;
 

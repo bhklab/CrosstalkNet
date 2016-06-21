@@ -126,8 +126,6 @@ controllers.controller('MainController', ['$scope',
                         $scope.needsRedraw = true;
                     }
                     $scope.applyConfig(data.config, "cyMain", $scope);
-                    // $scope.setNeighbours($scope, 1);
-                    // $scope.setNeighbours($scope, 2);
 
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
@@ -175,7 +173,6 @@ controllers.controller('MainController', ['$scope',
                     }
 
                     $scope.fileList = data.fileList;
-                    //$scope.getGeneList()
                 });
         };
 

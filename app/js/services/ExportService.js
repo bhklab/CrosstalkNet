@@ -75,13 +75,10 @@ myModule.factory('ExportService', function($http, $filter) {
             var temp = [];
             temp.push($filter('suffixTrim')(neighbours.epi[i]));
             for (var j = 0; j < neighbours.stroma.length; j++) {
-
-                //temp += colDelim;
                 temp.push(scope.getInteractionViaDictionary(neighbours.epi[i], neighbours.stroma[j]));
             }
 
             csv += temp.join();
-            //csv += temp;
             csv += rowDelim;
         }
 
@@ -89,9 +86,8 @@ myModule.factory('ExportService', function($http, $filter) {
         var link = document.createElement("a");
         link.setAttribute("href", csvData);
         link.setAttribute("download", fileName);
-        document.body.appendChild(link); // Required for FF
-
-        link.click(); // This w
+        document.body.appendChild(link);
+        link.click();
         document.body.removeChild(link);
     }
 
@@ -103,14 +99,11 @@ myModule.factory('ExportService', function($http, $filter) {
         var fileName = "graph" + Date.now() + ".png";
         var png64 = scope.cy.png();
 
-        //var pngData = 'data:image/png;base64,' + encodeURIComponent(png64);
-
         var link = document.createElement("a");
         link.setAttribute("href", png64);
         link.setAttribute("download", fileName);
-        document.body.appendChild(link); // Required for FF
-
-        link.click(); // This w
+        document.body.appendChild(link);
+        link.click();
         document.body.removeChild(link);
 
     }
