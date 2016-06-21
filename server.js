@@ -8,7 +8,6 @@ var bodyParser = require('body-parser')
 var app = express();
 var nodeUtils = require('nodeUtils');
 var configUtils = require('configUtils');
-var copyUtils = require('copyUtils');
 var edgeUtils = require('edgeUtils');
 var styleUtils = require('styleUtils');
 var geneUtils = require('geneUtils');
@@ -200,7 +199,7 @@ app.post('/neighbour-general', function(req, res) {
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
 
             for (var i = 0; i < parsedEdges.length; i++) {
-                edges = edges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdges[i], i + 1));
+                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
                 //interactionsTableList.push()
             }
 
@@ -379,14 +378,14 @@ app.post('/submatrix', function(req, res) {
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
-                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesFirst[i], 1));
+                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i], 1));
             }
 
             firstNeighbourInteractions = cytoscapeEdges;
             cytoscapeEdges = [];
 
             for (var i = 0; i < parsedEdgesSecond.length; i++) {
-                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdgesSecond[i], 2));
+                cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i], 2));
             }
 
             secondNeighbourInteractions = cytoscapeEdges;
@@ -404,7 +403,7 @@ app.post('/submatrix', function(req, res) {
                 allNodes.push({
                     data: { id: "stroma" }
                 });
-                layoutUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
+                nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
                 layout = layoutUtils.createPresetLayout();
 
                 configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
@@ -414,7 +413,7 @@ app.post('/submatrix', function(req, res) {
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = layoutUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + layoutUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
+                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -422,7 +421,7 @@ app.post('/submatrix', function(req, res) {
                 }
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    layoutUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+                    nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
                 }
 
                 layout = layoutUtils.createPresetLayout();
