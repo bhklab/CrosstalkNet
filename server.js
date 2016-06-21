@@ -45,19 +45,13 @@ app.use(function(req, res, next) {
                     if (!user) {
                         res.json({ success: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
-
-                        // check if password matches
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-
-                            // if user is found and password is right
-                            // create a token
                             var token = jwt.sign(user, app.get('superSecret'), {
-                                expiresIn: '168h' // expires in 24 hours
+                                expiresIn: '168h' // expires in 7 days
                             });
 
-                            // return the information including token as JSON
                             res.json({
                                 success: true,
                                 message: 'Enjoy your token!',
@@ -75,7 +69,6 @@ app.use(function(req, res, next) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
-                // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
                 next();
             }
@@ -93,8 +86,7 @@ app.post('/login', function(req, res) {
 app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
     var argsString = "";
-    var fileName = req.body.fileName;
-    var file = matchSelectedFile(fileName);
+    var file = matchSelectedFile(req.body.fileName);
     var geneList = [];
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -147,8 +139,7 @@ app.post('/gene-list', function(req, res) {
 
 app.post('/neighbour-general', function(req, res) {
     var args = {};
-    var fileName = req.body.fileName;
-    var file = matchSelectedFile(fileName);
+    var file = matchSelectedFile(req.body.fileName);
     var argsString = "";
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
@@ -160,9 +151,7 @@ app.post('/neighbour-general', function(req, res) {
         return;
     }
 
-    if (!(selectedGenes instanceof Array)) {
-        selectedGenes = [selectedGenes];
-    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
         res.json({ error: "Please select a gene." });
         return;
     }
@@ -210,25 +199,6 @@ app.post('/neighbour-general', function(req, res) {
 
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
 
-            if (parsedNodes.length == null) {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
-                nodeUtils.addStyleToNodes(sourceNodes[0], 10, 10,
-                    "left",
-                    "center",
-                    "blue");
-                elements.push(sourceNodes[0][0]);
-
-                config = configUtils.createConfig();
-                layout = configUtils.createPresetLayout();
-
-                configUtils.setConfigElements(config, elements);
-                configUtils.setConfigLayout(config, layout);
-
-                res.json({ config: config });
-                return;
-            }
-
             for (var i = 0; i < parsedEdges.length; i++) {
                 edges = edges.concat(edgeUtils.createEdgesFromREdgesFinal(parsedEdges[i], i + 1));
                 //interactionsTableList.push()
@@ -259,8 +229,6 @@ app.post('/neighbour-general', function(req, res) {
                         });
                     }
                 }
-
-                var yIncrement = 0;
 
                 for (var j = 0; j < nodes.length; j++) {
                     nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
@@ -315,8 +283,7 @@ app.post('/submatrix', function(req, res) {
     var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
-    var fileName = req.body.fileName;
-    var file = matchSelectedFile(fileName);
+    var file = matchSelectedFile(req.body.fileName);
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     console.log(req.body);
@@ -331,9 +298,7 @@ app.post('/submatrix', function(req, res) {
         return;
     }
 
-    if (!(selectedGenes instanceof Array)) {
-        selectedGenes = [selectedGenes];
-    } else if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
         res.json({ error: "Please select at least 1 gene of interest." });
         return;
     }
@@ -426,9 +391,6 @@ app.post('/submatrix', function(req, res) {
 
             secondNeighbourInteractions = cytoscapeEdges;
 
-            console.log("Length of all nodes: " + allNodes.length);
-            console.log("Length of all edges: " + (firstNeighbourInteractions.length + secondNeighbourInteractions.length));
-
             edges = edges.concat(firstNeighbourInteractions);
             edges = edges.concat(secondNeighbourInteractions);
 
@@ -494,8 +456,7 @@ app.post('/get-all-paths', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
-    var fileName = req.body.fileName;
-    var file = matchSelectedFile(fileName);
+    var file = matchSelectedFile(req.body.fileName);
     var source = req.body.source;
     var target = req.body.target;
 
@@ -560,8 +521,7 @@ app.post('/available-matrices', function(req, res) {
 
 app.post('/overall-matrix-stats', function(req, res) {
     var args = {};
-    var fileName = req.body.fileName;
-    var file = matchSelectedFile(fileName);
+    var file = matchSelectedFile(req.body.fileName);
 
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });
@@ -578,7 +538,6 @@ app.post('/overall-matrix-stats', function(req, res) {
                 50000
         },
         function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
 
             if (error != null) {
@@ -599,21 +558,12 @@ function getAvailableMatrices() {
     var fileList = [];
     var result = [];
 
-    // fileNames = fs.readdirSync('R_Scripts/Full_Matrices');
-    // fileList = fileNames.map(function(file) {
-    //     return {
-    //         fileName: file,
-    //         pValue: file.split(".").length > 2 ? file.split(".")[1] : "",
-    //         path: "Full_Matrices/"
-    //     };
-    // });
-
     fileNames = fs.readdirSync('R_Scripts/User_Matrices');
 
     fileList = fileList.concat(fileNames.map(function(file) {
         return {
             fileName: file,
-            pValue: "", //file.split(".").length > 2 ? file.split(".")[1] : "",
+            pValue: "",
             path: "User_Matrices/"
         };
     }));
