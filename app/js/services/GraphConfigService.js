@@ -1,6 +1,5 @@
 var myModule = angular.module("myApp");
 myModule.factory('GraphConfigService', function($http, RESTService) {
-
     var service = {};
 
     service.tabNames = { main: "main", neighbour: "neighbour" };
@@ -19,7 +18,16 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
     service.firstSelectedGene = null;
 
-    service.applyConfig = function(config, containerID, scope) {
+    service.applyConfig = applyConfig;
+    service.getInteractingNodes = getInteractingNodes;
+    service.findGeneInGraph = findGeneInGraph;
+    service.clearLocatedGene = clearLocatedGene;
+    service.closeEdgeInspector = closeEdgeInspector;
+    service.resetEdges = resetEdges;
+    service.resetZoom = resetZoom;
+    service.getAllVisibleGenes = getAllVisibleGenes;
+
+    function applyConfig(config, containerID, scope) {
         scope.elemCopy = angular.copy(config.elements);
         scope.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
@@ -34,8 +42,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         scope.cy.on('select', 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
-            console.log('tapped ' + id);
-
             var edges = scope.cy.edges("[source='" + id + "'], [target='" + id + "']");
 
             scope.cy.batch(function() {
@@ -55,7 +61,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
 
             service.selectedItem = null;
-            console.log(node);
         });
 
         scope.cy.on("tap", "edge", function(evt) {
@@ -69,14 +74,11 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
         });
 
-
         scope.cy.on("unselect", 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 
             service.resetEdges(scope.cy);
-            console.log('tapped ' + id);
-            console.log(node);
         });
 
         scope.cy.nodes().not(':parent').forEach(function(n) {
@@ -110,7 +112,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });
     };
 
-    service.getInteractingNodes = function(node, cy) {
+    function getInteractingNodes(node, cy) {
         var attribute = '';
 
         if (node.id().endsWith('-E')) {
@@ -135,7 +137,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         return nodes;
     };
 
-    service.findGeneInGraph = function(scope, gene) {
+    function findGeneInGraph(scope, gene) {
         service.clearLocatedGene(scope);
 
         var node = scope.cy.$("#" + gene.toUpperCase());
@@ -181,7 +183,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         scope.currentlyZoomed = { node: node, styleClass: colorClass };
     };
 
-    service.clearLocatedGene = function(scope) {
+    function clearLocatedGene(scope) {
         if (scope.currentlyZoomed != null) {
             scope.currentlyZoomed.node.removeClass('located');
             scope.currentlyZoomed.node.toggleClass(scope.currentlyZoomed.styleClass);
@@ -190,11 +192,11 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         scope.currentlyZoomed = null;
     };
 
-    service.closeEdgeInspector = function(scope) {
+    function closeEdgeInspector(scope) {
         scope.selectedEdge = {};
     };
 
-    service.resetEdges = function(cy) {
+    function resetEdges(cy) {
         var edges = cy.edges();
 
         cy.batch(function() {
@@ -205,19 +207,13 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         });
     };
 
-    service.resetZoom = function(cy) {
-        service.resetNodes(cy);
+    function resetZoom(cy) {
         if (cy != null) {
             cy.fit(cy.$("*"), 10);
         }
     };
 
-    service.resetNodes = function(cy, originalElements) {
-        //cy.json({ elements: originalElements });
-    };
-
-
-    service.getAllVisibleGenes = function(scope) {
+    function getAllVisibleGenes(scope) {
         var result = [];
         var nodes = scope.cy.$('node').not(':parent');
 

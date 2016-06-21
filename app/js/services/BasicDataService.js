@@ -27,60 +27,15 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
-
-    service.loadDropdownOptions = loadDropdownOptions;
-    service.loadGeneListDropdownOptions = loadGeneListDropdownOptions;
     service.loadNeighbourDropdownOptions = loadNeighbourDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
     service.setNeighboursGeneral = setNeighboursGeneral;
 
-    function initializeStandardVariables(scope) {
-        scope.selectedItemFirst = null;
-        scope.selectedGOI = null;
-        scope.zoomGene = null;
-        scope.searchTextGOI = "";
-        scope.searchTextFirst = "";
-        scope.searchTextSecond = "";
-        scope.searchTextZoom = "";
-        scope.minPositiveWeight = 0;
-        scope.minNegativeWeight = 0;
-        scope.ctrl = "main";
-
-        scope.pValues = angular.copy(service.pValues);
-        scope.layouts = angular.copy(service.layouts);
-    }
-
-    function loadDropdownOptions(cy, selectedGenes = null) {
-        var genes = [];
-        var selectedGenesStr = "";
-        var parentContainers = "#par0";
-        var parents = "";
-
-        for (var i = 0; i < selectedGenes.length; i++) {
-            selectedGenesStr += ', #' + selectedGenes[i].value;
-            parentContainers += ", #par" + (i + 1);
-            parents += ", [parent='par" + i + "']"
-        }
-
-        cy.nodes().not(parentContainers + parents + selectedGenesStr).forEach(function(
-            node) {
-            genes.push(node.data());
-        });
-
-        return genes.map(function(gene) {
-            return {
-                value: gene.id,
-                display: gene.id + ' ' + gene.degree,
-                object: gene
-            };
-        });
-    }
-
-    function loadNeighbourDropdownOptions(cy, selectedGenes) {
+    function loadNeighbourDropdownOptions(scope, selectedGenes) {
         var genes = [];
 
-        cy.edges("[source='" + selectedGenes[selectedGenes.length - 1].value + "']").forEach(function(
+        scope.cy.edges("[source='" + selectedGenes[selectedGenes.length - 1].value + "']").forEach(function(
             edge) {
             genes.push(edge.target().data());
         });
@@ -90,24 +45,6 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
                 value: gene.id,
                 display: gene.id + ' ' + gene.degree,
                 object: gene
-            };
-        });
-    }
-
-    function loadGeneListDropdownOptions(geneList) {
-        return geneList.map(function(gene) {
-            return {
-                value: gene.name,
-                display: gene.name + ' ' + gene.degree,
-                object: gene
-            };
-        });
-    }
-
-    function loadFileListDropdownOptions(fileList) {
-        return fileList.map(function(file) {
-            return {
-                value: file
             };
         });
     }

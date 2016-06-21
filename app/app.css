@@ -146,7 +146,7 @@ md-menu-content {
 }
 
 .label-position {
-    bottom: 60% !important;
+    bottom: 75% !important;
 }
 
 td, th {
@@ -257,55 +257,4 @@ md-dialog.md-transition-in {
     border-radius: 4px;
     background-color: rgba(0,0,0,.5);
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
-}
-
-/*Disable transition for fading in menu items dialog.*/
-.md-open-menu-container.md-active > md-menu-content > * {
-    opacity: 1;
-    transition: none;
-    transition-duration: 0ms;
-    transition-delay: 0ms;
-}
-.md-button
-{
-    transition: none;
-    transition-duration: 0ms;
-    transition-delay: 0ms;
-}
-md-dialog._md-transition-in {
-    transition: none;
-    transition-duration: 0ms;
-    transition-delay: 0ms;
-}
-
-md-input-container label{
-    transition: none!important;
-    transition-duration: 0ms!important;
-    transition-delay: 0ms!important;
-}
-
-
-md-slider ._md-thumb-container, ._md-focus-ring, ._md-track-fill, ._md-thumb{
-    transition: none!important;
-    transition-duration: 0ms!important;
-    transition-delay: 0ms!important;
-}
-
-md-select-menu
-{
-    transition: none!important;
-    transition-duration: 0ms!important;
-    transition-delay: 0ms!important;
-}
-md-select-menu md-content
-{
-    transition: none!important;
-    transition-duration: 0ms!important;
-    transition-delay: 0ms!important;
-}
-
-.ng-scope {
-    transition: none!important;
-    transition-duration: 0ms!important;
-    transition-delay: 0ms!important;
 }
