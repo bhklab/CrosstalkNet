@@ -21,6 +21,10 @@ controllers.controller('PathExistenceController', [
 
         $scope.allPaths = null;
 
+        $scope.init = function(whichController) {
+            $scope.whichController = whichController;
+        };
+
         $scope.setPathExplorerGene = function(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
@@ -50,7 +54,7 @@ controllers.controller('PathExistenceController', [
             RESTService.post('get-all-paths', {
                 target: $scope.pathExplorerTarget.value,
                 source: $scope.pathExplorerSource.value,
-                fileName: $rootScope.correlationFileActual
+                fileName: $rootScope.correlationFilesActual[$scope.whichController]
             }).then(function(data) {
                 console.log(data);
                 $scope.allPaths = data.paths;
@@ -60,7 +64,7 @@ controllers.controller('PathExistenceController', [
             });
         };
 
-        $rootScope.$watch('correlationFileActual', function() {
+        $rootScope.$watch('correlationFilesActual[whichController]', function() {
             $scope.genesOfInterest = [];
             $scope.resetInputFields();
             $scope.neighbours = [];
