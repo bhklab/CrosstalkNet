@@ -165,7 +165,8 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.getFileList = function() {
-            RESTService.post('available-matrices', {})
+            var types = $scope.whichController == 'nonDelta' ? ['normal', 'tumor'] : ['delta'];
+            RESTService.post('available-matrices', { types: types })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -220,20 +221,22 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.refreshGeneList = function() {
-            $rootScope.correlationFilesActual[$scope.whichController] = $rootScope.correlationFilesDisplayed[$scope.whichController];
             $scope.removeGenesOfInterest();
             $scope.resetInputFieldsGlobal();
             $scope.resetFilters();
+            $rootScope.correlationFilesActual[$scope.whichController] = $rootScope.correlationFilesDisplayed[$scope.whichController];
             $scope.overallMatrixStats = null;
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.allVisibleGenes = [];
-            $scope.getGeneList();
-            $scope.getOverallMatrixStats();
             $scope.tabIndex = 1;
+
             if ($scope.cy) {
                 $scope.cy.destroy();
             }
             $scope.cy = null;
+
+            $scope.getGeneList();
+            $scope.getOverallMatrixStats();
         };
 
         $scope.returnToFirstNeighboursFilter = function() {
@@ -247,7 +250,7 @@ controllers.controller('MainController', ['$scope',
                     if ($scope.config != null) {
                         $scope.cy.resize();
                         $scope.needsRedraw = false;
-                        $scope.applyConfig($scope.config, "cyMain", $scope);
+                        $scope.applyConfig($scope.config, "cyMain" + $scope.whichController, $scope);
                     }
                 }, 250);
 
