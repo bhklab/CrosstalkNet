@@ -22,7 +22,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     service.getInteractingNodes = getInteractingNodes;
     service.findGeneInGraph = findGeneInGraph;
     service.clearLocatedGene = clearLocatedGene;
-    service.closeEdgeInspector = closeEdgeInspector;
     service.resetEdges = resetEdges;
     service.resetZoom = resetZoom;
     service.getAllVisibleGenes = getAllVisibleGenes;
@@ -190,10 +189,6 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         }
 
         scope.currentlyZoomed = null;
-    };
-
-    function closeEdgeInspector(scope) {
-        scope.selectedEdge = {};
     };
 
     function resetEdges(cy) {
