@@ -42,6 +42,34 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             positiveEnabled: false
         };
 
+        scope.resetInputFieldsGlobal = function() {
+            angular.forEach(angular.element("md-autocomplete." + scope.whichController + " input"), function(value, key) {
+                var a = angular.element(value);
+                a.val('');
+            });
+
+            angular.forEach(angular.element("md-autocomplete." + scope.whichController + " button"), function(value, key) {
+                $timeout(function() {
+                    var a = angular.element(value);
+                    a.click();
+                });
+            });
+        };
+
+        scope.resetInputFieldsLocal = function(extraClass) {
+            angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " input"), function(value, key) {
+                var a = angular.element(value);
+                a.val('');
+            });
+
+            angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " button"), function(value, key) {
+                $timeout(function() {
+                    var a = angular.element(value);
+                    a.click();
+                });
+            });
+        };
+
         scope.correlationFilterFirst = angular.copy(scope.correlationFilterModel);
         scope.correlationFilterSecond = angular.copy(scope.correlationFilterModel);
 

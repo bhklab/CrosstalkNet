@@ -33,12 +33,6 @@ controllers.controller('PathExistenceController', [
             }
         };
 
-        $scope.resetInputFields = function() {
-            $("md-autocomplete input").each(function() {
-                $(this).val('');
-            });
-        };
-
         $scope.getAllPaths = function() {
             if ($scope.pathExplorerTarget == null || $scope.pathExplorerSource == null) {
                 alert("Please select a source and target gene.");
@@ -62,9 +56,11 @@ controllers.controller('PathExistenceController', [
             });
         };
 
-        $rootScope.$watch('correlationFilesActual[whichController]', function() {
+        $rootScope.$watch(function() {
+            return $rootScope.correlationFilesActual[$scope.whichController];
+        }, function() {
             $scope.genesOfInterest = [];
-            $scope.resetInputFields();
+            //$scope.resetInputFields();
             $scope.neighbours = [];
             $scope.allPaths = null;
         });
