@@ -16,7 +16,6 @@ controllers.controller('MainController', ['$scope',
         $scope.ctrl = "main";
         InitializationService.initializeCommonVariables($scope);
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
-        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
         $scope.uploadFiles = FileUploadService.uploadFiles;
         $scope.config = null;
         $scope.needsRedraw = false;
@@ -53,6 +52,10 @@ controllers.controller('MainController', ['$scope',
             }
         };
 
+        $scope.closeEdgeInspector = function() {
+            $scope.selectedEdge = {};
+        };
+
         $scope.clearLocatedGene = function() {
             $scope.resetInputFieldsLocal('geneLocator');
             GraphConfigService.clearLocatedGene($scope);
@@ -60,6 +63,7 @@ controllers.controller('MainController', ['$scope',
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
+            $scope.closeEdgeInspector();
             $scope.resetInputFieldsLocal('');
             $scope.resetFilters();
             if ($scope.cy) {
@@ -221,6 +225,7 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.refreshGeneList = function() {
+            $scope.closeEdgeInspector();
             $scope.removeGenesOfInterest();
             $scope.resetInputFieldsGlobal();
             $scope.resetFilters();

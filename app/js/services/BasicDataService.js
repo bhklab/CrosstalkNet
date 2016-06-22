@@ -27,12 +27,12 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
-    service.loadNeighbourDropdownOptions = loadNeighbourDropdownOptions;
+    service.loadExplorerDropdownOptions = loadExplorerDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
     service.setNeighboursGeneral = setNeighboursGeneral;
 
-    function loadNeighbourDropdownOptions(scope, selectedGenes) {
+    function loadExplorerDropdownOptions(scope, selectedGenes) {
         var genes = [];
 
         scope.cy.edges("[source='" + selectedGenes[selectedGenes.length - 1].value + "']").forEach(function(
@@ -59,22 +59,16 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
                     scope.allVisibleGenes,
                     deferred;
             }
-        } else if (source == "first") {
-            if (scope.firstNeighbourDropdownOptions != null) {
-                results = query ? scope.firstNeighbourDropdownOptions.filter(createFilterFor(query)) :
-                    scope.firstNeighbourDropdownOptions,
+        } else if (source == "explorer") {
+            if (scope.explorerGenes != null) {
+                results = query ? scope.explorerGenes.filter(createFilterFor(query)) :
+                    scope.explorerGenes,
                     deferred;
             }
         } else if (source == "geneList") {
             if ($rootScope.geneLists[scope.whichController] != null) {
                 results = query ? $rootScope.geneLists[scope.whichController].filter(createFilterFor(query)) :
                     $rootScope.geneLists[scope.whichController],
-                    deferred;
-            }
-        } else {
-            if (scope.genesSecond != null) {
-                results = query ? scope.genesSecond.filter(createFilterFor(query)) :
-                    scope.genesSecond,
                     deferred;
             }
         }
