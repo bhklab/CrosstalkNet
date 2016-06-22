@@ -66,7 +66,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
                     deferred;
             }
         } else if (source == "geneList") {
-            if ($rootScope.geneList != null) {
+            if ($rootScope.geneLists[scope.whichController] != null) {
                 results = query ? $rootScope.geneLists[scope.whichController].filter(createFilterFor(query)) :
                     $rootScope.geneLists[scope.whichController],
                     deferred;

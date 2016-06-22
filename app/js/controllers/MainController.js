@@ -2,9 +2,9 @@
 
 controllers.controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', '$q', '$timeout', '$cookies',
+    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
     '$mdDialog',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService,
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
         $rootScope.correlationFilesDisplayed = { nonDelta: null, delta: null };
@@ -25,8 +25,7 @@ controllers.controller('MainController', ['$scope',
         $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
-        $rootScope.tokenSet = false;
-        $scope.user = { name: null, password: null, token: null };
+        $scope.sharedData = SharedService.data;
 
         $scope.init = function(whichController) {
             $scope.whichController = whichController;
@@ -165,7 +164,7 @@ controllers.controller('MainController', ['$scope',
                         return;
                     }
 
-                    $rootScope.geneList = data.geneList;
+                    $rootScope.geneLists[$scope.whichController] = data.geneList;
                     $rootScope.state = $rootScope.states.initial;
                 });
         };
@@ -260,65 +259,11 @@ controllers.controller('MainController', ['$scope',
             }
         });
 
-        $rootScope.$watch('tokenSet', function(newValue, oldValue) {
-            if (newValue == false && oldValue == true) {
-                $cookies.remove('token');
-                $scope.showLoginDialog();
+        $scope.$watch('sharedData[whichController].reloadFileList', function(newValue, oldValue) {
+            if (newValue == true && oldValue == false) {
+                $scope.getFileList();
+                $scope.sharedData[$scope.whichController].reloadFileList = false;
             }
         });
-
-        $scope.checkToken = function() {
-            if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
-                $rootScope.tokenSet = true;
-                $scope.login();
-            } else {
-                $scope.showLoginDialog();
-            }
-        };
-
-        $scope.showLoginDialog = function(ev) {
-            $mdDialog.show({
-                    controller: function() { this.parent = $scope; },
-                    controllerAs: 'ctrl',
-                    templateUrl: '../../partials/dialogs/loginDialog.html',
-                    parent: angular.element(document.body),
-                    clickOutsideToClose: false,
-                    fullscreen: false,
-                    targetEvent: ev
-                })
-                .then(function(answer) {
-
-                }, function() {
-
-                });
-        };
-
-        $scope.login = function() {
-            RESTService.post('login', { user: $scope.user })
-                .then(function(data) {
-                    $scope.user = { name: null, password: null, token: null };
-                    if (!ValidationService.checkServerResponse(data)) {
-                        return;
-                    } else {
-                        var now = new Date();
-                        var exp = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-
-                        $rootScope.tokenSet = true;
-                        if (data.token != null) {
-                            $cookies.put('token', data.token, { expires: exp });
-                        }
-                        $scope.getFileList();
-                        $mdDialog.hide('');
-                    }
-                });
-        };
-
-        $scope.answer = function(answer) {
-            $mdDialog.hide(answer);
-        };
-
-        if ($scope.whichController == 'nonDelta') {
-            $scope.checkToken();
-        }
     }
 ]);
