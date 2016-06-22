@@ -9,7 +9,7 @@
     </md-card-title>
     <md-card-content>
         <md-table-container>
-            <table id="all-paths-table" md-table>
+            <table ng-class="'all-paths-table' + whichController" md-table>
                 <thead md-head md-order="myOrder">
                     <th md-column>Source</th>
                     <th md-column md-column md-order-by="firstEdge" md-numeric>Correlation</th>
@@ -28,6 +28,6 @@
                 </tbody>
             </table>
         </md-table-container>
-        <md-button class="md-raised md-primary" ng-click="exportTableToCSV('all-paths-table')">Download Interactions</md-button>
+        <md-button class="md-raised md-primary" ng-click="exportTableToCSV('all-paths-table' + whichController)">Download Interactions</md-button>
     </md-card-content>
 </md-card>

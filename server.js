@@ -508,10 +508,17 @@ app.post('/get-all-paths', function(req, res) {
 
 app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
+    var types = req.body.types;
     var fileNames = [];
+    var matrices = [];
 
-    availableMatrices = result;
-    fileNames = availableMatrices.map(function(file) {
+    for (var i = 0; i < types.length; i++) {
+        if (result[types[i]] != null) {
+            matrices = matrices.concat(result[types[i]]);
+        }
+    }
+
+    fileNames = matrices.map(function(file) {
         return file.fileName
     });
 
@@ -555,26 +562,26 @@ app.post('/overall-matrix-stats', function(req, res) {
 function getAvailableMatrices() {
     var fileNames = [];
     var fileList = [];
-    var result = [];
+    var result = { normal: [], tumor: [], delta: [] };
 
-    var directories = ['Normal', 'Tumor', 'Delta'];
+    var directories = ['normal', 'tumor', 'delta'];
 
     for (var i = 0; i < directories.length; i++) {
         fileNames = fs.readdirSync('R_Scripts/User_Matrices/' + directories[i]);
 
-        fileList = fileList.concat(fileNames.map(function(file) {
+        fileNames = fileNames.filter(function(fileName) {
+            return fileName.indexOf('degree') < 0;
+        });
+
+        fileList = fileNames.map(function(file) {
             return {
                 fileName: file,
                 pValue: "",
                 path: "User_Matrices/" + directories[i] + "/"
             };
-        }));
-    }
+        });
 
-    for (var i = 0; i < fileList.length; i++) {
-        if (fileList[i].fileName.indexOf('degree') < 0) {
-            result.push(fileList[i]);
-        }
+        result[directories[i]] = fileList;
     }
 
     return result;
@@ -599,9 +606,11 @@ function checkFileIntegrity(req, res, file) {
 }
 
 function matchSelectedFile(fileName) {
-    for (var i = 0; i < availableMatrices.length; i++) {
-        if (availableMatrices[i].fileName == fileName) {
-            return availableMatrices[i];
+    for (var prop in availableMatrices) {
+        for (var i = 0; i < availableMatrices[prop].length; i++) {
+            if (availableMatrices[prop][i].fileName == fileName) {
+                return availableMatrices[prop][i];
+            }
         }
     }
 
