@@ -116,7 +116,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
 
         scope.resize = GraphConfigService.resetZoom;
         scope.exportTableToCSV = function(tableID) {
-            $("#" + tableID).tableToCSV();
+            $("." + tableID).tableToCSV();
         };
 
         scope.edgeDictionary = {};

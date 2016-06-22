@@ -134,7 +134,7 @@ controllers.controller('NeighbourController', [
                     if ($scope.config != null) {
                         $scope.cy.resize();
                         $scope.needsRedraw = false;
-                        $scope.applyConfig($scope.config, "cyNeighbour", $scope);
+                        $scope.applyConfig($scope.config, "cyNeighbour" + $scope.whichController, $scope);
                     }
                 }, 250);
 
