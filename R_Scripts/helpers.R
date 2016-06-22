@@ -122,31 +122,51 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
     edges
 }
 
-getNeighboursNodes <- function(corMatrix, degrees, gene, exclusion, level, selectedGenes) {
-    neighboursNames <- getNeighbourNames(corMatrix, gene, exclusion)
-    neighboursDegrees <- getDegreesForNeighbourNames(degrees, neighboursNames)
-    nodes <- createEmptyNodes(length(neighboursNames))
+createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
+    edges <- createEmptyDifferentialEdges(0)
+    neighbours <- list(normal = NULL, tumor = NULL, delta = NULL)
 
-    if (length(neighboursNames) < 1) {
-        return(nodes)
+    if (length(gene) == 0 || is.na(gene)) {
+        return(edges)
     }
 
-    for (i in 1:length(neighboursNames)) {
-        #write("name", stderr())
-        nodes[i, "name"] <- neighboursNames[i]
-        #write("degree", stderr())
-        nodes[i, "degree"] <- neighboursDegrees[i]
-        #write("level", stderr())
-        nodes[i, "level"] <- level
+    if (getGeneSuffix(gene) == '-e') {
+        neighboursNames <- names(which(corMatrices$delta[gene, ] != 0)) 
+        neighboursNames <- setdiff(neighboursNames, exclusion)
 
-        if (nodes[i, "name"] %in% selectedGenes) {
-            nodes[i, "isSource"] <- TRUE 
-        } else {
-            nodes[i, "isSource"] <- FALSE
+        for (i in names(corMatrices)) {
+            neighbours[i] = corMatrices[[i]][gene, neighboursNames]
+            names(neighbours[[i]]) <- neighboursNames#names(corMatrix[gene, neighboursNames])
+        }
+    } else {
+        neighboursNames <- names(which(corMatrices$delta[, gene] != 0)) 
+        neighboursNames <- setdiff(neighboursNames, exclusion)
+
+        for (i in names(corMatrices)) {
+            neighbours[i] = corMatrices[[i]][neighboursNames, gene]
+            names(neighbours[[i]]) <- neighboursNames#names(corMatrix[gene, neighboursNames])
         }
     }
 
-    nodes
+    if (length(neighbours$delta) == 0) {
+        return(edges)
+    }
+
+    if (limit > 0) {
+        #neighbours <- tail(sort(abs(neighbours)), limit)
+    }
+
+    edges <- createEmptyDifferentialEdges(length(neighbours))
+    
+    for (i in 1:length(neighbours)) {       
+        edges[i, "source"] <- gene
+        edges[i, "target"] <- names(neighbours$delta[i])
+        edges[i, "weight"] <- neighbours$delta[i]
+        edges[i, "normal"] <- neighbours$normal[i]
+        edges[i, "tumor"] <- neighbours$tumor[i]
+    }
+
+    edges
 }
 
 getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, selectedGenes, exclusion) {

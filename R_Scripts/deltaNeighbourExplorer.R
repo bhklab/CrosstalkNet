@@ -6,18 +6,13 @@ epiStromaFlag <- TRUE
 args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])
-pValue <- settings$pValue
-fileName <- settings$fileName
-path <- settings$path
 selectedGenes <- settings$selectedGenes
 
-corMatrix <- readRDS(paste(path,fileName, sep=""))
+corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
+corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
+corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
 
-if (pValue != "") {
-	degrees <- readRDS(paste(path, 'fulldegrees.', pValue, ".RData", sep=""))	
-} else {
-	degrees <- readRDS(paste(path, 'degrees', fileName, sep=""))
-}
+degrees <- readRDS(settings$fileNameDegreesDelta)
 
 exclusions <- c()	
 edges <- list()
@@ -26,9 +21,11 @@ edgeExclusion <- c()
 nodes <- list()
 edgeTest <- c()
 
+corMatrices <- list(normal = corMatrixNormal, tumor = corMatrixTumor, delta = corMatrixDelta)
+
 for (i in 1:length(selectedGenes)) {
-    edges[[i]] <- createEdgesDF(corMatrix, selectedGenes[i], edgeExclusion, 0)
-    nodesToAdd <- getNeighboursNodesFromEdges(corMatrix, degrees, edges[[i]], i, selectedGenes, exclusions)
+    edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0)
+    nodesToAdd <- getNeighboursNodesFromEdges(corMatrixDelta, degrees, edges[[i]], i, selectedGenes, exclusions)
     nodes[[i]] <- nodesToAdd
     
     #edgeExclusion <- selectedGenes[i]

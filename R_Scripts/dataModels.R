@@ -11,7 +11,7 @@ createEmptyEdges <- function(amount) {
 }
 
 createEmptyDifferentialEdges <- function(amount) {
-	edges <- data.frame(source = character(amount), target = character(amount), change = numeric(amount), start = numeric(amount), end = numeric(amount), stringsAsFactors = FALSE)
+	edges <- data.frame(source = character(amount), target = character(amount), weight = numeric(amount), normal = numeric(amount), tumor = numeric(amount), stringsAsFactors = FALSE)
 
 	edges
 }
