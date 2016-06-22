@@ -28,6 +28,7 @@
     <script src="bower_components/tabletoCSV/dist/jquery.tabletoCSV.js"></script>
     <script src="app.js"></script>
     <script src="js/controllers/DeltaNetworkController.js"></script>
+    <script src="js/controllers/LoginController.js"></script>
     <script src="js/controllers/MainController.js"></script>
     <script src="js/controllers/NeighbourController.js"></script>
     <script src="js/controllers/PathExistenceController.js"></script>
@@ -37,6 +38,7 @@
     <script src="js/services/RESTService.js"></script>
     <script src="js/services/FileUploadService.js"></script>
     <script src="js/services/InitializationService.js"></script>
+    <script src="js/services/SharedService.js"></script>
     <script src="js/services/ValidationService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
@@ -49,7 +51,7 @@
 </head>
 
 <body md-no-ink>
-    <md-toolbar class=" md-primary md-hue-3">
+    <md-toolbar ng-controller="LoginController" class=" md-primary md-hue-3">
         <div layout="row">
             <div class="" flex="40">Status:
                 <span>{{state.text}}</span>
@@ -103,8 +105,8 @@
                         </section>
                     </md-content>
                 </md-tab>
-                <md-tab label="Path Existence Viewer" ng-init="init('nonDelta')">
-                    <md-content ng-controller="PathExistenceController">
+                <md-tab label="Path Existence Viewer">
+                    <md-content ng-controller="PathExistenceController" ng-init="init('nonDelta')">
                         <section layout="row">
                             <div static-include="partials/sideBar.html">
                             </div>
