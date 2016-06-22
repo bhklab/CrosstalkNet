@@ -39,12 +39,6 @@ controllers.controller('MainController', ['$scope',
             }
         };
 
-        $scope.resetInputFields = function() {
-            $("md-autocomplete input").each(function() {
-                $(this).val('');
-            });
-        };
-
         $scope.addGeneOfInterest = function(gene) {
             if (gene != null) {
                 if ($scope.genesOfInterest.indexOf(gene) < 0) {
@@ -60,12 +54,13 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.clearLocatedGene = function() {
+            $scope.resetInputFieldsLocal('geneLocator');
             GraphConfigService.clearLocatedGene($scope);
-        }
+        };
 
         $scope.removeGenesOfInterest = function() {
             $scope.genesOfInterest = [];
-            $scope.resetInputFields();
+            $scope.resetInputFieldsLocal('');
             $scope.resetFilters();
             if ($scope.cy) {
                 $scope.cy.destroy();
@@ -227,7 +222,7 @@ controllers.controller('MainController', ['$scope',
         $scope.refreshGeneList = function() {
             $rootScope.correlationFilesActual[$scope.whichController] = $rootScope.correlationFilesDisplayed[$scope.whichController];
             $scope.removeGenesOfInterest();
-            $scope.resetInputFields();
+            $scope.resetInputFieldsGlobal();
             $scope.resetFilters();
             $scope.overallMatrixStats = null;
             $scope.GOIState = $scope.GOIStates.initial;

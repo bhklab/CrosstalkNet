@@ -71,7 +71,7 @@ controllers.controller('LoginController', [
 
         $scope.answer = function(answer) {
             $mdDialog.hide(answer);
-        };
+        };        
 
         $scope.checkToken();
     }

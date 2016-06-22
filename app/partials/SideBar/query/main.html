@@ -4,7 +4,7 @@
             <md-tooltip ng-if="GOIState != GOIStates.initial" md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>
-            <md-autocomplete md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="GOIState != GOIStates.initial">
+            <md-autocomplete ng-class="[whichController, whichController + ctrl]" md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="GOIState != GOIStates.initial">
                 <md-item-template>
                     <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                 </md-item-template>
@@ -101,7 +101,7 @@
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[whichController, whichController + ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
                 <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>

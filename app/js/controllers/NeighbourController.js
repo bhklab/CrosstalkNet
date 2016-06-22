@@ -52,17 +52,12 @@ controllers.controller('NeighbourController', [
             }
         };
 
-        $scope.resetInputFields = function() {
-            $("md-autocomplete input").each(function() {
-                $(this).val('');
-            });
-        };
-
         $scope.resetAllData = function() {
             $scope.neighbours = null;
         };
 
         $scope.clearLocatedGene = function() {
+            $scope.resetInputFieldsLocal('geneLocator');
             GraphConfigService.clearLocatedGene($scope);
         }
 
@@ -120,9 +115,11 @@ controllers.controller('NeighbourController', [
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
-        $rootScope.$watch('correlationFilesActual[whichController]', function() {
+        $rootScope.$watch(function() {
+            return $rootScope.correlationFilesActual[$scope.whichController];
+        }, function() {
             $scope.genesOfInterest = [];
-            $scope.resetInputFields();
+            //$scope.resetInputFieldsLocal();
             $scope.allVisibleGenes = [];
             $scope.neighbours = [];
             if ($scope.cy) {
