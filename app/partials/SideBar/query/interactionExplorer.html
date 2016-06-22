@@ -1,6 +1,6 @@
 <md-content>
     <div ng-show="ctrl == 'neighbour'" class="md-padding">
-        <md-autocomplete ng-class="[whichController, whichController + ctrl]" md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchTextFirst, genesOfInterest.length > 0 ? 'second' : 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="genesOfInterest.length > 0 ? 0 : 2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
+        <md-autocomplete ng-class="[whichController, whichController + ctrl]" md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchTextFirst, genesOfInterest.length > 0 ? 'explorer' : 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="genesOfInterest.length > 0 ? 0 : 2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
             <md-item-template>
                 <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
             </md-item-template>
@@ -28,6 +28,7 @@
             </md-list-item>
         </md-list>
         <md-button class="md-raised md-primary" ng-click="getConfigForSelectedNeighbours()">Get Data</md-button>
+        <md-button class="md-raised md-primary" ng-click="removeAllGenes()">Remove All</md-button>
     </div>
     <md-divider></md-divider>
     <div class="md-padding">

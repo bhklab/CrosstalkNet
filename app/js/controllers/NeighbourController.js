@@ -36,6 +36,10 @@ controllers.controller('NeighbourController', [
             }
         };
 
+        $scope.closeEdgeInspector = function() {
+            $scope.selectedEdge = {};
+        };
+
         $scope.changeDisplay = function() {
             if ($scope.display == "Graph") {
                 $scope.display = "Tables";
@@ -64,6 +68,7 @@ controllers.controller('NeighbourController', [
         $scope.getConfigForSelectedNeighbours = function() {
             var level = $scope.genesOfInterest.length;
             $rootScope.state = $rootScope.states.loadingGraph;
+            $scope.resetDisplayedData();
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
                 selectedGenes: $scope.genesOfInterest,
@@ -76,7 +81,6 @@ controllers.controller('NeighbourController', [
                 }
 
                 $rootScope.state = $rootScope.states.loadingConfig;
-                $scope.neighbours = angular.copy($scope.genesSecond);
                 if ($scope.display == "Tables") {
                     $scope.needsRedraw = true;
                 }
@@ -86,19 +90,36 @@ controllers.controller('NeighbourController', [
 
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
-                $scope.genesSecond = $scope.loadNeighbourDropdownOptions($scope, $scope.genesOfInterest);
+                $scope.explorerGenes = BasicDataService.loadExplorerDropdownOptions($scope, $scope.genesOfInterest);
                 $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
                 $rootScope.state = $rootScope.states.showingGraph;
 
                 $scope.setNeighboursGeneral($scope, level, true);
-
             });
         };
 
         $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
 
         $scope.removeGene = function(gene) {
+            $scope.resetDisplayedData();
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
+            if ($scope.genesOfInterest.length == 0) {
+                if ($scope.cy) {
+                    $scope.cy.destroy();
+                }
+                $scope.cy = null;
+            } else {
+                $scope.getConfigForSelectedNeighbours();
+            }
+        };
+
+        $scope.removeAllGenes = function() {
+            $scope.genesOfInterest = [];
+            $scope.resetDisplayedData();
+            if ($scope.cy) {
+                $scope.cy.destroy();
+            }
+            $scope.cy = null;
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
@@ -111,7 +132,14 @@ controllers.controller('NeighbourController', [
             }
         };
 
-        $scope.closeEdgeInspector = GraphConfigService.closeEdgeInspector;
+        $scope.resetDisplayedData = function() {
+            $scope.closeEdgeInspector();
+            $scope.allVisibleGenes = [];
+            $scope.explorerGenes = [];
+            $scope.selfLoops = [];
+            $scope.neighbours = [];
+        };
+
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
@@ -119,9 +147,7 @@ controllers.controller('NeighbourController', [
             return $rootScope.correlationFilesActual[$scope.whichController];
         }, function() {
             $scope.genesOfInterest = [];
-            //$scope.resetInputFieldsLocal();
-            $scope.allVisibleGenes = [];
-            $scope.neighbours = [];
+            $scope.resetDisplayedData();
             if ($scope.cy) {
                 $scope.cy.destroy();
             }
