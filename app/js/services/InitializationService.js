@@ -52,6 +52,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
                 $timeout(function() {
                     var a = angular.element(value);
                     a.click();
+                    console.log("clicked");
                 });
             });
         };
@@ -60,14 +61,24 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " input"), function(value, key) {
                 var a = angular.element(value);
                 a.val('');
+                if (document.activeElement != null) {
+                    document.activeElement.blur();
+                }
             });
 
             angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " button"), function(value, key) {
                 $timeout(function() {
                     var a = angular.element(value);
                     a.click();
+                    if (document.activeElement != null) {
+                        document.activeElement.blur();
+                    }
                 });
             });
+
+            if (document.activeElement != null) {
+                document.activeElement.blur();
+            }
         };
 
         scope.correlationFilterFirst = angular.copy(scope.correlationFilterModel);
