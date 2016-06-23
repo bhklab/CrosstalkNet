@@ -26,6 +26,8 @@ controllers.controller('NeighbourController', [
         $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
+        $scope.allowAdditionalGenes = true;
+
         $scope.init = function(whichController) {
             $scope.whichController = whichController;
         };
@@ -50,8 +52,9 @@ controllers.controller('NeighbourController', [
 
         $scope.addGeneOfInterest = function(gene) {
             if (gene != null) {
-                if ($scope.genesOfInterest.indexOf(gene) < 0) {
+                if ($scope.genesOfInterest.indexOf(gene) < 0 && $scope.allowAdditionalGenes == true) {
                     $scope.genesOfInterest.push(gene);
+                    $scope.allowAdditionalGenes = false;
                 }
             }
         };
@@ -95,13 +98,13 @@ controllers.controller('NeighbourController', [
                 $rootScope.state = $rootScope.states.showingGraph;
 
                 $scope.setNeighboursGeneral($scope, level, true);
+                $scope.allowAdditionalGenes = true;
             });
         };
 
         $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
 
         $scope.removeGene = function(gene) {
-            $scope.resetDisplayedData();
             $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
             if ($scope.genesOfInterest.length == 0) {
                 if ($scope.cy) {
@@ -111,15 +114,19 @@ controllers.controller('NeighbourController', [
             } else {
                 $scope.getConfigForSelectedNeighbours();
             }
+
+            $scope.allowAdditionalGenes = true;
+            $scope.resetDisplayedData();
         };
 
         $scope.removeAllGenes = function() {
+            $scope.allowAdditionalGenes = true;
             $scope.genesOfInterest = [];
-            $scope.resetDisplayedData();
             if ($scope.cy) {
                 $scope.cy.destroy();
             }
             $scope.cy = null;
+            $scope.resetDisplayedData();
         };
 
         $scope.getInteractionViaDictionary = function(source, target) {
@@ -138,6 +145,8 @@ controllers.controller('NeighbourController', [
             $scope.explorerGenes = [];
             $scope.selfLoops = [];
             $scope.neighbours = [];
+            $scope.resetInputFieldsLocal('');
+            $scope.clearLocatedGene();
         };
 
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
