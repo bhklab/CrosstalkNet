@@ -24,10 +24,16 @@ var jwt = require('jsonwebtoken');
 var https = require('https');
 var databaseConfigUtils = require('databaseConfigUtils');
 var bcrypt = require('bcrypt');
+var pem = require('pem');
 
 //mongoose.connect(databaseConfigUtils.database);
 
 var availableMatrices = {};
+
+var sslOptions = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
 
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
@@ -642,20 +648,10 @@ function createSampleUser() {
     });
 }
 
-
-
-https.createServer({}, app).listen(5000, function() {
+app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
 
     initializeAvaialbleMatrices();
     //createSampleUser();
 });
-
-// app.listen(5000, function() {
-//     console.log("Listening on port 5000");
-//     console.log("Initializing data and config");
-
-//     initializeAvaialbleMatrices();
-//     //createSampleUser();
-// });
