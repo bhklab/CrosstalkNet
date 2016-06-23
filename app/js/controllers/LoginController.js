@@ -34,7 +34,7 @@ controllers.controller('LoginController', [
             $mdDialog.show({
                     controller: function() { this.parent = $scope; },
                     controllerAs: 'ctrl',
-                    templateUrl: '../../partials/dialogs/loginDialog.html',
+                    templateUrl: '/app/partials/dialogs/loginDialog.html',
                     parent: angular.element(document.body),
                     clickOutsideToClose: false,
                     fullscreen: false,
