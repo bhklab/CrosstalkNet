@@ -35,6 +35,7 @@ var sslOptions = {
   cert: fs.readFileSync('cert.pem')
 };
 
+app.use('/app', express.static(__dirname + '/app'));
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
