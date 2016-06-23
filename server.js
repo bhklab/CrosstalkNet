@@ -570,7 +570,7 @@ function getAvailableMatrices() {
         fileNames = fs.readdirSync('R_Scripts/User_Matrices/' + directories[i]);
 
         fileNames = fileNames.filter(function(fileName) {
-            return fileName.indexOf('degree') < 0;
+            return fileName.indexOf('degree') < 0 && fileName.indexOf('gitkeep') < 0;
         });
 
         fileList = fileNames.map(function(file) {
