@@ -21,6 +21,7 @@ var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
 // var mongoose = require('mongoose');
 // var User = require('user');
+var https = require('https');
 var databaseConfigUtils = require('databaseConfigUtils');
 var bcrypt = require('bcrypt');
 
@@ -641,10 +642,20 @@ function createSampleUser() {
     });
 }
 
-app.listen(5000, function() {
+
+
+https.createServer({}, app).listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
 
     initializeAvaialbleMatrices();
     //createSampleUser();
 });
+
+// app.listen(5000, function() {
+//     console.log("Listening on port 5000");
+//     console.log("Initializing data and config");
+
+//     initializeAvaialbleMatrices();
+//     //createSampleUser();
+// });

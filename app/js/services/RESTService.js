@@ -1,6 +1,6 @@
 var myModule = angular.module("myApp");
 myModule.factory('RESTService', function($http, $cookies) {
-    var SERVER_URL = "https://205.210.128.1:5000/";
+    var SERVER_URL = "https://localhost:5000/";
 
     function get(url, params) {
         return $http.get(SERVER_URL + url, params).then(function(result) {
