@@ -1,9 +1,8 @@
 {
-  "name": "angular-seed",
+  "name": "EpiStroma-webapp",
   "private": true,
   "version": "0.0.0",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
+  "description": "A data mining tool for analyzing large genetic networks",
   "license": "MIT",
   "devDependencies": {
     "async": "2.0.0-rc.4",
@@ -38,6 +37,7 @@
     "jsonwebtoken": "^7.0.1",
     "media-typer": "^0.3.0",
     "mongoose": "^4.5.0",
+    "pem": "^1.8.3",
     "raw-body": "^2.1.6"
   }
 }
