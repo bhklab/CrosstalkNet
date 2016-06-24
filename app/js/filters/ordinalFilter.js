@@ -1,5 +1,5 @@
 //var filters = angular.module("myApp");
-filters.filter('ordinal', function() {
+angular.module('myApp.filters').filter('ordinal', function() {
     return function(number) {
         if (isNaN(number) || number < 1) {
             return number;

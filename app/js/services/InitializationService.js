@@ -1,4 +1,4 @@
-var myModule = angular.module("myApp");
+var myModule = angular.module("myApp.services");
 myModule.factory('InitializationService', function($http, $timeout, Upload, BasicDataService, GraphConfigService) {
     var service = {};
 
@@ -17,6 +17,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
 
         scope.pValues = angular.copy(BasicDataService.pValues);
         scope.layouts = angular.copy(BasicDataService.layouts);
+        scope.displayModes = angular.copy(BasicDataService.displayModes);
 
         scope.minDegree = {
             first: 0,
@@ -25,7 +26,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
 
         scope.totalInteractions = null;
 
-        scope.display = "Graph";
+        scope.display = scope.displayModes.graph;
         scope.switchModel = false;
 
         scope.selectedLayout = scope.layouts.main[0].value;

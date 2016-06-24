@@ -1,5 +1,5 @@
 //var filters = angular.module("myApp");
-filters.filter('geneFilter', function() {
+angular.module('myApp.filters').filter('geneFilter', function() {
     return function(genes, side) {
         var filtered = [];
         if (side == null || side == "") {

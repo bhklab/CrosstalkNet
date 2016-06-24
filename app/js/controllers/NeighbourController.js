@@ -1,6 +1,6 @@
 'use strict';
 
-controllers.controller('NeighbourController', [
+angular.module('myApp.controllers').controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', '$q', '$timeout',
@@ -44,10 +44,10 @@ controllers.controller('NeighbourController', [
         };
 
         $scope.changeDisplay = function() {
-            if ($scope.display == "Graph") {
-                $scope.display = "Tables";
+            if ($scope.display == $scope.displayModes.graph) {
+                $scope.display = $scope.displayModes.table;
             } else {
-                $scope.display = "Graph";
+                $scope.display = $scope.displayModes.graph;
             }
         };
 
@@ -86,7 +86,7 @@ controllers.controller('NeighbourController', [
                 }
 
                 $rootScope.state = $rootScope.states.loadingConfig;
-                if ($scope.display == "Tables") {
+                if ($scope.display == $scope.displayModes.table) {
                     $scope.needsRedraw = true;
                 }
                 $scope.applyConfig(data.config, "cyNeighbour" + $scope.whichController, $scope);

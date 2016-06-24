@@ -1,4 +1,4 @@
-var myModule = angular.module("myApp");
+var myModule = angular.module("myApp.services");
 myModule.factory('ValidationService', function($http, $rootScope) {
     var service = {};
     service.checkServerResponse = checkServerResponse;

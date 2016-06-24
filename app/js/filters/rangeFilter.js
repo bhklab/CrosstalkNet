@@ -1,5 +1,5 @@
 //var filters = angular.module("myApp");
-filters.filter('range', function() {
+angular.module('myApp.filters').filter('range', function() {
   return function(input, total) {
     total = parseInt(total);
 

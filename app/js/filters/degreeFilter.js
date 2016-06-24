@@ -1,5 +1,5 @@
 //var filters = angular.module("myApp");
-filters.filter('degreeFilter', function() {
+angular.module('myApp.filters').filter('degreeFilter', function() {
   return function( items, degree) {
     var filtered = [];
     angular.forEach(items, function(item) {
