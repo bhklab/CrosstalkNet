@@ -27,6 +27,7 @@ controllers.controller('NeighbourController', [
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         $scope.allowAdditionalGenes = true;
+        $scope.showGraphSummary = false;
 
         $scope.init = function(whichController) {
             $scope.whichController = whichController;
@@ -71,6 +72,7 @@ controllers.controller('NeighbourController', [
         $scope.getConfigForSelectedNeighbours = function() {
             var level = $scope.genesOfInterest.length;
             $rootScope.state = $rootScope.states.loadingGraph;
+            $scope.showGraphSummary = false;
             $scope.resetDisplayedData();
             RESTService.post('neighbour-general', {
                 layout: $scope.selectedLayout,
@@ -99,6 +101,8 @@ controllers.controller('NeighbourController', [
 
                 $scope.setNeighboursGeneral($scope, level, true);
                 $scope.allowAdditionalGenes = true;
+
+                $scope.showGraphSummary = true;
             });
         };
 
@@ -147,6 +151,7 @@ controllers.controller('NeighbourController', [
             $scope.neighbours = [];
             $scope.resetInputFieldsLocal('');
             $scope.clearLocatedGene();
+            $scope.showGraphSummary = false;
         };
 
         $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
