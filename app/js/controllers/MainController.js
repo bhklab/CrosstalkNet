@@ -157,7 +157,11 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.removeGene = function(gene) {
-            $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
+            if ($scope.genesOfInterest.length == 1) {
+                $scope.removeGenesOfInterest();
+            } else {
+                $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
+            }
         };
 
         $scope.getGeneList = function() {
