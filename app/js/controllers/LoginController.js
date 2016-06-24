@@ -1,6 +1,6 @@
 'use strict';
 
-controllers.controller('LoginController', [
+angular.module('myApp.controllers').controller('LoginController', [
     '$scope',
     '$rootScope', 'RESTService',
     'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',

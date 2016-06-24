@@ -1,5 +1,5 @@
 //var filters = angular.module("myApp");
-filters.filter('interactionFilter', function() {
+angular.module('myApp.filters').filter('interactionFilter', function() {
     return function(edges, name) {
         var filtered = [];
         if (name == null || name == "") {

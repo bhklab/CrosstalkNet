@@ -1,6 +1,6 @@
 'use strict';
 
-controllers.controller('DeltaNetworkController', [
+angular.module('myApp.controllers').controller('DeltaNetworkController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
