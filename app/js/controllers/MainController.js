@@ -25,6 +25,7 @@ controllers.controller('MainController', ['$scope',
         $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         $scope.sharedData = SharedService.data;
+        $scope.showGraphSummary = false;
 
         $scope.init = function(whichController) {
             $scope.whichController = whichController;
@@ -69,6 +70,8 @@ controllers.controller('MainController', ['$scope',
             if ($scope.cy) {
                 $scope.cy.destroy();
             }
+            $scope.cy = null;
+            $scope.showGraphSummary = false;
         };
 
         $scope.getRelevantGenes = function(filter) {
@@ -76,6 +79,7 @@ controllers.controller('MainController', ['$scope',
             var filterSecond = false;
             var depth = 1;
             $rootScope.state = $rootScope.states.loadingGraph;
+            $scope.showGraphSummary = false;
 
             if ($scope.GOIState == $scope.GOIStates.filterFirst) {
                 if (filter == false) {
@@ -133,6 +137,7 @@ controllers.controller('MainController', ['$scope',
                     $scope.edgeDictionary = data.edgeDictionary;
                     $scope.selfLoops = data.selfLoops;
                     $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
+                    $scope.showGraphSummary = true;
                     $rootScope.state = $rootScope.states.showingGraph;
 
                     if ($scope.GOIState == $scope.GOIStates.initial) {
@@ -234,6 +239,7 @@ controllers.controller('MainController', ['$scope',
             $scope.GOIState = $scope.GOIStates.initial;
             $scope.allVisibleGenes = [];
             $scope.tabIndex = 1;
+            $scope.showGraphSummary = false;
 
             if ($scope.cy) {
                 $scope.cy.destroy();
