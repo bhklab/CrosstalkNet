@@ -1,6 +1,6 @@
 'use strict';
 
-controllers.controller('PathExistenceController', [
+angular.module('myApp.controllers').controller('PathExistenceController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',

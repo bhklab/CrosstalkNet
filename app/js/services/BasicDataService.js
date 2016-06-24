@@ -1,4 +1,4 @@
-var myModule = angular.module("myApp");
+var myModule = angular.module("myApp.services");
 myModule.factory('BasicDataService', function($http, $rootScope) {
     var service = {};
 
@@ -18,6 +18,8 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
         { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
     ];
+
+    service.displayModes = {graph: 'Graph', table: 'Tables'};
 
     service.layouts = { main: null, interactionExplorer: null };
     service.layouts.main = [{ display: "Bipartite", value: "preset" }, {

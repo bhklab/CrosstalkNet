@@ -1,4 +1,4 @@
-var myModule = angular.module("myApp");
+var myModule = angular.module("myApp.services");
 myModule.factory('SharedService', function($http, $timeout, $rootScope) {
     var service = {};
     var dataModel = {reloadFileList: false};

@@ -1,6 +1,6 @@
 'use strict';
 
-controllers.controller('MainController', ['$scope',
+angular.module('myApp.controllers').controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
     '$mdDialog',
@@ -32,10 +32,10 @@ controllers.controller('MainController', ['$scope',
         };
 
         $scope.changeDisplay = function() {
-            if ($scope.display == "Graph") {
-                $scope.display = "Tables";
+            if ($scope.display == $scope.displayModes.graph) {
+                $scope.display = $scope.displayModes.table;
             } else {
-                $scope.display = "Graph";
+                $scope.display = $scope.displayModes.graph;
             }
         };
 
@@ -129,7 +129,7 @@ controllers.controller('MainController', ['$scope',
                     $scope.totalInteractions = data.totalInteractions;
                     $scope.firstNeighbourInteractions = data.firstNeighbourInteractions;
                     $scope.secondNeighbourInteractions = data.secondNeighbourInteractions;
-                    if ($scope.display == "Tables") {
+                    if ($scope.display == $scope.displayModes.table) {
                         $scope.needsRedraw = true;
                     }
                     $scope.applyConfig(data.config, "cyMain" + $scope.whichController, $scope);
