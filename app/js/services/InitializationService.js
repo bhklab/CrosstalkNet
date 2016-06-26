@@ -1,40 +1,46 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('InitializationService', function($http, $timeout, Upload, BasicDataService, GraphConfigService) {
+myModule.factory('InitializationService', function($http, $timeout, Upload, BasicDataService, GraphConfigService, SharedService) {
     var service = {};
 
     service.initializeCommonVariables = initializeCommonVariables;
+    service.initializeSharedMethods = initializeSharedMethods;
 
-    function initializeCommonVariables(scope) {
-        scope.selectedItemFirst = null;
-        scope.selectedGOI = null;
-        scope.zoomGene = null;
-        scope.searchTextGOI = "";
-        scope.searchTextFirst = "";
-        scope.searchTextSecond = "";
-        scope.searchTextZoom = "";
-        scope.minPositiveWeight = 0;
-        scope.minNegativeWeight = 0;
+    function initializeSharedMethods(vm) {
+        for (var prop in SharedService.methods) {
+            vm[prop] = SharedService.methods[prop];
+        }
+    }
 
-        scope.pValues = angular.copy(BasicDataService.pValues);
-        scope.layouts = angular.copy(BasicDataService.layouts);
-        scope.displayModes = angular.copy(BasicDataService.displayModes);
+    function initializeCommonVariables(vm) {
+        vm.selectedItemFirst = null;
+        vm.selectedGOI = null;
+        vm.zoomGene = null;
+        vm.searchTextGOI = "";
+        vm.searchTextFirst = "";
+        vm.searchTextSecond = "";
+        vm.searchTextZoom = "";
+        vm.minPositiveWeight = 0;
+        vm.minNegativeWeight = 0;
 
-        scope.minDegree = {
+        vm.layouts = angular.copy(BasicDataService.layouts);
+        vm.displayModes = angular.copy(BasicDataService.displayModes);
+
+        vm.minDegree = {
             first: 0,
             second: 0
-        }
+        };
 
-        scope.totalInteractions = null;
+        vm.totalInteractions = null;
 
-        scope.display = scope.displayModes.graph;
-        scope.switchModel = false;
+        vm.display = vm.displayModes.graph;
+        vm.switchModel = false;
 
-        scope.selectedLayout = scope.layouts.main[0].value;
+        vm.selectedLayout = vm.layouts.main[0].value;
 
-        scope.sliderMinWeightNegative = -1;
-        scope.sliderMaxWeightPositive = 1;
+        vm.sliderMinWeightNegative = -1;
+        vm.sliderMaxWeightPositive = 1;
 
-        scope.correlationFilterModel = {
+        vm.correlationFilterModel = {
             min: -1,
             max: 1,
             negativeFilter: 0,
@@ -43,13 +49,13 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             positiveEnabled: false
         };
 
-        scope.resetInputFieldsGlobal = function() {
-            angular.forEach(angular.element("md-autocomplete." + scope.whichController + " input"), function(value, key) {
+        vm.resetInputFieldsGlobal = function() {
+            angular.forEach(angular.element("md-autocomplete." + vm.graphType + " input"), function(value, key) {
                 var a = angular.element(value);
                 a.val('');
             });
 
-            angular.forEach(angular.element("md-autocomplete." + scope.whichController + " button"), function(value, key) {
+            angular.forEach(angular.element("md-autocomplete." + vm.graphType + " button"), function(value, key) {
                 $timeout(function() {
                     var a = angular.element(value);
                     a.click();
@@ -58,8 +64,8 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             });
         };
 
-        scope.resetInputFieldsLocal = function(extraClass) {
-            angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " input"), function(value, key) {
+        vm.resetInputFieldsLocal = function(extraClass) {
+            angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " input"), function(value, key) {
                 var a = angular.element(value);
                 a.val('');
                 if (document.activeElement != null) {
@@ -67,7 +73,7 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
                 }
             });
 
-            angular.forEach(angular.element("md-autocomplete." + scope.whichController + scope.ctrl + extraClass + " button"), function(value, key) {
+            angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " button"), function(value, key) {
                 $timeout(function() {
                     var a = angular.element(value);
                     a.click();
@@ -82,60 +88,60 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             }
         };
 
-        scope.correlationFilterFirst = angular.copy(scope.correlationFilterModel);
-        scope.correlationFilterSecond = angular.copy(scope.correlationFilterModel);
+        vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+        vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
 
-        scope.negativeFilterEnabled = false;
-        scope.positiveFilterEnabled = false;
+        vm.negativeFilterEnabled = false;
+        vm.positiveFilterEnabled = false;
 
-        scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
-        scope.getInteractingNodes = GraphConfigService.getInteractingNodes;
-        scope.applyConfig = GraphConfigService.applyConfig;
+        vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
+        vm.getInteractingNodes = GraphConfigService.getInteractingNodes;
+        vm.applyConfig = GraphConfigService.applyConfig;
 
-        scope.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-        scope.loadDropdownOptions = BasicDataService.loadDropdownOptions;
-        scope.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
-        scope.loadNeighbourDropdownOptions = BasicDataService.loadNeighbourDropdownOptions;
-        scope.querySearch = BasicDataService.querySearch;
-        scope.setNeighboursGeneral = BasicDataService.setNeighboursGeneral;
+        vm.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
+        vm.loadDropdownOptions = BasicDataService.loadDropdownOptions;
+        vm.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
+        vm.loadNeighbourDropdownOptions = BasicDataService.loadNeighbourDropdownOptions;
+        vm.querySearch = BasicDataService.querySearch;
+        vm.setNeighboursGeneral = BasicDataService.setNeighboursGeneral;
 
-        scope.genesOfInterest = [];
-        scope.edges = 0;
-        scope.nodes = 0;
-        scope.displaySecondNeighbours = true;
+        vm.genesOfInterest = [];
+        vm.edges = 0;
+        vm.nodes = 0;
+        vm.displaySecondNeighbours = true;
 
-        scope.GOIStates = {
+        vm.GOIStates = {
             initial: 0,
             filterFirst: 1,
             getSecondNeighbours: 2,
             filterSecond: 3
         };
 
-        scope.GOIState = scope.GOIStates.initial;
+        vm.GOIState = vm.GOIStates.initial;
 
-        scope.firstNeighbourInteractions = [];
-        scope.secondNeighbourInteractions = [];
+        vm.firstNeighbourInteractions = [];
+        vm.secondNeighbourInteractions = [];
 
-        scope.firstNeighbours = {
+        vm.firstNeighbours = {
             epi: [],
             stroma: []
         };
 
-        scope.secondNeighbours = {
+        vm.secondNeighbours = {
             epi: [],
             stroma: []
         };
 
-        scope.resize = GraphConfigService.resetZoom;
-        scope.exportTableToCSV = function(tableID) {
+        vm.resize = GraphConfigService.resetZoom;
+        vm.exportTableToCSV = function(tableID) {
             $("." + tableID).tableToCSV();
         };
 
-        scope.edgeDictionary = {};
-        scope.selfLoops = [];
-        scope.allVisibleGenes = [];
+        vm.edgeDictionary = {};
+        vm.selfLoops = [];
+        vm.allVisibleGenes = [];
 
-        scope.query = {
+        vm.query = {
             limit: 5,
             page: 1
         };

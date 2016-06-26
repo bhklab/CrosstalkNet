@@ -3,81 +3,87 @@
 angular.module('myApp.controllers').controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, ExportService,
+    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', 'SharedService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, ExportService, SharedService,
         $q, $timeout) {
-        $scope.ctrl = "neighbour";
+        var vm = this;
+        vm.scope = $scope;
 
-        InitializationService.initializeCommonVariables($scope);
+        vm.ctrl = "neighbour";
+        vm.graphType = "nonDelta";
 
-        $scope.genesOfInterest = [];
-        $scope.pathExplorerSource = null;
-        $scope.pathExplorerTarget = null;
+        InitializationService.initializeCommonVariables(vm);
 
-        $scope.pathExplorerTextSource = null;
-        $scope.pathExplorerTextTarget = null;
+        vm.genesOfInterest = [];
+        vm.pathExplorerSource = null;
+        vm.pathExplorerTarget = null;
 
-        $scope.allPaths = null;
-        $scope.config = null;
+        vm.pathExplorerTextSource = null;
+        vm.pathExplorerTextTarget = null;
 
-        $scope.needsRedraw = false;
-        $scope.applyConfig = GraphConfigService.applyConfig;
+        vm.allPaths = null;
+        vm.config = null;
 
-        $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
-        $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
+        vm.needsRedraw = false;
+        vm.applyConfig = GraphConfigService.applyConfig;
 
-        $scope.allowAdditionalGenes = true;
-        $scope.showGraphSummary = false;
+        vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+        vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
-        $scope.init = function(whichController) {
-            $scope.whichController = whichController;
+        vm.sharedData = SharedService.data.nonDelta;
+
+        vm.allowAdditionalGenes = true;
+        vm.showGraphSummary = false;
+
+        vm.init = function(whichController) {
+            vm.whichController = whichController;
         };
 
-        $scope.locateGene = function(gene) {
+        vm.locateGene = function(gene) {
             if (gene != null && gene != '') {
-                $scope.findGeneInGraph($scope, gene);
+                vm.findGeneInGraph(vm, gene);
             }
         };
 
-        $scope.closeEdgeInspector = function() {
-            $scope.selectedEdge = {};
+        vm.closeEdgeInspector = function() {
+            vm.selectedEdge = {};
         };
 
-        $scope.changeDisplay = function() {
-            if ($scope.display == $scope.displayModes.graph) {
-                $scope.display = $scope.displayModes.table;
+        vm.changeDisplay = function() {
+            if (vm.display == vm.displayModes.graph) {
+                vm.display = vm.displayModes.table;
             } else {
-                $scope.display = $scope.displayModes.graph;
+                vm.display = vm.displayModes.graph;
             }
         };
 
-        $scope.addGeneOfInterest = function(gene) {
+        vm.addGeneOfInterest = function(gene) {
             if (gene != null) {
-                if ($scope.genesOfInterest.indexOf(gene) < 0 && $scope.allowAdditionalGenes == true) {
-                    $scope.genesOfInterest.push(gene);
-                    $scope.allowAdditionalGenes = false;
+                if (vm.genesOfInterest.indexOf(gene) < 0 && vm.allowAdditionalGenes == true) {
+                    vm.genesOfInterest.push(gene);
+                    vm.allowAdditionalGenes = false;
                 }
             }
         };
 
-        $scope.resetAllData = function() {
-            $scope.neighbours = null;
+        vm.resetAllData = function() {
+            vm.neighbours = null;
         };
 
-        $scope.clearLocatedGene = function() {
-            $scope.resetInputFieldsLocal('geneLocator');
-            GraphConfigService.clearLocatedGene($scope);
+        vm.clearLocatedGene = function() {
+            vm.resetInputFieldsLocal('geneLocator');
+            GraphConfigService.clearLocatedGene(vm);
         }
 
-        $scope.getConfigForSelectedNeighbours = function() {
-            var level = $scope.genesOfInterest.length;
+        vm.getConfigForSelectedNeighbours = function() {
+            var level = vm.genesOfInterest.length;
             $rootScope.state = $rootScope.states.loadingGraph;
-            $scope.showGraphSummary = false;
-            $scope.resetDisplayedData();
+            vm.showGraphSummary = false;
+            vm.resetDisplayedData();
             RESTService.post('neighbour-general', {
-                layout: $scope.selectedLayout,
-                selectedGenes: $scope.genesOfInterest,
-                fileName: $rootScope.correlationFilesActual[$scope.whichController]
+                layout: vm.selectedLayout,
+                selectedGenes: vm.genesOfInterest,
+                fileName: vm.sharedData.correlationFileActual
             }).then(function(data) {
                 console.log(data);
 
@@ -86,95 +92,97 @@ angular.module('myApp.controllers').controller('NeighbourController', [
                 }
 
                 $rootScope.state = $rootScope.states.loadingConfig;
-                if ($scope.display == $scope.displayModes.table) {
-                    $scope.needsRedraw = true;
+                if (vm.display == vm.displayModes.table) {
+                    vm.needsRedraw = true;
                 }
-                $scope.applyConfig(data.config, "cyNeighbour" + $scope.whichController, $scope);
-                $scope.selfLoops = data.selfLoops;
-                $scope.edgeDictionary = data.edgeDictionary;
+                vm.applyConfig(data.config, "cyNeighbour" + vm.graphType, vm);
+                vm.selfLoops = data.selfLoops;
+                vm.edgeDictionary = data.edgeDictionary;
 
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
-                $scope.explorerGenes = BasicDataService.loadExplorerDropdownOptions($scope, $scope.genesOfInterest);
-                $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
+                vm.explorerGenes = BasicDataService.loadExplorerDropdownOptions(vm, vm.genesOfInterest);
+                vm.allVisibleGenes = vm.getAllVisibleGenes(vm);
                 $rootScope.state = $rootScope.states.showingGraph;
 
-                $scope.setNeighboursGeneral($scope, level, true);
-                $scope.allowAdditionalGenes = true;
+                vm.setNeighboursGeneral(vm, level, true);
+                vm.allowAdditionalGenes = true;
 
-                $scope.showGraphSummary = true;
+                vm.showGraphSummary = true;
             });
         };
 
-        $scope.neighbourConfigs = GraphConfigService.neighbourConfigs;
+        vm.neighbourConfigs = GraphConfigService.neighbourConfigs;
 
-        $scope.removeGene = function(gene) {
-            $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
-            if ($scope.genesOfInterest.length == 0) {
-                if ($scope.cy) {
-                    $scope.cy.destroy();
+        vm.removeGene = function(gene) {
+            vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+            if (vm.genesOfInterest.length == 0) {
+                if (vm.cy) {
+                    vm.cy.destroy();
                 }
-                $scope.cy = null;
+                vm.cy = null;
             } else {
-                $scope.getConfigForSelectedNeighbours();
+                vm.getConfigForSelectedNeighbours();
             }
 
-            $scope.allowAdditionalGenes = true;
-            $scope.resetDisplayedData();
+            vm.allowAdditionalGenes = true;
+            vm.resetDisplayedData();
         };
 
-        $scope.removeAllGenes = function() {
-            $scope.allowAdditionalGenes = true;
-            $scope.genesOfInterest = [];
-            if ($scope.cy) {
-                $scope.cy.destroy();
+        vm.removeAllGenes = function() {
+            vm.allowAdditionalGenes = true;
+            vm.genesOfInterest = [];
+            if (vm.cy) {
+                vm.cy.destroy();
             }
-            $scope.cy = null;
-            $scope.resetDisplayedData();
+            vm.cy = null;
+            vm.resetDisplayedData();
         };
 
-        $scope.getInteractionViaDictionary = function(source, target) {
-            if ($scope.edgeDictionary[source] != null && $scope.edgeDictionary[source][target] != null) {
-                return $scope.edgeDictionary[source][target];
-            } else if ($scope.edgeDictionary[target] != null && $scope.edgeDictionary[target][source] != null) {
-                return $scope.edgeDictionary[target][source];
+        vm.getInteractionViaDictionary = function(source, target) {
+            if (vm.edgeDictionary[source] != null && vm.edgeDictionary[source][target] != null) {
+                return vm.edgeDictionary[source][target];
+            } else if (vm.edgeDictionary[target] != null && vm.edgeDictionary[target][source] != null) {
+                return vm.edgeDictionary[target][source];
             } else {
                 return 0;
             }
         };
 
-        $scope.resetDisplayedData = function() {
-            $scope.closeEdgeInspector();
-            $scope.allVisibleGenes = [];
-            $scope.explorerGenes = [];
-            $scope.selfLoops = [];
-            $scope.neighbours = [];
-            $scope.resetInputFieldsLocal('');
-            $scope.clearLocatedGene();
-            $scope.showGraphSummary = false;
+        vm.resetDisplayedData = function() {
+            vm.closeEdgeInspector();
+            vm.allVisibleGenes = [];
+            vm.explorerGenes = [];
+            vm.selfLoops = [];
+            vm.neighbours = [];
+            vm.resetInputFieldsLocal('');
+            vm.clearLocatedGene();
+            vm.showGraphSummary = false;
         };
 
-        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
-        $scope.findGeneInGraph = GraphConfigService.findGeneInGraph;
+        vm.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
         $rootScope.$watch(function() {
-            return $rootScope.correlationFilesActual[$scope.whichController];
+            return vm.sharedData.correlationFileActual;
         }, function() {
-            $scope.genesOfInterest = [];
-            $scope.resetDisplayedData();
-            if ($scope.cy) {
-                $scope.cy.destroy();
+            vm.genesOfInterest = [];
+            vm.resetDisplayedData();
+            if (vm.cy) {
+                vm.cy.destroy();
             }
-            $scope.cy = null;
+            vm.cy = null;
         });
 
-        $scope.$watch('display', function(newValue, oldValue) {
-            if (newValue == 'Graph') {
+        $scope.$watch(function() {
+            return vm.display;
+        }, function(newValue, oldValue) {
+            if (newValue == vm.displayModes.graph) {
                 $timeout(function() {
-                    if ($scope.config != null) {
-                        $scope.cy.resize();
-                        $scope.needsRedraw = false;
-                        $scope.applyConfig($scope.config, "cyNeighbour" + $scope.whichController, $scope);
+                    if (vm.config != null && vm.cy != null) {
+                        vm.cy.resize();
+                        vm.needsRedraw = false;
+                        vm.applyConfig(vm.config, "cyNeighbour" + vm.graphType, vm);
                     }
                 }, 250);
 

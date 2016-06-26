@@ -4,6 +4,8 @@ library(Matrix)
 setwd('R_Scripts')
 source('helpers.R')
 
+ptm <- proc.time()
+
 args <- commandArgs(trailingOnly = TRUE)
 settings <- fromJSON(args[2])
 
@@ -17,6 +19,10 @@ if (!(is.matrix(corMatrix))) {
 } else {
 	selfLoops <- length(which(diag(corMatrix) != 0))	
 }
+
+timedif <- proc.time() - ptm
+write("overall stats took:", stderr())
+write(timedif, stderr())
 
 significantInteractions <- length(which(corMatrix != 0))
 

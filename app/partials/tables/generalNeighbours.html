@@ -1,5 +1,5 @@
-<div ng-repeat="x in [] | range:neighbours.length-1">
-    <md-card ng-show="cy != null && cy.edges() != null ">
+<div ng-repeat="x in [] | range:vm.neighbours.length-1">
+    <md-card ng-show="vm.cy != null && vm.cy.edges() != null ">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -12,25 +12,25 @@
                 </div>
                  -->
                 </div>
-                <span class="md-subhead">Total: {{cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                <span class="md-subhead">Total: {{vm.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content class="table-card-height">
-            <table ng-if="neighbours[x].epi.length * neighbours[x].stroma.length < 1000" id="{{ctrl + '-neighbours-table-' + x}}">
+            <table ng-if="vm.neighbours[x].epi.length * vm.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="stroma in neighbours[x].stroma">{{stroma | suffixTrim}}</th>
+                        <th ng-repeat="stroma in vm.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="epi in neighbours[x].epi">
+                    <tr ng-repeat="epi in vm.neighbours[x].epi">
                         <td class="row-name">{{epi | suffixTrim}}</td>
-                        <td ng-repeat="stroma in neighbours[x].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                        <td ng-repeat="stroma in vm.neighbours[x].stroma">{{vm.getInteractionViaDictionary(epi, stroma)}}</td>
                     </tr>
                 </tbody>
             </table>
-            <div ng-if="neighbours[x].epi.length * neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
+            <div ng-if="vm.neighbours[x].epi.length * vm.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
             <!-- exact table from live demo -->
             <!--
             <md-table-container>
@@ -50,7 +50,7 @@
                 </table>
             </md-table-container>
             <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{neighbours[x].epi.length}}"></md-table-pagination>-->
-            <md-button class="md-raised md-primary" ng-click="exportNeighboursToCSV(this, x)">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x)">Download Interactions</md-button>
         </md-card-content>
     </md-card>
 </div>

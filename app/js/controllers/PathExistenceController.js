@@ -3,10 +3,11 @@
 angular.module('myApp.controllers').controller('PathExistenceController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService,
+    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, SharedService,
         $q, $timeout) {
         $scope.ctrl = "pathExistence";
+        $scope.graphType = "nonDelta";
 
         InitializationService.initializeCommonVariables($scope);
 
@@ -19,9 +20,7 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
 
         $scope.allPaths = null;
 
-        $scope.init = function(whichController) {
-            $scope.whichController = whichController;
-        };
+        $scope.sharedData = SharedService.data.nonDelta;
 
         $scope.setPathExplorerGene = function(gene, which) {
             if (gene != null) {
@@ -46,7 +45,7 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
             RESTService.post('get-all-paths', {
                 target: $scope.pathExplorerTarget.value,
                 source: $scope.pathExplorerSource.value,
-                fileName: $rootScope.correlationFilesActual[$scope.whichController]
+                fileName: $scope.sharedData.correlationFileActual
             }).then(function(data) {
                 console.log(data);
                 $scope.allPaths = data.paths;
@@ -57,7 +56,7 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
         };
 
         $rootScope.$watch(function() {
-            return $rootScope.correlationFilesActual[$scope.whichController];
+            return $scope.sharedData.correlationFileActual;
         }, function() {
             $scope.genesOfInterest = [];
             //$scope.resetInputFields();

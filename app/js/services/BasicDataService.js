@@ -68,9 +68,9 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
                     deferred;
             }
         } else if (source == "geneList") {
-            if ($rootScope.geneLists[scope.whichController] != null) {
-                results = query ? $rootScope.geneLists[scope.whichController].filter(createFilterFor(query)) :
-                    $rootScope.geneLists[scope.whichController],
+            if (scope.sharedData.geneList != null) {
+                results = query ? scope.sharedData.geneList.filter(createFilterFor(query)) :
+                    scope.sharedData.geneList,
                     deferred;
             }
         }

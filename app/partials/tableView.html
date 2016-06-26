@@ -1,10 +1,10 @@
-<div ng-if="display == 'Tables'">
-    <div ng-if="ctrl == 'main'">
+<div ng-if="vm.display == 'Tables'">
+    <div ng-if="vm.ctrl == 'main'">
         <div static-include="partials/tables/selfLoops.html"></div>
         <div static-include="partials/tables/generalNeighbours.html"></div>
         <!--<div static-include="partials/tables/secondNeighbours.html"></div>-->
     </div>
-    <div ng-if="ctrl == 'neighbour'">
+    <div ng-if="vm.ctrl == 'neighbour'">
         <div static-include="partials/tables/selfLoops.html"></div>
         <div static-include="partials/tables/generalNeighbours.html"></div>
         <!--<div static-include="partials/tables/interactionExplorerNeighbours.html"></div>-->
@@ -12,7 +12,7 @@
         <!--<div static-include="partials/tables/firstNeighbours.html"></div>
         <div static-include="partials/tables/secondNeighbours.html"></div>-->
     </div>
-    <div ng-if="ctrl == 'pathExistence'">
+    <div ng-if="vm.ctrl == 'pathExistence'">
         <div static-include="partials/tables/allPaths.html"></div>
     </div>
 </div>

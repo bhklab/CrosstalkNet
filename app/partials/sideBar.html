@@ -1,27 +1,27 @@
 <md-sidenav class="md-sidenav-left md-whiteframe-z3" md-component-id="left" md-is-locked-open="true">
-    <md-toolbar class="md-primary md-hue-3" >
+    <md-toolbar class="md-primary md-hue-3">
         <div layout="row">
             <div flex class="left-padded">Navigation</div>
             <div flex style="position: relative;">
-                <md-switch ng-if="ctrl != 'pathExistence'" ng-model="switchModel" aria-label="Switch 1" ng-change="changeDisplay()" style="position: absolute; right: 5px;">
-                    {{display}}
+                <md-switch ng-show="vm.ctrl != 'pathExistence'" ng-model="vm.switchModel" aria-label="Switch 1" ng-change="vm.changeDisplay(vm)" style="position: absolute; right: 5px;">
+                    {{vm.display}}
                 </md-switch>
             </div>
         </div>
     </md-toolbar>
     <md-content>
-        <md-tabs md-selected="tabIndex" md-dynamic-height md-border-bottom md-disable-animation>
-            <md-tab ng-if="ctrl == 'main'" label="Data" class="md-padding">
+        <md-tabs md-selected="vm.tabIndex" md-dynamic-height md-border-bottom md-disable-animation>
+            <md-tab ng-if="vm.ctrl == 'main'" label="Data" class="md-padding">
                 <div static-include="partials/SideBar/dataTab.html"></div>
             </md-tab>
             <md-tab label="Query" class="md-padding">
-                <div ng-show="ctrl == 'main'" static-include="partials/SideBar/query/main.html"></div>
-                <div ng-show="ctrl == 'neighbour'" static-include="partials/SideBar/query/interactionExplorer.html"></div>
-                <div ng-show="ctrl == 'pathExistence'" static-include="partials/SideBar/query/pathExistence.html"></div>
+                <div ng-show="vm.ctrl == 'main'" static-include="partials/SideBar/query/main.html"></div>
+                <div ng-show="vm.ctrl == 'neighbour'" static-include="partials/SideBar/query/interactionExplorer.html"></div>
+                <div ng-show="vm.ctrl == 'pathExistence'" static-include="partials/SideBar/query/pathExistence.html"></div>
             </md-tab>
-            <md-tab label="Styling">
-                <div ng-show="ctrl == 'main'" static-include="partials/SideBar/layout/main.html"></div>
-                <div ng-show="ctrl == 'neighbour'" static-include="partials/SideBar/layout/interactionExplorer.html"></div>
+            <md-tab ng-if="vm.ctrl != 'pathExistence'" label="Styling">
+                <div ng-show="vm.ctrl == 'main'" static-include="partials/SideBar/layout/main.html"></div>
+                <div ng-show="vm.ctrl == 'neighbour'" static-include="partials/SideBar/layout/interactionExplorer.html"></div>
             </md-tab>
         </md-tabs>
     </md-content>

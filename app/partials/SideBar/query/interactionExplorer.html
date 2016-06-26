@@ -1,28 +1,28 @@
 <md-content>
-    <div ng-show="ctrl == 'neighbour'" class="md-padding">
-        <md-tooltip ng-if="!allowAdditionalGenes" md-direction="right">
+    <div ng-show="vm.ctrl == 'neighbour'" class="md-padding">
+        <md-tooltip ng-if="!vm.allowAdditionalGenes" md-direction="right">
             Remove recently added gene or get data to re-enable gene selection.
         </md-tooltip>
-        <md-autocomplete ng-class="[whichController, whichController + ctrl]" md-no-cache='true' md-selected-item="selectedItemFirst" md-search-text="searchTextFirst" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchTextFirst, genesOfInterest.length > 0 ? 'explorer' : 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="genesOfInterest.length > 0 ? 0 : 2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedItemFirst" md-search-text="vm.searchTextFirst" md-selected-item-change="vm.addGeneOfInterest(item, 'first')" md-items="item in vm.querySearch(vm.searchTextFirst, vm.genesOfInterest.length > 0 ? 'explorer' : 'geneList', vm) | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.genesOfInterest.length > 0 ? 0 : 2" md-match-case-insensitive="true" placeholder="Please enter a gene of interest">
             <md-item-template>
-                <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
+                <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
             </md-item-template>
             <md-not-found>
-                No states matching "{{searchTextFirst}}" were found.
+                No states matching "{{vm.searchTextFirst}}" were found.
             </md-not-found>
         </md-autocomplete>
     </div>
-    <div ng-if="ctrl == 'neighbour'" class="md-padding">
+    <div ng-if="vm.ctrl == 'neighbour'" class="md-padding">
         Selected Path
         <md-list class="selected-genes-list">
-            <md-list-item ng-repeat="gene in genesOfInterest">
+            <md-list-item ng-repeat="gene in vm.genesOfInterest">
                 <md-menu>
                     <md-button ng-click="$last && $mdOpenMenu($event)">
                         {{gene.display}}
                     </md-button>
                     <md-menu-content width="6">
                         <md-menu-item ng-repeat="item in [1]">
-                            <md-button ng-click="removeGene(gene)">
+                            <md-button ng-click="vm.removeGene(gene)">
                                 Remove Gene
                             </md-button>
                         </md-menu-item>
@@ -30,20 +30,20 @@
                 </md-menu>
             </md-list-item>
         </md-list>
-        <md-button class="md-raised md-primary" ng-click="getConfigForSelectedNeighbours()">Get Data</md-button>
-        <md-button class="md-raised md-primary" ng-click="removeAllGenes()">Remove All</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.getConfigForSelectedNeighbours()">Get Data</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.removeAllGenes()">Remove All</md-button>
     </div>
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete ng-class="[whichController, whichController + ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate', vm)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
-                <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
+                <span md-highlight-text="vm.searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>
             <md-not-found>
-                No states matching "{{searchTextZoom}}" were found.
+                No states matching "{{vm.searchTextZoom}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-button class="md-raised md-primary" ng-click="clearLocatedGene()">Clear Located Gene</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.clearLocatedGene()">Clear Located Gene</md-button>
     </div>
 </md-content>

@@ -7,117 +7,90 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
     function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
-        $rootScope.correlationFilesDisplayed = { nonDelta: null, delta: null };
-        $rootScope.correlationFilesActual = { nonDelta: null, delta: null };
         $rootScope.geneLists = { nonDelta: null, delta: null };
         $rootScope.states = angular.copy(BasicDataService.states);
         $rootScope.state = $rootScope.states.initial;
 
-        $scope.ctrl = "main";
-        InitializationService.initializeCommonVariables($scope);
-        $scope.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
-        $scope.uploadFiles = FileUploadService.uploadFiles;
-        $scope.config = null;
-        $scope.needsRedraw = false;
-        $scope.tabIndex = 0;
+        var vm = this;
+        vm.scope = $scope;
+        vm.ctrl = "main";
+        vm.graphType = "nonDelta";
 
-        $scope.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
-        $scope.exportGraphToPNG = ExportService.exportGraphToPNG;
+        InitializationService.initializeCommonVariables(vm);
+        vm.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        vm.uploadFiles = FileUploadService.uploadFiles;
+        vm.config = null;
+        vm.needsRedraw = false;
+        vm.tabIndex = 0;
 
-        $scope.sharedData = SharedService.data;
-        $scope.showGraphSummary = false;
+        vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+        vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
-        $scope.init = function(whichController) {
-            $scope.whichController = whichController;
-        };
+        vm.sharedData = SharedService.data.nonDelta;
+        vm.showGraphSummary = false;
 
-        $scope.changeDisplay = function() {
-            if ($scope.display == $scope.displayModes.graph) {
-                $scope.display = $scope.displayModes.table;
-            } else {
-                $scope.display = $scope.displayModes.graph;
+        vm.changeDisplay = SharedService.methods.changeDisplay;
+        vm.addGeneOfInterest = SharedService.methods.addGeneOfInterest;
+        vm.locateGene = SharedService.methods.locateGene;
+        vm.closeEdgeInspector = SharedService.methods.closeEdgeInspector;
+        vm.clearLocatedGene = SharedService.methods.clearLocatedGene;
+
+        vm.removeGenesOfInterest = function() {
+            vm.genesOfInterest = [];
+            vm.closeEdgeInspector(this);
+            vm.resetInputFieldsLocal('');
+            vm.resetFilters();
+            if (vm.cy) {
+                vm.cy.destroy();
             }
+            vm.cy = null;
+            vm.showGraphSummary = false;
         };
 
-        $scope.addGeneOfInterest = function(gene) {
-            if (gene != null) {
-                if ($scope.genesOfInterest.indexOf(gene) < 0) {
-                    $scope.genesOfInterest.push(gene);
-                }
-            }
-        };
-
-        $scope.locateGene = function(gene) {
-            if (gene != null && gene != '') {
-                $scope.findGeneInGraph($scope, gene);
-            }
-        };
-
-        $scope.closeEdgeInspector = function() {
-            $scope.selectedEdge = {};
-        };
-
-        $scope.clearLocatedGene = function() {
-            $scope.resetInputFieldsLocal('geneLocator');
-            GraphConfigService.clearLocatedGene($scope);
-        };
-
-        $scope.removeGenesOfInterest = function() {
-            $scope.genesOfInterest = [];
-            $scope.closeEdgeInspector();
-            $scope.resetInputFieldsLocal('');
-            $scope.resetFilters();
-            if ($scope.cy) {
-                $scope.cy.destroy();
-            }
-            $scope.cy = null;
-            $scope.showGraphSummary = false;
-        };
-
-        $scope.getRelevantGenes = function(filter) {
+        vm.getRelevantGenes = function(filter) {
             var filterFirst = false;
             var filterSecond = false;
             var depth = 1;
             $rootScope.state = $rootScope.states.loadingGraph;
-            $scope.showGraphSummary = false;
+            vm.showGraphSummary = false;
 
-            if ($scope.GOIState == $scope.GOIStates.filterFirst) {
+            if (vm.GOIState == vm.GOIStates.filterFirst) {
                 if (filter == false) {
                     depth = 2;
                 }
                 filter = true;
-                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
-            } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
-                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
-                filterSecond = $scope.correlationFilterSecond.negativeEnabled || $scope.correlationFilterSecond.positiveEnabled;
+                filterFirst = vm.correlationFilterFirst.negativeEnabled || vm.correlationFilterFirst.positiveEnabled;
+            } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
+                filterFirst = vm.correlationFilterFirst.negativeEnabled || vm.correlationFilterFirst.positiveEnabled;
+                filterSecond = vm.correlationFilterSecond.negativeEnabled || vm.correlationFilterSecond.positiveEnabled;
                 depth = 2;
-            } else if ($scope.GOIState == $scope.GOIStates.filterSecond) {
-                filterFirst = $scope.correlationFilterFirst.negativeEnabled || $scope.correlationFilterFirst.positiveEnabled;
-                filterSecond = $scope.correlationFilterSecond.negativeEnabled || $scope.correlationFilterSecond.positiveEnabled;
+            } else if (vm.GOIState == vm.GOIStates.filterSecond) {
+                filterFirst = vm.correlationFilterFirst.negativeEnabled || vm.correlationFilterFirst.positiveEnabled;
+                filterSecond = vm.correlationFilterSecond.negativeEnabled || vm.correlationFilterSecond.positiveEnabled;
                 depth = 2;
             }
 
             RESTService.post("submatrix", {
-                    selectedGenes: $scope.genesOfInterest,
-                    minNegativeWeightFirst: $scope.correlationFilterFirst.negativeFilter ==
-                        null || !$scope.correlationFilterFirst.negativeEnabled ?
-                        "NA" : $scope.correlationFilterFirst.negativeFilter,
-                    minPositiveWeightFirst: $scope.correlationFilterFirst.positiveFilter ==
-                        null || !$scope.correlationFilterFirst.positiveEnabled ?
-                        "NA" : $scope.correlationFilterFirst.positiveFilter,
-                    minNegativeWeightSecond: $scope.correlationFilterSecond.negativeFilter ==
-                        null || !$scope.correlationFilterSecond.negativeEnabled ?
-                        "NA" : $scope.correlationFilterSecond.negativeFilter,
-                    minPositiveWeightSecond: $scope.correlationFilterSecond.positiveFilter ==
-                        null || !$scope.correlationFilterSecond.positiveEnabled ?
-                        "NA" : $scope.correlationFilterSecond.positiveFilter,
-                    selectedFilterFirst: { negative: $scope.correlationFilterFirst.negativeEnabled, positive: $scope.correlationFilterFirst.positiveEnabled },
-                    selectedFilterSecond: { negative: $scope.correlationFilterSecond.negativeEnabled, positive: $scope.correlationFilterSecond.positiveEnabled },
+                    selectedGenes: vm.genesOfInterest,
+                    minNegativeWeightFirst: vm.correlationFilterFirst.negativeFilter ==
+                        null || !vm.correlationFilterFirst.negativeEnabled ?
+                        "NA" : vm.correlationFilterFirst.negativeFilter,
+                    minPositiveWeightFirst: vm.correlationFilterFirst.positiveFilter ==
+                        null || !vm.correlationFilterFirst.positiveEnabled ?
+                        "NA" : vm.correlationFilterFirst.positiveFilter,
+                    minNegativeWeightSecond: vm.correlationFilterSecond.negativeFilter ==
+                        null || !vm.correlationFilterSecond.negativeEnabled ?
+                        "NA" : vm.correlationFilterSecond.negativeFilter,
+                    minPositiveWeightSecond: vm.correlationFilterSecond.positiveFilter ==
+                        null || !vm.correlationFilterSecond.positiveEnabled ?
+                        "NA" : vm.correlationFilterSecond.positiveFilter,
+                    selectedFilterFirst: { negative: vm.correlationFilterFirst.negativeEnabled, positive: vm.correlationFilterFirst.positiveEnabled },
+                    selectedFilterSecond: { negative: vm.correlationFilterSecond.negativeEnabled, positive: vm.correlationFilterSecond.positiveEnabled },
                     filterFirst: filterFirst && filter,
                     filterSecond: filterSecond && filter,
-                    layout: $scope.selectedLayout,
+                    layout: vm.selectedLayout,
                     depth: depth,
-                    fileName: $rootScope.correlationFilesActual[$scope.whichController]
+                    fileName: vm.sharedData.correlationFileActual
                 })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
@@ -126,94 +99,93 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
 
                     console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
-                    $scope.totalInteractions = data.totalInteractions;
-                    $scope.firstNeighbourInteractions = data.firstNeighbourInteractions;
-                    $scope.secondNeighbourInteractions = data.secondNeighbourInteractions;
-                    if ($scope.display == $scope.displayModes.table) {
-                        $scope.needsRedraw = true;
+                    vm.totalInteractions = data.totalInteractions;
+                    vm.firstNeighbourInteractions = data.firstNeighbourInteractions;
+                    vm.secondNeighbourInteractions = data.secondNeighbourInteractions;
+                    if (vm.display == vm.displayModes.table) {
+                        vm.needsRedraw = true;
                     }
-                    $scope.applyConfig(data.config, "cyMain" + $scope.whichController, $scope);
+                    vm.applyConfig(data.config, "cyMain" + vm.graphType, vm);
 
-                    $scope.edgeDictionary = data.edgeDictionary;
-                    $scope.selfLoops = data.selfLoops;
-                    $scope.allVisibleGenes = $scope.getAllVisibleGenes($scope);
-                    $scope.showGraphSummary = true;
+                    vm.edgeDictionary = data.edgeDictionary;
+                    vm.selfLoops = data.selfLoops;
+                    vm.allVisibleGenes = vm.getAllVisibleGenes(vm);
+                    vm.showGraphSummary = true;
                     $rootScope.state = $rootScope.states.showingGraph;
 
-                    if ($scope.GOIState == $scope.GOIStates.initial) {
-                        $scope.correlationFilterFirst.min = data.minNegativeWeight;
-                        $scope.correlationFilterFirst.max = data.maxPositiveWeight;
-                        $scope.GOIState = $scope.GOIStates.filterFirst;
-                    } else if ($scope.GOIState == $scope.GOIStates.filterFirst && depth == 2) {
-                        $scope.correlationFilterSecond.min = data.minNegativeWeight;
-                        $scope.correlationFilterSecond.max = data.maxPositiveWeight;
-                        $scope.GOIState = $scope.GOIStates.getSecondNeighbours;
-                    } else if ($scope.GOIState == $scope.GOIStates.getSecondNeighbours) {
-                        $scope.GOIState = $scope.GOIStates.filterSecond;
+                    if (vm.GOIState == vm.GOIStates.initial) {
+                        vm.correlationFilterFirst.min = data.minNegativeWeight;
+                        vm.correlationFilterFirst.max = data.maxPositiveWeight;
+                        vm.GOIState = vm.GOIStates.filterFirst;
+                    } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
+                        vm.correlationFilterSecond.min = data.minNegativeWeight;
+                        vm.correlationFilterSecond.max = data.maxPositiveWeight;
+                        vm.GOIState = vm.GOIStates.getSecondNeighbours;
+                    } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
+                        vm.GOIState = vm.GOIStates.filterSecond;
                     }
 
-                    $scope.setNeighboursGeneral($scope, depth, false);
+                    vm.setNeighboursGeneral(vm, depth, false);
                 });
         };
 
-        $scope.removeGene = function(gene) {
-            if ($scope.genesOfInterest.length == 1) {
-                $scope.removeGenesOfInterest();
+        vm.removeGene = function(gene) {
+            if (vm.genesOfInterest.length == 1) {
+                vm.removeGenesOfInterest();
             } else {
-                $scope.genesOfInterest.splice($scope.genesOfInterest.indexOf(gene), 1);
+                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
             }
         };
 
-        $scope.getGeneList = function() {
+        vm.getGeneList = function() {
             $rootScope.state = $rootScope.states.gettingGeneList;
-            RESTService.post('gene-list', { fileName: $rootScope.correlationFilesActual[$scope.whichController] })
+            RESTService.post('gene-list', { fileName: vm.sharedData.correlationFileActual })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
                     }
 
-                    $rootScope.geneLists[$scope.whichController] = data.geneList;
+                    vm.sharedData.geneList = data.geneList;
                     $rootScope.state = $rootScope.states.initial;
                 });
         };
 
-        $scope.getFileList = function() {
-            var types = $scope.whichController == 'nonDelta' ? ['normal', 'tumor'] : ['delta'];
-            RESTService.post('available-matrices', { types: types })
+        vm.getFileList = function() {
+            RESTService.post('available-matrices', { types: ['normal', 'tumor'] })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
                     }
 
-                    $scope.fileList = data.fileList;
+                    vm.fileList = data.fileList;
                 });
         };
 
-        $scope.getOverallMatrixStats = function() {
-            RESTService.post('overall-matrix-stats', { fileName: $rootScope.correlationFilesActual[$scope.whichController] }).then(function(data) {
+        vm.getOverallMatrixStats = function() {
+            RESTService.post('overall-matrix-stats', { fileName: vm.sharedData.correlationFileActual }).then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
                     return;
                 }
 
-                $scope.overallMatrixStats = data.overallMatrixStats;
+                vm.overallMatrixStats = data.overallMatrixStats;
                 console.log(data);
             });
         };
 
-        $scope.resetGeneSelection = function() {
-            $scope.GOIState = $scope.GOIStates.initial;
-            $scope.resetFilters();
+        vm.resetGeneSelection = function() {
+            vm.GOIState = vm.GOIStates.initial;
+            vm.resetFilters();
         };
 
-        $scope.resetFilters = function() {
-            $scope.correlationFilterFirst = angular.copy($scope.correlationFilterModel);
-            $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
+        vm.resetFilters = function() {
+            vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
         };
 
-        $scope.getInteraction = function(source, target) {
+        vm.getInteraction = function(source, target) {
             var edge = null;
 
-            edge = $scope.cy.filter(function(i, element) {
+            edge = vm.cy.filter(function(i, element) {
                 if (element.isEdge() && ((element.source().id() == source.id() && element.target().id() == target.id()) ||
                         (element.target().id() == source.id() && element.source().id() == target.id()))) {
                     return true;
@@ -225,57 +197,60 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
             return edge.length == 0 ? 0 : edge.data('weight');
         };
 
-        $scope.getInteractionViaDictionary = function(source, target) {
-            if ($scope.edgeDictionary[source] != null && $scope.edgeDictionary[source][target] != null) {
-                return $scope.edgeDictionary[source][target];
+        vm.getInteractionViaDictionary = function(source, target) {
+            if (vm.edgeDictionary[source] != null && vm.edgeDictionary[source][target] != null) {
+                return vm.edgeDictionary[source][target];
             } else {
                 return 0;
             }
         };
 
-        $scope.refreshGeneList = function() {
-            $scope.closeEdgeInspector();
-            $scope.removeGenesOfInterest();
-            $scope.resetInputFieldsGlobal();
-            $scope.resetFilters();
-            $rootScope.correlationFilesActual[$scope.whichController] = $rootScope.correlationFilesDisplayed[$scope.whichController];
-            $scope.overallMatrixStats = null;
-            $scope.GOIState = $scope.GOIStates.initial;
-            $scope.allVisibleGenes = [];
-            $scope.tabIndex = 1;
-            $scope.showGraphSummary = false;
+        vm.refreshGeneList = function() {
+            vm.GOIState = vm.GOIStates.initial;
+            vm.closeEdgeInspector(this);
+            vm.removeGenesOfInterest();
+            vm.resetInputFieldsGlobal();
+            vm.resetFilters();
+            vm.sharedData.correlationFileActual = vm.correlationFileDisplayed;
+            vm.overallMatrixStats = null;
+            vm.allVisibleGenes = [];
+            vm.tabIndex = 1;
+            vm.showGraphSummary = false;
 
-            if ($scope.cy) {
-                $scope.cy.destroy();
+            if (vm.cy) {
+                vm.cy.destroy();
             }
-            $scope.cy = null;
+            vm.cy = null;
 
-            $scope.getGeneList();
-            $scope.getOverallMatrixStats();
+            vm.getGeneList();
+            vm.getOverallMatrixStats();
         };
 
-        $scope.returnToFirstNeighboursFilter = function() {
-            $scope.GOIState = $scope.GOIStates.filterFirst;
-            $scope.correlationFilterSecond = angular.copy($scope.correlationFilterModel);
+        vm.returnToFirstNeighboursFilter = function() {
+            vm.GOIState = vm.GOIStates.filterFirst;
+            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
         };
 
-        $scope.$watch('display', function(newValue, oldValue) {
-            if (newValue == 'Graph') {
+        $scope.$watch(function() {
+            return vm.mdDialog;
+        }, function(newValue, oldValue) {
+            if (newValue == vm.displayModes.graph) {
                 $timeout(function() {
-                    if ($scope.config != null) {
-                        $scope.cy.resize();
-                        $scope.needsRedraw = false;
-                        $scope.applyConfig($scope.config, "cyMain" + $scope.whichController, $scope);
+                    if (vm.config != null) {
+                        vm.cy.resize();
+                        vm.needsRedraw = false;
+                        vm.applyConfig(vm.config, "cyMain" + vm.graphType, vm);
                     }
                 }, 250);
 
             }
         });
 
-        $scope.$watch('sharedData[whichController].reloadFileList', function(newValue, oldValue) {
+        $scope.$watch(function() {
+            return vm.sharedData.reloadFileList; }, function(newValue, oldValue) {
             if (newValue == true && oldValue == false) {
-                $scope.getFileList();
-                $scope.sharedData[$scope.whichController].reloadFileList = false;
+                vm.getFileList();
+                vm.sharedData.reloadFileList = false;
             }
         });
     }
