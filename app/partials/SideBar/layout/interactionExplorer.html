@@ -3,7 +3,7 @@
         <div flex>
             <md-input-container class="select">
                 <label>Layout</label>
-                <md-select ng-change="getConfigForSelectedNeighbours()" ng-model="selectedLayout">
+                <md-select ng-change="getConfigForSelectedNeighbours()" ng-model="vm.selectedLayout">
                     <md-option ng-repeat="layout in layouts.interactionExplorer" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
                         {{layout.display}}
                     </md-option>

@@ -26,33 +26,31 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     service.resetZoom = resetZoom;
     service.getAllVisibleGenes = getAllVisibleGenes;
 
-    function applyConfig(config, containerID, scope) {
-        scope.elemCopy = angular.copy(config.elements);
-        scope.styleCopy = angular.copy(config.style);
+    function applyConfig(config, containerID, vm) {
+        vm.elemCopy = angular.copy(config.elements);
+        vm.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
-        scope.cy = cytoscape(config);
+        vm.cy = cytoscape(config);
 
-        scope.nodes = scope.cy.nodes().length;
-        scope.edges = scope.cy.edges().length;
-        scope.config = config;
+        vm.config = config;
 
-        scope.cy.fit(scope.cy.$("*"), 10);
+        vm.cy.fit(vm.cy.$("*"), 10);
 
-        scope.cy.on('select', 'node', function(evt) {
+        vm.cy.on('select', 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
-            var edges = scope.cy.edges("[source='" + id + "'], [target='" + id + "']");
+            var edges = vm.cy.edges("[source='" + id + "'], [target='" + id + "']");
 
-            scope.cy.batch(function() {
+            vm.cy.batch(function() {
                 for (var i = edges.length - 1; i >= 0; i--) {
                     edges[i].addClass('highlighted-edge');
                     edges[i].removeClass('faded-edge');
                 }
             });
 
-            edges = scope.cy.edges().not("[source='" + id + "'], [target='" + id + "']");
+            edges = vm.cy.edges().not("[source='" + id + "'], [target='" + id + "']");
 
-            scope.cy.batch(function() {
+            vm.cy.batch(function() {
                 for (var i = edges.length - 1; i >= 0; i--) {
                     edges[i].addClass('faded-edge');
                     edges[i].removeClass('highlighted-edge');
@@ -62,25 +60,25 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             service.selectedItem = null;
         });
 
-        scope.cy.on("tap", "edge", function(evt) {
+        vm.cy.on("tap", "edge", function(evt) {
             var edge = evt.cyTarget;
-            scope.selectedEdge = { source: null, target: null, weight: null };
+            vm.selectedEdge = { source: null, target: null, weight: null };
 
-            scope.$apply(function() {
-                scope.selectedEdge.source = edge.source().id();
-                scope.selectedEdge.target = edge.target().id();
-                scope.selectedEdge.weight = edge.data('weight');
+            vm.scope.$apply(function() {
+                vm.selectedEdge.source = edge.source().id();
+                vm.selectedEdge.target = edge.target().id();
+                vm.selectedEdge.weight = edge.data('weight');
             });
         });
 
-        scope.cy.on("unselect", 'node', function(evt) {
+        vm.cy.on("unselect", 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 
-            service.resetEdges(scope.cy);
+            service.resetEdges(vm.cy);
         });
 
-        scope.cy.nodes().not(':parent').forEach(function(n) {
+        vm.cy.nodes().not(':parent').forEach(function(n) {
             var g = n.data('id').slice(0, -2);
             n.qtip({
                 content: [{

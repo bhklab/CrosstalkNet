@@ -1,4 +1,4 @@
-<md-card ng-show="overallMatrixStats" class="overall-matrix-summary">
+<md-card ng-show="vm.overallMatrixStats" class="overall-matrix-summary">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
@@ -7,7 +7,7 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
-        <div class="md-subhead"># of Self Loops: {{overallMatrixStats.selfLoops}}</div>
-        <div class="md-subhead"># of Significant Interactions: {{overallMatrixStats.significantInteractions}}</div>
+        <div class="md-subhead"># of Self Loops: {{vm.overallMatrixStats.selfLoops}}</div>
+        <div class="md-subhead"># of Significant Interactions: {{vm.overallMatrixStats.significantInteractions}}</div>
     </md-card-content>
 </md-card>

@@ -1,4 +1,4 @@
-<md-card ng-show="selectedEdge.source != null" class="edge-inspector">
+<md-card ng-show="vm.selectedEdge.source != null" class="edge-inspector">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
@@ -7,9 +7,9 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
-        <div>Interactor #1: {{selectedEdge.source}}</div>
-        <div>Interactor #2: {{selectedEdge.target}}</div>
-        <div>Correlation: {{selectedEdge.weight}}</div>
-        <md-button ng-click="closeEdgeInspector(this)">Close</md-button>
+        <div>Interactor #1: {{vm.selectedEdge.source}}</div>
+        <div>Interactor #2: {{vm.selectedEdge.target}}</div>
+        <div>Correlation: {{vm.selectedEdge.weight}}</div>
+        <md-button ng-click="closeEdgeInspector(vm)">Close</md-button>
     </md-card-content>
 </md-card>
