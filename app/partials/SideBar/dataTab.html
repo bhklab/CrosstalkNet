@@ -1,8 +1,8 @@
 <md-content class="md-padding">
     <md-input-container class="select">
         <label>Select Matrix File</label>
-        <md-select ng-change="refreshGeneList()" ng-model="$root.correlationFilesDisplayed[whichController]">
-            <md-option ng-repeat="file in fileList" value="{{file}}" ng-selected="0">
+        <md-select ng-change="vm.refreshGeneList()" ng-model="vm.correlationFileDisplayed">
+            <md-option ng-repeat="file in vm.fileList" value="{{file}}" ng-selected="0">
                 {{file}}
             </md-option>
         </md-select>

@@ -21,25 +21,25 @@ var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
 // var mongoose = require('mongoose');
 // var User = require('user');
-var https = require('https');
 var databaseConfigUtils = require('databaseConfigUtils');
 var bcrypt = require('bcrypt');
-var pem = require('pem');
 
 //mongoose.connect(databaseConfigUtils.database);
 
 var availableMatrices = {};
 
-var sslOptions = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-};
+// var sslOptions = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.pem')
+// };
+
 
 app.use('/app', express.static(__dirname + '/app'));
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+//app.use(morgan('combined'));
 
 app.use(function(req, res, next) {
     console.log(req.body);
@@ -108,6 +108,7 @@ app.post('/gene-list', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
+    console.log("request passed authentication");
     var child = exec("Rscript R_Scripts/getGeneList.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
@@ -547,6 +548,7 @@ app.post('/overall-matrix-stats', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
+    console.log("request passed authentication");
     var child = exec("Rscript R_Scripts/getOverallMatrixStats.R  --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000

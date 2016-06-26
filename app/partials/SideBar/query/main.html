@@ -1,24 +1,24 @@
 <md-content>
-    <div ng-show="ctrl == 'main'" ng-disabled="GOIState != GOIStates.initial" class="md-padding">
+    <div ng-show="vm.ctrl == 'main'" class="md-padding">
         <div>
-            <md-tooltip ng-if="GOIState != GOIStates.initial" md-direction="right">
+            <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>
-            <md-autocomplete ng-class="[whichController, whichController + ctrl]" md-no-cache='true' md-selected-item="selectedGOI" md-search-text="searchGOI" md-selected-item-change="addGeneOfInterest(item, 'first')" md-items="item in querySearch(searchGOI, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="GOIState != GOIStates.initial">
+            <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(vm, item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList', vm) | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                 <md-item-template>
-                    <span md-highlight-text="searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
+                    <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                 </md-item-template>
                 <md-not-found>
-                    No states matching "{{searchTextFirst}}" were found.
+                    No states matching "{{vm.searchTextFirst}}" were found.
                 </md-not-found>
             </md-autocomplete>
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="removeGenesOfInterest()" ng-disabled="GOIState != GOIStates.initial || genesOfInterest.length == 0">Remove All</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" ng-click="resetGeneSelection()" ng-disabled="GOIState == GOIStates.initial">Reset Gene Selection</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
             </div>
         </div>
         <div>
@@ -26,7 +26,7 @@
             <md-list class="selected-genes-list">
                 <md-list-item ng-repeat="gene in genesOfInterest">
                     <md-menu>
-                        <md-button ng-click="$mdOpenMenu($event)" ng-disabled="GOIState != GOIStates.initial">
+                        <md-button ng-click="$mdOpenMenu($event)" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                             {{gene.value}}
                         </md-button>
                         <md-menu-content width="6">
@@ -42,56 +42,56 @@
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="getRelevantGenes(true)" ng-disabled="GOIState == GOIStates.initial">Filter</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.getRelevantGenes(true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="getRelevantGenes(false)" ng-show="GOIState < GOIStates.getSecondNeighbours" ng-disabled="GOIState >= GOIStates.getSecondNeighbours || genesOfInterest.length == 0">Get {{GOIState == GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="returnToFirstNeighboursFilter()" ng-show="GOIState >= GOIStates.getSecondNeighbours">Back to
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.getRelevantGenes(false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="GOIState >= vm.GOIStates.getSecondNeighbours">Back to
                     <br>First Neighbours
                 </md-button>
             </div>
         </div>
-        <fieldset ng-disabled="GOIState != GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
+        <fieldset ng-disabled="vm.GOIState != vm.GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
             <legend class="fieldset-legend">First Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
                 <div flex="50">
                     <md-input-container class="md-icon-float md-icon-right md-block md-input-has-value">
-                        <label class="label-position">Min Negative Correlation | Lowest: {{correlationFilterFirst.min}}</label>
-                        <input ng-model="correlationFilterFirst.negativeFilter" min="{{correlationFilterFirst.min}}" max="0" type="number" step="0.001" autocomplete="off">
+                        <label class="label-position">Min Negative Correlation | Lowest: {{vm.correlationFilterFirst.min}}</label>
+                        <input ng-model="vm.correlationFilterFirst.negativeFilter" min="{{vm.correlationFilterFirst.min}}" max="0" type="number" step="0.001" autocomplete="off">
                     </md-input-container>
-                    <md-checkbox ng-disabled="GOIState != GOIStates.filterFirst" ng-model="correlationFilterFirst.negativeEnabled" aria-label="Checkbox 1">
+                    <md-checkbox ng-disabled="vm.GOIState != vm.GOIStates.filterFirst" ng-model="vm.correlationFilterFirst.negativeEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
                 <div flex="50">
                     <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Positive Correlation | Highest: {{correlationFilterFirst.max}}</label>
-                        <input ng-model="correlationFilterFirst.positiveFilter" min="0" max="{{correlationFilterFirst.max}}" type="number" step="0.001" autocomplete="off">
+                        <label class="label-position">Min Positive Correlation | Highest: {{vm.correlationFilterFirst.max}}</label>
+                        <input ng-model="vm.correlationFilterFirst.positiveFilter" min="0" max="{{vm.correlationFilterFirst.max}}" type="number" step="0.001" autocomplete="off">
                     </md-input-container>
-                    <md-checkbox ng-disabled="GOIState != GOIStates.filterFirst" ng-model="correlationFilterFirst.positiveEnabled" aria-label="Checkbox 1">
+                    <md-checkbox ng-disabled="vm.GOIState != vm.GOIStates.filterFirst" ng-model="vm.correlationFilterFirst.positiveEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
             </div>
         </fieldset>
-        <fieldset ng-show="GOIState > GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
+        <fieldset ng-show="vm.GOIState > vm.GOIStates.filterFirst" class="fieldset-border fieldset-left-padding">
             <legend class="fieldset-legend">Second Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
                 <div flex="50">
                     <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Negative Correlation | Lowest: {{correlationFilterSecond.min}}</label>
-                        <input ng-model="correlationFilterSecond.negativeFilter" min="{{correlationFilterSecond.min}}" max="0" type="number" step="0.001">
+                        <label class="label-position">Min Negative Correlation | Lowest: {{vm.correlationFilterSecond.min}}</label>
+                        <input ng-model="vm.correlationFilterSecond.negativeFilter" min="{{vm.correlationFilterSecond.min}}" max="0" type="number" step="0.001">
                     </md-input-container>
-                    <md-checkbox ng-model="correlationFilterSecond.negativeEnabled" aria-label="Checkbox 1">
+                    <md-checkbox ng-model="vm.correlationFilterSecond.negativeEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
                 <div flex="50">
                     <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Positive Correlation | Highest: {{correlationFilterSecond.max}}</label>
-                        <input ng-model="correlationFilterSecond.positiveFilter" min="0" max="{{correlationFilterSecond.max}}" type="number" step="0.001">
+                        <label class="label-position">Min Positive Correlation | Highest: {{vm.correlationFilterSecond.max}}</label>
+                        <input ng-model="vm.correlationFilterSecond.positiveFilter" min="0" max="{{vm.correlationFilterSecond.max}}" type="number" step="0.001">
                     </md-input-container>
-                    <md-checkbox ng-model="correlationFilterSecond.positiveEnabled" aria-label="Checkbox 1">
+                    <md-checkbox ng-model="vm.correlationFilterSecond.positiveEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
@@ -101,29 +101,29 @@
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete ng-class="[whichController, whichController + ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="zoomGene" md-search-text="searchTextZoom" md-selected-item-change="locateGene(gene)" md-items="gene in querySearch(searchTextZoom, 'locate', this)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate', vm)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
-                <span md-highlight-text="searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
+                <span md-highlight-text="vm.searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>
             <md-not-found>
-                No states matching "{{searchTextZoom}}" were found.
+                No states matching "{{vm.searchTextZoom}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-button class="md-raised md-primary" ng-click="clearLocatedGene()">
+        <md-button class="md-raised md-primary" ng-click="vm.clearLocatedGene(vm)">
             <md-tooltip md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>Clear Located Gene
         </md-button>
     </div>
-    <div ng-if="geneList.length > 0" layout-wrap class="md-padding">
+    <div ng-if="vm.geneList.length > 0" layout-wrap class="md-padding">
         <div flex="100" layout layout-align="center center">
             <span class="md-body-1">Min Degree</span>
         </div>
         <div layout="row">
-            <md-slider flex min="0" max="800" ng-model="minDegree.first" aria-label="red" id="min-degree-first" class>
+            <md-slider flex min="0" max="800" ng-model="vm.minDegree.first" aria-label="red" id="min-degree-first" class>
             </md-slider>
             <div flex="20" layout layout-align="center center">
-                <input flex type="number" ng-model="minDegree.first" aria-label="red" aria-controls="min-degree-first">
+                <input flex type="number" ng-model="vm.minDegree.first" aria-label="red" aria-controls="min-degree-first">
             </div>
         </div>
     </div>

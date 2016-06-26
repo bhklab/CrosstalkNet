@@ -1,4 +1,4 @@
-<md-card ng-if="cy != null">
+<md-card ng-if="vm.cy != null">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
@@ -6,14 +6,14 @@
                 <div flex style="position: relative;">
                     <md-input-container class="no-margin right-aligned">
                         <label>Filter Self Loops</label>
-                        <input ng-model="selfLoopSearch">
+                        <input ng-model="vm.selfLoopSearch">
                     </md-input-container>
                 </div>
             </div>
-            <span class="md-subhead">Total: {{selfLoops.length}}</span>
+            <span class="md-subhead">Total: {{vm.selfLoops.length}}</span>
         </md-card-title-text>
     </md-card-title>
     <md-card-content layout="row" layout-wrap>
-        <div flex="20" ng-repeat="gene in selfLoops | filter: selfLoopSearch track by $index">{{gene}}</div>
+        <div flex="20" ng-repeat="gene in vm.selfLoops | filter: vm.selfLoopSearch track by $index">{{gene}}</div>
     </md-card-content>
 </md-card>
