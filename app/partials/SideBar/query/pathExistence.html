@@ -1,22 +1,22 @@
 <md-content>
     <div class="md-padding">
         <h2 class="md-subhead">Path Existence Checker</h2>
-        <md-autocomplete ng-class="[graphType, graphType + ctrl]" md-no-cache='true' md-selected-item="pathExplorerSource" md-search-text="pathExplorerTextSource" md-selected-item-change="setPathExplorerGene(item, 'source')" md-items="item in querySearch(pathExplorerTextSource, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Source">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.pathExplorerSource" md-search-text="vm.pathExplorerTextSource" md-selected-item-change="vm.setPathExplorerGene(item, 'source')" md-items="item in vm.querySearch(vm.pathExplorerTextSource, 'geneList', vm) | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Source">
             <md-item-template>
-                <span md-highlight-text="pathExplorerTextSource" md-highlight-flags="^i">{{item.display}}</span>
+                <span md-highlight-text="vm.pathExplorerTextSource" md-highlight-flags="^i">{{item.display}}</span>
             </md-item-template>
             <md-not-found>
-                No states matching "{{pathExplorerTextSource}}" were found.
+                No states matching "{{vm.pathExplorerTextSource}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-autocomplete ng-class="[graphType, graphType + ctrl]" md-no-cache='true' md-selected-item="pathExplorerTarget" md-search-text="pathExplorerTextTarget" md-selected-item-change="setPathExplorerGene(item, 'target')" md-items="item in querySearch(pathExplorerTextTarget, 'geneList', this) | degreeFilter : minDegree.first" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Target">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.pathExplorerTarget" md-search-text="vm.pathExplorerTextTarget" md-selected-item-change="vm.setPathExplorerGene(item, 'target')" md-items="item in vm.querySearch(vm.pathExplorerTextTarget, 'geneList', vm) | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Target">
             <md-item-template>
-                <span md-highlight-text="pathExplorerTextTarget" md-highlight-flags="^i">{{item.display}}</span>
+                <span md-highlight-text="vm.pathExplorerTextTarget" md-highlight-flags="^i">{{item.display}}</span>
             </md-item-template>
             <md-not-found>
-                No states matching "{{pathExplorerTextTarget}}" were found.
+                No states matching "{{vm.pathExplorerTextTarget}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-button class="md-raised md-primary" ng-click="getAllPaths()">Get All Paths</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.getAllPaths()">Get All Paths</md-button>
     </div>
 </md-content>
