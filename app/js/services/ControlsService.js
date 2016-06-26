@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('BasicDataService', function($http, $rootScope) {
+myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
     var service = {};
 
     service.states = {
@@ -19,7 +19,7 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
     ];
 
-    service.displayModes = {graph: 'Graph', table: 'Tables'};
+    service.displayModes = { graph: 'Graph', table: 'Tables' };
 
     service.layouts = { main: null, interactionExplorer: null };
     service.layouts.main = [{ display: "Bipartite", value: "preset" }, {
@@ -32,7 +32,32 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
     service.loadExplorerDropdownOptions = loadExplorerDropdownOptions;
     service.querySearch = querySearch;
     service.getNodesWithMinDegree = getNodesWithMinDegree;
-    service.setNeighboursGeneral = setNeighboursGeneral;
+    service.getAllVisibleGenes = getAllVisibleGenes;
+    service.resetInputFieldsGlobal = resetInputFieldsGlobal;
+    service.resetInputFieldsLocal = resetInputFieldsLocal;
+    service.resetFilters = resetFilters;
+    service.resetGeneSelection = resetGeneSelection;
+    service.removeGenesOfInterest = removeGenesOfInterest;
+    service.removeGene = removeGene;
+    service.changeDisplay = changeDisplay;
+    service.addGeneOfInterest = addGeneOfInterest;
+    service.closeEdgeInspector = closeEdgeInspector;
+
+    function changeDisplay(vm) {
+        if (vm.display == vm.displayModes.graph) {
+            vm.display = vm.displayModes.table;
+        } else {
+            vm.display = vm.displayModes.graph;
+        }
+    }
+
+    function addGeneOfInterest(vm, gene) {
+        if (gene != null) {
+            if (vm.genesOfInterest.indexOf(gene) < 0) {
+                vm.genesOfInterest.push(gene);
+            }
+        }
+    }
 
     function loadExplorerDropdownOptions(scope, selectedGenes) {
         var genes = [];
@@ -85,6 +110,10 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         }
     }
 
+    function closeEdgeInspector(vm) {
+        vm.selectedEdge = {};
+    }
+
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(gene) {
@@ -110,42 +139,80 @@ myModule.factory('BasicDataService', function($http, $rootScope) {
         return result;
     }
 
-    function setNeighboursGeneral(scope, highestLevel, isExplorer) {
-        var neighbours = [];
+    function getAllVisibleGenes(vm) {
+        var result = [];
+        var nodes = vm.cy.$('node').not(':parent');
 
-        for (var i = 1; i <= highestLevel; i++) {
-            var temp = getNeighboursFromEdges(scope, i);
-
-            neighbours.push(temp);
+        for (var i = 0; i < nodes.length; i++) {
+            result.push(nodes[i].id());
         }
 
-        scope.neighbours = neighbours;
+        return result;
     }
 
-    function getNeighboursFromEdges(scope, level) {
-        var neighbours = { epi: new Set(), stroma: new Set() };
-        var edges = scope.cy.filter(function(i, element) {
-            if (element.isEdge() && element.data('neighbourLevel') == level) {
-                return true;
-            }
+    function resetGeneSelection(vm) {
+        vm.GOIState = vm.GOIStates.initial;
+        resetFilters(vm);
+    }
 
-            return false;
+    function resetFilters(vm) {
+        vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+        vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+    }
+
+    function removeGene(vm, gene) {
+        if (vm.genesOfInterest.length == 1) {
+            removeGenesOfInterest(vm);
+        } else {
+            vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+        }
+    }
+
+    function removeGenesOfInterest(vm) {
+        vm.genesOfInterest = [];
+        vm.closeEdgeInspector(vm);
+        resetInputFieldsLocal(vm, '');
+        resetFilters(vm);
+        vm.showGraphSummary = false;
+    }
+
+    function resetInputFieldsGlobal(vm) {
+        angular.forEach(angular.element("md-autocomplete." + vm.graphType + " input"), function(value, key) {
+            var a = angular.element(value);
+            a.val('');
         });
 
-        for (var i = 0; i < edges.length; i++) {
-            if (edges[i].data('source').endsWith("-E")) {
-                neighbours.epi.add(edges[i].data('source'));
-                neighbours.stroma.add(edges[i].data('target'));
-            } else {
-                neighbours.epi.add(edges[i].data('target'));
-                neighbours.stroma.add(edges[i].data('source'));
+        angular.forEach(angular.element("md-autocomplete." + vm.graphType + " button"), function(value, key) {
+            $timeout(function() {
+                var a = angular.element(value);
+                a.click();
+                console.log("clicked");
+            });
+        });
+    }
+
+    function resetInputFieldsLocal(vm, extraClass) {
+        angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " input"), function(value, key) {
+            var a = angular.element(value);
+            a.val('');
+            if (document.activeElement != null) {
+                document.activeElement.blur();
             }
+        });
+
+        angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " button"), function(value, key) {
+            $timeout(function() {
+                var a = angular.element(value);
+                a.click();
+                if (document.activeElement != null) {
+                    document.activeElement.blur();
+                }
+            });
+        });
+
+        if (document.activeElement != null) {
+            document.activeElement.blur();
         }
-
-        neighbours.epi = Array.from(neighbours.epi);
-        neighbours.stroma = Array.from(neighbours.stroma);
-
-        return neighbours;
     }
 
     return service;

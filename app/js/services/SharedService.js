@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphConfigService) {
+myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService) {
     var service = {};
     var dataModel = { reloadFileList: false, correlationFileActual: null, geneList: null };
 
@@ -7,44 +7,40 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     service.data.delta = angular.copy(dataModel);
     service.data.nonDelta = angular.copy(dataModel);
 
-    service.methods = {};
+    service.methods = { main: {}, neighbour: {}, path: {}, global: {} };
 
-    service.methods.changeDisplay = changeDisplay;
-    service.methods.addGeneOfInterest = addGeneOfInterest;
-    service.methods.locateGene = locateGene;
-    service.methods.closeEdgeInspector = closeEdgeInspector;
-    service.methods.clearLocatedGene = clearLocatedGene;
+    service.methods.main.clearLocatedGene = clearLocatedGene;
+    service.methods.main.getGeneList = getGeneList;
+    service.methods.main.getFileList = getFileList;
 
-    function changeDisplay(scope) {
-        if (scope.display == scope.displayModes.graph) {
-            scope.display = scope.displayModes.table;
-        } else {
-            scope.display = scope.displayModes.graph;
-        }
-    };
+    function clearLocatedGene(vm) {
+        vm.resetInputFieldsLocal(vm, 'geneLocator');
+        GraphConfigService.clearLocatedGene(vm);
+    }
 
-    function addGeneOfInterest(scope, gene) {
-        if (gene != null) {
-            if (scope.genesOfInterest.indexOf(gene) < 0) {
-                scope.genesOfInterest.push(gene);
-            }
-        }
-    };
+    function getGeneList(vm) {
+        $rootScope.state = $rootScope.states.gettingGeneList;
+        RESTService.post('gene-list', { fileName: vm.sharedData.correlationFileActual })
+            .then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    return;
+                }
 
-    function locateGene(scope, gene) {
-        if (gene != null && gene != '') {
-            scope.findGeneInGraph(scope, gene);
-        }
-    };
+                vm.sharedData.geneList = data.geneList;
+                $rootScope.state = $rootScope.states.initial;
+            });
+    }
 
-    function closeEdgeInspector(scope) {
-        scope.selectedEdge = {};
-    };
+    function getFileList(vm, types) {
+        RESTService.post('available-matrices', { types: types })
+            .then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    return;
+                }
 
-    function clearLocatedGene(scope) {
-        scope.resetInputFieldsLocal('geneLocator');
-        GraphConfigService.clearLocatedGene(scope);
-    };
+                vm.fileList = data.fileList;
+            });
+    }
 
     return service;
 });

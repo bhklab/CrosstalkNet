@@ -19,14 +19,12 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     service.firstSelectedGene = null;
 
     service.applyConfig = applyConfig;
-    service.getInteractingNodes = getInteractingNodes;
-    service.findGeneInGraph = findGeneInGraph;
+    service.locateGene = locateGene;
     service.clearLocatedGene = clearLocatedGene;
-    service.resetEdges = resetEdges;
     service.resetZoom = resetZoom;
-    service.getAllVisibleGenes = getAllVisibleGenes;
+    service.destroyGraph = destroyGraph;
 
-    function applyConfig(config, containerID, vm) {
+    function applyConfig(vm, config, containerID) {
         vm.elemCopy = angular.copy(config.elements);
         vm.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
@@ -75,7 +73,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             var node = evt.cyTarget;
             var id = node.id();
 
-            service.resetEdges(vm.cy);
+            service.resetEdges(vm);
         });
 
         vm.cy.nodes().not(':parent').forEach(function(n) {
@@ -107,37 +105,16 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
                 }
             });
         });
-    };
+    }
 
-    function getInteractingNodes(node, cy) {
-        var attribute = '';
-
-        if (node.id().endsWith('-E')) {
-            attribute = 'source';
-        } else {
-            attribute = 'target';
+    function locateGene(vm, gene) {
+        if (gene == '' || gene == null) {
+            return;
         }
 
-        var edges = cy.edges("[" + attribute + "='" + node.id() + "']");
-        var nodes = [];
+        service.clearLocatedGene(vm);
 
-
-        for (var i = 0; i < edges.length; i++) {
-            if (attribute == 'source') {
-                nodes.push(edges[i].target());
-            } else {
-                nodes.push(edges[i].source());
-            }
-
-        }
-
-        return nodes;
-    };
-
-    function findGeneInGraph(scope, gene) {
-        service.clearLocatedGene(scope);
-
-        var node = scope.cy.$("#" + gene.toUpperCase());
+        var node = vm.cy.$("#" + gene.toUpperCase());
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
         var allClasses = node[0]._private.classes;
@@ -171,51 +148,48 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         node.addClass('located');
 
 
-        scope.cy.zoom({
+        vm.cy.zoom({
             level: 1.5, // the zoom level
             renderedPosition: { x: x, y: y }
         });
-        scope.cy.center(node);
+        vm.cy.center(node);
 
-        scope.currentlyZoomed = { node: node, styleClass: colorClass };
-    };
+        vm.currentlyZoomed = { node: node, styleClass: colorClass };
+    }
 
-    function clearLocatedGene(scope) {
-        if (scope.currentlyZoomed != null) {
-            scope.currentlyZoomed.node.removeClass('located');
-            scope.currentlyZoomed.node.toggleClass(scope.currentlyZoomed.styleClass);
+    function clearLocatedGene(vm) {
+        if (vm.currentlyZoomed != null) {
+            vm.currentlyZoomed.node.removeClass('located');
+            vm.currentlyZoomed.node.toggleClass(vm.currentlyZoomed.styleClass);
         }
 
-        scope.currentlyZoomed = null;
-    };
+        vm.currentlyZoomed = null;
+    }
 
-    function resetEdges(cy) {
-        var edges = cy.edges();
+    function resetEdges(vm) {
+        var edges = vm.cy.edges();
 
-        cy.batch(function() {
+        vm.cy.batch(function() {
             for (var i = edges.length - 1; i >= 0; i--) {
                 edges[i].removeClass('highlighted-edge');
                 edges[i].removeClass('faded-edge');
             }
         });
-    };
+    }
 
-    function resetZoom(cy) {
-        if (cy != null) {
-            cy.fit(cy.$("*"), 10);
+    function resetZoom(vm) {
+        if (vm.cy != null) {
+            vm.cy.fit(vm.cy.$("*"), 10);
         }
-    };
+    }
 
-    function getAllVisibleGenes(scope) {
-        var result = [];
-        var nodes = scope.cy.$('node').not(':parent');
-
-        for (var i = 0; i < nodes.length; i++) {
-            result.push(nodes[i].id());
+    function destroyGraph(vm) {
+        if (vm.cy) {
+            vm.cy.destroy();
         }
 
-        return result;
-    };
+        vm.cy = null;
+    }
 
     return service;
 });

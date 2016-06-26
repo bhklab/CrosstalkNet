@@ -3,65 +3,71 @@
 angular.module('myApp.controllers').controller('PathExistenceController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, SharedService,
+    'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, InitializationService, ValidationService, SharedService,
         $q, $timeout) {
-        $scope.ctrl = "pathExistence";
-        $scope.graphType = "nonDelta";
+        var vm = this;
+        vm.scope = $scope;
 
-        InitializationService.initializeCommonVariables($scope);
+        vm.ctrl = "pathExistence";
+        vm.graphType = "nonDelta";
 
-        $scope.genesOfInterest = [];
-        $scope.pathExplorerSource = null;
-        $scope.pathExplorerTarget = null;
+        InitializationService.initializeCommonVariables(vm);
 
-        $scope.pathExplorerTextSource = null;
-        $scope.pathExplorerTextTarget = null;
+        vm.genesOfInterest = [];
+        vm.pathExplorerSource = null;
+        vm.pathExplorerTarget = null;
 
-        $scope.allPaths = null;
+        vm.pathExplorerTextSource = null;
+        vm.pathExplorerTextTarget = null;
 
-        $scope.sharedData = SharedService.data.nonDelta;
+        vm.allPaths = null;
 
-        $scope.setPathExplorerGene = function(gene, which) {
+        vm.sharedData = SharedService.data.nonDelta;
+
+        vm.resetInputFieldsGlobal = SharedService.methods.global.resetInputFieldsGlobal;
+        vm.resetInputFieldsLocal = SharedService.methods.global.resetInputFieldsLocal;
+
+        vm.setPathExplorerGene = function(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
-                    $scope.pathExplorerSource = gene;
+                    vm.pathExplorerSource = gene;
                 } else {
-                    $scope.pathExplorerTarget = gene;
+                    vm.pathExplorerTarget = gene;
                 }
             }
         };
 
-        $scope.getAllPaths = function() {
-            if ($scope.pathExplorerTarget == null || $scope.pathExplorerSource == null) {
+        vm.getAllPaths = function() {
+            if (vm.pathExplorerTarget == null || vm.pathExplorerSource == null) {
                 alert("Please select a source and target gene.");
                 return;
             }
 
             $rootScope.state = $rootScope.states.gettingAllPaths;
-            $scope.allPaths = null;
-            $scope.pathTarget = $scope.pathExplorerTarget.value;
-            $scope.pathSource = $scope.pathExplorerSource.value;
+            vm.allPaths = null;
+            vm.pathTarget = vm.pathExplorerTarget.value;
+            vm.pathSource = vm.pathExplorerSource.value;
             RESTService.post('get-all-paths', {
-                target: $scope.pathExplorerTarget.value,
-                source: $scope.pathExplorerSource.value,
-                fileName: $scope.sharedData.correlationFileActual
+                target: vm.pathExplorerTarget.value,
+                source: vm.pathExplorerSource.value,
+                fileName: vm.sharedData.correlationFileActual
             }).then(function(data) {
                 console.log(data);
-                $scope.allPaths = data.paths;
+                vm.allPaths = data.paths;
                 $rootScope.state = $rootScope.states.finishedGettingAllPaths;
-                $scope.display = "Tables";
-                $scope.switchModel = true;
+                vm.display = "Tables";
+                vm.switchModel = true;
             });
         };
 
         $rootScope.$watch(function() {
-            return $scope.sharedData.correlationFileActual;
+            return vm.sharedData.correlationFileActual;
         }, function() {
-            $scope.genesOfInterest = [];
-            //$scope.resetInputFields();
-            $scope.neighbours = [];
-            $scope.allPaths = null;
+            vm.genesOfInterest = [];
+            //vm.resetInputFields();
+            vm.neighbours = [];
+            vm.allPaths = null;
         });
     }
 ]);

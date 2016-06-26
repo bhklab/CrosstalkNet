@@ -36,7 +36,7 @@
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate', vm)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate', vm)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
                 <span md-highlight-text="vm.searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>
