@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('InitializationService', function($http, $timeout, Upload, BasicDataService, GraphConfigService, SharedService) {
+myModule.factory('InitializationService', function($http, $timeout, Upload, ControlsService, GraphConfigService, SharedService) {
     var service = {};
 
     service.initializeCommonVariables = initializeCommonVariables;
@@ -22,8 +22,8 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         vm.minPositiveWeight = 0;
         vm.minNegativeWeight = 0;
 
-        vm.layouts = angular.copy(BasicDataService.layouts);
-        vm.displayModes = angular.copy(BasicDataService.displayModes);
+        vm.layouts = angular.copy(ControlsService.layouts);
+        vm.displayModes = angular.copy(ControlsService.displayModes);
 
         vm.minDegree = {
             first: 0,
@@ -49,45 +49,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             positiveEnabled: false
         };
 
-        vm.resetInputFieldsGlobal = function() {
-            angular.forEach(angular.element("md-autocomplete." + vm.graphType + " input"), function(value, key) {
-                var a = angular.element(value);
-                a.val('');
-            });
-
-            angular.forEach(angular.element("md-autocomplete." + vm.graphType + " button"), function(value, key) {
-                $timeout(function() {
-                    var a = angular.element(value);
-                    a.click();
-                    console.log("clicked");
-                });
-            });
-        };
-
-        vm.resetInputFieldsLocal = function(extraClass) {
-            angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " input"), function(value, key) {
-                var a = angular.element(value);
-                a.val('');
-                if (document.activeElement != null) {
-                    document.activeElement.blur();
-                }
-            });
-
-            angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " button"), function(value, key) {
-                $timeout(function() {
-                    var a = angular.element(value);
-                    a.click();
-                    if (document.activeElement != null) {
-                        document.activeElement.blur();
-                    }
-                });
-            });
-
-            if (document.activeElement != null) {
-                document.activeElement.blur();
-            }
-        };
-
         vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
         vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
 
@@ -97,13 +58,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
         vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
         vm.getInteractingNodes = GraphConfigService.getInteractingNodes;
         vm.applyConfig = GraphConfigService.applyConfig;
-
-        vm.getNodesWithMinDegree = BasicDataService.getNodesWithMinDegree;
-        vm.loadDropdownOptions = BasicDataService.loadDropdownOptions;
-        vm.loadGeneListDropdownOptions = BasicDataService.loadGeneListDropdownOptions;
-        vm.loadNeighbourDropdownOptions = BasicDataService.loadNeighbourDropdownOptions;
-        vm.querySearch = BasicDataService.querySearch;
-        vm.setNeighboursGeneral = BasicDataService.setNeighboursGeneral;
 
         vm.genesOfInterest = [];
         vm.edges = 0;
@@ -132,7 +86,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Basi
             stroma: []
         };
 
-        vm.resize = GraphConfigService.resetZoom;
         vm.exportTableToCSV = function(tableID) {
             $("." + tableID).tableToCSV();
         };

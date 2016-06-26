@@ -59,9 +59,9 @@ myModule.factory('ExportService', function($http, $filter) {
         }
     }
 
-    function exportNeighboursToCSV(scope, index) {
+    function exportNeighboursToCSV(vm, index) {
         var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
-        var neighbours = scope.neighbours[index];
+        var neighbours = vm.neighbours[index];
         var rowDelim = "\r\n";
         var colDelim = ",";
         var csv = "";
@@ -75,7 +75,7 @@ myModule.factory('ExportService', function($http, $filter) {
             var temp = [];
             temp.push($filter('suffixTrim')(neighbours.epi[i]));
             for (var j = 0; j < neighbours.stroma.length; j++) {
-                temp.push(scope.getInteractionViaDictionary(neighbours.epi[i], neighbours.stroma[j]));
+                temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j]));
             }
 
             csv += temp.join();
@@ -91,13 +91,13 @@ myModule.factory('ExportService', function($http, $filter) {
         document.body.removeChild(link);
     }
 
-    function exportGraphToPNG(scope) {
-        if (scope.cy == null) {
+    function exportGraphToPNG(vm) {
+        if (vm.cy == null) {
             return;
         }
 
         var fileName = "graph" + Date.now() + ".png";
-        var png64 = scope.cy.png();
+        var png64 = vm.cy.png();
 
         var link = document.createElement("a");
         link.setAttribute("href", png64);

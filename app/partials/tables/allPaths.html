@@ -1,33 +1,33 @@
-<md-card ng-if="allPaths != null">
+<md-card ng-if="vm.allPaths != null">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
-                <div flex><span class="md-headline">All Paths Between {{pathSource}} and {{pathTarget}}</span></div>
+                <div flex><span class="md-headline">All Paths Between {{vm.pathSource}} and {{vm.pathTarget}}</span></div>
             </div>
-            <span class="md-subhead">Total: {{allPaths.length}}</span>
+            <span class="md-subhead">Total: {{vm.allPaths.length}}</span>
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
         <md-table-container>
-            <table ng-class="'all-paths-table' + graphType" md-table>
-                <thead md-head md-order="myOrder">
+            <table ng-class="'all-paths-table' + vm.graphType" md-table>
+                <thead md-head md-order="vm.myOrder">
                     <th md-column>Source</th>
                     <th md-column md-column md-order-by="firstEdge" md-numeric>Correlation</th>
-                    <th ng-if="allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
-                    <th ng-if="allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
+                    <th ng-if="vm.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
+                    <th ng-if="vm.allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
                     <th md-column>Destination</th>
                 </thead>
                 <tbody md-body>
-                    <tr ng-repeat="path in allPaths | orderBy: myOrder">
-                        <td md-cell>{{pathSource}}</td>
+                    <tr ng-repeat="path in vm.allPaths | orderBy: vm.myOrder">
+                        <td md-cell>{{vm.pathSource}}</td>
                         <td md-cell>{{path.firstEdge}}</td>
-                        <td md-cell ng-if="allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
-                        <td md-cell ng-if="allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
-                        <td md-cell>{{pathTarget}}</td>
+                        <td md-cell ng-if="vm.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                        <td md-cell ng-if="vm.allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
+                        <td md-cell>{{vm.pathTarget}}</td>
                     </tr>
                 </tbody>
             </table>
         </md-table-container>
-        <md-button class="md-raised md-primary" ng-click="exportTableToCSV('all-paths-table' + graphType)">Download Interactions</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + vm.graphType)">Download Interactions</md-button>
     </md-card-content>
 </md-card>

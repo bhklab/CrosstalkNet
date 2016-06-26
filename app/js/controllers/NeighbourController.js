@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('NeighbourController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'InitializationService', 'ValidationService', 'ExportService', 'SharedService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, InitializationService, ValidationService, ExportService, SharedService,
+    'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'ExportService', 'SharedService', 'TableService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, InitializationService, ValidationService, ExportService, SharedService, TableService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -26,6 +26,7 @@ angular.module('myApp.controllers').controller('NeighbourController', [
 
         vm.needsRedraw = false;
         vm.applyConfig = GraphConfigService.applyConfig;
+        vm.resize = GraphConfigService.resetZoom;
 
         vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
@@ -35,18 +36,28 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         vm.allowAdditionalGenes = true;
         vm.showGraphSummary = false;
 
+        vm.resetInputFieldsGlobal = ControlsService.resetInputFieldsGlobal;
+        vm.resetInputFieldsLocal = ControlsService.resetInputFieldsLocal;
+
+        vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
+        vm.setNeighboursGeneral = TableService.setNeighboursGeneral;
+
+        vm.getNodesWithMinDegree = ControlsService.getNodesWithMinDegree;
+        vm.loadDropdownOptions = ControlsService.loadDropdownOptions;
+        vm.loadGeneListDropdownOptions = ControlsService.loadGeneListDropdownOptions;
+        vm.loadNeighbourDropdownOptions = ControlsService.loadNeighbourDropdownOptions;
+        vm.querySearch = ControlsService.querySearch;
+        vm.getAllVisibleGenes = ControlsService.getAllVisibleGenes;
+        vm.closeEdgeInspector = ControlsService.closeEdgeInspector;
+
         vm.init = function(whichController) {
             vm.whichController = whichController;
         };
 
-        vm.locateGene = function(gene) {
+        vm.locateGene = function(vm, gene) {
             if (gene != null && gene != '') {
                 vm.findGeneInGraph(vm, gene);
             }
-        };
-
-        vm.closeEdgeInspector = function() {
-            vm.selectedEdge = {};
         };
 
         vm.changeDisplay = function() {
@@ -71,7 +82,7 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         };
 
         vm.clearLocatedGene = function() {
-            vm.resetInputFieldsLocal('geneLocator');
+            vm.resetInputFieldsLocal(vm, 'geneLocator');
             GraphConfigService.clearLocatedGene(vm);
         }
 
@@ -95,13 +106,13 @@ angular.module('myApp.controllers').controller('NeighbourController', [
                 if (vm.display == vm.displayModes.table) {
                     vm.needsRedraw = true;
                 }
-                vm.applyConfig(data.config, "cyNeighbour" + vm.graphType, vm);
+                vm.applyConfig(vm, data.config, "cyNeighbour" + vm.graphType);
                 vm.selfLoops = data.selfLoops;
                 vm.edgeDictionary = data.edgeDictionary;
 
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
-                vm.explorerGenes = BasicDataService.loadExplorerDropdownOptions(vm, vm.genesOfInterest);
+                vm.explorerGenes = ControlsService.loadExplorerDropdownOptions(vm, vm.genesOfInterest);
                 vm.allVisibleGenes = vm.getAllVisibleGenes(vm);
                 $rootScope.state = $rootScope.states.showingGraph;
 
@@ -117,10 +128,7 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         vm.removeGene = function(gene) {
             vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
             if (vm.genesOfInterest.length == 0) {
-                if (vm.cy) {
-                    vm.cy.destroy();
-                }
-                vm.cy = null;
+                GraphConfigService.destroyGraph(vm);
             } else {
                 vm.getConfigForSelectedNeighbours();
             }
@@ -132,21 +140,8 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         vm.removeAllGenes = function() {
             vm.allowAdditionalGenes = true;
             vm.genesOfInterest = [];
-            if (vm.cy) {
-                vm.cy.destroy();
-            }
-            vm.cy = null;
+            GraphConfigService.destroyGraph(vm);
             vm.resetDisplayedData();
-        };
-
-        vm.getInteractionViaDictionary = function(source, target) {
-            if (vm.edgeDictionary[source] != null && vm.edgeDictionary[source][target] != null) {
-                return vm.edgeDictionary[source][target];
-            } else if (vm.edgeDictionary[target] != null && vm.edgeDictionary[target][source] != null) {
-                return vm.edgeDictionary[target][source];
-            } else {
-                return 0;
-            }
         };
 
         vm.resetDisplayedData = function() {
@@ -155,12 +150,11 @@ angular.module('myApp.controllers').controller('NeighbourController', [
             vm.explorerGenes = [];
             vm.selfLoops = [];
             vm.neighbours = [];
-            vm.resetInputFieldsLocal('');
+            vm.resetInputFieldsLocal(vm, '');
             vm.clearLocatedGene();
             vm.showGraphSummary = false;
         };
 
-        vm.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
         vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
         $rootScope.$watch(function() {
@@ -168,10 +162,7 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         }, function() {
             vm.genesOfInterest = [];
             vm.resetDisplayedData();
-            if (vm.cy) {
-                vm.cy.destroy();
-            }
-            vm.cy = null;
+            GraphConfigService.destroyGraph(vm);
         });
 
         $scope.$watch(function() {
@@ -180,9 +171,9 @@ angular.module('myApp.controllers').controller('NeighbourController', [
             if (newValue == vm.displayModes.graph) {
                 $timeout(function() {
                     if (vm.config != null && vm.cy != null) {
-                        vm.cy.resize();
+                        vm.cy.resize(vm);
                         vm.needsRedraw = false;
-                        vm.applyConfig(vm.config, "cyNeighbour" + vm.graphType, vm);
+                        vm.applyConfig(vm, vm.config, "cyNeighbour" + vm.graphType);
                     }
                 }, 250);
 

@@ -3,15 +3,15 @@
         <div flex>
             <md-input-container class="select">
                 <label>Layout</label>
-                <md-select ng-change="getConfigForSelectedNeighbours()" ng-model="vm.selectedLayout">
-                    <md-option ng-repeat="layout in layouts.interactionExplorer" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
+                <md-select ng-change="vm.getConfigForSelectedNeighbours()" ng-model="vm.selectedLayout">
+                    <md-option ng-repeat="layout in vm.layouts.interactionExplorer" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
                         {{layout.display}}
                     </md-option>
                 </md-select>
             </md-input-container>
         </div>
         <div flex style="position: relative;">
-            <md-button class="no-margin float-bottom md-raised md-primary" ng-click="resize(cy)">Resize</md-button>
+            <md-button class="no-margin float-bottom md-raised md-primary" ng-click="vm.resize(vm)">Resize</md-button>
         </div>
     </div>
 </md-content>

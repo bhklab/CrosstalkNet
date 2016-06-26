@@ -15,23 +15,23 @@
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest(vm)" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection(vm)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
             </div>
         </div>
         <div>
             <span class="md-subhead">Selected Genes:</span>
             <md-list class="selected-genes-list">
-                <md-list-item ng-repeat="gene in genesOfInterest">
+                <md-list-item ng-repeat="gene in vm.genesOfInterest">
                     <md-menu>
                         <md-button ng-click="$mdOpenMenu($event)" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                             {{gene.value}}
                         </md-button>
                         <md-menu-content width="6">
                             <md-menu-item ng-repeat="item in [1]">
-                                <md-button ng-click="removeGene(gene)">
+                                <md-button ng-click="vm.removeGene(vm, gene)">
                                     Remove Gene
                                 </md-button>
                             </md-menu-item>
@@ -46,7 +46,7 @@
             </div>
             <div flex="60">
                 <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.getRelevantGenes(false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="GOIState >= vm.GOIStates.getSecondNeighbours">Back to
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="vm.GOIState >= vm.GOIStates.getSecondNeighbours">Back to
                     <br>First Neighbours
                 </md-button>
             </div>

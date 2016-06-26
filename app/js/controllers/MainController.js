@@ -2,13 +2,13 @@
 
 angular.module('myApp.controllers').controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'BasicDataService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
+    'GraphConfigService', 'ControlsService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', '$q', '$timeout', '$cookies',
     '$mdDialog',
-    function($scope, $rootScope, RESTService, GraphConfigService, BasicDataService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService,
+    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
         $rootScope.geneLists = { nonDelta: null, delta: null };
-        $rootScope.states = angular.copy(BasicDataService.states);
+        $rootScope.states = angular.copy(ControlsService.states);
         $rootScope.state = $rootScope.states.initial;
 
         var vm = this;
@@ -17,7 +17,10 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         vm.graphType = "nonDelta";
 
         InitializationService.initializeCommonVariables(vm);
-        vm.getAllVisibleGenes = GraphConfigService.getAllVisibleGenes;
+        vm.getAllVisibleGenes = ControlsService.getAllVisibleGenes;
+        vm.resize = GraphConfigService.resetZoom;
+        vm.locateGene = GraphConfigService.locateGene;
+
         vm.uploadFiles = FileUploadService.uploadFiles;
         vm.config = null;
         vm.needsRedraw = false;
@@ -28,24 +31,28 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
 
         vm.sharedData = SharedService.data.nonDelta;
         vm.showGraphSummary = false;
+        
+        vm.clearLocatedGene = SharedService.methods.main.clearLocatedGene;
+        vm.getGeneList = SharedService.methods.main.getGeneList;
+        vm.getFileList = SharedService.methods.main.getFileList;
 
-        vm.changeDisplay = SharedService.methods.changeDisplay;
-        vm.addGeneOfInterest = SharedService.methods.addGeneOfInterest;
-        vm.locateGene = SharedService.methods.locateGene;
-        vm.closeEdgeInspector = SharedService.methods.closeEdgeInspector;
-        vm.clearLocatedGene = SharedService.methods.clearLocatedGene;
+        vm.closeEdgeInspector = ControlsService.closeEdgeInspector;
+        vm.addGeneOfInterest = ControlsService.addGeneOfInterest;
+        vm.changeDisplay = ControlsService.changeDisplay;
+        vm.removeGene = ControlsService.removeGene;
+        vm.removeGenesOfInterest = ControlsService.removeGenesOfInterest;
+        vm.resetFilters = ControlsService.resetFilters;
+        vm.resetGeneSelection = ControlsService.resetGeneSelection;
+        vm.resetInputFieldsGlobal = ControlsService.resetInputFieldsGlobal;
+        vm.resetInputFieldsLocal = ControlsService.resetInputFieldsLocal;
+        vm.getNodesWithMinDegree = ControlsService.getNodesWithMinDegree;
+        vm.loadDropdownOptions = ControlsService.loadDropdownOptions;
+        vm.loadGeneListDropdownOptions = ControlsService.loadGeneListDropdownOptions;
+        vm.loadNeighbourDropdownOptions = ControlsService.loadNeighbourDropdownOptions;
+        vm.querySearch = ControlsService.querySearch;
 
-        vm.removeGenesOfInterest = function() {
-            vm.genesOfInterest = [];
-            vm.closeEdgeInspector(this);
-            vm.resetInputFieldsLocal('');
-            vm.resetFilters();
-            if (vm.cy) {
-                vm.cy.destroy();
-            }
-            vm.cy = null;
-            vm.showGraphSummary = false;
-        };
+        vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
+        vm.setNeighboursGeneral = TableService.setNeighboursGeneral;
 
         vm.getRelevantGenes = function(filter) {
             var filterFirst = false;
@@ -97,7 +104,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
                         return;
                     }
 
-                    console.log(data);
                     $rootScope.state = $rootScope.states.loadingConfig;
                     vm.totalInteractions = data.totalInteractions;
                     vm.firstNeighbourInteractions = data.firstNeighbourInteractions;
@@ -105,7 +111,7 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
                     if (vm.display == vm.displayModes.table) {
                         vm.needsRedraw = true;
                     }
-                    vm.applyConfig(data.config, "cyMain" + vm.graphType, vm);
+                    vm.applyConfig(vm, data.config, "cyMain" + vm.graphType);
 
                     vm.edgeDictionary = data.edgeDictionary;
                     vm.selfLoops = data.selfLoops;
@@ -129,38 +135,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
                 });
         };
 
-        vm.removeGene = function(gene) {
-            if (vm.genesOfInterest.length == 1) {
-                vm.removeGenesOfInterest();
-            } else {
-                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-            }
-        };
-
-        vm.getGeneList = function() {
-            $rootScope.state = $rootScope.states.gettingGeneList;
-            RESTService.post('gene-list', { fileName: vm.sharedData.correlationFileActual })
-                .then(function(data) {
-                    if (!ValidationService.checkServerResponse(data)) {
-                        return;
-                    }
-
-                    vm.sharedData.geneList = data.geneList;
-                    $rootScope.state = $rootScope.states.initial;
-                });
-        };
-
-        vm.getFileList = function() {
-            RESTService.post('available-matrices', { types: ['normal', 'tumor'] })
-                .then(function(data) {
-                    if (!ValidationService.checkServerResponse(data)) {
-                        return;
-                    }
-
-                    vm.fileList = data.fileList;
-                });
-        };
-
         vm.getOverallMatrixStats = function() {
             RESTService.post('overall-matrix-stats', { fileName: vm.sharedData.correlationFileActual }).then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
@@ -172,57 +146,21 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
             });
         };
 
-        vm.resetGeneSelection = function() {
-            vm.GOIState = vm.GOIStates.initial;
-            vm.resetFilters();
-        };
-
-        vm.resetFilters = function() {
-            vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
-            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-        };
-
-        vm.getInteraction = function(source, target) {
-            var edge = null;
-
-            edge = vm.cy.filter(function(i, element) {
-                if (element.isEdge() && ((element.source().id() == source.id() && element.target().id() == target.id()) ||
-                        (element.target().id() == source.id() && element.source().id() == target.id()))) {
-                    return true;
-                }
-
-                return false
-            });
-
-            return edge.length == 0 ? 0 : edge.data('weight');
-        };
-
-        vm.getInteractionViaDictionary = function(source, target) {
-            if (vm.edgeDictionary[source] != null && vm.edgeDictionary[source][target] != null) {
-                return vm.edgeDictionary[source][target];
-            } else {
-                return 0;
-            }
-        };
-
         vm.refreshGeneList = function() {
             vm.GOIState = vm.GOIStates.initial;
             vm.closeEdgeInspector(this);
-            vm.removeGenesOfInterest();
-            vm.resetInputFieldsGlobal();
-            vm.resetFilters();
+            vm.removeGenesOfInterest(vm);
+            vm.resetInputFieldsGlobal(vm);
+            vm.resetFilters(vm);
             vm.sharedData.correlationFileActual = vm.correlationFileDisplayed;
             vm.overallMatrixStats = null;
             vm.allVisibleGenes = [];
             vm.tabIndex = 1;
             vm.showGraphSummary = false;
 
-            if (vm.cy) {
-                vm.cy.destroy();
-            }
-            vm.cy = null;
+            GraphConfigService.destroyGraph(vm);
 
-            vm.getGeneList();
+            vm.getGeneList(vm);
             vm.getOverallMatrixStats();
         };
 
@@ -232,14 +170,14 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         };
 
         $scope.$watch(function() {
-            return vm.mdDialog;
+            return vm.display;
         }, function(newValue, oldValue) {
             if (newValue == vm.displayModes.graph) {
                 $timeout(function() {
                     if (vm.config != null) {
                         vm.cy.resize();
                         vm.needsRedraw = false;
-                        vm.applyConfig(vm.config, "cyMain" + vm.graphType, vm);
+                        vm.applyConfig(vm, vm.config, "cyMain" + vm.graphType);
                     }
                 }, 250);
 
@@ -247,9 +185,10 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         });
 
         $scope.$watch(function() {
-            return vm.sharedData.reloadFileList; }, function(newValue, oldValue) {
+            return vm.sharedData.reloadFileList;
+        }, function(newValue, oldValue) {
             if (newValue == true && oldValue == false) {
-                vm.getFileList();
+                vm.getFileList(vm, ['tumor', 'normal']);
                 vm.sharedData.reloadFileList = false;
             }
         });
