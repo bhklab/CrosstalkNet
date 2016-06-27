@@ -60,12 +60,12 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
         cy.on("tap", "edge", function(evt) {
             var edge = evt.cyTarget;
-            vm.selectedEdge = { source: null, target: null, weight: null };
+            vm.sdWithinTab.selectedEdge = { source: null, target: null, weight: null };
 
             vm.scope.$apply(function() {
-                vm.selectedEdge.source = edge.source().id();
-                vm.selectedEdge.target = edge.target().id();
-                vm.selectedEdge.weight = edge.data('weight');
+                vm.sdWithinTab.selectedEdge.source = edge.source().id();
+                vm.sdWithinTab.selectedEdge.target = edge.target().id();
+                vm.sdWithinTab.selectedEdge.weight = edge.data('weight');
             });
         });
 

@@ -19,7 +19,6 @@ angular.module('myApp.controllers').controller('QueryController', [
         vm.sharedData = SharedService.data.nonDelta;
 
         function intializeVariables() {
-
             vm.selectedItemFirst = null;
             vm.selectedGOI = null;
             vm.zoomGene = null;
@@ -93,8 +92,12 @@ angular.module('myApp.controllers').controller('QueryController', [
 
         vm.refreshGraph = function() {
             vm.getRelevantGenes(vm, true);
-        }
+        };
 
+        vm.returnToFirstNeighboursFilter = function() {
+            vm.GOIState = vm.GOIStates.filterFirst;
+            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+        };
 
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
@@ -114,15 +117,13 @@ angular.module('myApp.controllers').controller('QueryController', [
             }
         });
 
-
-
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
                 return vm.sdWithinTab.display;
             }
             return null;
         }, function(newValue, oldValue) {
-            if (newValue == vm.displayModes.graph) {
+            if (newValue == vm.displayModes.graph && newValue != oldValue) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null) {
                         vm.sdWithinTab.cy.resize();

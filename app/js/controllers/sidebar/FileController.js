@@ -19,6 +19,7 @@ angular.module('myApp.controllers').controller('FileController', [
         $scope.init = function(ctrl, type) {
             vm.ctrl = ctrl;
             vm.graphType = type;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
         };
 
         $scope.$watch(function() {
@@ -34,6 +35,8 @@ angular.module('myApp.controllers').controller('FileController', [
                 QueryService.getMatrixSummary(newValue).then(function(result) {
                     vm.sharedData.matrixSummary = result.matrixSummary;
                 });
+
+                vm.sdWithinTab.selectedTab = 1;
             }
         });
         $scope.$watch(function() {

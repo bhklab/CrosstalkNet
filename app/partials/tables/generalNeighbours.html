@@ -1,5 +1,5 @@
-<div ng-repeat="x in [] | range:vm.neighbours.length-1">
-    <md-card ng-show="vm.cy != null && vm.cy.edges() != null ">
+<div ng-repeat="x in [] | range:vm.sdWithinTab.neighbours.length-1">
+    <md-card ng-show="vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null ">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -12,25 +12,25 @@
                 </div>
                  -->
                 </div>
-                <span class="md-subhead">Total: {{vm.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
             </md-card-title-text>
         </md-card-title>
         <md-card-content class="table-card-height">
-            <table ng-if="vm.neighbours[x].epi.length * vm.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
+            <table ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
                 <thead>
                     <tr>
                         <th> </th>
-                        <th ng-repeat="stroma in vm.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
+                        <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="epi in vm.neighbours[x].epi">
+                    <tr ng-repeat="epi in vm.sdWithinTab.neighbours[x].epi">
                         <td class="row-name">{{epi | suffixTrim}}</td>
-                        <td ng-repeat="stroma in vm.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)}}</td>
+                        <td ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)}}</td>
                     </tr>
                 </tbody>
             </table>
-            <div ng-if="vm.neighbours[x].epi.length * vm.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
+            <div ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
             <!-- exact table from live demo -->
             <!--
             <md-table-container>

@@ -25,9 +25,6 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
 
         vm.sharedData = SharedService.data.nonDelta;
 
-        vm.resetInputFieldsGlobal = SharedService.methods.global.resetInputFieldsGlobal;
-        vm.resetInputFieldsLocal = SharedService.methods.global.resetInputFieldsLocal;
-
         vm.setPathExplorerGene = function(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
