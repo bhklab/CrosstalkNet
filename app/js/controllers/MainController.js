@@ -2,15 +2,31 @@
 
 angular.module('myApp.controllers').controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'ControlsService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', '$q', '$timeout', '$cookies',
+    'GraphConfigService', 'ControlsService', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
     '$mdDialog',
-    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService,
+    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
         $rootScope.geneLists = { nonDelta: null, delta: null };
         $rootScope.states = angular.copy(ControlsService.states);
         $rootScope.state = $rootScope.states.initial;
 
+        var vm = this;
+        vm.scope = $scope;
+
+        $scope.init = function(ctrl, type) {
+            vm.ctrl = ctrl;
+            vm.graphType = type;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab.display = vm.displayModes.graph;
+        };
+
+        vm.displayModes = angular.copy(ControlsService.displayModes);
+        vm.switchModel = false;
+        vm.sharedData = SharedService.data.nonDelta;
+        vm.changeDisplay = ControlsService.changeDisplay;
+
+        /*
         var vm = this;
         vm.scope = $scope;
         vm.ctrl = "main";
@@ -30,11 +46,11 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         vm.sharedData = SharedService.data.nonDelta;
-        vm.showGraphSummary = false;
         
         vm.clearLocatedGene = SharedService.methods.main.clearLocatedGene;
-        vm.getGeneList = SharedService.methods.main.getGeneList;
-        vm.getFileList = SharedService.methods.main.getFileList;
+        vm.getGeneList = QueryService.getGeneList;
+        vm.getFileList = QueryService.getFileList;
+        vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
 
         vm.closeEdgeInspector = ControlsService.closeEdgeInspector;
         vm.addGeneOfInterest = ControlsService.addGeneOfInterest;
@@ -46,9 +62,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         vm.resetInputFieldsGlobal = ControlsService.resetInputFieldsGlobal;
         vm.resetInputFieldsLocal = ControlsService.resetInputFieldsLocal;
         vm.getNodesWithMinDegree = ControlsService.getNodesWithMinDegree;
-        vm.loadDropdownOptions = ControlsService.loadDropdownOptions;
-        vm.loadGeneListDropdownOptions = ControlsService.loadGeneListDropdownOptions;
-        vm.loadNeighbourDropdownOptions = ControlsService.loadNeighbourDropdownOptions;
         vm.querySearch = ControlsService.querySearch;
 
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
@@ -106,8 +119,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
 
                     $rootScope.state = $rootScope.states.loadingConfig;
                     vm.totalInteractions = data.totalInteractions;
-                    vm.firstNeighbourInteractions = data.firstNeighbourInteractions;
-                    vm.secondNeighbourInteractions = data.secondNeighbourInteractions;
                     if (vm.display == vm.displayModes.table) {
                         vm.needsRedraw = true;
                     }
@@ -135,17 +146,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
                 });
         };
 
-        vm.getOverallMatrixStats = function() {
-            RESTService.post('overall-matrix-stats', { fileName: vm.sharedData.correlationFileActual }).then(function(data) {
-                if (!ValidationService.checkServerResponse(data)) {
-                    return;
-                }
-
-                vm.overallMatrixStats = data.overallMatrixStats;
-                console.log(data);
-            });
-        };
-
         vm.refreshGeneList = function() {
             vm.GOIState = vm.GOIStates.initial;
             vm.closeEdgeInspector(this);
@@ -161,7 +161,7 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
             GraphConfigService.destroyGraph(vm);
 
             vm.getGeneList(vm);
-            vm.getOverallMatrixStats();
+            vm.getOverallMatrixStats(vm);
         };
 
         vm.returnToFirstNeighboursFilter = function() {
@@ -184,6 +184,7 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
             }
         });
 
+        /*
         $scope.$watch(function() {
             return vm.sharedData.reloadFileList;
         }, function(newValue, oldValue) {
@@ -191,6 +192,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
                 vm.getFileList(vm, ['tumor', 'normal']);
                 vm.sharedData.reloadFileList = false;
             }
-        });
+        });*/
     }
 ]);

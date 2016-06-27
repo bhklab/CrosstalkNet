@@ -16,21 +16,21 @@ myModule.factory('TableService', function($http, $rootScope) {
         }
     }
 
-    function setNeighboursGeneral(scope, highestLevel, isExplorer) {
+    function getNeighboursGeneral(vm, highestLevel, isExplorer) {
         var neighbours = [];
 
         for (var i = 1; i <= highestLevel; i++) {
-            var temp = getNeighboursFromEdges(scope, i);
+            var temp = getNeighboursFromEdges(vm, i);
 
             neighbours.push(temp);
         }
 
-        scope.neighbours = neighbours;
+        return neighbours;
     }
 
-    function getNeighboursFromEdges(scope, level) {
+    function getNeighboursFromEdges(vm, level) {
         var neighbours = { epi: new Set(), stroma: new Set() };
-        var edges = scope.cy.filter(function(i, element) {
+        var edges = vm.sdWithinTab.cy.filter(function(i, element) {
             if (element.isEdge() && element.data('neighbourLevel') == level) {
                 return true;
             }

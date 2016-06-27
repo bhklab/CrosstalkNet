@@ -28,27 +28,27 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         vm.elemCopy = angular.copy(config.elements);
         vm.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
-        vm.cy = cytoscape(config);
+        cy = cytoscape(config);
 
-        vm.config = config;
+        vm.sdWithinTab.config = config;
 
-        vm.cy.fit(vm.cy.$("*"), 10);
+        cy.fit(cy.$("*"), 10);
 
-        vm.cy.on('select', 'node', function(evt) {
+        cy.on('select', 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
-            var edges = vm.cy.edges("[source='" + id + "'], [target='" + id + "']");
+            var edges = cy.edges("[source='" + id + "'], [target='" + id + "']");
 
-            vm.cy.batch(function() {
+            cy.batch(function() {
                 for (var i = edges.length - 1; i >= 0; i--) {
                     edges[i].addClass('highlighted-edge');
                     edges[i].removeClass('faded-edge');
                 }
             });
 
-            edges = vm.cy.edges().not("[source='" + id + "'], [target='" + id + "']");
+            edges = cy.edges().not("[source='" + id + "'], [target='" + id + "']");
 
-            vm.cy.batch(function() {
+            cy.batch(function() {
                 for (var i = edges.length - 1; i >= 0; i--) {
                     edges[i].addClass('faded-edge');
                     edges[i].removeClass('highlighted-edge');
@@ -58,7 +58,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             service.selectedItem = null;
         });
 
-        vm.cy.on("tap", "edge", function(evt) {
+        cy.on("tap", "edge", function(evt) {
             var edge = evt.cyTarget;
             vm.selectedEdge = { source: null, target: null, weight: null };
 
@@ -69,14 +69,14 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             });
         });
 
-        vm.cy.on("unselect", 'node', function(evt) {
+        cy.on("unselect", 'node', function(evt) {
             var node = evt.cyTarget;
             var id = node.id();
 
-            service.resetEdges(vm);
+            resetEdges(vm);
         });
 
-        vm.cy.nodes().not(':parent').forEach(function(n) {
+        cy.nodes().not(':parent').forEach(function(n) {
             var g = n.data('id').slice(0, -2);
             n.qtip({
                 content: [{
@@ -105,6 +105,8 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
                 }
             });
         });
+
+        return cy;
     }
 
     function locateGene(vm, gene) {
@@ -114,7 +116,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
         service.clearLocatedGene(vm);
 
-        var node = vm.cy.$("#" + gene.toUpperCase());
+        var node = vm.sdWithinTab.cy.$("#" + gene.toUpperCase());
         var x = node.renderedPosition('x');
         var y = node.renderedPosition('y');
         var allClasses = node[0]._private.classes;
@@ -148,11 +150,11 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
         node.addClass('located');
 
 
-        vm.cy.zoom({
+        vm.sdWithinTab.cy.zoom({
             level: 1.5, // the zoom level
             renderedPosition: { x: x, y: y }
         });
-        vm.cy.center(node);
+        vm.sdWithinTab.cy.center(node);
 
         vm.currentlyZoomed = { node: node, styleClass: colorClass };
     }
@@ -167,9 +169,9 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     }
 
     function resetEdges(vm) {
-        var edges = vm.cy.edges();
+        var edges = vm.sdWithinTab.cy.edges();
 
-        vm.cy.batch(function() {
+        vm.sdWithinTab.cy.batch(function() {
             for (var i = edges.length - 1; i >= 0; i--) {
                 edges[i].removeClass('highlighted-edge');
                 edges[i].removeClass('faded-edge');
@@ -178,17 +180,17 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
     }
 
     function resetZoom(vm) {
-        if (vm.cy != null) {
-            vm.cy.fit(vm.cy.$("*"), 10);
+        if (vm.sdWithinTab.cy != null) {
+            vm.sdWithinTab.cy.fit(vm.sdWithinTab.cy.$("*"), 10);
         }
     }
 
     function destroyGraph(vm) {
-        if (vm.cy) {
-            vm.cy.destroy();
+        if (vm.sdWithinTab.cy) {
+            vm.sdWithinTab.cy.destroy();
         }
 
-        vm.cy = null;
+        vm.sdWithinTab.cy = null;
     }
 
     return service;
