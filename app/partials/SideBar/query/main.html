@@ -1,5 +1,5 @@
-<md-content>
-    <div ng-show="vm.ctrl == 'main'" class="md-padding">
+<md-content ng-controller="QueryController as vm" ng-init="vm.initialize('main', 'nonDelta')">
+    <div class="md-padding">
         <div>
             <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
                 Click Reset Genes To Add More Genes
@@ -42,10 +42,10 @@
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="vm.getRelevantGenes(true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.getRelevantGenes(vm, true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.getRelevantGenes(false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.getRelevantGenes(vm, false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
                 <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="vm.GOIState >= vm.GOIStates.getSecondNeighbours">Back to
                     <br>First Neighbours
                 </md-button>

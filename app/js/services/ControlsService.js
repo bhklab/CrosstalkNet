@@ -44,10 +44,10 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
     service.closeEdgeInspector = closeEdgeInspector;
 
     function changeDisplay(vm) {
-        if (vm.display == vm.displayModes.graph) {
-            vm.display = vm.displayModes.table;
+        if (vm.sdWithinTab.display == vm.displayModes.graph) {
+            vm.sdWithinTab.display = vm.displayModes.table;
         } else {
-            vm.display = vm.displayModes.graph;
+            vm.sdWithinTab.display = vm.displayModes.graph;
         }
     }
 
@@ -141,7 +141,7 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
 
     function getAllVisibleGenes(vm) {
         var result = [];
-        var nodes = vm.cy.$('node').not(':parent');
+        var nodes = vm.sdWithinTab.cy.$('node').not(':parent');
 
         for (var i = 0; i < nodes.length; i++) {
             result.push(nodes[i].id());
@@ -170,7 +170,6 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
 
     function removeGenesOfInterest(vm) {
         vm.genesOfInterest = [];
-        vm.closeEdgeInspector(vm);
         resetInputFieldsLocal(vm, '');
         resetFilters(vm);
         vm.showGraphSummary = false;

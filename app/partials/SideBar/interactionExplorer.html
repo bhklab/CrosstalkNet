@@ -1,0 +1,23 @@
+<md-sidenav class="md-sidenav-left md-whiteframe-z3" md-component-id="left" md-is-locked-open="true">
+    <md-toolbar class="md-primary md-hue-3">
+        <div layout="row">
+            <div flex class="left-padded">Navigation</div>
+            <div flex style="position: relative;">
+                <md-switch ng-model="vm.switchModel" aria-label="Switch 1" ng-change="vm.changeDisplay(vm)" style="position: absolute; right: 5px;">
+                    {{vm.display}}
+                </md-switch>
+            </div>
+        </div>
+    </md-toolbar>
+    <md-content>
+        <md-tabs md-selected="vm.tabIndex" md-dynamic-height md-border-bottom md-disable-animation>
+            <md-tab label="Query" class="md-padding">
+                <div static-include="partials/SideBar/query/interactionExplorer.html"></div>
+            </md-tab>
+            <md-tab label="Styling">
+                <div static-include="partials/SideBar/layout/interactionExplorer.html"></div>
+            </md-tab>
+        </md-tabs>
+    </md-content>
+</md-sidenav>
+
