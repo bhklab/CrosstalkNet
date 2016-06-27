@@ -8,7 +8,7 @@ angular.module('myApp', [
   'md.data.table',
   'myApp.controllers',
   'myApp.filters',
-  'myApp.services'
+  'myApp.services',
 ]).config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
     .primaryPalette('light-blue', {
@@ -23,3 +23,4 @@ angular.module('myApp', [
 angular.module('myApp.filters', []);
 angular.module('myApp.controllers', []);
 angular.module('myApp.services', []);
+angular.module('myApp.mainGraph', []);

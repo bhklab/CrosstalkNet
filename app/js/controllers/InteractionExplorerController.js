@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.controllers').controller('NeighbourController', [
+angular.module('myApp.controllers').controller('InteractionExplorerController', [
     '$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'ExportService', 'SharedService', 'TableService', '$q', '$timeout',
@@ -49,24 +49,10 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         vm.querySearch = ControlsService.querySearch;
         vm.getAllVisibleGenes = ControlsService.getAllVisibleGenes;
         vm.closeEdgeInspector = ControlsService.closeEdgeInspector;
+        vm.changeDisplay = ControlsService.changeDisplay;
 
-        vm.init = function(whichController) {
-            vm.whichController = whichController;
-        };
+        vm.locateGene = GraphConfigService.locateGene;
 
-        vm.locateGene = function(vm, gene) {
-            if (gene != null && gene != '') {
-                vm.findGeneInGraph(vm, gene);
-            }
-        };
-
-        vm.changeDisplay = function() {
-            if (vm.display == vm.displayModes.graph) {
-                vm.display = vm.displayModes.table;
-            } else {
-                vm.display = vm.displayModes.graph;
-            }
-        };
 
         vm.addGeneOfInterest = function(gene) {
             if (gene != null) {
@@ -145,7 +131,7 @@ angular.module('myApp.controllers').controller('NeighbourController', [
         };
 
         vm.resetDisplayedData = function() {
-            vm.closeEdgeInspector();
+            vm.closeEdgeInspector(vm);
             vm.allVisibleGenes = [];
             vm.explorerGenes = [];
             vm.selfLoops = [];
@@ -154,8 +140,6 @@ angular.module('myApp.controllers').controller('NeighbourController', [
             vm.clearLocatedGene();
             vm.showGraphSummary = false;
         };
-
-        vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
 
         $rootScope.$watch(function() {
             return vm.sharedData.correlationFileActual;

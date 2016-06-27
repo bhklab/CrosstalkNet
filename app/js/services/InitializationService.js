@@ -37,9 +37,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Cont
 
         vm.selectedLayout = vm.layouts.main[0].value;
 
-        vm.sliderMinWeightNegative = -1;
-        vm.sliderMaxWeightPositive = 1;
-
         vm.correlationFilterModel = {
             min: -1,
             max: 1,
@@ -51,9 +48,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Cont
 
         vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
         vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-
-        vm.negativeFilterEnabled = false;
-        vm.positiveFilterEnabled = false;
 
         vm.findGeneInGraph = GraphConfigService.findGeneInGraph;
         vm.getInteractingNodes = GraphConfigService.getInteractingNodes;
@@ -72,19 +66,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Cont
         };
 
         vm.GOIState = vm.GOIStates.initial;
-
-        vm.firstNeighbourInteractions = [];
-        vm.secondNeighbourInteractions = [];
-
-        vm.firstNeighbours = {
-            epi: [],
-            stroma: []
-        };
-
-        vm.secondNeighbours = {
-            epi: [],
-            stroma: []
-        };
 
         vm.exportTableToCSV = function(tableID) {
             $("." + tableID).tableToCSV();

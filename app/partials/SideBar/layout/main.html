@@ -1,9 +1,9 @@
-<md-content class="md-padding">
+<md-content ng-controller="LayoutController as vm" ng-init="init('main', 'nonDelta')" class="md-padding">
     <div layout="row">
         <div flex>
             <md-input-container class="select">
                 <label>Layout</label>
-                <md-select ng-change="vm.getRelevantGenes(true)" ng-model="vm.selectedLayout">
+                <md-select ng-model="vm.sdWithinTab.selectedLayout">
                     <md-option ng-repeat="layout in vm.layouts.main" value="{{layout.value}}" ng-selected="layout.value == 'preset'">
                         {{layout.display}}
                     </md-option>

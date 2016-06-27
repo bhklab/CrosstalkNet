@@ -23,6 +23,7 @@ var jwt = require('jsonwebtoken');
 // var User = require('user');
 var databaseConfigUtils = require('databaseConfigUtils');
 var bcrypt = require('bcrypt');
+var morgan = require('morgan')
 
 //mongoose.connect(databaseConfigUtils.database);
 
@@ -33,8 +34,8 @@ var availableMatrices = {};
 //   cert: fs.readFileSync('cert.pem')
 // };
 
-
 app.use('/app', express.static(__dirname + '/app'));
+app.use(morgan('combined'));
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
