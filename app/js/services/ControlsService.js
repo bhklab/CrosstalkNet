@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
+myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphConfigService, SharedService) {
     var service = {};
 
     service.states = {
@@ -111,7 +111,7 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
     }
 
     function closeEdgeInspector(vm) {
-        vm.selectedEdge = {};
+        vm.sdWithinTab.selectedEdge = {};
     }
 
     function createFilterFor(query) {
@@ -170,9 +170,10 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout) {
 
     function removeGenesOfInterest(vm) {
         vm.genesOfInterest = [];
+        GraphConfigService.destroyGraph(vm);
         resetInputFieldsLocal(vm, '');
         resetFilters(vm);
-        vm.showGraphSummary = false;
+        SharedService.resetWTM(vm);
     }
 
     function resetInputFieldsGlobal(vm) {

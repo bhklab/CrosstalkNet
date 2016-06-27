@@ -7,17 +7,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     service.data.delta = angular.copy(dataModel);
     service.data.nonDelta = angular.copy(dataModel);
 
-    service.data.main = {
-        cy: null,
-        display: null,
-        neighbours: null,
-        selectedLayout: null,
-        graphSummary: null,
-        selfLoops: null,
-        selectedTab: 0,
-        showGraphSummary: false
-    };
-    service.data.interaction = {
+    var withinTabModel = {
         cy: null,
         display: null,
         neighbours: null,
@@ -28,7 +18,19 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         showGraphSummary: false
     };
 
-    service.methods = { main: {}, neighbour: {}, path: {}, global: {} };
+    service.data.main = angular.copy(withinTabModel);
+    service.data.interaction = angular.copy(withinTabModel);
+
+    service.resetWTM = resetWTM;
+
+    function resetWTM(vm) {
+        for (var prop in withinTabModel) {
+            if (prop != "display") {
+                vm.sdWithinTab[prop] = withinTabModel[prop];
+            }
+        }
+    }
+
 
     return service;
 });
