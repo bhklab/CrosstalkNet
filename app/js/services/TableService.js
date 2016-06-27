@@ -3,14 +3,14 @@ myModule.factory('TableService', function($http, $rootScope) {
     var service = {};
 
     service.getInteractionViaDictionary = getInteractionViaDictionary;
-    service.setNeighboursGeneral = setNeighboursGeneral;
+    service.getNeighboursGeneral = getNeighboursGeneral;
     service.getNeighboursFromEdges = getNeighboursFromEdges;
 
     function getInteractionViaDictionary(vm, source, target) {
-        if (vm.edgeDictionary[source] != null && vm.edgeDictionary[source][target] != null) {
-            return vm.edgeDictionary[source][target];
-        } else if (vm.edgeDictionary[target] != null && vm.edgeDictionary[target][source] != null) {
-            return vm.edgeDictionary[target][source];
+        if (vm.sdWithinTab.edgeDictionary[source] != null && vm.sdWithinTab.edgeDictionary[source][target] != null) {
+            return vm.sdWithinTab.edgeDictionary[source][target];
+        } else if (vm.sdWithinTab.edgeDictionary[target] != null && vm.sdWithinTab.edgeDictionary[target][source] != null) {
+            return vm.sdWithinTab.edgeDictionary[target][source];
         } else {
             return 0;
         }

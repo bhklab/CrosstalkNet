@@ -25,6 +25,10 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         vm.switchModel = false;
         vm.sharedData = SharedService.data.nonDelta;
         vm.changeDisplay = ControlsService.changeDisplay;
+        vm.closeEdgeInspector = ControlsService.closeEdgeInspector;
+        vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
+        vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
+        vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         /*
         var vm = this;

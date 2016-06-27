@@ -61,7 +61,7 @@ myModule.factory('ExportService', function($http, $filter) {
 
     function exportNeighboursToCSV(vm, index) {
         var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
-        var neighbours = vm.neighbours[index];
+        var neighbours = vm.sdWithinTab.neighbours[index];
         var rowDelim = "\r\n";
         var colDelim = ",";
         var csv = "";
@@ -92,12 +92,12 @@ myModule.factory('ExportService', function($http, $filter) {
     }
 
     function exportGraphToPNG(vm) {
-        if (vm.cy == null) {
+        if (vm.sdWithinTab.cy == null) {
             return;
         }
 
         var fileName = "graph" + Date.now() + ".png";
-        var png64 = vm.cy.png();
+        var png64 = vm.sdWithinTab.cy.png();
 
         var link = document.createElement("a");
         link.setAttribute("href", png64);
