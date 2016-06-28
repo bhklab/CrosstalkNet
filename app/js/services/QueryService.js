@@ -6,6 +6,8 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
     service.getFileList = getFileList;
     service.getMatrixSummary = getMatrixSummary;
     service.getRelevantGenes = getRelevantGenes;
+    service.getInteractionExplorerConfig = getInteractionExplorerConfig;
+    service.getAllPaths = getAllPaths;
 
     function getGeneList(fileName) {
         $rootScope.state = $rootScope.states.gettingGeneList;
@@ -51,12 +53,11 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
     }
 
     function getRelevantGenes(vm, filter) {
+        var deferred = $q.defer();
         var filterFirst = false;
         var filterSecond = false;
         var depth = 1;
         $rootScope.state = $rootScope.states.loadingGraph;
-        vm.sdWithinTab.showGraphSummary = false;
-        GlobalControls.closeEdgeInspector(vm);
 
         if (vm.GOIState == vm.GOIStates.filterFirst) {
             if (filter == false) {
@@ -98,37 +99,58 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
             })
             .then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
-                    return;
+                    deferred.resolve({ data: null });
                 }
 
-                $rootScope.state = $rootScope.states.loadingConfig;
-                vm.totalInteractions = data.totalInteractions;
-                if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
-                    vm.needsRedraw = true;
-                }
-                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, data.config, "cyMain" + vm.graphType);
-
-                vm.sdWithinTab.edgeDictionary = data.edgeDictionary;
-                vm.sdWithinTab.selfLoops = data.selfLoops;
-                vm.allVisibleGenes = vm.getAllVisibleGenes(vm);
-                vm.sdWithinTab.showGraphSummary = true;
-                $rootScope.state = $rootScope.states.showingGraph;
-
-                if (vm.GOIState == vm.GOIStates.initial) {
-                    vm.correlationFilterFirst.min = data.minNegativeWeight;
-                    vm.correlationFilterFirst.max = data.maxPositiveWeight;
-                    vm.GOIState = vm.GOIStates.filterFirst;
-                } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
-                    vm.correlationFilterSecond.min = data.minNegativeWeight;
-                    vm.correlationFilterSecond.max = data.maxPositiveWeight;
-                    vm.GOIState = vm.GOIStates.getSecondNeighbours;
-                } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
-                    vm.GOIState = vm.GOIStates.filterSecond;
-                }
-
-                vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, depth, false);
+                deferred.resolve({ data: data, depth: depth });
             });
-    };
+
+        return deferred.promise;
+    }
+
+    function getInteractionExplorerConfig(vm) {
+        var deferred = $q.defer();
+        var level = vm.genesOfInterest.length;
+        $rootScope.state = $rootScope.states.loadingGraph;
+        RESTService.post('neighbour-general', {
+            layout: vm.sdWithinTab.selectedLayout,
+            selectedGenes: vm.genesOfInterest,
+            fileName: vm.sharedData.correlationFileActual
+        }).then(function(data) {
+            if (!ValidationService.checkServerResponse(data)) {
+                deferred.resolve({ data: null });
+            }
+
+            deferred.resolve({ data: data, level: level });
+        });
+
+        return deferred.promise;
+    }
+
+    function getAllPaths() {
+        var deferred = $q.defer();
+
+        if (vm.pathExplorerTarget == null || vm.pathExplorerSource == null) {
+            alert("Please select a source and target gene.");
+            return;
+        }
+
+        $rootScope.state = $rootScope.states.gettingAllPaths;
+
+        RESTService.post('get-all-paths', {
+            target: vm.pathExplorerTarget.value,
+            source: vm.pathExplorerSource.value,
+            fileName: vm.sharedData.correlationFileActual
+        }).then(function(data) {
+            if (!ValidationService.checkServerResponse(data)) {
+                deferred.resolve({ allPaths: null });
+            }
+
+            deferred.resolve({ allPaths: allPaths});
+        });
+
+        return deferred.promise;
+    }
 
     return service;
 });

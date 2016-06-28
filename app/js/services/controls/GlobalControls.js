@@ -29,69 +29,70 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
-    service.querySearch = querySearch;
+    // service.querySearch = querySearch;
+
+    // service.clearLocatedGene = clearLocatedGene;
+    service.changeDisplay = changeDisplay;
+    service.closeEdgeInspector = closeEdgeInspector;
     service.getAllVisibleGenes = getAllVisibleGenes;
     service.resetInputFieldsGlobal = resetInputFieldsGlobal;
     service.resetInputFieldsLocal = resetInputFieldsLocal;
-    service.changeDisplay = changeDisplay;
-    service.closeEdgeInspector = closeEdgeInspector;
 
-    function changeDisplay(vm) {
-        if (vm.sdWithinTab.display == vm.displayModes.graph) {
-            vm.sdWithinTab.display = vm.displayModes.table;
-        } else {
-            vm.sdWithinTab.display = vm.displayModes.graph;
-        }
-    }
+    service.setMethodsSideBar = setMethodsSideBar;
+    service.setMethodsWholeTab = setMethodsWholeTab;
 
-    function querySearch(query, source, scope) {
-        var results = [];
-        var deferred;
 
-        if (source == "locate") {
-            if (scope.allVisibleGenes != null) {
-                results = query ? scope.allVisibleGenes.filter(createFilterFor(query)) :
-                    scope.allVisibleGenes,
-                    deferred;
+    function setMethodsSideBar(vm) {
+        vm.querySearch = function(query, source) {
+            var results = [];
+            var deferred;
+
+            if (source == "locate") {
+                if (vm.allVisibleGenes != null) {
+                    results = query ? vm.allVisibleGenes.filter(createFilterFor(query)) :
+                        vm.allVisibleGenes,
+                        deferred;
+                }
+            } else if (source == "explorer") {
+                if (vm.explorerGenes != null) {
+                    results = query ? vm.explorerGenes.filter(createFilterFor(query)) :
+                        vm.explorerGenes,
+                        deferred;
+                }
+            } else if (source == "geneList") {
+                if (vm.sharedData.geneList != null) {
+                    results = query ? vm.sharedData.geneList.filter(createFilterFor(query)) :
+                        vm.sharedData.geneList,
+                        deferred;
+                }
             }
-        } else if (source == "explorer") {
-            if (scope.explorerGenes != null) {
-                results = query ? scope.explorerGenes.filter(createFilterFor(query)) :
-                    scope.explorerGenes,
-                    deferred;
-            }
-        } else if (source == "geneList") {
-            if (scope.sharedData.geneList != null) {
-                results = query ? scope.sharedData.geneList.filter(createFilterFor(query)) :
-                    scope.sharedData.geneList,
-                    deferred;
-            }
-        }
 
-        if (self.simulateQuery) {
-            deferred = $q.defer();
-            $timeout(function() { deferred.resolve(results); }, Math.random() *
-                1000, false);
-            return deferred.promise;
-        } else {
-            return results;
-        }
-    }
-
-    function closeEdgeInspector(vm) {
-        vm.sdWithinTab.selectedEdge = {};
-    }
-
-    function createFilterFor(query) {
-        var lowercaseQuery = angular.lowercase(query);
-        return function filterFn(gene) {
-            if (gene.value != null) {
-                return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);
+            if (self.simulateQuery) {
+                deferred = $q.defer();
+                $timeout(function() { deferred.resolve(results); }, Math.random() *
+                    1000, false);
+                return deferred.promise;
             } else {
-                return (angular.lowercase(gene).indexOf(lowercaseQuery) === 0);
+                return results;
             }
-
         };
+
+        vm.clearLocatedGene = function() {
+            service.resetInputFieldsLocal(vm, 'geneLocator');
+            GraphConfigService.clearLocatedGene(vm);
+        };
+
+        function createFilterFor(query) {
+            var lowercaseQuery = angular.lowercase(query);
+            return function filterFn(gene) {
+                if (gene.value != null) {
+                    return (angular.lowercase(gene.value).indexOf(lowercaseQuery) === 0);
+                } else {
+                    return (angular.lowercase(gene).indexOf(lowercaseQuery) === 0);
+                }
+
+            };
+        }
     }
 
     function getAllVisibleGenes(vm) {
@@ -142,6 +143,22 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
         if (document.activeElement != null) {
             document.activeElement.blur();
         }
+    }
+
+    function closeEdgeInspector(vm) {
+        vm.sdWithinTab.selectedEdge = {};
+    }
+
+    function changeDisplay(vm) {
+        if (vm.sdWithinTab.display == vm.displayModes.graph) {
+            vm.sdWithinTab.display = vm.displayModes.table;
+        } else {
+            vm.sdWithinTab.display = vm.displayModes.graph;
+        }
+    }
+
+    function setMethodsWholeTab(vm) {
+
     }
 
     return service;

@@ -18,7 +18,7 @@
                 <div static-include="partials/SideBar/query/main.html"></div>
             </md-tab>
             <md-tab label="Styling">
-                <div static-include="partials/SideBar/layout/main.html"></div>
+                <div ng-controller="LayoutController as vm" ng-init="init('main', 'nonDelta')" static-include="partials/SideBar/layout/main.html"></div>
             </md-tab>
         </md-tabs>
     </md-content>

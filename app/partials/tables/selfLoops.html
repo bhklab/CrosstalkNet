@@ -6,7 +6,7 @@
                 <div flex style="position: relative;">
                     <md-input-container class="no-margin right-aligned">
                         <label>Filter Self Loops</label>
-                        <input ng-model="vm.selfLoopSearch">
+                        <input ng-model="vm.sdWithinTab.selfLoopSearch">
                     </md-input-container>
                 </div>
             </div>
@@ -14,6 +14,6 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content layout="row" layout-wrap>
-        <div flex="20" ng-repeat="gene in vm.sdWithinTab.selfLoops | filter: vm.selfLoopSearch track by $index">{{gene}}</div>
+        <div flex="20" ng-repeat="gene in vm.sdWithinTab.selfLoops | filter: vm.sdWithinTab.selfLoopSearch track by $index">{{gene}}</div>
     </md-card-content>
 </md-card>
