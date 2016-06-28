@@ -29,7 +29,9 @@
     <script src="app.js"></script>
     <script src="js/controllers/sidebar/FileController.js"></script>
     <script src="js/controllers/sidebar/LayoutController.js"></script>
-    <script src="js/controllers/sidebar/QueryController.js"></script>
+    <script src="js/controllers/sidebar/IEQueryController.js"></script>
+    <script src="js/controllers/sidebar/MGQueryController.js"></script>
+    <script src="js/controllers/sidebar/PEQueryController.js"></script>
     <script src="js/controllers/DeltaNetworkController.js"></script>
     <script src="js/controllers/LoginController.js"></script>
     <script src="js/controllers/MainController.js"></script>
@@ -37,6 +39,8 @@
     <script src="js/controllers/PathExistenceController.js"></script>
     <script src="js/services/controls/GlobalControls.js"></script>
     <script src="js/services/controls/MainGraphControls.js"></script>
+    <script src="js/services/controls/InteractionExplorerControls.js"></script>
+    <script src="js/services/controls/PathExistenceControls.js"></script>
     <script src="js/services/ExportService.js"></script>
     <script src="js/services/GraphConfigService.js"></script>
     <script src="js/services/RESTService.js"></script>
@@ -73,7 +77,7 @@
         <md-content>
             <md-tabs md-selected="selectedTab" md-dynamic-height md-border-bottom md-disable-animation md-enable-disconnect="true">
                 <md-tab label="Main Graph">
-                    <md-content ng-controller="MainController as vm" ng-init="init('main', 'nonDelta')">
+                    <md-content ng-controller="MainController as vm" ng-init="initialize('main', 'nonDelta')">
                         <section layout="row">
                             <div class="md-whiteframe-1dp" static-include="partials/SideBar/main.html">
                             </div>
@@ -92,15 +96,14 @@
                         </section>
                     </md-content>
                 </md-tab>
-                <!--
                 <md-tab label="Interaction Explorer">
-                    <md-content ng-controller="InteractionExplorerController as vm" ng-init="init('nonDelta')">
+                    <md-content ng-controller="InteractionExplorerController as vm" ng-init="initialize('interactionExplorer', 'nonDelta')">
                         <section layout="row">
                             <div static-include="partials/SideBar/interactionExplorer.html">
                             </div>
                             <md-content flex>
-                                <div ng-show="vm.display == vm.displayModes.graph">
-                                    <div style="width: 100%; height:800px; background-color: white;" id="cyNeighbournonDelta"></div>
+                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
+                                    <div style="width: 100%; height:800px; background-color: white;" id="cyInteractionExplorernonDelta"></div>
                                     <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
@@ -109,9 +112,9 @@
                             </md-content>
                         </section>
                     </md-content>
-                </md-tab>-->
+                </md-tab>
                 <md-tab label="Path Existence Viewer">
-                    <md-content ng-controller="PathExistenceController as vm" ng-init="init('nonDelta')">
+                    <md-content ng-controller="PathExistenceController as vm" ng-init="initialize('pathExistence', 'nonDelta')">
                         <section layout="row">
                             <div static-include="partials/SideBar/pathExistence.html">
                             </div>
@@ -119,7 +122,6 @@
                                 <div>
                                 </div>
                                 <div static-include="partials/tableView.html"></div>
-                                <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
                     </md-content>
