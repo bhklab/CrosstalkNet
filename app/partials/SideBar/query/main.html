@@ -1,10 +1,10 @@
-<md-content ng-controller="QueryController as vm" ng-init="vm.initialize('main', 'nonDelta')">
+<md-content ng-controller="MGQueryController as vm" ng-init="vm.initialize('main', 'nonDelta')">
     <div class="md-padding">
         <div>
             <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>
-            <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(vm, item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList', vm) | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
+            <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                 <md-item-template>
                     <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                 </md-item-template>
@@ -15,10 +15,10 @@
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest(vm)" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection(vm)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
             </div>
         </div>
         <div>
@@ -31,7 +31,7 @@
                         </md-button>
                         <md-menu-content width="6">
                             <md-menu-item ng-repeat="item in [1]">
-                                <md-button ng-click="vm.removeGene(vm, gene)">
+                                <md-button ng-click="vm.removeGene(gene)">
                                     Remove Gene
                                 </md-button>
                             </md-menu-item>
@@ -42,10 +42,10 @@
         </div>
         <div layout="row">
             <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="vm.getRelevantGenes(vm, true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.refreshGraph(true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.getRelevantGenes(vm, false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.refreshGraph(false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
                 <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="vm.GOIState >= vm.GOIStates.getSecondNeighbours">Back to
                     <br>First Neighbours
                 </md-button>
@@ -101,7 +101,7 @@
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate', vm)" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate')" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
                 <span md-highlight-text="vm.searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>
@@ -109,7 +109,7 @@
                 No states matching "{{vm.searchTextZoom}}" were found.
             </md-not-found>
         </md-autocomplete>
-        <md-button class="md-raised md-primary" ng-click="vm.clearLocatedGene(vm)">
+        <md-button class="md-raised md-primary" ng-click="vm.clearLocatedGene()">
             <md-tooltip md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>Clear Located Gene

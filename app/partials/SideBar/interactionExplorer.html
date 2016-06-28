@@ -4,18 +4,18 @@
             <div flex class="left-padded">Navigation</div>
             <div flex style="position: relative;">
                 <md-switch ng-model="vm.switchModel" aria-label="Switch 1" ng-change="vm.changeDisplay(vm)" style="position: absolute; right: 5px;">
-                    {{vm.display}}
+                    {{vm.sdWithinTab.display}}
                 </md-switch>
             </div>
         </div>
     </md-toolbar>
     <md-content>
-        <md-tabs md-selected="vm.tabIndex" md-dynamic-height md-border-bottom md-disable-animation>
+        <md-tabs md-selected="vm.sdWithinTab.selectedTab" md-dynamic-height md-border-bottom md-disable-animation>
             <md-tab label="Query" class="md-padding">
                 <div static-include="partials/SideBar/query/interactionExplorer.html"></div>
             </md-tab>
             <md-tab label="Styling">
-                <div static-include="partials/SideBar/layout/interactionExplorer.html"></div>
+                <div ng-controller="LayoutController as vm" ng-init="init('interactionExplorer', 'nonDelta')" static-include="partials/SideBar/layout/main.html"></div>
             </md-tab>
         </md-tabs>
     </md-content>

@@ -1,10 +1,10 @@
 'use strict';
 
-angular.module('myApp.controllers').controller('QueryController', [
+angular.module('myApp.controllers').controller('MGQueryController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService,
+    'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService, TableService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -71,33 +71,36 @@ angular.module('myApp.controllers').controller('QueryController', [
 
         vm.getRelevantGenes = QueryService.getRelevantGenes;
 
-        vm.addGeneOfInterest = MainGraphControls.addGeneOfInterest;
-        vm.removeGene = MainGraphControls.removeGene;
-        vm.removeGenesOfInterest = MainGraphControls.removeGenesOfInterest;
-        vm.resetFilters = MainGraphControls.resetFilters;
-        vm.getNodesWithMinDegree = MainGraphControls.getNodesWithMinDegree;
-        vm.resetGeneSelection = MainGraphControls.resetGeneSelection;
+        MainGraphControls.setMethods(vm);
+        GlobalControls.setMethodsSideBar(vm);
 
-        vm.resetInputFieldsGlobal = GlobalControls.resetInputFieldsGlobal;
-        vm.resetInputFieldsLocal = GlobalControls.resetInputFieldsLocal;
-        vm.querySearch = GlobalControls.querySearch;
-        vm.getAllVisibleGenes = GlobalControls.getAllVisibleGenes;
-        
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
 
-        vm.clearLocatedGene = function() {
-            vm.resetInputFieldsLocal(vm, 'geneLocator');
-            GraphConfigService.clearLocatedGene(vm);
-        };
+        vm.refreshGraph = function(filter) {
+            vm.clearLocatedGene();
+            SharedService.resetWTM(vm);
+            vm.getRelevantGenes(vm, filter).then(function(result) {
+                if (result.data == null) {
+                    return;
+                }
 
-        vm.refreshGraph = function() {
-            vm.getRelevantGenes(vm, true);
-        };
+                $rootScope.state = $rootScope.states.loadingConfig;
+                vm.totalInteractions = result.data.totalInteractions;
+                if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
+                    vm.needsRedraw = true;
+                }
+                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyMain" + vm.graphType);
 
-        vm.returnToFirstNeighboursFilter = function() {
-            vm.GOIState = vm.GOIStates.filterFirst;
-            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+                vm.sdWithinTab.edgeDictionary = result.data.edgeDictionary;
+                vm.sdWithinTab.selfLoops = result.data.selfLoops;
+                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm);
+                vm.sdWithinTab.showGraphSummary = true;
+                $rootScope.state = $rootScope.states.showingGraph;
+
+                vm.advanceGOIState(result.data, result.depth);
+                vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
+            });
         };
 
         $scope.$watch(function() {
@@ -108,7 +111,7 @@ angular.module('myApp.controllers').controller('QueryController', [
             return null;
         }, function(newValue, oldValue) {
             if (newValue != null && oldValue != null && newValue != oldValue) {
-                vm.refreshGraph();    
+                vm.refreshGraph(true);    
             }
         });
 
@@ -129,8 +132,8 @@ angular.module('myApp.controllers').controller('QueryController', [
         }, function(newValue, oldValue) {
             if (newValue == vm.displayModes.graph && newValue != oldValue) {
                 $timeout(function() {
-                    if (vm.sdWithinTab.config != null) {
-                        vm.sdWithinTab.cy.resize();
+                    if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
+                        GraphConfigService.destroyGraph(vm);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain" + vm.graphType);
                     }

@@ -14,7 +14,7 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         var vm = this;
         vm.scope = $scope;
 
-        $scope.init = function(ctrl, type) {
+        $scope.initialize = function(ctrl, type) {
             vm.ctrl = ctrl;
             vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];

@@ -7,60 +7,77 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
         value: "clustered"
     }, { display: "Random", value: "random" }];
 
-    service.getNodesWithMinDegree = getNodesWithMinDegree;
-    service.resetFilters = resetFilters;
-    service.resetGeneSelection = resetGeneSelection;
-    service.removeGenesOfInterest = removeGenesOfInterest;
-    service.removeGene = removeGene;
-    service.addGeneOfInterest = addGeneOfInterest;
+    service.setMethods = setMethods;
 
-    function addGeneOfInterest(vm, gene) {
-        if (gene != null) {
-            if (vm.genesOfInterest.indexOf(gene) < 0) {
-                vm.genesOfInterest.push(gene);
+    function setMethods(vm) {
+        vm.addGeneOfInterest = function(gene) {
+            if (gene != null) {
+                if (vm.genesOfInterest.indexOf(gene) < 0) {
+                    vm.genesOfInterest.push(gene);
+                }
             }
-        }
-    }
+        };
 
-    function getNodesWithMinDegree(scope) {
-        var nodes = scope.cy.nodes();
-        var result = [];
+        vm.getNodesWithMinDegree = function() {
+            var nodes = vm.sdWithinTab.cy.nodes();
+            var result = [];
 
-        for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].data('degree') > scope.minDegree.first) {
-                result.push(nodes[i]);
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].data('degree') > vm.minDegree.first) {
+                    result.push(nodes[i]);
+                }
             }
-        }
 
-        return result;
-    }
+            return result;
+        };
 
-    function resetGeneSelection(vm) {
-        vm.GOIState = vm.GOIStates.initial;
-        resetFilters(vm);
-    }
+        vm.advanceGOIState = function(data, depth) {
+            if (vm.GOIState == vm.GOIStates.initial) {
+                vm.correlationFilterFirst.min = data.minNegativeWeight;
+                vm.correlationFilterFirst.max = data.maxPositiveWeight;
+                vm.GOIState = vm.GOIStates.filterFirst;
+            } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
+                vm.correlationFilterSecond.min = data.minNegativeWeight;
+                vm.correlationFilterSecond.max = data.maxPositiveWeight;
+                vm.GOIState = vm.GOIStates.getSecondNeighbours;
+            } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
+                vm.GOIState = vm.GOIStates.filterSecond;
+            }
+        };
 
-    function resetFilters(vm) {
-        vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
-        vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-    }
+        vm.resetGeneSelection = function() {
+            vm.GOIState = vm.GOIStates.initial;
+            vm.resetFilters();
+        };
 
-    function removeGene(vm, gene) {
-        if (vm.genesOfInterest.length == 1) {
-            removeGenesOfInterest(vm);
-        } else {
-            vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-        }
-    }
+        vm.resetFilters = function() {
+            vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+        };
 
-    function removeGenesOfInterest(vm) {
-        vm.genesOfInterest = [];
-        vm.allVisibleGenes = [];
-        GraphConfigService.destroyGraph(vm);
-        GlobalControls.resetInputFieldsLocal(vm, '');
-        GlobalControls.closeEdgeInspector(vm);
-        resetFilters(vm);
-        SharedService.resetWTM(vm);
+        vm.removeGene = function(gene) {
+            if (vm.genesOfInterest.length == 1) {
+                vm.removeGenesOfInterest();
+            } else {
+                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+            }
+        };
+
+        vm.removeGenesOfInterest = function() {
+            vm.genesOfInterest = [];
+            vm.allVisibleGenes = [];
+            GraphConfigService.destroyGraph(vm);
+            GlobalControls.resetInputFieldsLocal(vm, '');
+            GlobalControls.closeEdgeInspector(vm);
+            vm.clearLocatedGene();
+            vm.resetFilters();
+            SharedService.resetWTM(vm);
+        };
+
+        vm.returnToFirstNeighboursFilter = function() {
+            vm.GOIState = vm.GOIStates.filterFirst;
+            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+        };
     }
 
     return service;

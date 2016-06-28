@@ -1,10 +1,10 @@
-<md-card ng-if="vm.allPaths != null">
+<md-card ng-if="vm.sdWithinTab.allPaths != null">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
-                <div flex><span class="md-headline">All Paths Between {{vm.pathSource}} and {{vm.pathTarget}}</span></div>
+                <div flex><span class="md-headline">All Paths Between {{vm.sdWithinTab.pathSourceCached}} and {{vm.sdWithinTab.pathTargetCached}}</span></div>
             </div>
-            <span class="md-subhead">Total: {{vm.allPaths.length}}</span>
+            <span class="md-subhead">Total: {{vm.sdWithinTab.allPaths.length}}</span>
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
@@ -13,17 +13,17 @@
                 <thead md-head md-order="vm.myOrder">
                     <th md-column>Source</th>
                     <th md-column md-column md-order-by="firstEdge" md-numeric>Correlation</th>
-                    <th ng-if="vm.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
-                    <th ng-if="vm.allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
+                    <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
+                    <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
                     <th md-column>Destination</th>
                 </thead>
                 <tbody md-body>
-                    <tr ng-repeat="path in vm.allPaths | orderBy: vm.myOrder">
-                        <td md-cell>{{vm.pathSource}}</td>
+                    <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.myOrder">
+                        <td md-cell>{{vm.sdWithinTab.pathSourceCached}}</td>
                         <td md-cell>{{path.firstEdge}}</td>
-                        <td md-cell ng-if="vm.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
-                        <td md-cell ng-if="vm.allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
-                        <td md-cell>{{vm.pathTarget}}</td>
+                        <td md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                        <td md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
+                        <td md-cell>{{vm.sdWithinTab.pathTargetCached}}</td>
                     </tr>
                 </tbody>
             </table>

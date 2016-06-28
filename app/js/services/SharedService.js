@@ -15,12 +15,14 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         graphSummary: null,
         selfLoops: null,
         selectedTab: 0,
-        showGraphSummary: false
+        showGraphSummary: false,
+        selectedEdge: null,
+        selfLoopSearch: ""
     };
 
     service.data.main = angular.copy(withinTabModel);
-    service.data.interaction = angular.copy(withinTabModel);
-
+    service.data.interactionExplorer = angular.copy(withinTabModel);
+    service.data.pathExistence = {pathSourceCached: null, pathTargetCached: null, allPaths: null};
     service.resetWTM = resetWTM;
 
     function resetWTM(vm) {
@@ -30,7 +32,6 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
             }
         }
     }
-
 
     return service;
 });
