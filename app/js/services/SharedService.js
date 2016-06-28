@@ -25,7 +25,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     function resetWTM(vm) {
         for (var prop in withinTabModel) {
-            if (prop != "display") {
+            if (prop != "display" && prop != "selectedTab" && prop != "selectedLayout") {
                 vm.sdWithinTab[prop] = withinTabModel[prop];
             }
         }

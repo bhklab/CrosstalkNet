@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('PathExistenceController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, InitializationService, ValidationService, SharedService,
+    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -12,7 +12,7 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
         vm.ctrl = "pathExistence";
         vm.graphType = "nonDelta";
 
-        InitializationService.initializeCommonVariables(vm);
+        //InitializationService.initializeCommonVariables(vm);
 
         vm.genesOfInterest = [];
         vm.pathExplorerSource = null;

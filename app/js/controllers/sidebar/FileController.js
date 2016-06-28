@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('FileController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, InitializationService, ValidationService, SharedService, QueryService,
+    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -25,7 +25,7 @@ angular.module('myApp.controllers').controller('FileController', [
         $scope.$watch(function() {
             return vm.sharedData.correlationFileActual;
         }, function(newValue, oldValue) {
-            ControlsService.resetInputFieldsGlobal(vm);
+            GlobalControls.resetInputFieldsGlobal(vm);
 
             if (newValue != "" && newValue != null && newValue != oldValue) {
                 QueryService.getGeneList(newValue).then(function(result) {

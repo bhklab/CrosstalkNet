@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService, ControlsService, TableService) {
+myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService, GlobalControls, TableService) {
     var service = {};
 
     service.getGeneList = getGeneList;
@@ -56,6 +56,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         var depth = 1;
         $rootScope.state = $rootScope.states.loadingGraph;
         vm.sdWithinTab.showGraphSummary = false;
+        GlobalControls.closeEdgeInspector(vm);
 
         if (vm.GOIState == vm.GOIStates.filterFirst) {
             if (filter == false) {
@@ -102,7 +103,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
 
                 $rootScope.state = $rootScope.states.loadingConfig;
                 vm.totalInteractions = data.totalInteractions;
-                if (vm.sdWithinTab.display == ControlsService.displayModes.table) {
+                if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
                     vm.needsRedraw = true;
                 }
                 vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, data.config, "cyMain" + vm.graphType);
