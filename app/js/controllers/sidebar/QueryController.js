@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('QueryController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'ControlsService', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, ControlsService, InitializationService, ValidationService, SharedService, QueryService,
+    'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -44,7 +44,7 @@ angular.module('myApp.controllers').controller('QueryController', [
             vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
             vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
 
-            vm.displayModes = angular.copy(ControlsService.displayModes);
+            vm.displayModes = angular.copy(GlobalControls.displayModes);
 
             vm.genesOfInterest = [];
 
@@ -71,17 +71,18 @@ angular.module('myApp.controllers').controller('QueryController', [
 
         vm.getRelevantGenes = QueryService.getRelevantGenes;
 
-        vm.addGeneOfInterest = ControlsService.addGeneOfInterest;
-        vm.removeGene = ControlsService.removeGene;
-        vm.removeGenesOfInterest = ControlsService.removeGenesOfInterest;
-        vm.resetFilters = ControlsService.resetFilters;
-        vm.resetGeneSelection = ControlsService.resetGeneSelection;
-        vm.resetInputFieldsGlobal = ControlsService.resetInputFieldsGlobal;
-        vm.resetInputFieldsLocal = ControlsService.resetInputFieldsLocal;
-        vm.getNodesWithMinDegree = ControlsService.getNodesWithMinDegree;
-        vm.querySearch = ControlsService.querySearch;
+        vm.addGeneOfInterest = MainGraphControls.addGeneOfInterest;
+        vm.removeGene = MainGraphControls.removeGene;
+        vm.removeGenesOfInterest = MainGraphControls.removeGenesOfInterest;
+        vm.resetFilters = MainGraphControls.resetFilters;
+        vm.getNodesWithMinDegree = MainGraphControls.getNodesWithMinDegree;
+        vm.resetGeneSelection = MainGraphControls.resetGeneSelection;
 
-        vm.getAllVisibleGenes = ControlsService.getAllVisibleGenes;
+        vm.resetInputFieldsGlobal = GlobalControls.resetInputFieldsGlobal;
+        vm.resetInputFieldsLocal = GlobalControls.resetInputFieldsLocal;
+        vm.querySearch = GlobalControls.querySearch;
+        vm.getAllVisibleGenes = GlobalControls.getAllVisibleGenes;
+        
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
 
@@ -100,12 +101,15 @@ angular.module('myApp.controllers').controller('QueryController', [
         };
 
         $scope.$watch(function() {
-            if (vm.sdWithinTab) {
+            if (vm.sdWithinTab && (vm.genesOfInterest != null && vm.genesOfInterest.length > 0) ||
+                (vm.sdWithinTab != null && vm.sdWithinTab.selectedLayout != null && vm.GOIState != vm.GOIStates.initial)) {
                 return vm.sdWithinTab.selectedLayout;
             }
             return null;
         }, function(newValue, oldValue) {
-            vm.refreshGraph();
+            if (newValue != null && oldValue != null && newValue != oldValue) {
+                vm.refreshGraph();    
+            }
         });
 
         $scope.$watch(function() {

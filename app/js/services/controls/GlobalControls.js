@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphConfigService, SharedService) {
+myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphConfigService, SharedService) {
     var service = {};
 
     service.states = {
@@ -29,18 +29,11 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphC
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
-    service.loadExplorerDropdownOptions = loadExplorerDropdownOptions;
     service.querySearch = querySearch;
-    service.getNodesWithMinDegree = getNodesWithMinDegree;
     service.getAllVisibleGenes = getAllVisibleGenes;
     service.resetInputFieldsGlobal = resetInputFieldsGlobal;
     service.resetInputFieldsLocal = resetInputFieldsLocal;
-    service.resetFilters = resetFilters;
-    service.resetGeneSelection = resetGeneSelection;
-    service.removeGenesOfInterest = removeGenesOfInterest;
-    service.removeGene = removeGene;
     service.changeDisplay = changeDisplay;
-    service.addGeneOfInterest = addGeneOfInterest;
     service.closeEdgeInspector = closeEdgeInspector;
 
     function changeDisplay(vm) {
@@ -49,31 +42,6 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphC
         } else {
             vm.sdWithinTab.display = vm.displayModes.graph;
         }
-    }
-
-    function addGeneOfInterest(vm, gene) {
-        if (gene != null) {
-            if (vm.genesOfInterest.indexOf(gene) < 0) {
-                vm.genesOfInterest.push(gene);
-            }
-        }
-    }
-
-    function loadExplorerDropdownOptions(scope, selectedGenes) {
-        var genes = [];
-
-        scope.cy.edges("[source='" + selectedGenes[selectedGenes.length - 1].value + "']").forEach(function(
-            edge) {
-            genes.push(edge.target().data());
-        });
-
-        return genes.map(function(gene) {
-            return {
-                value: gene.id,
-                display: gene.id + ' ' + gene.degree,
-                object: gene
-            };
-        });
     }
 
     function querySearch(query, source, scope) {
@@ -126,19 +94,6 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphC
         };
     }
 
-    function getNodesWithMinDegree(scope) {
-        var nodes = scope.cy.nodes();
-        var result = [];
-
-        for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].data('degree') > scope.minDegree.first) {
-                result.push(nodes[i]);
-            }
-        }
-
-        return result;
-    }
-
     function getAllVisibleGenes(vm) {
         var result = [];
         var nodes = vm.sdWithinTab.cy.$('node').not(':parent');
@@ -148,32 +103,6 @@ myModule.factory('ControlsService', function($http, $rootScope, $timeout, GraphC
         }
 
         return result;
-    }
-
-    function resetGeneSelection(vm) {
-        vm.GOIState = vm.GOIStates.initial;
-        resetFilters(vm);
-    }
-
-    function resetFilters(vm) {
-        vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
-        vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-    }
-
-    function removeGene(vm, gene) {
-        if (vm.genesOfInterest.length == 1) {
-            removeGenesOfInterest(vm);
-        } else {
-            vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-        }
-    }
-
-    function removeGenesOfInterest(vm) {
-        vm.genesOfInterest = [];
-        GraphConfigService.destroyGraph(vm);
-        resetInputFieldsLocal(vm, '');
-        resetFilters(vm);
-        SharedService.resetWTM(vm);
     }
 
     function resetInputFieldsGlobal(vm) {
