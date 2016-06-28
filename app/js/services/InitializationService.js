@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('InitializationService', function($http, $timeout, Upload, ControlsService, GraphConfigService, SharedService) {
+myModule.factory('InitializationService', function($http, $timeout, Upload, GraphConfigService, SharedService) {
     var service = {};
 
     service.initializeCommonVariables = initializeCommonVariables;
@@ -21,9 +21,6 @@ myModule.factory('InitializationService', function($http, $timeout, Upload, Cont
         vm.searchTextZoom = "";
         vm.minPositiveWeight = 0;
         vm.minNegativeWeight = 0;
-
-        vm.layouts = angular.copy(ControlsService.layouts);
-        vm.displayModes = angular.copy(ControlsService.displayModes);
 
         vm.minDegree = {
             first: 0,
