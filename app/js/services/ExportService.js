@@ -7,6 +7,7 @@ myModule.factory('ExportService', function($http, $filter) {
     service.exportGraphToPNG = exportGraphToPNG;
 
     function exportTableToCSV($table, filename) {
+        var filename = "allPaths" + Date.now() + ".csv";
         var $headers = $table.find('tr:has(th)'),
             $rows = $table.find('tr:has(td)')
             // Temporary delimiter characters unlikely to be typed by keyboard
