@@ -7,8 +7,8 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
-        <div>Interactor #1: {{vm.sdWithinTab.selectedEdge.source}}</div>
-        <div>Interactor #2: {{vm.sdWithinTab.selectedEdge.target}}</div>
+        <div>Interactor #1: <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.selectedEdge.source | suffixTrim}}">{{vm.sdWithinTab.selectedEdge.source}}</a></div>
+        <div>Interactor #2: <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.selectedEdge.target | suffixTrim}}">{{vm.sdWithinTab.selectedEdge.target}}</a></div>
         <div>Correlation: {{vm.sdWithinTab.selectedEdge.weight}}</div>
         <md-button ng-click="vm.closeEdgeInspector(vm)">Close</md-button>
     </md-card-content>
