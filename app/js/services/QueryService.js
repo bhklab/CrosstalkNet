@@ -127,13 +127,8 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         return deferred.promise;
     }
 
-    function getAllPaths() {
+    function getAllPaths(vm) {
         var deferred = $q.defer();
-
-        if (vm.pathExplorerTarget == null || vm.pathExplorerSource == null) {
-            alert("Please select a source and target gene.");
-            return;
-        }
 
         $rootScope.state = $rootScope.states.gettingAllPaths;
 
@@ -146,7 +141,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
                 deferred.resolve({ allPaths: null });
             }
 
-            deferred.resolve({ allPaths: allPaths});
+            deferred.resolve({ allPaths: data.paths});
         });
 
         return deferred.promise;

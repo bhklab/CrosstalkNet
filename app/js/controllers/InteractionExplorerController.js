@@ -9,7 +9,7 @@ angular.module('myApp.controllers').controller('InteractionExplorerController', 
         var vm = this;
         vm.scope = $scope;
 
-        $scope.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl, type) {
             vm.ctrl = ctrl;
             vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];

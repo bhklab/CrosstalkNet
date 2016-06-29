@@ -20,8 +20,8 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             vm.pathExplorerSource = null;
             vm.pathExplorerTarget = null;
 
-            vm.pathExplorerTextSource = null;
-            vm.pathExplorerTextTarget = null;
+            vm.pathExplorerTextSource = "";
+            vm.pathExplorerTextTarget = "";
 
             vm.sdWithinTab.allPaths = null;
         }
@@ -46,7 +46,7 @@ angular.module('myApp.controllers').controller('PEQueryController', [
                 return;
             }
 
-            SharedService.resetWTM(vm);
+            SharedService.resetWTMPE(vm);
             vm.sdWithinTab.pathTargetCached = vm.pathExplorerTarget.value;
             vm.sdWithinTab.pathSourceCached = vm.pathExplorerSource.value;
             QueryService.getAllPaths(vm).then(function(result) {
@@ -54,7 +54,7 @@ angular.module('myApp.controllers').controller('PEQueryController', [
                     return;
                 }
 
-                vm.sdWithinTab.allPaths = data.allPaths;
+                vm.sdWithinTab.allPaths = result.allPaths;
                 $rootScope.state = $rootScope.states.finishedGettingAllPaths;
             });
         }
