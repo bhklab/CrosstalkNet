@@ -32,24 +32,23 @@
     <script src="js/controllers/sidebar/IEQueryController.js"></script>
     <script src="js/controllers/sidebar/MGQueryController.js"></script>
     <script src="js/controllers/sidebar/PEQueryController.js"></script>
-    <script src="js/controllers/DeltaNetworkController.js"></script>
-    <script src="js/controllers/LoginController.js"></script>
-    <script src="js/controllers/MainController.js"></script>
-    <script src="js/controllers/InteractionExplorerController.js"></script>
-    <script src="js/controllers/PathExistenceController.js"></script>
+    <script src="js/controllers/wholeTab/LoginController.js"></script>
+    <script src="js/controllers/wholeTab/MainController.js"></script>
+    <script src="js/controllers/wholeTab/InteractionExplorerController.js"></script>
+    <script src="js/controllers/wholeTab/PathExistenceController.js"></script>
     <script src="js/services/controls/GlobalControls.js"></script>
     <script src="js/services/controls/MainGraphControls.js"></script>
     <script src="js/services/controls/InteractionExplorerControls.js"></script>
     <script src="js/services/controls/PathExistenceControls.js"></script>
-    <script src="js/services/ExportService.js"></script>
-    <script src="js/services/GraphConfigService.js"></script>
-    <script src="js/services/RESTService.js"></script>
-    <script src="js/services/FileUploadService.js"></script>
-    <script src="js/services/InitializationService.js"></script>
-    <script src="js/services/SharedService.js"></script>
-    <script src="js/services/QueryService.js"></script>
-    <script src="js/services/ValidationService.js"></script>
-    <script src="js/services/TableService.js"></script>
+    <script src="js/services/functionality/ExportService.js"></script>
+    <script src="js/services/functionality/GraphConfigService.js"></script>
+    <script src="js/services/functionality/RESTService.js"></script>
+    <script src="js/services/functionality/FileUploadService.js"></script>
+    <script src="js/services/functionality/InitializationService.js"></script>
+    <script src="js/services/functionality/SharedService.js"></script>
+    <script src="js/services/functionality/QueryService.js"></script>
+    <script src="js/services/functionality/ValidationService.js"></script>
+    <script src="js/services/functionality/TableService.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
     <script src="js/filters/rangeFilter.js"></script>
@@ -84,13 +83,13 @@
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
                                     <div style="width: 100%; height:800px; background-color: white;" id="cyMainnonDelta"></div>
-                                    <div class="card-side-by-side" static-include="partials/overallMatrixSummary.html"></div>
-                                    <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/overallMatrixSummary.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
-                                    <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div static-include="partials/tableView.html"></div>
+                                <div static-include="partials/tables/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
@@ -104,11 +103,11 @@
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
                                     <div style="width: 100%; height:800px; background-color: white;" id="cyInteractionExplorernonDelta"></div>
-                                    <div class="card-side-by-side" static-include="partials/graphSummary.html"></div>
-                                    <div class="card-side-by-side" static-include="partials/edgeInspectorTile.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div static-include="partials/tableView.html"></div>
+                                <div static-include="partials/tables/tableView.html"></div>
                             </md-content>
                         </section>
                     </md-content>
@@ -119,7 +118,7 @@
                             <div static-include="partials/SideBar/pathExistence.html">
                             </div>
                             <md-content flex>
-                                <div static-include="partials/tableView.html"></div>
+                                <div static-include="partials/tables/tableView.html"></div>
                             </md-content>
                         </section>
                     </md-content>
