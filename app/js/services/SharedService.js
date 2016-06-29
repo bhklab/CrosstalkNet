@@ -20,14 +20,25 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
+    var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null };
+
     service.data.main = angular.copy(withinTabModel);
     service.data.interactionExplorer = angular.copy(withinTabModel);
-    service.data.pathExistence = {pathSourceCached: null, pathTargetCached: null, allPaths: null};
+    service.data.pathExistence = angular.copy(withinTabModelPE);
     service.resetWTM = resetWTM;
+    service.resetWTMPE = resetWTMPE;
 
     function resetWTM(vm) {
         for (var prop in withinTabModel) {
             if (prop != "display" && prop != "selectedTab" && prop != "selectedLayout") {
+                vm.sdWithinTab[prop] = withinTabModel[prop];
+            }
+        }
+    }
+
+    function resetWTMPE(vm) {
+        for (var prop in withinTabModelPE) {
+            if (prop != "display") {
                 vm.sdWithinTab[prop] = withinTabModel[prop];
             }
         }

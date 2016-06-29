@@ -13,10 +13,14 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
             vm.ctrl = ctrl;
             vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
-            initializeVariables();
+            vm.sdWithinTab.display = vm.displayModes.table;
         };
 
+        vm.exportTableToCSV = function(tableID) {
+            $("." + tableID).tableToCSV();
+        };
+
+        vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.sharedData = SharedService.data.nonDelta;
-        vm.exportTableToCSV = ExportService.exportTableToCSV;
     }
 ]);

@@ -56,9 +56,6 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             };
 
             vm.GOIState = vm.GOIStates.initial;
-
-            vm.edgeDictionary = {};
-            vm.selfLoops = [];
             vm.allVisibleGenes = [];
 
             vm.query = {
