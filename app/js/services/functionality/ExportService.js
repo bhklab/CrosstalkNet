@@ -98,7 +98,7 @@ myModule.factory('ExportService', function($http, $filter) {
         }
 
         var fileName = "graph" + Date.now() + ".png";
-        var png64 = vm.sdWithinTab.cy.png();
+        var png64 = vm.sdWithinTab.cy.png({full: true});
 
         var link = document.createElement("a");
         link.setAttribute("href", png64);
