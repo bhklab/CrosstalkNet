@@ -36,7 +36,7 @@ var availableMatrices = {};
 // };
 
 app.use('/app', express.static(__dirname + '/app'));
-app.use(morgan('combined'));
+//app.use(morgan('combined'));
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -96,6 +96,8 @@ app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
     var argsString = "";
     var file;
+
+    console.log(availableMatrices);
 
     if (req.body.fileName.delta != null) {
         file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
@@ -328,9 +330,10 @@ app.post('/delta-interaction-explorer', function(req, res) {
     args.fileNameMatrixNormal = files.normal;
     args.fileNameMatrixTumor = files.tumor;
     args.fileNameMatrixDelta = files.delta;
-    args.fileNameDegree = files.degree;
+    args.fileNameDegrees = files.degree;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
+    console.log("Running R script now!");
 
     var child = exec("Rscript R_scripts/deltaNeighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
@@ -753,7 +756,7 @@ function getAvailableMatrices() {
             return {
                 fileName: file,
                 pValue: "",
-                path: "User_Matrices/" + directories[i] + "/"
+                path: "R_Scripts/User_Matrices/" + directories[i] + "/"
             };
         });
 
@@ -810,5 +813,6 @@ app.listen(5000, function() {
     console.log("Initializing data and config");
 
     initializeAvaialbleMatrices();
+    console.log(availableMatrices);
     //createSampleUser();
 });

@@ -1,28 +1,26 @@
 library(jsonlite)
 
-setwd('R_Scripts')
-source('helpers.R')
+source('R_Scripts/helpers.R')
 epiStromaFlag <- TRUE
 args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])
 selectedGenes <- settings$selectedGenes
 
-corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
-corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
-corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
-
 corMatrices = list()
 
-if (!is.null(corMatrixNormal)) {
-	corMatrices["normal"] = corMatrixNormal;
+if (!is.null(settings$fileNameMatrixNormal)) {
+	corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
+	corMatrices[["normal"]] = corMatrixNormal;
 }
 
-if (!is.null(corMatrixTumor)) {
+if (!is.null(settings$fileNameMatrixTumor)) {
+	corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
 	corMatrices["tumor"] = corMatrixTumor;
 }
 
-if (!is.null(corMatrixDelta)) {
+if (!is.null(settings$fileNameMatrixDelta)) {
+	corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
 	corMatrices["delta"] = corMatrixDelta;
 }
 

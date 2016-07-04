@@ -1,8 +1,7 @@
 library(jsonlite)
 library(Matrix)
 
-setwd('R_Scripts')
-source('helpers.R')
+source('R_Scripts/helpers.R')
 
 ptm <- proc.time()
 

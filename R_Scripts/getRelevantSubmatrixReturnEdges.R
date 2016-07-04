@@ -1,7 +1,6 @@
 library(jsonlite)
 
-setwd('R_Scripts')
-source('helpers.R')
+source('R_Scripts/helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
 

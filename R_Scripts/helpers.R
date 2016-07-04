@@ -1,4 +1,4 @@
-source('dataModels.R')
+source('R_Scripts/dataModels.R')
 library(Matrix)
 
 getDegrees <- function(corMatrix) {

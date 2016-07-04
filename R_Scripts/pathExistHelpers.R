@@ -1,5 +1,5 @@
-source('helpers.R')
-source('dataModels.R')
+source('R_Scripts/helpers.R')
+source('R_Scripts/dataModels.R')
 
 findAllPaths <- function(source, target, corMatrix) {
 	neighbours <- c()
