@@ -12,7 +12,7 @@ angular.module('myApp.controllers').controller('LoginController', [
         $rootScope.tokenSet = false;
         $scope.user = { name: null, password: null, token: null };
 
-        $scope.sharedData = SharedService.data;
+        $scope.sharedData = SharedService.data.global;
 
         $rootScope.$watch('tokenSet', function(newValue, oldValue) {
             if (newValue == false && oldValue == true) {
@@ -62,8 +62,7 @@ angular.module('myApp.controllers').controller('LoginController', [
                             $cookies.put('token', data.token, { expires: exp });
                         }
                         
-                        $scope.sharedData.delta.reloadFileList = true;
-                        $scope.sharedData.nonDelta.reloadFileList = true;
+                        $scope.sharedData.reloadFileList = true;
                         $mdDialog.hide('');
                     }
                 });

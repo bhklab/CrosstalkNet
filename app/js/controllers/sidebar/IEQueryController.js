@@ -16,7 +16,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             initializeVariables();
         };
 
-        vm.sharedData = SharedService.data.nonDelta;
+        vm.sharedData = SharedService.data.global;
         vm.getInteractionExplorerConfig = QueryService.getInteractionExplorerConfig;
 
         InteractionExplorerControls.setMethods(vm);

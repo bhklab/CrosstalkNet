@@ -94,7 +94,16 @@ app.post('/login', function(req, res) {
 app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
     var argsString = "";
-    var file = matchSelectedFile(req.body.fileName);
+    var file;
+
+    if (req.body.fileName.delta != null) {
+        file = matchSelectedFile(req.body.fileName.delta);
+    } else if (req.body.fileName.normal != null) {
+        file = matchSelectedFile(req.body.fileName.normal);
+    } else if (req.body.fileName.tumor != null) {
+        file = matchSelectedFile(req.body.fileName.tumor);
+    }
+
     var geneList = [];
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -520,24 +529,34 @@ app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
     var types = req.body.types;
     var fileNames = [];
-    var matrices = [];
+    var matrices = {};
+
+    console.log(Object.keys(result));
+    console.log(types);
 
     for (var i = 0; i < types.length; i++) {
-        if (result[types[i]] != null) {
-            matrices = matrices.concat(result[types[i]]);
+        if (Object.keys(result).indexOf(types[i]) >= 0 && result[types[i]] != null) {
+            matrices[types[i]] = result[types[i]];
+            matrices[types[i]] = matrices[types[i]].map(function(file) {
+                return file.fileName
+            });
         }
     }
 
-    fileNames = matrices.map(function(file) {
-        return file.fileName
-    });
-
-    res.send({ fileList: fileNames });
+    res.send({ fileList: matrices });
 });
 
 app.post('/overall-matrix-stats', function(req, res) {
     var args = {};
-    var file = matchSelectedFile(req.body.fileName);
+    var file;
+
+    if (req.body.fileName.delta != null) {
+        file = matchSelectedFile(req.body.fileName.delta);
+    } else if (req.body.fileName.normal != null) {
+        file = matchSelectedFile(req.body.fileName.normal);
+    } else if (req.body.fileName.tumor != null) {
+        file = matchSelectedFile(req.body.fileName.tumor);
+    }
 
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });

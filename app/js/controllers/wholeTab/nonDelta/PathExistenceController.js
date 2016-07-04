@@ -21,6 +21,6 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
         };
 
         vm.displayModes = angular.copy(GlobalControls.displayModes);
-        vm.sharedData = SharedService.data.nonDelta;
+        vm.sharedData = SharedService.data.global;
     }
 ]);
