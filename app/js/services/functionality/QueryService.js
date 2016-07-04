@@ -112,7 +112,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         var deferred = $q.defer();
         var level = vm.genesOfInterest.length;
         $rootScope.state = $rootScope.states.loadingGraph;
-        RESTService.post('neighbour-general', {
+        RESTService.post('delta-neighbour-explorer', {
             layout: vm.sdWithinTab.selectedLayout,
             selectedGenes: vm.genesOfInterest,
             fileName: vm.sharedData.correlationFileActual
