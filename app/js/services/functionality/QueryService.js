@@ -112,10 +112,11 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         var deferred = $q.defer();
         var level = vm.genesOfInterest.length;
         $rootScope.state = $rootScope.states.loadingGraph;
-        RESTService.post('delta-neighbour-explorer', {
+        RESTService.post('delta-interaction-explorer', {
             layout: vm.sdWithinTab.selectedLayout,
             selectedGenes: vm.genesOfInterest,
-            fileName: vm.sharedData.correlationFileActual
+            fileName: vm.sharedData.correlationFileActual,
+            selectedNetworkType: vm.sharedData.selectedNetworkType
         }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
                 deferred.resolve({ data: null });
