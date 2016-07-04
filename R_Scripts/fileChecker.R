@@ -1,9 +1,8 @@
 library(jsonlite)
 library(Matrix)
 
-setwd('R_Scripts')
-source('helpers.R')
-setwd('User_Matrices')
+source('R_Scripts/helpers.R')
+setwd('R_Scripts/User_Matrices')
 
 args <- commandArgs(trailingOnly = TRUE)
 fileName <- args[2]

@@ -1,8 +1,7 @@
 library(jsonlite)
 
-setwd('R_Scripts')
-source('helpers.R')
-source('pathExistHelpers.R')
+source('R_Scripts/helpers.R')
+source('R_Scripts/pathExistHelpers.R')
 args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])
