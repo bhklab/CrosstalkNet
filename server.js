@@ -22,6 +22,7 @@ var jwt = require('jsonwebtoken');
 // var mongoose = require('mongoose');
 // var User = require('user');
 var databaseConfigUtils = require('databaseConfigUtils');
+var fileUtils = require('fileUtils');
 var bcrypt = require('bcrypt');
 var morgan = require('morgan')
 
@@ -97,19 +98,19 @@ app.post('/gene-list', function(req, res) {
     var file;
 
     if (req.body.fileName.delta != null) {
-        file = matchSelectedFile(req.body.fileName.delta);
+        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
     } else if (req.body.fileName.normal != null) {
-        file = matchSelectedFile(req.body.fileName.normal);
+        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices);
     } else if (req.body.fileName.tumor != null) {
-        file = matchSelectedFile(req.body.fileName.tumor);
+        file = fileUtils.matchSelectedFile(req.body.fileName.tumor , availableMatrices);
     }
-
-    var geneList = [];
 
     if (file == null || file.path == null || file.fileName == null) {
         res.send({ error: "Please specify a file name" });
         return;
     }
+
+    var geneList = [];
 
     args.pValue = file.pValue;
     args.fileName = file.fileName;
@@ -157,7 +158,7 @@ app.post('/gene-list', function(req, res) {
 
 app.post('/neighbour-general', function(req, res) {
     var args = {};
-    var file = matchSelectedFile(req.body.fileName);
+    var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
     var argsString = "";
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
@@ -295,13 +296,158 @@ app.post('/neighbour-general', function(req, res) {
         });
 });
 
+app.post('/delta-interaction-explorer', function(req, res) {
+    var args = {};
+    var argsString = "";
+    var selectedGeneNames = [];
+    var selectedGenes = req.body.selectedGenes;
+    var requestedLayout = req.body.layout;
+    var genesArg = "";
+    var files = null;
+
+    files = fileUtils.getRequestedFiles(req, availableMatrices);
+
+    if (files == null) {
+        res.send({ error: "Please specify the necessary files." });
+        return;
+    } else if (files.error != null) {
+        res.send({error: files.error});
+        return;
+    }
+
+    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        res.json({ error: "Please select a gene." });
+        return;
+    }
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    args.selectedGenes = selectedGeneNames;
+    args.fileNameMatrixNormal = files.normal;
+    args.fileNameMatrixTumor = files.tumor;
+    args.fileNameMatrixDelta = files.delta;
+    args.fileNameDegree = files.degree;
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_scripts/deltaNeighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
+        function(error, stdout, stderr) {
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
+
+            var parsedValue = JSON.parse(stdout);
+            var parsedNodes = parsedValue.nodes
+            var parsedEdges = parsedValue.edges;
+
+            var interactionsTableList = [];
+            var sourceNodes = [];
+            var nodes = [];
+            var parentNodes = [];
+            var edges = [];
+            var elements = [];
+            var config = null;
+            var layout = null;
+            var edgeDictionary = {};
+            var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
+            var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
+
+            var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
+            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
+
+            for (var i = 0; i < parsedEdges.length; i++) {
+                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
+                //interactionsTableList.push()
+            }
+
+            for (var i = 0; i < parsedNodes.length; i++) {
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
+            }
+
+            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
+                    100, 0, 0);
+
+                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+
+                for (var i = 0; i < selectedGenes.length + 1; i++) {
+                    if (i < 1) {
+                        parentNodes.push({
+                            data: {
+                                id: "par" + i
+                            }
+                        });
+                    } else if (nodes[i - 1].length > 0) {
+                        parentNodes.push({
+                            data: {
+                                id: "par" + i
+                            }
+                        });
+                    }
+                }
+
+                for (var j = 0; j < nodes.length; j++) {
+                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
+                }
+
+                elements = elements.concat(parentNodes);
+
+                layout = layoutUtils.createPresetLayout();
+                config = configUtils.createConfig();
+
+                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+            } else {
+                for (var i = 0; i < nodes.length; i++) {
+                    for (var j = 0; j < nodes[i].length; j++) {
+                        if (nodes[i][j].data.isSource) {
+                            nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
+                        }
+                    }
+                }
+
+                config = configUtils.createConfig();
+                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
+
+                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+            }
+
+            elements = elements.concat([].concat.apply([], nodes));
+            elements = elements.concat(edges);
+            elements.push(sourceNodes[0][0]);
+
+            configUtils.addStyleToConfig(config, edgeStyleNegative);
+            configUtils.addStyleToConfig(config, edgeStylePositive);
+            configUtils.setConfigElements(config, elements);
+            configUtils.setConfigLayout(config, layout);
+
+            selfLoops = clientTableUtils.getSelfLoops(edges);
+            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+
+            res.json({
+                config: config,
+                selfLoops: selfLoops,
+                edgeDictionary: edgeDictionary
+            });
+        });
+});
+
 app.post('/submatrix', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
-    var file = matchSelectedFile(req.body.fileName);
+    var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     console.log(req.body);
@@ -474,7 +620,7 @@ app.post('/get-all-paths', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
-    var file = matchSelectedFile(req.body.fileName);
+    var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
     var source = req.body.source;
     var target = req.body.target;
 
@@ -551,11 +697,11 @@ app.post('/overall-matrix-stats', function(req, res) {
     var file;
 
     if (req.body.fileName.delta != null) {
-        file = matchSelectedFile(req.body.fileName.delta);
+        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
     } else if (req.body.fileName.normal != null) {
-        file = matchSelectedFile(req.body.fileName.normal);
+        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices);
     } else if (req.body.fileName.tumor != null) {
-        file = matchSelectedFile(req.body.fileName.tumor);
+        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -633,18 +779,6 @@ function checkFileIntegrity(req, res, file) {
 
         res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
     });
-}
-
-function matchSelectedFile(fileName) {
-    for (var prop in availableMatrices) {
-        for (var i = 0; i < availableMatrices[prop].length; i++) {
-            if (availableMatrices[prop][i].fileName == fileName) {
-                return availableMatrices[prop][i];
-            }
-        }
-    }
-
-    return null;
 }
 
 function initializeAvaialbleMatrices() {

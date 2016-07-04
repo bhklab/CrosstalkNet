@@ -66,8 +66,6 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             vm.sdWithinTab.showGraphSummary = false;
         }
 
-        vm.getRelevantGenes = QueryService.getRelevantGenes;
-
         MainGraphControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 
@@ -77,7 +75,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         vm.refreshGraph = function(filter) {
             vm.clearLocatedGene();
             SharedService.resetWTM(vm);
-            vm.getRelevantGenes(vm, filter).then(function(result) {
+            QueryService.getRelevantGenes(vm, filter).then(function(result) {
                 if (result.data == null) {
                     return;
                 }
