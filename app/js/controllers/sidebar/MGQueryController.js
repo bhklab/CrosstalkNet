@@ -16,7 +16,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             intializeVariables();
         };
 
-        vm.sharedData = SharedService.data.nonDelta;
+        vm.sharedData = SharedService.data.global;
 
         function intializeVariables() {
             vm.selectedItemFirst = null;
