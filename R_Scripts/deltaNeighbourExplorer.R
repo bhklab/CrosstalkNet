@@ -12,7 +12,21 @@ corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
 corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
 corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
 
-degrees <- readRDS(settings$fileNameDegreesDelta)
+corMatrices = list()
+
+if (!is.null(corMatrixNormal)) {
+	corMatrices["normal"] = corMatrixNormal;
+}
+
+if (!is.null(corMatrixTumor)) {
+	corMatrices["tumor"] = corMatrixTumor;
+}
+
+if (!is.null(corMatrixDelta)) {
+	corMatrices["delta"] = corMatrixDelta;
+}
+
+degrees <- readRDS(settings$fileNameDegrees)
 
 exclusions <- c()	
 edges <- list()
@@ -20,8 +34,6 @@ edgeExclusion <- c()
 #nodes <- createEmptyNodes()
 nodes <- list()
 edgeTest <- c()
-
-corMatrices <- list(normal = corMatrixNormal, tumor = corMatrixTumor, delta = corMatrixDelta)
 
 for (i in 1:length(selectedGenes)) {
     edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0)

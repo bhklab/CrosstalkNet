@@ -17,7 +17,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         };
 
         vm.sharedData = SharedService.data.global;
-        vm.getInteractionExplorerConfig = QueryService.getInteractionExplorerConfig;
+        //vm.getInteractionExplorerConfig = QueryService.getInteractionExplorerConfig;
 
         InteractionExplorerControls.setMethods(vm);
 
@@ -51,7 +51,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         vm.refreshGraph = function() {
             vm.resetDisplayedData();
             SharedService.resetWTM(vm);
-            vm.getInteractionExplorerConfig(vm).then(function(result) {
+            QueryService.getInteractionExplorerConfig(vm).then(function(result) {
                 if (result.data == null) {
                     return;
                 }
