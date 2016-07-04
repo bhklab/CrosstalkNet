@@ -26,7 +26,7 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             vm.sdWithinTab.allPaths = null;
         }
 
-        vm.sharedData = SharedService.data.nonDelta;
+        vm.sharedData = SharedService.data.global;
         PathExistenceControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 

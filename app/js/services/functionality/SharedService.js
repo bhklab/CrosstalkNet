@@ -1,11 +1,11 @@
 var myModule = angular.module("myApp.services");
 myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService) {
     var service = {};
-    var dataModel = { reloadFileList: false, correlationFileActual: null, geneList: null, matrixSummary: null };
+    var networkTypes = { normal: 'normal', tumor: 'tumor', delta: 'delta' };
+    var correlationFileModel = { normal: null, tumor: null, delta: null };
+    var dataModel = { reloadFileList: false, correlationFileActual: angular.copy(correlationFileModel), geneList: null, matrixSummary: null, selectedNetworkType: networkTypes.normal};
 
-    service.data = { delta: {}, nonDelta: {} };
-    service.data.delta = angular.copy(dataModel);
-    service.data.nonDelta = angular.copy(dataModel);
+    service.data = {global: angular.copy(dataModel)};
 
     var withinTabModel = {
         cy: null,
@@ -27,6 +27,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     service.data.pathExistence = angular.copy(withinTabModelPE);
     service.resetWTM = resetWTM;
     service.resetWTMPE = resetWTMPE;
+    service.resetCorrelationFiles = resetCorrelationFiles;
 
     function resetWTM(vm) {
         for (var prop in withinTabModel) {
@@ -42,6 +43,10 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
                 vm.sdWithinTab[prop] = withinTabModel[prop];
             }
         }
+    }
+
+    function resetCorrelationFiles() {
+        service.data.global.correlationFileActual = angular.copy(correlationFileModel);
     }
 
     return service;

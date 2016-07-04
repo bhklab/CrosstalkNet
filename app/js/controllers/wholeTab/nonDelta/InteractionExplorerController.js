@@ -18,7 +18,7 @@ angular.module('myApp.controllers').controller('InteractionExplorerController', 
 
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.switchModel = false;
-        vm.sharedData = SharedService.data.nonDelta;
+        vm.sharedData = SharedService.data.global;
         vm.changeDisplay = GlobalControls.changeDisplay;
         vm.closeEdgeInspector = GlobalControls.closeEdgeInspector;
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
