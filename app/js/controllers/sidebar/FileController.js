@@ -13,6 +13,7 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.fileList = { normal: null, tumor: null, delta: null };
 
         vm.correlationFileDisplayed = null;
+        vm.selectedNetworkType = vm.sharedData.selectedNetworkType;
 
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
@@ -26,6 +27,7 @@ angular.module('myApp.controllers').controller('FileController', [
 
         vm.getGenes = function() {
             vm.sharedData.clearAllData = true;
+            vm.sharedData.selectedNetworkType = vm.selectedNetworkType;
             GlobalControls.resetInputFieldsGlobal(vm);
 
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
@@ -35,16 +37,16 @@ angular.module('myApp.controllers').controller('FileController', [
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.matrixSummary = result.matrixSummary;
                 vm.sharedData.clearAllData = false;
+                vm.sdWithinTab.selectedTab = 1;
             });
-
-            vm.sdWithinTab.selectedTab = 1;
         };
 
         $scope.$watch(function() {
-                return vm.sharedData.selectedNetworkType; },
+                return vm.selectedNetworkType; },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
                     SharedService.resetCorrelationFiles();
+                    vm.sharedData.clearAllData = true;
                 }
             });
 

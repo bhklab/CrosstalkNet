@@ -1,13 +1,13 @@
 <md-content ng-controller="FileController as vm" ng-init="vm.initialize('main', 'nonDelta')" class="md-padding">
     <div>
-        <md-radio-group ng-model="vm.sharedData.selectedNetworkType">
+        <md-radio-group ng-model="vm.selectedNetworkType">
             <md-radio-button value="normal" class="md-primary">Normal</md-radio-button>
             <md-radio-button value="tumor" class="md-primary">Tumor</md-radio-button>
             <md-radio-button value="delta" class="md-primary">Delta</md-radio-button>
         </md-radio-group>
     </div>
     <div class="bottom-margin">
-        <md-input-container ng-if="vm.sharedData.selectedNetworkType == 'normal' || vm.sharedData.selectedNetworkType == 'delta'" class="select">
+        <md-input-container ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Normal Matrix File</label>
             <md-select ng-model="vm.sharedData.correlationFileActual.normal">
                 <md-option ng-repeat="file in vm.fileList.normal" value="{{file}}" ng-selected="0">
@@ -15,7 +15,7 @@
                 </md-option>
             </md-select>
         </md-input-container>
-        <md-input-container ng-if="vm.sharedData.selectedNetworkType == 'tumor' || vm.sharedData.selectedNetworkType == 'delta'" class="select">
+        <md-input-container ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Tumor Matrix File</label>
             <md-select ng-model="vm.sharedData.correlationFileActual.tumor">
                 <md-option ng-repeat="file in vm.fileList.tumor" value="{{file}}" ng-selected="0">
@@ -23,7 +23,7 @@
                 </md-option>
             </md-select>
         </md-input-container>
-        <md-input-container ng-if="vm.sharedData.selectedNetworkType == 'delta'" class="select">
+        <md-input-container ng-if="vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Delta Matrix File</label>
             <md-select ng-model="vm.sharedData.correlationFileActual.delta">
                 <md-option ng-repeat="file in vm.fileList.delta" value="{{file}}" ng-selected="0">
