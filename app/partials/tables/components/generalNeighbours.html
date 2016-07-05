@@ -4,7 +4,14 @@
             <md-card-title>
                 <md-card-title-text>
                     <div layout="row">
-                        <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions {{matType | uppercase}}</span></div>
+                        <div flex>
+                            <span class="md-headline">
+                                {{x + 1 | ordinal}} Neighbour Interactions 
+                            </span>
+                            <span class="md-headline" ng-if="vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta">
+                                {{matType == 'weight' ? 'delta' : matType | uppercase}}
+                            </span>
+                        </div>
                     </div>
                     <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
                 </md-card-title-text>

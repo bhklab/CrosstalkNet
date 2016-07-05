@@ -162,7 +162,17 @@ table {
 }
 
 table, th, td {
-    border: 1px solid black;
+    border: 1px solid black !important;
+}
+
+table.md-table {
+    overflow: auto;
+}
+
+.md-table .table-center {
+    vertical-align: middle !important;
+    text-align: center !important;
+    padding: 0px !important;
 }
 
 .row-name { 

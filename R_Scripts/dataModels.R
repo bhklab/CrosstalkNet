@@ -16,8 +16,8 @@ createEmptyDifferentialEdges <- function(amount) {
 	edges
 }
 
-createEmptyPaths <- function() {
-	paths <- data.frame(firstEdge = numeric(0), intermediateGene = character(0), secondEdge <- numeric(0), stringsAsFactors = FALSE)
+createPaths <- function(amount) {
+	paths <- data.frame(firstEdge = data.frame(weight = numeric(amount), normal = numeric(amount), tumor = numeric(amount)), intermediateGene = character(amount), secondEdge = data.frame(weight = numeric(amount), normal = numeric(amount), tumor = numeric(amount)), stringsAsFactors = FALSE)
 
 	paths
 }
