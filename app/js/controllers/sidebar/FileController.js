@@ -25,7 +25,8 @@ angular.module('myApp.controllers').controller('FileController', [
         };
 
         vm.getGenes = function() {
-            SharedService.resetWTM(vm);
+            vm.sharedData.clearAllData = true;
+            GlobalControls.resetInputFieldsGlobal(vm);
 
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.geneList = result.geneList;
@@ -33,6 +34,7 @@ angular.module('myApp.controllers').controller('FileController', [
 
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.matrixSummary = result.matrixSummary;
+                vm.sharedData.clearAllData = false;
             });
 
             vm.sdWithinTab.selectedTab = 1;
