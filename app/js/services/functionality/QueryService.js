@@ -134,16 +134,17 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
 
         $rootScope.state = $rootScope.states.gettingAllPaths;
 
-        RESTService.post('get-all-paths', {
+        RESTService.post('delta-get-all-paths', {
             target: vm.pathExplorerTarget.value,
             source: vm.pathExplorerSource.value,
-            fileName: vm.sharedData.correlationFileActual
+            fileName: vm.sharedData.correlationFileActual, 
+            selectedNetworkType: vm.sharedData.selectedNetworkType
         }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
                 deferred.resolve({ allPaths: null });
             }
 
-            deferred.resolve({ allPaths: data.paths});
+            deferred.resolve({ allPaths: data.paths, types: data.types});
         });
 
         return deferred.promise;

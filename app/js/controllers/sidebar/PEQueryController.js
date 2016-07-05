@@ -55,6 +55,7 @@ angular.module('myApp.controllers').controller('PEQueryController', [
                 }
 
                 vm.sdWithinTab.allPaths = result.allPaths;
+                vm.sdWithinTab.types = result.types;
                 $rootScope.state = $rootScope.states.finishedGettingAllPaths;
             });
         }

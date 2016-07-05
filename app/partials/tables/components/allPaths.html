@@ -1,33 +1,44 @@
-<md-card ng-if="vm.sdWithinTab.allPaths != null">
-    <md-card-title>
-        <md-card-title-text>
-            <div layout="row">
-                <div flex><span class="md-headline">All Paths Between {{vm.sdWithinTab.pathSourceCached}} and {{vm.sdWithinTab.pathTargetCached}}</span></div>
-            </div>
-            <span class="md-subhead">Total: {{vm.sdWithinTab.allPaths.length}}</span>
-        </md-card-title-text>
-    </md-card-title>
-    <md-card-content>
-        <md-table-container>
-            <table ng-class="'all-paths-table' + vm.graphType" md-table>
-                <thead md-head md-order="vm.myOrder">
-                    <th md-column>Source</th>
-                    <th md-column md-column md-order-by="firstEdge" md-numeric>Correlation</th>
-                    <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
-                    <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="secondEdge" md-numeric>Correlation</th>
-                    <th md-column>Destination</th>
-                </thead>
-                <tbody md-body>
-                    <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.myOrder">
-                        <td md-cell>{{vm.sdWithinTab.pathSourceCached}}</td>
-                        <td md-cell>{{path.firstEdge}}</td>
-                        <td md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
-                        <td md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.secondEdge}}</td>
-                        <td md-cell>{{vm.sdWithinTab.pathTargetCached}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </md-table-container>
-        <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + vm.graphType)">Download Interactions</md-button>
-    </md-card-content>
-</md-card>
+<div ng-if="vm.sdWithinTab.allPaths != null">
+    <md-card ng-repeat="matType in vm.sdWithinTab.types">
+        <md-card-title>
+            <md-card-title-text>
+                <div layout="row">
+                    <div flex>
+                        <span class="md-headline">All Paths Between {{vm.sdWithinTab.pathSourceCached}} and {{vm.sdWithinTab.pathTargetCached}}</span>
+                        <span class="md-headline" ng-if="vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta">
+                                {{matType == 'weight' ? 'delta' : matType | uppercase}}
+                        </span>
+                    </div>
+                </div>
+                <span class="md-subhead">Total: {{vm.sdWithinTab.allPaths.length}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <md-table-container>
+                <table ng-class="'all-paths-table' + vm.graphType + matType" md-table>
+                    <thead md-head md-order="vm.myOrder">
+                        <th md-column>Source</th>
+                        <th md-column md-column md-order-by="{{'firstEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
+                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="{{'secondEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th md-column>Destination</th>
+                    </thead>
+                    <tbody md-body>
+                        <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.myOrder">
+                            <td class="table-center" md-cell>{{vm.sdWithinTab.pathSourceCached}}</td>
+                            <td class="table-center" md-cell>
+                                {{path["firstEdge." + matType]}}
+                            </td>
+                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">
+                                {{path["secondEdge." + matType]}}
+                            </td>
+                            <td class="table-center" md-cell>{{vm.sdWithinTab.pathTargetCached}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-table-container>
+            <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + vm.graphType + matType)">Download Interactions</md-button>
+        </md-card-content>
+    </md-card>
+</div>
