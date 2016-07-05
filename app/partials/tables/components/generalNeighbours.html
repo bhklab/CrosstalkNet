@@ -4,7 +4,7 @@
             <md-card-title>
                 <md-card-title-text>
                     <div layout="row">
-                        <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions</span></div>
+                        <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions {{matType | uppercase}}</span></div>
                     </div>
                     <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
                 </md-card-title-text>
@@ -25,7 +25,7 @@
                     </tbody>
                 </table>
                 <div ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
-                <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x)">Download Interactions</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x, matType)">Download Interactions</md-button>
             </md-card-content>
         </md-card>
     </div>

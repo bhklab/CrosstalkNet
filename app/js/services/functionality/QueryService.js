@@ -75,7 +75,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
             depth = 2;
         }
 
-        RESTService.post("submatrix", {
+        RESTService.post("delta-submatrix", {
                 selectedGenes: vm.genesOfInterest,
                 minNegativeWeightFirst: vm.correlationFilterFirst.negativeFilter ==
                     null || !vm.correlationFilterFirst.negativeEnabled ?
@@ -95,7 +95,8 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
                 filterSecond: filterSecond && filter,
                 layout: vm.sdWithinTab.selectedLayout,
                 depth: depth,
-                fileName: vm.sharedData.correlationFileActual
+                fileName: vm.sharedData.correlationFileActual,
+                selectedNetworkType: vm.sharedData.selectedNetworkType
             })
             .then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
