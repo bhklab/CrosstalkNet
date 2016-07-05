@@ -104,7 +104,7 @@ app.post('/gene-list', function(req, res) {
     } else if (req.body.fileName.normal != null) {
         file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices);
     } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.tumor , availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -158,146 +158,6 @@ app.post('/gene-list', function(req, res) {
         });
 });
 
-app.post('/neighbour-general', function(req, res) {
-    var args = {};
-    var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
-    var argsString = "";
-    var selectedGeneNames = [];
-    var selectedGenes = req.body.selectedGenes;
-    var requestedLayout = req.body.layout;
-    var genesArg = "";
-
-    if (file == null || file.path == null || file.fileName == null) {
-        res.send({ error: "Please specify a file name" });
-        return;
-    }
-
-    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select a gene." });
-        return;
-    }
-
-    for (var i = 0; i < selectedGenes.length; i++) {
-        selectedGeneNames.push(selectedGenes[i].value);
-    }
-
-    args.pValue = file.pValue;
-    args.fileName = file.fileName;
-    args.path = file.path;
-    args.selectedGenes = selectedGeneNames;
-
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-
-    var child = exec("Rscript R_scripts/neighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
-        function(error, stdout, stderr) {
-            console.log('stderr: ' + stderr);
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
-
-            var parsedValue = JSON.parse(stdout);
-            var parsedNodes = parsedValue.nodes
-            var parsedEdges = parsedValue.edges;
-
-            var interactionsTableList = [];
-            var sourceNodes = [];
-            var nodes = [];
-            var parentNodes = [];
-            var edges = [];
-            var elements = [];
-            var config = null;
-            var layout = null;
-            var edgeDictionary = {};
-            var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
-            var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
-
-            var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
-            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
-
-            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
-
-            for (var i = 0; i < parsedEdges.length; i++) {
-                edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
-                //interactionsTableList.push()
-            }
-
-            for (var i = 0; i < parsedNodes.length; i++) {
-                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
-            }
-
-            if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
-
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-
-                for (var i = 0; i < selectedGenes.length + 1; i++) {
-                    if (i < 1) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
-                    } else if (nodes[i - 1].length > 0) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
-                    }
-                }
-
-                for (var j = 0; j < nodes.length; j++) {
-                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
-                }
-
-                elements = elements.concat(parentNodes);
-
-                layout = layoutUtils.createPresetLayout();
-                config = configUtils.createConfig();
-
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-            } else {
-                for (var i = 0; i < nodes.length; i++) {
-                    for (var j = 0; j < nodes[i].length; j++) {
-                        if (nodes[i][j].data.isSource) {
-                            nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
-                        }
-                    }
-                }
-
-                config = configUtils.createConfig();
-                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
-
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
-            }
-
-            elements = elements.concat([].concat.apply([], nodes));
-            elements = elements.concat(edges);
-            elements.push(sourceNodes[0][0]);
-
-            configUtils.addStyleToConfig(config, edgeStyleNegative);
-            configUtils.addStyleToConfig(config, edgeStylePositive);
-            configUtils.setConfigElements(config, elements);
-            configUtils.setConfigLayout(config, layout);
-
-            selfLoops = clientTableUtils.getSelfLoops(edges);
-            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
-
-            res.json({
-                config: config,
-                selfLoops: selfLoops,
-                edgeDictionary: edgeDictionary
-            });
-        });
-});
-
 app.post('/delta-interaction-explorer', function(req, res) {
     var args = {};
     var argsString = "";
@@ -313,7 +173,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
         res.send({ error: "Please specify the necessary files." });
         return;
     } else if (files.error != null) {
-        res.send({error: files.error});
+        res.send({ error: files.error });
         return;
     }
 
@@ -326,6 +186,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
         selectedGeneNames.push(selectedGenes[i].value);
     }
 
+    args.selectedNetworkType = req.body.selectedNetworkType;
     args.selectedGenes = selectedGeneNames;
     args.fileNameMatrixNormal = files.normal;
     args.fileNameMatrixTumor = files.tumor;
@@ -333,7 +194,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
     args.fileNameDegrees = files.degree;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
-    console.log("Running R script now!");
 
     var child = exec("Rscript R_scripts/deltaNeighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
@@ -348,6 +208,8 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var parsedValue = JSON.parse(stdout);
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
+
+            console.log(parsedEdges);
 
             var interactionsTableList = [];
             var sourceNodes = [];
@@ -444,21 +306,28 @@ app.post('/delta-interaction-explorer', function(req, res) {
         });
 });
 
-app.post('/submatrix', function(req, res) {
+app.post('/delta-submatrix', function(req, res) {
     var args = {};
     var argsString = "";
     var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
-    var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     console.log(req.body);
 
-    if (file == null || file.path == null || file.fileName == null) {
-        res.send({ error: "Please specify a file name" });
+    var files = null;
+
+    files = fileUtils.getRequestedFiles(req, availableMatrices);
+
+    if (files == null) {
+        res.send({ error: "Please specify the necessary files." });
+        return;
+    } else if (files.error != null) {
+        res.send({ error: files.error });
         return;
     }
+
 
     if (filterValidationRes.error) {
         res.send(filterValidationRes);
@@ -474,9 +343,11 @@ app.post('/submatrix', function(req, res) {
         selectedGeneNames.push(selectedGenes[i].value);
     }
 
-    args.pValue = file.pValue;
-    args.fileName = file.fileName;
-    args.path = file.path;
+    args.selectedNetworkType = req.body.selectedNetworkType;
+    args.fileNameMatrixNormal = files.normal;
+    args.fileNameMatrixTumor = files.tumor;
+    args.fileNameMatrixDelta = files.delta;
+    args.fileNameDegrees = files.degree;
     args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
     args.minNegativeWeightFirst = req.body.minNegativeWeightFirst;
     args.minPositiveWeightSecond = req.body.minPositiveWeightSecond;
@@ -489,7 +360,7 @@ app.post('/submatrix', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/submatrix.R --args \"" + argsString + "\"", {
+    var child = exec("Rscript R_Scripts/deltaSubmatrix.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },
@@ -507,6 +378,7 @@ app.post('/submatrix', function(req, res) {
 
             var parsedEdgesFirst = parsedValue.edges.first;
             var parsedEdgesSecond = parsedValue.edges.second;
+            var parsedEdgesAll = parsedEdgesFirst.concat(parsedEdgesSecond);
 
             var sourceNodes = [];
             var firstNodes = [];
@@ -604,7 +476,7 @@ app.post('/submatrix', function(req, res) {
             configUtils.addStyleToConfig(config, edgeStylePositive);
             configUtils.setConfigElements(config, edges.concat(allNodes));
             configUtils.setConfigLayout(config, layout);
-            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+            edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdgesAll));
             selfLoops = clientTableUtils.getSelfLoops(edges);
 
             res.json({
@@ -618,6 +490,181 @@ app.post('/submatrix', function(req, res) {
             });
         });
 });
+
+// app.post('/submatrix', function(req, res) {
+//     var args = {};
+//     var argsString = "";
+//     var argsArray = [];
+//     var selectedGeneNames = [];
+//     var selectedGenes = req.body.selectedGenes;
+//     var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
+//     var requestedLayout = req.body.layout;
+//     var filterValidationRes = validationUtils.validateFilters(req.body);
+//     console.log(req.body);
+
+//     if (file == null || file.path == null || file.fileName == null) {
+//         res.send({ error: "Please specify a file name" });
+//         return;
+//     }
+
+//     if (filterValidationRes.error) {
+//         res.send(filterValidationRes);
+//         return;
+//     }
+
+//     if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+//         res.json({ error: "Please select at least 1 gene of interest." });
+//         return;
+//     }
+
+//     for (var i = 0; i < selectedGenes.length; i++) {
+//         selectedGeneNames.push(selectedGenes[i].value);
+//     }
+
+//     args.pValue = file.pValue;
+//     args.fileName = file.fileName;
+//     args.path = file.path;
+//     args.minPositiveWeightFirst = req.body.minPositiveWeightFirst;
+//     args.minNegativeWeightFirst = req.body.minNegativeWeightFirst;
+//     args.minPositiveWeightSecond = req.body.minPositiveWeightSecond;
+//     args.minNegativeWeightSecond = req.body.minNegativeWeightSecond;
+//     args.weightFilterFirst = req.body.filterFirst;
+//     args.weightFilterSecond = req.body.filterSecond;
+//     args.depth = req.body.depth;
+
+//     args.genesOfInterest = selectedGeneNames;
+//     argsString = JSON.stringify(args);
+//     argsString = argsString.replace(/"/g, '\\"');
+
+//     var child = exec("Rscript R_Scripts/submatrix.R --args \"" + argsString + "\"", {
+//             maxBuffer: 1024 *
+//                 50000
+//         },
+//         function(error, stdout, stderr) {
+//             console.log('stderr: ' + stderr);
+
+//             if (error != null) {
+//                 console.log('error: ' + error);
+//             }
+
+//             var parsedValue = JSON.parse(stdout);
+
+//             var parsedNodesFirst = parsedValue.neighboursNodes.first;
+//             var parsedNodesSecond = parsedValue.neighboursNodes.second;
+
+//             var parsedEdgesFirst = parsedValue.edges.first;
+//             var parsedEdgesSecond = parsedValue.edges.second;
+
+//             var sourceNodes = [];
+//             var firstNodes = [];
+//             var secondNodes = [];
+//             var parentNodes = [];
+//             var allNodes = [];
+//             var edges = [];
+//             var cytoscapeEdges = [];
+//             var firstNeighbourInteractions = [];
+//             var secondNeighbourInteractions = [];
+//             var edgeDictionary = {};
+//             var selfLoops = [];
+//             var elements = [];
+//             var config = null;
+//             var layout = null;
+//             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
+//             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
+
+//             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
+//             var depthWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightDepth);
+
+//             styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+
+//             for (var i = 0; i < selectedGenes.length; i++) {
+//                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
+//                 allNodes.push(sourceNodes[i]);
+//             }
+
+//             for (var i = 0; i < parsedNodesFirst.length; i++) {
+//                 firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
+//                 allNodes = allNodes.concat(firstNodes[i]);
+//             }
+
+//             for (var i = 0; i < parsedNodesSecond.length; i++) {
+//                 secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], false);
+//                 allNodes = allNodes.concat(secondNodes[i]);
+//             }
+
+//             for (var i = 0; i < parsedEdgesFirst.length; i++) {
+//                 cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesFirst[i], 1));
+//             }
+
+//             firstNeighbourInteractions = cytoscapeEdges;
+//             cytoscapeEdges = [];
+
+//             for (var i = 0; i < parsedEdgesSecond.length; i++) {
+//                 cytoscapeEdges = cytoscapeEdges.concat(edgeUtils.createEdgesFromREdges(parsedEdgesSecond[i], 2));
+//             }
+
+//             secondNeighbourInteractions = cytoscapeEdges;
+
+//             edges = edges.concat(firstNeighbourInteractions);
+//             edges = edges.concat(secondNeighbourInteractions);
+
+//             elements = elements.concat(edges);
+//             config = configUtils.createConfig();
+
+//             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+//                 allNodes.push({
+//                     data: { id: "epi" }
+//                 });
+//                 allNodes.push({
+//                     data: { id: "stroma" }
+//                 });
+//                 nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
+//                 layout = layoutUtils.createPresetLayout();
+
+//                 configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+//                 configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+//             } else if (requestedLayout == 'clustered') {
+//                 var largestClusterSize = 0;
+//                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+
+//                 for (var i = 0; i < sourceNodes.length; i++) {
+//                     var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
+
+//                     if (clusterSize > largestClusterSize) {
+//                         largestClusterSize = clusterSize;
+//                     }
+//                 }
+
+//                 for (var i = 0; i < sourceNodes.length; i++) {
+//                     nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+//                 }
+
+//                 layout = layoutUtils.createPresetLayout();
+//                 configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+//             } else {
+//                 layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
+//                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+//                 configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+//             }
+
+//             configUtils.addStyleToConfig(config, edgeStyleNegative);
+//             configUtils.addStyleToConfig(config, edgeStylePositive);
+//             configUtils.setConfigElements(config, edges.concat(allNodes));
+//             configUtils.setConfigLayout(config, layout);
+//             edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+//             selfLoops = clientTableUtils.getSelfLoops(edges);
+
+//             res.json({
+//                 config: config,
+//                 minNegativeWeight: depthWeights.minNegative,
+//                 maxPositiveWeight: depthWeights.maxPositive,
+//                 firstNeighbours: firstNodes,
+//                 secondNeighbours: secondNodes,
+//                 edgeDictionary: edgeDictionary,
+//                 selfLoops: selfLoops
+//             });
+//         });
+// });
 
 app.post('/get-all-paths', function(req, res) {
     var args = {};

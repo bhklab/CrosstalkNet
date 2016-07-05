@@ -111,11 +111,12 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         });
 
         $scope.$watch(function() {
-            return vm.sharedData.correlationFileActual;
+            return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
-            if (newValue != "" && newValue != null && newValue != oldValue) {
+            if (newValue == true && newValue != oldValue) {
                 intializeVariables();
                 GraphConfigService.destroyGraph(vm);
+                SharedService.resetWTM(vm);
             }
         });
 

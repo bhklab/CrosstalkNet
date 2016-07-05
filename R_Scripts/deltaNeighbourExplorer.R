@@ -6,6 +6,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])
 selectedGenes <- settings$selectedGenes
+selectedNetworkType <- settings$selectedNetworkType
 
 corMatrices = list()
 
@@ -34,8 +35,8 @@ nodes <- list()
 edgeTest <- c()
 
 for (i in 1:length(selectedGenes)) {
-    edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0)
-    nodesToAdd <- getNeighboursNodesFromEdges(corMatrixDelta, degrees, edges[[i]], i, selectedGenes, exclusions)
+    edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0, selectedNetworkType)
+    nodesToAdd <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edges[[i]], i, selectedGenes, exclusions)
     nodes[[i]] <- nodesToAdd
     
     #edgeExclusion <- selectedGenes[i]

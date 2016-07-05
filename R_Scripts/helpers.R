@@ -122,7 +122,7 @@ createEdgesDF <- function(corMatrix, gene, exclusion, limit) {
     edges
 }
 
-createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
+createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType) {
     edges <- createEmptyDifferentialEdges(0)
     neighbours <- list(normal = NULL, tumor = NULL, delta = NULL)
 
@@ -131,7 +131,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
     }
 
     if (getGeneSuffix(gene) == '-e') {
-        neighboursNames <- names(which(corMatrices$delta[gene, ] != 0)) 
+        neighboursNames <- names(which(corMatrices[[networkType]][gene, ] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
         for (i in names(corMatrices)) {
@@ -139,7 +139,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
             names(neighbours[[i]]) <- neighboursNames#names(corMatrix[gene, neighboursNames])
         }
     } else {
-        neighboursNames <- names(which(corMatrices$delta[, gene] != 0)) 
+        neighboursNames <- names(which(corMatrices[[networkType]][, gene] != 0)) 
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
         for (i in names(corMatrices)) {
@@ -148,7 +148,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
         }
     }
 
-    if (length(neighbours$delta) == 0) {
+    if (length(neighbours[[networkType]]) == 0) {
         return(edges)
     }
 
@@ -156,22 +156,29 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
         #neighbours <- tail(sort(abs(neighbours)), limit)
     }
 
-    edges <- createEmptyDifferentialEdges(length(neighbours))
+    edges <- createEmptyDifferentialEdges(length(neighbours[[networkType]]))
     
     if (!is.null(neighbours$delta)) {
+        write("delta iterator", stderr())
         iterator <- length(neighbours$delta)
     } else if (!is.null(neighbours$normal)) {
+        write("normal iterator", stderr())
         iterator <- length(neighbours$normal)
     } else {
+        write("tumor iterator", stderr())
         iterator <- length(neighbours$tumor)
     }
 
+
+
     for (i in 1:iterator) {       
         edges[i, "source"] <- gene
-        edges[i, "target"] <- names(neighbours$delta[i])
-        edges[i, "weight"] <- neighbours$delta[i]
-        edges[i, "normal"] <- neighbours$normal[i]
-        edges[i, "tumor"] <- neighbours$tumor[i]
+        edges[i, "target"] <- names(neighbours[[networkType]][i])
+        edges[i, "weight"] <- neighbours[[networkType]][i]
+        if (networkType == 'delta') {        
+            edges[i, "normal"] <- neighbours$normal[i]
+            edges[i, "tumor"] <- neighbours$tumor[i]   
+        }
     }
 
     edges
