@@ -16,12 +16,12 @@ if (!is.null(settings$fileNameMatrixNormal)) {
 
 if (!is.null(settings$fileNameMatrixTumor)) {
 	corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
-	corMatrices["tumor"] = corMatrixTumor;
+	corMatrices[["tumor"]] = corMatrixTumor;
 }
 
 if (!is.null(settings$fileNameMatrixDelta)) {
 	corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
-	corMatrices["delta"] = corMatrixDelta;
+	corMatrices[["delta"]] = corMatrixDelta;
 }
 
 degrees <- readRDS(settings$fileNameDegrees)

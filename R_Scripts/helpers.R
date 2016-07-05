@@ -135,7 +135,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
         for (i in names(corMatrices)) {
-            neighbours[i] = corMatrices[[i]][gene, neighboursNames]
+            neighbours[[i]] = corMatrices[[i]][gene, neighboursNames]
             names(neighbours[[i]]) <- neighboursNames#names(corMatrix[gene, neighboursNames])
         }
     } else {
@@ -143,7 +143,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
         neighboursNames <- setdiff(neighboursNames, exclusion)
 
         for (i in names(corMatrices)) {
-            neighbours[i] = corMatrices[[i]][neighboursNames, gene]
+            neighbours[[i]] = corMatrices[[i]][neighboursNames, gene]
             names(neighbours[[i]]) <- neighboursNames#names(corMatrix[gene, neighboursNames])
         }
     }
@@ -158,7 +158,15 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit) {
 
     edges <- createEmptyDifferentialEdges(length(neighbours))
     
-    for (i in 1:length(neighbours)) {       
+    if (!is.null(neighbours$delta)) {
+        iterator <- length(neighbours$delta)
+    } else if (!is.null(neighbours$normal)) {
+        iterator <- length(neighbours$normal)
+    } else {
+        iterator <- length(neighbours$tumor)
+    }
+
+    for (i in 1:iterator) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours$delta[i])
         edges[i, "weight"] <- neighbours$delta[i]

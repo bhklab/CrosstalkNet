@@ -1,4 +1,4 @@
-<md-card ng-show="vm.sdWithinTab.selectedEdge.source != null" class="edge-inspector">
+<md-card ng-if="vm.sdWithinTab.selectedEdge.source != null" class="edge-inspector">
     <md-card-title>
         <md-card-title-text>
             <div layout="row">
@@ -9,7 +9,9 @@
     <md-card-content>
         <div>Interactor #1: <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.selectedEdge.source | suffixTrim}}">{{vm.sdWithinTab.selectedEdge.source}}</a></div>
         <div>Interactor #2: <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.selectedEdge.target | suffixTrim}}">{{vm.sdWithinTab.selectedEdge.target}}</a></div>
-        <div>Correlation: {{vm.sdWithinTab.selectedEdge.weight}}</div>
+        <div>Weight/Delta: {{vm.getInteractionViaDictionary(vm, vm.sdWithinTab.selectedEdge.source, vm.sdWithinTab.selectedEdge.target).weight}}</div>
+        <div>Normal: {{vm.getInteractionViaDictionary(vm, vm.sdWithinTab.selectedEdge.source, vm.sdWithinTab.selectedEdge.target).normal}}</div>
+        <div>Tumor: {{vm.getInteractionViaDictionary(vm, vm.sdWithinTab.selectedEdge.source, vm.sdWithinTab.selectedEdge.target).tumor}}</div>
         <md-button ng-click="vm.closeEdgeInspector(vm)">Close</md-button>
     </md-card-content>
 </md-card>
