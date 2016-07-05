@@ -1,56 +1,32 @@
 <div ng-repeat="x in [] | range:vm.sdWithinTab.neighbours.length-1">
-    <md-card ng-show="vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null ">
-        <md-card-title>
-            <md-card-title-text>
-                <div layout="row">
-                    <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions</span></div>
-                <!-- <div flex style="position: relative;">
-                    <md-input-container class="no-margin right-aligned">
-                        <label>Filter Interactions</label>
-                        <input ng-model="interactionSearch">
-                    </md-input-container>
-                </div>
-                 -->
-                </div>
-                <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content class="table-card-height">
-            <table ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
-                <thead>
-                    <tr>
-                        <th> </th>
-                        <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="epi in vm.sdWithinTab.neighbours[x].epi">
-                        <td class="row-name">{{epi | suffixTrim}}</td>
-                        <td ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
-            <!-- exact table from live demo -->
-            <!--
-            <md-table-container>
-                <table id="{{ctrl + '-neighbours-table-' + x}}" md-table>
-                    <thead md-head>
-                        <tr md-row>
-                            <th md-column></th>
-                            <th md-column ng-repeat="stroma in neighbours[x].stroma"><span>{{stroma}}</span></th>
+    <div ng-repeat="matType in vm.sdWithinTab.edgeDictionary.types">
+        <md-card ng-if="vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null ">
+            <md-card-title>
+                <md-card-title-text>
+                    <div layout="row">
+                        <div flex><span class="md-headline">{{x + 1 | ordinal}} Neighbour Interactions</span></div>
+                    </div>
+                    <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content class="table-card-height">
+                <table ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
                         </tr>
                     </thead>
-                    <tbody md-body>
-                        <tr md-row ng-repeat="epi in neighbours[x].epi | limitTo: query.limit: (query.page - 1) * query.limit"">
-                            <td md-cell>{{epi}}</td>
-                            <td md-cell ng-repeat="stroma in neighbours[x].stroma">{{getInteractionViaDictionary(epi, stroma)}}</td>
+                    <tbody>
+                        <tr ng-repeat="epi in vm.sdWithinTab.neighbours[x].epi">
+                            <td class="row-name">{{epi | suffixTrim}}</td>
+                            <td ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)[matType]}}</td>
                         </tr>
                     </tbody>
                 </table>
-            </md-table-container>
-            <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{neighbours[x].epi.length}}"></md-table-pagination>-->
-            <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x)">Download Interactions</md-button>
-        </md-card-content>
-    </md-card>
+                <div ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
+                <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x)">Download Interactions</md-button>
+            </md-card-content>
+        </md-card>
+    </div>
 </div>

@@ -434,7 +434,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
             configUtils.setConfigLayout(config, layout);
 
             selfLoops = clientTableUtils.getSelfLoops(edges);
-            edgeDictionary = clientTableUtils.createEdgeDictionary(edges);
+            edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdges));
 
             res.json({
                 config: config,
