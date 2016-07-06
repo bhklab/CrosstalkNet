@@ -1,10 +1,10 @@
-<md-content ng-controller="MGQueryController as vm" ng-init="vm.initialize('main', 'nonDelta')">
+<md-content ng-controller="MGQueryController as vm" ng-init="vm.initialize('main')">
     <div class="md-padding">
         <div>
             <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
                 Click Reset Genes To Add More Genes
             </md-tooltip>
-            <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
+            <md-autocomplete ng-class="[vm.ctrl]" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                 <md-item-template>
                     <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
                 </md-item-template>
@@ -101,7 +101,7 @@
     <md-divider></md-divider>
     <div class="md-padding">
         <h2 class="md-subhead">Gene Locator</h2>
-        <md-autocomplete ng-class="[vm.graphType, vm.graphType + vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate')" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
+        <md-autocomplete ng-class="[vm.ctrl + 'geneLocator']" md-no-cache='true' md-selected-item="vm.zoomGene" md-search-text="vm.searchTextZoom" md-selected-item-change="vm.locateGene(vm, gene)" md-items="gene in vm.querySearch(vm.searchTextZoom, 'locate')" md-item-text="gene" md-min-length="0" placeholder="Locate Gene">
             <md-item-template>
                 <span md-highlight-text="vm.searchTextZoom" md-highlight-flags="^i">{{gene}}</span>
             </md-item-template>

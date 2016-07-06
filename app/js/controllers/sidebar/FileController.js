@@ -19,9 +19,8 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
         };
 

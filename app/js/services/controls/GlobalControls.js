@@ -107,12 +107,12 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
     }
 
     function resetInputFieldsGlobal(vm) {
-        angular.forEach(angular.element("md-autocomplete." + vm.graphType + " input"), function(value, key) {
+        angular.forEach(angular.element("md-autocomplete" + " input"), function(value, key) {
             var a = angular.element(value);
             a.val('');
         });
 
-        angular.forEach(angular.element("md-autocomplete." + vm.graphType + " button"), function(value, key) {
+        angular.forEach(angular.element("md-autocomplete" + " button"), function(value, key) {
             $timeout(function() {
                 var a = angular.element(value);
                 a.click();
@@ -122,7 +122,7 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
     }
 
     function resetInputFieldsLocal(vm, extraClass) {
-        angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " input"), function(value, key) {
+        angular.forEach(angular.element("md-autocomplete." + vm.ctrl + extraClass + " input"), function(value, key) {
             var a = angular.element(value);
             a.val('');
             if (document.activeElement != null) {
@@ -130,7 +130,7 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
             }
         });
 
-        angular.forEach(angular.element("md-autocomplete." + vm.graphType + vm.ctrl + extraClass + " button"), function(value, key) {
+        angular.forEach(angular.element("md-autocomplete." + vm.ctrl + extraClass + " button"), function(value, key) {
             $timeout(function() {
                 var a = angular.element(value);
                 a.click();

@@ -15,7 +15,7 @@
         </md-card-title>
         <md-card-content>
             <md-table-container>
-                <table ng-class="'all-paths-table' + vm.graphType + matType" md-table>
+                <table ng-class="'all-paths-table' + matType" md-table>
                     <thead md-head md-order="vm.sdWithinTab.tableOrder[matType]">
                         <th md-column>Source</th>
                         <th md-column md-column md-order-by="{{'\'firstEdge.' + matType + '\''}}" md-numeric>Correlation</th>
@@ -34,7 +34,7 @@
                     </tbody>
                 </table>
             </md-table-container>
-            <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + vm.graphType + matType)">Download Interactions</md-button>
+            <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + matType)">Download Interactions</md-button>
         </md-card-content>
     </md-card>
 </div>
