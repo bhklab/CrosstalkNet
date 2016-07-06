@@ -17,7 +17,8 @@
                 </md-card-title-text>
             </md-card-title>
             <md-card-content class="table-card-height">
-                <table ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000" id="{{vm.ctrl + '-neighbours-table-' + x}}">
+                <table ng-if="(vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000 && vm.sharedData.selectedNetworkType != vm.sharedData.networkTypes.delta) ||
+                (vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000 && vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta && x < 1) " id="{{vm.ctrl + '-neighbours-table-' + x}}">
                     <thead>
                         <tr>
                             <th> </th>

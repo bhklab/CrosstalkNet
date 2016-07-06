@@ -42,31 +42,16 @@ angular.module('myApp.controllers').controller('FileController', [
         };
 
         $scope.$watch(function() {
-                return vm.selectedNetworkType; },
+                return vm.selectedNetworkType;
+            },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
                     SharedService.resetCorrelationFiles();
                     vm.sharedData.clearAllData = true;
+                    SharedService.resetMatrixSummary();
                 }
             });
 
-        // $scope.$watch(function() {
-        //     return vm.sharedData.correlationFileActual;
-        // }, function(newValue, oldValue) {
-        //     GlobalControls.resetInputFieldsGlobal(vm);
-
-        //     if (newValue != "" && newValue != null && newValue != oldValue) {
-        //         QueryService.getGeneList(newValue).then(function(result) {
-        //             vm.sharedData.geneList = result.geneList;
-        //         });
-
-        //         QueryService.getMatrixSummary(newValue).then(function(result) {
-        //             vm.sharedData.matrixSummary = result.matrixSummary;
-        //         });
-
-        //         vm.sdWithinTab.selectedTab = 1;
-        //     }
-        // });
         $scope.$watch(function() {
             return vm.sharedData.reloadFileList;
         }, function(newValue, oldValue) {
