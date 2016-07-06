@@ -9,9 +9,8 @@ angular.module('myApp.controllers').controller('PEQueryController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
         };

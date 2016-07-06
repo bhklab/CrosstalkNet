@@ -11,9 +11,8 @@ angular.module('myApp.controllers').controller('LayoutController', [
 
         vm.resize = GraphConfigService.resetZoom;
 
-        $scope.init = function(ctrl, type) {
+        $scope.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             vm.layouts = angular.copy(GlobalControls.layouts[vm.ctrl]);
             vm.sdWithinTab.selectedLayout = vm.layouts[0].value;

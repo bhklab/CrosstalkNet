@@ -9,15 +9,13 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
         };
 
         vm.sharedData = SharedService.data.global;
-        //vm.getInteractionExplorerConfig = QueryService.getInteractionExplorerConfig;
 
         InteractionExplorerControls.setMethods(vm);
 
@@ -60,7 +58,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
                 if (vm.display == vm.displayModes.table) {
                     vm.needsRedraw = true;
                 }
-                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyInteractionExplorer" + vm.graphType);
+                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyInteractionExplorer");
                 vm.sdWithinTab.selfLoops = result.data.selfLoops;
                 vm.sdWithinTab.edgeDictionary = result.data.edgeDictionary;
 
@@ -110,7 +108,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
                         GraphConfigService.destroyGraph(vm);
                         vm.needsRedraw = false;
-                        vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyInteractionExplorer" + vm.graphType);
+                        vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyInteractionExplorer");
                     }
                 }, 250);
             }

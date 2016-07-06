@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 angular.module('myApp.controllers').controller('PathExistenceController', [
     '$scope',
@@ -9,9 +9,8 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             vm.sdWithinTab.display = vm.displayModes.table;
         };
