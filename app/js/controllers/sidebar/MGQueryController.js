@@ -9,9 +9,8 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             intializeVariables();
         };
@@ -85,7 +84,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
                 if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
                     vm.needsRedraw = true;
                 }
-                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyMain" + vm.graphType);
+                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyMain");
 
                 vm.sdWithinTab.edgeDictionary = result.data.edgeDictionary;
                 vm.sdWithinTab.selfLoops = result.data.selfLoops;
@@ -131,7 +130,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
                         GraphConfigService.destroyGraph(vm);
                         vm.needsRedraw = false;
-                        vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain" + vm.graphType);
+                        vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain");
                     }
                 }, 250);
             }

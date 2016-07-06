@@ -32,10 +32,10 @@
     <script src="js/controllers/sidebar/IEQueryController.js"></script>
     <script src="js/controllers/sidebar/MGQueryController.js"></script>
     <script src="js/controllers/sidebar/PEQueryController.js"></script>
-    <script src="js/controllers/wholeTab/nonDelta/LoginController.js"></script>
-    <script src="js/controllers/wholeTab/nonDelta/MainController.js"></script>
-    <script src="js/controllers/wholeTab/nonDelta/InteractionExplorerController.js"></script>
-    <script src="js/controllers/wholeTab/nonDelta/PathExistenceController.js"></script>
+    <script src="js/controllers/wholeTab/LoginController.js"></script>
+    <script src="js/controllers/wholeTab/MainController.js"></script>
+    <script src="js/controllers/wholeTab/InteractionExplorerController.js"></script>
+    <script src="js/controllers/wholeTab/PathExistenceController.js"></script>
     <script src="js/services/controls/GlobalControls.js"></script>
     <script src="js/services/controls/MainGraphControls.js"></script>
     <script src="js/services/controls/InteractionExplorerControls.js"></script>
@@ -76,13 +76,13 @@
         <md-content>
             <md-tabs md-selected="selectedTab" md-dynamic-height md-border-bottom md-disable-animation md-enable-disconnect="false">
                 <md-tab label="Main Graph">
-                    <md-content ng-controller="MainController as vm" ng-init="vm.initialize('main', 'nonDelta')">
+                    <md-content ng-controller="MainController as vm" ng-init="vm.initialize('main')">
                         <section layout="row">
                             <div class="md-whiteframe-1dp" static-include="partials/SideBar/main.html">
                             </div>
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
-                                    <div style="width: 100%; height:800px; background-color: white;" id="cyMainnonDelta"></div>
+                                    <div style="width: 100%; height:800px; background-color: white;" id="cyMain"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/overallMatrixSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
@@ -96,13 +96,13 @@
                     </md-content>
                 </md-tab>
                 <md-tab label="Interaction Explorer">
-                    <md-content ng-controller="InteractionExplorerController as vm" ng-init="vm.initialize('interactionExplorer', 'nonDelta')">
+                    <md-content ng-controller="InteractionExplorerController as vm" ng-init="vm.initialize('interactionExplorer')">
                         <section layout="row">
                             <div static-include="partials/SideBar/interactionExplorer.html">
                             </div>
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
-                                    <div style="width: 100%; height:800px; background-color: white;" id="cyInteractionExplorernonDelta"></div>
+                                    <div style="width: 100%; height:800px; background-color: white;" id="cyInteractionExplorer"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
@@ -113,7 +113,7 @@
                     </md-content>
                 </md-tab>
                 <md-tab label="Path Existence Viewer">
-                    <md-content ng-controller="PathExistenceController as vm" ng-init="vm.initialize('pathExistence', 'nonDelta')">
+                    <md-content ng-controller="PathExistenceController as vm" ng-init="vm.initialize('pathExistence')">
                         <section layout="row">
                             <div static-include="partials/SideBar/pathExistence.html">
                             </div>

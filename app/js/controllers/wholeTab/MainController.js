@@ -1,17 +1,20 @@
 'use strict';
 
-angular.module('myApp.controllers').controller('InteractionExplorerController', ['$scope',
+angular.module('myApp.controllers').controller('MainController', ['$scope',
     '$rootScope', 'RESTService',
     'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
     '$mdDialog',
     function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
+        $rootScope.selectedTab = 0;
+        $rootScope.states = angular.copy(GlobalControls.states);
+        $rootScope.state = $rootScope.states.initial;
+
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl, type) {
+        vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
-            vm.graphType = type;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             vm.sdWithinTab.display = vm.displayModes.graph;
         };
@@ -24,7 +27,5 @@ angular.module('myApp.controllers').controller('InteractionExplorerController', 
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
         vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
-
-        GlobalControls.setMethodsWholeTab(vm);
     }
 ]);

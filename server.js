@@ -19,29 +19,21 @@ var clientTableUtils = require('clientTableUtils');
 var parseUtils = require('parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-// var mongoose = require('mongoose');
-// var User = require('user');
 var databaseConfigUtils = require('databaseConfigUtils');
 var fileUtils = require('fileUtils');
 var bcrypt = require('bcrypt');
-var morgan = require('morgan')
-
-//mongoose.connect(databaseConfigUtils.database);
 
 var availableMatrices = {};
 
-// var sslOptions = {
-//   key: fs.readFileSync('key.pem'),
-//   cert: fs.readFileSync('cert.pem')
-// };
+app.get('', function(req, res) {
+    res.redirect('/app');
+});
 
 app.use('/app', express.static(__dirname + '/app'));
-//app.use(morgan('combined'));
 app.set('superSecret', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-//app.use(morgan('combined'));
 
 app.use(function(req, res, next) {
     console.log(req.body);
@@ -545,61 +537,6 @@ app.post('/delta-get-all-paths', function(req, res) {
     });
 
 });
-
-// app.post('/get-all-paths', function(req, res) {
-//     var args = {};
-//     var argsString = "";
-//     var argsArray = [];
-//     var file = fileUtils.matchSelectedFile(req.body.fileName, availableMatrices);
-//     var source = req.body.source;
-//     var target = req.body.target;
-
-//     if (file == null || file.path == null || file.fileName == null) {
-//         res.send({ error: "Please specify a file name" });
-//         return;
-//     }
-
-//     args.source = source;
-//     args.target = target;
-//     args.fileName = file.fileName;
-//     args.path = file.path;
-
-//     argsString = JSON.stringify(args);
-//     argsString = argsString.replace(/"/g, '\\"');
-
-//     var child = exec("Rscript R_Scripts/getAllPaths.R --args \"" + argsString + "\"", {
-//         maxBuffer: 1024 *
-//             50000
-//     }, function(error, stdout, stderr) {
-//         if (error != null) {
-//             console.log('error: ' + error);
-//         }
-
-//         if (stderr != null) {
-//             console.log(stderr);
-//         }
-
-//         var parsedValue = JSON.parse(stdout);
-//         var paths = parsedValue.paths;
-
-//         res.send({ paths: paths });
-//     });
-
-// });
-
-// app.post('/upload-matrix', multiparty({ maxFieldsSize: 15 * 1024 * 1024 }), function(req, res) {
-//     var file = req.files.file;
-//     var data = req.body.data;
-//     console.log(file.name);
-//     console.log(file.type);
-
-//     data = data.replace(/^data:;base64,/, "");
-
-//     fs.writeFile('R_Scripts/User_Matrices/' + file.name, data, 'base64', (err) => {
-//         if (err) throw err;
-//         checkFileIntegrity(req, res, file);
-//     });
-// });
 
 app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
