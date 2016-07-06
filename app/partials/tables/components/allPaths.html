@@ -16,23 +16,19 @@
         <md-card-content>
             <md-table-container>
                 <table ng-class="'all-paths-table' + vm.graphType + matType" md-table>
-                    <thead md-head md-order="vm.myOrder">
+                    <thead md-head md-order="vm.sdWithinTab.tableOrder[matType]">
                         <th md-column>Source</th>
-                        <th md-column md-column md-order-by="{{'firstEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th md-column md-column md-order-by="{{'\'firstEdge.' + matType + '\''}}" md-numeric>Correlation</th>
                         <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
-                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="{{'secondEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="{{'\'secondEdge.' + matType + '\''}}" md-numeric>Correlation</th>
                         <th md-column>Destination</th>
                     </thead>
                     <tbody md-body>
-                        <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.myOrder">
+                        <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.sdWithinTab.tableOrder[matType]">
                             <td class="table-center" md-cell>{{vm.sdWithinTab.pathSourceCached}}</td>
-                            <td class="table-center" md-cell>
-                                {{path["firstEdge." + matType]}}
-                            </td>
+                            <td class="table-center" md-cell>{{path["firstEdge." + matType]}}</td>
                             <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
-                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">
-                                {{path["secondEdge." + matType]}}
-                            </td>
+                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path["secondEdge." + matType]}}</td>
                             <td class="table-center" md-cell>{{vm.sdWithinTab.pathTargetCached}}</td>
                         </tr>
                     </tbody>
