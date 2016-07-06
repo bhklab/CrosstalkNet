@@ -22,12 +22,14 @@
                     <thead>
                         <tr>
                             <th> </th>
-                            <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{stroma | suffixTrim}}</th>
+                            <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">
+                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{stroma | suffixTrim}}">{{stroma | suffixTrim}}</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="epi in vm.sdWithinTab.neighbours[x].epi">
-                            <td class="row-name">{{epi | suffixTrim}}</td>
+                            <td class="row-name"><a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{epi | suffixTrim}}">{{epi | suffixTrim}}</a></td>
                             <td ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)[matType]}}</td>
                         </tr>
                     </tbody>
