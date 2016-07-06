@@ -29,14 +29,12 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
-    // service.querySearch = querySearch;
-
-    // service.clearLocatedGene = clearLocatedGene;
     service.changeDisplay = changeDisplay;
     service.closeEdgeInspector = closeEdgeInspector;
     service.getAllVisibleGenes = getAllVisibleGenes;
     service.resetInputFieldsGlobal = resetInputFieldsGlobal;
     service.resetInputFieldsLocal = resetInputFieldsLocal;
+    service.focusElement = focusElement;
 
     service.setMethodsSideBar = setMethodsSideBar;
     service.setMethodsWholeTab = setMethodsWholeTab;
@@ -143,6 +141,13 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
         if (document.activeElement != null) {
             document.activeElement.blur();
         }
+    }
+
+    function focusElement(selector) {
+        $timeout(function() {
+            var elem = angular.element(selector);
+            elem.focus();
+        }, 50);
     }
 
     function closeEdgeInspector(vm) {

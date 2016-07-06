@@ -29,6 +29,15 @@
     padding: 0;
 }
 
+.highlight:hover {
+    background: rgba(0,0,0, 0.3);
+    cursor: pointer;
+}
+
+.red-text {
+    color: #d50000;
+}
+
 md-sidenav {
     width: inherit;
     max-width: 350px;
@@ -37,6 +46,10 @@ md-sidenav {
 
 .bottom-margin {
     margin-bottom: 10px;
+}
+
+.left-margin {
+    margin-left: 15px;
 }
 
 .center-text {

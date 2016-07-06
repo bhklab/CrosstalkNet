@@ -15,6 +15,9 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
                 if (vm.genesOfInterest.indexOf(gene) < 0) {
                     vm.genesOfInterest.push(gene);
                 }
+
+                GlobalControls.resetInputFieldsLocal(vm, 'gene-input');
+                GlobalControls.focusElement("md-autocomplete." + vm.ctrl + "gene-input" + " input");
             }
         };
 
