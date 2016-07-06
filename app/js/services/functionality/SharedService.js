@@ -29,6 +29,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     service.resetWTM = resetWTM;
     service.resetWTMPE = resetWTMPE;
     service.resetCorrelationFiles = resetCorrelationFiles;
+    service.resetMatrixSummary = resetMatrixSummary;
 
     function resetWTM(vm) {
         for (var prop in withinTabModel) {
@@ -51,6 +52,10 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     function resetCorrelationFiles() {
         service.data.global.correlationFileActual = angular.copy(correlationFileModel);
+    }
+
+    function resetMatrixSummary() {
+        service.data.global.matrixSummary = null;
     }
 
     return service;
