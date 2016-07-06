@@ -159,13 +159,10 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType)
     edges <- createEmptyDifferentialEdges(length(neighbours[[networkType]]))
     
     if (!is.null(neighbours$delta)) {
-        write("delta iterator", stderr())
         iterator <- length(neighbours$delta)
     } else if (!is.null(neighbours$normal)) {
-        write("normal iterator", stderr())
         iterator <- length(neighbours$normal)
     } else {
-        write("tumor iterator", stderr())
         iterator <- length(neighbours$tumor)
     }
 

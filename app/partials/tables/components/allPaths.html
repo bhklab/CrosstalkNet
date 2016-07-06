@@ -25,11 +25,17 @@
                     </thead>
                     <tbody md-body>
                         <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.sdWithinTab.tableOrder[matType]">
-                            <td class="table-center" md-cell>{{vm.sdWithinTab.pathSourceCached}}</td>
+                            <td class="table-center" md-cell>
+                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.pathSourceCached | suffixTrim}}">{{vm.sdWithinTab.pathSourceCached}}</a>
+                            </td>
                             <td class="table-center" md-cell>{{path["firstEdge." + matType]}}</td>
-                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path.intermediateNode}}</td>
+                            <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">
+                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{path.intermediateNode | suffixTrim}}">{{path.intermediateNode}}</a>
+                            </td>
                             <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null">{{path["secondEdge." + matType]}}</td>
-                            <td class="table-center" md-cell>{{vm.sdWithinTab.pathTargetCached}}</td>
+                            <td class="table-center" md-cell>
+                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.pathTargetCached | suffixTrim}}">{{vm.sdWithinTab.pathTargetCached}}</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

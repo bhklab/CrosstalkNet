@@ -89,8 +89,6 @@ app.post('/gene-list', function(req, res) {
     var argsString = "";
     var file;
 
-    console.log(availableMatrices);
-
     if (req.body.fileName.delta != null) {
         file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
     } else if (req.body.fileName.normal != null) {
@@ -113,7 +111,6 @@ app.post('/gene-list', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    console.log("request passed authentication");
     var child = exec("Rscript R_Scripts/getGeneList.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
@@ -200,8 +197,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var parsedValue = JSON.parse(stdout);
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
-
-            console.log(parsedEdges);
 
             var interactionsTableList = [];
             var sourceNodes = [];
@@ -544,9 +539,6 @@ app.post('/available-matrices', function(req, res) {
     var fileNames = [];
     var matrices = {};
 
-    console.log(Object.keys(result));
-    console.log(types);
-
     for (var i = 0; i < types.length; i++) {
         if (Object.keys(result).indexOf(types[i]) >= 0 && result[types[i]] != null) {
             matrices[types[i]] = result[types[i]];
@@ -581,7 +573,6 @@ app.post('/overall-matrix-stats', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    console.log("request passed authentication");
     var child = exec("Rscript R_Scripts/getOverallMatrixStats.R  --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
