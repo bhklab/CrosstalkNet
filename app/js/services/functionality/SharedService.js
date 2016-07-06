@@ -20,7 +20,8 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
-    var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null };
+    var tableOrderModel = {weight: null, normal: null, tumor: null};
+    var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel)};
 
     service.data.main = angular.copy(withinTabModel);
     service.data.interactionExplorer = angular.copy(withinTabModel);
@@ -39,7 +40,10 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     function resetWTMPE(vm) {
         for (var prop in withinTabModelPE) {
-            if (prop != "display") {
+            if (prop == "tableOrder") {
+                vm.sdWithinTab[prop] = angular.copy(tableOrderModel);
+            }
+            else if (prop != "display") {
                 vm.sdWithinTab[prop] = withinTabModel[prop];
             }
         }
