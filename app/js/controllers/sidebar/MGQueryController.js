@@ -23,7 +23,6 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             vm.zoomGene = null;
             vm.searchTextGOI = "";
             vm.searchTextFirst = "";
-            vm.searchTextSecond = "";
             vm.searchTextZoom = "";
 
             vm.minDegree = {
@@ -81,6 +80,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
 
                 $rootScope.state = $rootScope.states.loadingConfig;
                 vm.totalInteractions = result.data.totalInteractions;
+                
                 if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
                     vm.needsRedraw = true;
                 }
