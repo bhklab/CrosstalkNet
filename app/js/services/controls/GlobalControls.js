@@ -29,6 +29,8 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
 
     service.layouts.interactionExplorer = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
 
+    service.startingLayouts = {main: service.layouts.main[1], interactionExplorer: service.layouts.interactionExplorer[0]};
+
     service.changeDisplay = changeDisplay;
     service.closeEdgeInspector = closeEdgeInspector;
     service.getAllVisibleGenes = getAllVisibleGenes;
@@ -38,7 +40,6 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
 
     service.setMethodsSideBar = setMethodsSideBar;
     service.setMethodsWholeTab = setMethodsWholeTab;
-
 
     function setMethodsSideBar(vm) {
         vm.querySearch = function(query, source) {

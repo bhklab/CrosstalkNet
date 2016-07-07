@@ -62,8 +62,7 @@
 <body md-no-ink>
     <md-toolbar ng-controller="LoginController" class=" md-primary md-hue-3">
         <div class="toolbar-height" layout="row">
-            <div class="flex-toolbar align-flex-vertical left-padded" flex="33">Status:
-                <span>{{state.text}}</span>
+            <div class="flex-toolbar align-flex-vertical left-padded" flex="33">Status: {{state.text}}
                 <md-progress-circular ng-show="state == states.loading" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="33">
@@ -82,7 +81,7 @@
                             </div>
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
-                                    <div style="width: 100%; height:800px; background-color: white;" id="cyMain"></div>
+                                    <div class="graph-container" id="cyMain"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/overallMatrixSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
@@ -102,7 +101,7 @@
                             </div>
                             <md-content flex>
                                 <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
-                                    <div style="width: 100%; height:800px; background-color: white;" id="cyInteractionExplorer"></div>
+                                    <div class="graph-container" id="cyInteractionExplorer"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>

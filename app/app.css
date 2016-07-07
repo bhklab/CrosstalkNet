@@ -1,5 +1,15 @@
 /* app css stylesheet */
 
+.graph-container {
+    width: 100%;
+    height: 800px;
+    background-color: white;
+}
+
+md-list-item.md-clickable:hover {
+    cursor: initial;
+}
+
 .flex-toolbar {
     display: flex;
 }
@@ -66,6 +76,10 @@ md-sidenav {
 
 .left-margin {
     margin-left: 15px;
+}
+
+.right-margin {
+    margin-right: 15px;
 }
 
 .center-text {
