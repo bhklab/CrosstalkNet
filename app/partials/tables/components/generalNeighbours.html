@@ -1,6 +1,6 @@
 <div ng-repeat="x in [] | range:vm.sdWithinTab.neighbours.length-1">
     <div ng-repeat="matType in vm.sdWithinTab.edgeDictionary.types">
-        <md-card ng-if="vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null ">
+        <md-card ng-if="::(vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null)">
             <md-card-title>
                 <md-card-title-text>
                     <div layout="row">
@@ -13,28 +13,28 @@
                             </span>
                         </div>
                     </div>
-                    <span class="md-subhead">Total: {{vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
+                    <span class="md-subhead">Total: {{::vm.sdWithinTab.cy.edges("[neighbourLevel=" + (x + 1) + "]").length}}</span>
                 </md-card-title-text>
             </md-card-title>
             <md-card-content class="table-card-height">
-                <table ng-if="(vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000 && vm.sharedData.selectedNetworkType != vm.sharedData.networkTypes.delta) ||
+                <table ng-if="::(vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000 && vm.sharedData.selectedNetworkType != vm.sharedData.networkTypes.delta) ||
                 (vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length < 1000 && vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta && x < 1) " id="{{vm.ctrl + '-neighbours-table-' + x}}">
                     <thead>
                         <tr>
                             <th> </th>
-                            <th ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">
-                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{stroma | suffixTrim}}">{{stroma | suffixTrim}}</a>
+                            <th ng-repeat="stroma in ::vm.sdWithinTab.neighbours[x].stroma">
+                                <a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{::stroma | suffixTrim}}">{{stroma | suffixTrim}}</a>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="epi in vm.sdWithinTab.neighbours[x].epi">
-                            <td class="row-name"><a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{epi | suffixTrim}}">{{epi | suffixTrim}}</a></td>
-                            <td ng-repeat="stroma in vm.sdWithinTab.neighbours[x].stroma">{{vm.getInteractionViaDictionary(vm, epi, stroma)[matType]}}</td>
+                        <tr ng-repeat="epi in ::vm.sdWithinTab.neighbours[x].epi">
+                            <td class="row-name"><a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{::epi | suffixTrim}}">{{epi | suffixTrim}}</a></td>
+                            <td ng-repeat="stroma in ::vm.sdWithinTab.neighbours[x].stroma">{{::vm.getInteractionViaDictionary(vm, epi, stroma, matType)}}</td>
                         </tr>
                     </tbody>
                 </table>
-                <div ng-if="vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000">Table too large to display. Click download button go obtain CSV file instead.</div>
+                <div ng-if="::(vm.sdWithinTab.neighbours[x].epi.length * vm.sdWithinTab.neighbours[x].stroma.length >= 1000)">Table too large to display. Click download button go obtain CSV file instead.</div>
                 <md-button class="md-raised md-primary" ng-click="vm.exportNeighboursToCSV(vm, x, matType)">Download Interactions</md-button>
             </md-card-content>
         </md-card>

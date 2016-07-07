@@ -67,6 +67,7 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
         };
 
         vm.removeGenesOfInterest = function() {
+            vm.GOIState = vm.GOIStates.initial;
             vm.genesOfInterest = [];
             vm.allVisibleGenes = [];
             GraphConfigService.destroyGraph(vm);
