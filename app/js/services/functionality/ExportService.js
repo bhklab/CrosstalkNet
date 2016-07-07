@@ -76,7 +76,7 @@ myModule.factory('ExportService', function($http, $filter) {
             var temp = [];
             temp.push($filter('suffixTrim')(neighbours.epi[i]));
             for (var j = 0; j < neighbours.stroma.length; j++) {
-                temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j])[networkType]);
+                temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j], networkType));
             }
 
             csv += temp.join();

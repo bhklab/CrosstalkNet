@@ -3,7 +3,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     var service = {};
     var networkTypes = { normal: 'normal', tumor: 'tumor', delta: 'delta' };
     var correlationFileModel = { normal: null, tumor: null, delta: null };
-    var dataModel = { reloadFileList: false, correlationFileActual: angular.copy(correlationFileModel), geneList: null, matrixSummary: null, selectedNetworkType: networkTypes.normal, clearAllData: false, networkTypes: networkTypes};
+    var dataModel = { reloadFileList: false, correlationFileActual: angular.copy(correlationFileModel), geneList: null, matrixSummary: null, selectedNetworkType: networkTypes.tumor, clearAllData: false, networkTypes: networkTypes};
 
     service.data = {global: angular.copy(dataModel)};
 
