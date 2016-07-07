@@ -6,11 +6,11 @@ myModule.factory('TableService', function($http, $rootScope) {
     service.getNeighboursGeneral = getNeighboursGeneral;
     service.getNeighboursFromEdges = getNeighboursFromEdges;
 
-    function getInteractionViaDictionary(vm, source, target) {
+    function getInteractionViaDictionary(vm, source, target, matType) {
         if (vm.sdWithinTab.edgeDictionary[source] != null && vm.sdWithinTab.edgeDictionary[source][target] != null) {
-            return vm.sdWithinTab.edgeDictionary[source][target];
+            return vm.sdWithinTab.edgeDictionary[source][target][matType]; 
         } else if (vm.sdWithinTab.edgeDictionary[target] != null && vm.sdWithinTab.edgeDictionary[target][source] != null) {
-            return vm.sdWithinTab.edgeDictionary[target][source];
+            return vm.sdWithinTab.edgeDictionary[target][source][matType];
         } else {
             return 0;
         }

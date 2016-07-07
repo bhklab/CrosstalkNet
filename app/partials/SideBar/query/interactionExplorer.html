@@ -16,7 +16,7 @@
         Selected Path
         <md-list class="selected-genes-list">
             <md-list-item ng-repeat="gene in vm.genesOfInterest">
-                <span ng-click="vm.removeGene(gene)" class="highlight right-margin red-text">X</span>
+                <span ng-if="$last" ng-click="vm.removeGene(gene)" class="highlight right-margin red-text">X</span>
                 <span>{{gene.value}}</span>
             </md-list-item>
         </md-list>
