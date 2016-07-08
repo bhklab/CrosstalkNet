@@ -6,21 +6,21 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser')
 var app = express();
-var nodeUtils = require('nodeUtils');
-var configUtils = require('configUtils');
-var edgeUtils = require('edgeUtils');
-var styleUtils = require('styleUtils');
-var geneUtils = require('geneUtils');
-var execUtils = require('execUtils');
-var layoutUtils = require('layoutUtils');
-var authenticationUtils = require('authenticationUtils');
-var validationUtils = require('validationUtils');
-var clientTableUtils = require('clientTableUtils');
-var parseUtils = require('parseUtils');
+var nodeUtils = require('./server-utils/nodeUtils');
+var configUtils = require('./server-utils/configUtils');
+var edgeUtils = require('./server-utils/edgeUtils');
+var styleUtils = require('./server-utils/styleUtils');
+var geneUtils = require('./server-utils/geneUtils');
+var execUtils = require('./server-utils/execUtils');
+var layoutUtils = require('./server-utils/layoutUtils');
+var authenticationUtils = require('./server-utils/authenticationUtils');
+var validationUtils = require('./server-utils/validationUtils');
+var clientTableUtils = require('./server-utils/clientTableUtils');
+var parseUtils = require('./server-utils/parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-var databaseConfigUtils = require('databaseConfigUtils');
-var fileUtils = require('fileUtils');
+var databaseConfigUtils = require('./server-utils/databaseConfigUtils');
+var fileUtils = require('./server-utils/fileUtils');
 var bcrypt = require('bcrypt');
 
 var availableMatrices = {};
@@ -30,7 +30,7 @@ app.get('', function(req, res) {
 });
 
 app.use('/app', express.static(__dirname + '/app'));
-app.set('superSecret', databaseConfigUtils.secret);
+app.set('secretKey', databaseConfigUtils.secret);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-                            var token = jwt.sign(user, app.get('superSecret'), {
+                            var token = jwt.sign(user, app.get('secretKey'), {
                                 expiresIn: '168h' // expires in 7 days
                             });
 
@@ -65,7 +65,7 @@ app.use(function(req, res, next) {
                 });
         }
     } else {
-        jwt.verify(req.body.token, app.get('superSecret'), function(err, decoded) {
+        jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
             if (err) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
@@ -666,6 +666,10 @@ function createSampleUser() {
 app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
+
+    var salt = bcrypt.genSaltSync(3);
+    var password = bcrypt.hashSync('', salt);
+    console.log("password: " + password);
 
     initializeAvaialbleMatrices();
     console.log(availableMatrices);
