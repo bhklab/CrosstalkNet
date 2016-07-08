@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('RESTService', function($http, $cookies) {
+myModule.factory('RESTService', function($http, $cookies, SharedService) {
     var SERVER_URL = "http://localhost:5000/";
     //\var SERVER_URL = "http://epistroma.pmgenomics.ca/";
 
@@ -10,7 +10,7 @@ myModule.factory('RESTService', function($http, $cookies) {
     }
 
     function post(url, data) {
-        data.token = $cookies.get('token');
+        SharedService.data.global.guest ? data.token = 'guest' : data.token = $cookies.get('token');
         return $http.post(SERVER_URL + url, data).then(function(result) {
             return result.data;
         });
