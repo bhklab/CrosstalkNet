@@ -1,5 +1,22 @@
 /* app css stylesheet */
 
+md-dialog md-dialog-actions.login {
+    display: block;
+    justify-content: inherit;
+    padding-right: 16px;
+}
+
+md-dialog md-dialog-actions .md-button {
+    margin-right: 8px;
+}
+
+.login-controls-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .graph-container {
     width: 100%;
     height: 800px;

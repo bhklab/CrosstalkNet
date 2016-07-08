@@ -18,7 +18,7 @@ var bipartiteStyles = {
                 'text-halign': 'center',
                 'text-valign': 'center',
                 'text-outline-color': 'red',
-                'text-outline-width': 2,
+                'text-outline-width': 1,
                 'color': 'white',
                 'font-family': 'Verdana'
             }
@@ -37,7 +37,7 @@ var bipartiteStyles = {
                 'text-halign': 'center',
                 'text-valign': 'center',
                 'text-outline-color': 'blue',
-                'text-outline-width': 2,
+                'text-outline-width': 1,
                 'color': 'white',
                 'font-family': 'Verdana'
             }

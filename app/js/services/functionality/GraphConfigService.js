@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('GraphConfigService', function($http, RESTService) {
+myModule.factory('GraphConfigService', function($http) {
     var service = {};
 
     service.tabNames = { main: "main", neighbour: "neighbour" };
@@ -182,6 +182,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
 
     function resetZoom(vm) {
         if (vm.sdWithinTab.cy != null) {
+            vm.sdWithinTab.cy.resize();
             vm.sdWithinTab.cy.fit(vm.sdWithinTab.cy.$("*"), 10);
         }
     }
