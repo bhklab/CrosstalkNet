@@ -39,11 +39,6 @@ angular.module('myApp.controllers').controller('LoginController', [
                     clickOutsideToClose: false,
                     fullscreen: false,
                     targetEvent: ev
-                })
-                .then(function(answer) {
-
-                }, function() {
-
                 });
         };
 
@@ -61,16 +56,23 @@ angular.module('myApp.controllers').controller('LoginController', [
                         if (data.token != null) {
                             $cookies.put('token', data.token, { expires: exp });
                         }
-                        
+
                         $scope.sharedData.reloadFileList = true;
                         $mdDialog.hide('');
                     }
                 });
         };
 
+        $scope.guestLogin = function() {
+            $rootScope.tokenSet = true;
+            $scope.sharedData.guest = true;
+            $scope.sharedData.reloadFileList = true;
+            $mdDialog.hide('');
+        };
+
         $scope.answer = function(answer) {
             $mdDialog.hide(answer);
-        };        
+        };
 
         $scope.checkToken();
     }

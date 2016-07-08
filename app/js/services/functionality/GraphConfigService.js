@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('GraphConfigService', function($http, RESTService) {
+myModule.factory('GraphConfigService', function($http) {
     var service = {};
 
     service.tabNames = { main: "main", neighbour: "neighbour" };

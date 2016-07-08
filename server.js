@@ -22,6 +22,7 @@ var jwt = require('jsonwebtoken');
 var databaseConfigUtils = require('./server-utils/databaseConfigUtils');
 var fileUtils = require('./server-utils/fileUtils');
 var bcrypt = require('bcrypt');
+var jsonfile = require('jsonfile');
 
 var availableMatrices = {};
 
@@ -46,12 +47,24 @@ app.use(function(req, res, next) {
                     if (!user) {
                         res.json({ success: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
+                        if (user.name == 'guest') {
+                            res.json({
+                                success: true,
+                                message: 'Enjoy your token!',
+                                token: 'guest'
+                            });
+
+                            return;
+                        }
+
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
                             var token = jwt.sign(user, app.get('secretKey'), {
                                 expiresIn: '168h' // expires in 7 days
                             });
+
+                            authenticationUtils.addTokenToUser(user, token);
 
                             res.json({
                                 success: true,
@@ -64,6 +77,9 @@ app.use(function(req, res, next) {
 
                 });
         }
+    } else if (req.body.token == 'guest') {
+        req.accessLevel = 0;
+        next();
     } else {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
             if (err) {
@@ -71,6 +87,7 @@ app.use(function(req, res, next) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
                 req.decoded = decoded;
+                req.accessLevel = authenticationUtils.getAccessLevelToken(req.body.token);
                 next();
             }
         });
@@ -90,11 +107,11 @@ app.post('/gene-list', function(req, res) {
     var file;
 
     if (req.body.fileName.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -538,10 +555,13 @@ app.post('/available-matrices', function(req, res) {
     var types = req.body.types;
     var fileNames = [];
     var matrices = {};
+    var accessibleMatrices;
+
+    req.accessLevel == 0 || req.accessLevel == null ? accessibleMatrices = result.fake : accessibleMatrices = result.real;
 
     for (var i = 0; i < types.length; i++) {
-        if (Object.keys(result).indexOf(types[i]) >= 0 && result[types[i]] != null) {
-            matrices[types[i]] = result[types[i]];
+        if (Object.keys(accessibleMatrices).indexOf(types[i]) >= 0 && accessibleMatrices[types[i]] != null) {
+            matrices[types[i]] = accessibleMatrices[types[i]];
             matrices[types[i]] = matrices[types[i]].map(function(file) {
                 return file.fileName
             });
@@ -556,11 +576,11 @@ app.post('/overall-matrix-stats', function(req, res) {
     var file;
 
     if (req.body.fileName.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices);
+        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -594,28 +614,14 @@ app.post('/overall-matrix-stats', function(req, res) {
 });
 
 function getAvailableMatrices() {
-    var fileNames = [];
     var fileList = [];
-    var result = { normal: [], tumor: [], delta: [] };
+    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] } };
 
     var directories = ['normal', 'tumor', 'delta'];
 
     for (var i = 0; i < directories.length; i++) {
-        fileNames = fs.readdirSync('R_Scripts/User_Matrices/' + directories[i]);
-
-        fileNames = fileNames.filter(function(fileName) {
-            return fileName.indexOf('degree') < 0 && fileName.indexOf('gitkeep') < 0;
-        });
-
-        fileList = fileNames.map(function(file) {
-            return {
-                fileName: file,
-                pValue: "",
-                path: "R_Scripts/User_Matrices/" + directories[i] + "/"
-            };
-        });
-
-        result[directories[i]] = fileList;
+        result.real[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/User_Matrices/' + directories[i]);
+        result.fake[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/Fake_Matrices/' + directories[i]);
     }
 
     return result;

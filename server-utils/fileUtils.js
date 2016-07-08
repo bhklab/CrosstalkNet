@@ -10,30 +10,30 @@ function getRequestedFiles(req, availableMatrices, degree) {
     }
 
     if (req.body.selectedNetworkType == 'normal' && req.body.fileName.normal != null) {
-        file = matchSelectedFile(req.body.fileName.normal, availableMatrices);
+        file = matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
 
         if (file != null) {
             result.normal = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
     } else if (req.body.selectedNetworkType == 'tumor' && req.body.fileName.tumor != null) {
-        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices);
+        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
 
         if (file != null) {
             result.tumor = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
     } else if (req.body.selectedNetworkType == 'delta' && req.body.fileName.delta != null) {
-        file = matchSelectedFile(req.body.fileName.delta, availableMatrices);
+        file = matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
 
         if (file != null) {
             result.delta = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
 
-        file = matchSelectedFile(req.body.fileName.normal, availableMatrices);
+        file = matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
         result.normal = file.path + file.fileName;
-        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices);
+        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
         result.tumor = file.path + file.fileName;
 
         if (result.tumor == null || result.normal == null) {
@@ -50,7 +50,7 @@ function getRequestedFiles(req, availableMatrices, degree) {
             if (!degree) {
                 continue;
             }
-            
+
             val = fs.accessSync(result[prop], fs.R_OK, function(err) {
                 if (err) {
                     return { error: prop + " file does not exist!" };
@@ -68,15 +68,39 @@ function getRequestedFiles(req, availableMatrices, degree) {
     return result;
 }
 
-function matchSelectedFile(fileName, availableMatrices) {
+function getFilesInDirectory(directory) {
+    var fileNames = null;
+    var fileList = null;
+
+    fileNames = fs.readdirSync(directory);
+
+    fileNames = fileNames.filter(function(fileName) {
+        return fileName.indexOf('degree') < 0 && fileName.indexOf('gitkeep') < 0;
+    });
+
+    fileList = fileNames.map(function(file) {
+        return {
+            fileName: file,
+            pValue: "",
+            path: directory + "/"
+        };
+    });
+
+    return fileList;
+}
+
+function matchSelectedFile(fileName, availableMatrices, accessLevel) {
     if (fileName == null) {
         return null;
     }
 
-    for (var prop in availableMatrices) {
-        for (var i = 0; i < availableMatrices[prop].length; i++) {
-            if (availableMatrices[prop][i].fileName == fileName) {
-                return availableMatrices[prop][i];
+    var accessibleMatrices;
+    accessLevel == 0 || accessLevel == null ? accessibleMatrices = availableMatrices.fake : accessibleMatrices = availableMatrices.real;
+
+    for (var prop in accessibleMatrices) {
+        for (var i = 0; i < accessibleMatrices[prop].length; i++) {
+            if (accessibleMatrices[prop][i].fileName == fileName) {
+                return accessibleMatrices[prop][i];
             }
         }
     }
@@ -87,5 +111,6 @@ function matchSelectedFile(fileName, availableMatrices) {
 
 module.exports = {
     getRequestedFiles: getRequestedFiles,
-    matchSelectedFile: matchSelectedFile
+    matchSelectedFile: matchSelectedFile,
+    getFilesInDirectory: getFilesInDirectory
 };
