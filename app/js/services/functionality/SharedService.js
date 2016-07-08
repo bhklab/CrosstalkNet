@@ -1,11 +1,20 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService) {
+myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphConfigService, ValidationService) {
     var service = {};
     var networkTypes = { normal: 'normal', tumor: 'tumor', delta: 'delta' };
     var correlationFileModel = { normal: null, tumor: null, delta: null };
-    var dataModel = { reloadFileList: false, correlationFileActual: angular.copy(correlationFileModel), geneList: null, matrixSummary: null, selectedNetworkType: networkTypes.tumor, clearAllData: false, networkTypes: networkTypes};
+    var dataModel = {
+        reloadFileList: false,
+        correlationFileActual: angular.copy(correlationFileModel),
+        geneList: null,
+        matrixSummary: null,
+        selectedNetworkType: networkTypes.tumor,
+        clearAllData: false,
+        networkTypes: networkTypes,
+        guest: false
+    };
 
-    service.data = {global: angular.copy(dataModel)};
+    service.data = { global: angular.copy(dataModel) };
 
     var withinTabModel = {
         cy: null,
@@ -20,8 +29,8 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
-    var tableOrderModel = {weight: null, normal: null, tumor: null};
-    var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel)};
+    var tableOrderModel = { weight: null, normal: null, tumor: null };
+    var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel) };
 
     service.data.main = angular.copy(withinTabModel);
     service.data.interactionExplorer = angular.copy(withinTabModel);
@@ -43,8 +52,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         for (var prop in withinTabModelPE) {
             if (prop == "tableOrder") {
                 vm.sdWithinTab[prop] = angular.copy(tableOrderModel);
-            }
-            else if (prop != "display") {
+            } else if (prop != "display") {
                 vm.sdWithinTab[prop] = withinTabModel[prop];
             }
         }
