@@ -1,6 +1,6 @@
 'use strict'
 
-var styleUtils = require('styleUtils');
+var styleUtils = require('./styleUtils');
 
 var classes = [];
 for (var key in styleUtils.classSuffixes) {
