@@ -3,7 +3,6 @@
         <md-toolbar>
             <div class="md-toolbar-tools">
                 <h2>Login</h2>
-                
             </div>
         </md-toolbar>
         <md-dialog-content>
@@ -19,10 +18,15 @@
                 </md-input-container>
             </div>
         </md-dialog-content>
-        <md-dialog-actions layout="row">
-            <md-button class="md-raised md-primary" ng-click="ctrl.parent.login()">
-                Login
-            </md-button>
+        <md-dialog-actions class="login">
+            <div>
+                <div class="login-controls-container">
+                    <md-button class="md-raised md-primary" ng-click="ctrl.parent.login()">Login</md-button>
+                </div>
+                <div class="login-controls-container">
+                    <md-button md-no-ink class="md-primary" ng-click="ctrl.parent.guestLogin()">Sign in as Guest</md-button>
+                </div>
+            </div>
         </md-dialog-actions>
     </form>
 </md-dialog>
