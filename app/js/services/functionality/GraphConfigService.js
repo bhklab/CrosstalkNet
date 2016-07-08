@@ -76,6 +76,7 @@ myModule.factory('GraphConfigService', function($http, RESTService) {
             resetEdges(vm);
         });
 
+        
         cy.nodes().not(':parent').forEach(function(n) {
             var g = n.data('id').slice(0, -2);
             n.qtip({
