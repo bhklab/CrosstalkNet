@@ -9,11 +9,11 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
     service.getInteractionExplorerConfig = getInteractionExplorerConfig;
     service.getAllPaths = getAllPaths;
 
-    function getGeneList(fileName) {
+    function getGeneList(file) {
         $rootScope.state = $rootScope.states.gettingGeneList;
         var deferred = $q.defer();
 
-        RESTService.post('gene-list', { fileName: fileName })
+        RESTService.post('gene-list', { selectedFile: file })
             .then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
                     deferred.resolve({ geneList: null });
@@ -39,10 +39,10 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         return deferred.promise;
     }
 
-    function getMatrixSummary(fileName) {
+    function getMatrixSummary(file) {
         var deferred = $q.defer();
 
-        RESTService.post('overall-matrix-stats', { fileName: fileName }).then(function(data) {
+        RESTService.post('overall-matrix-stats', { selectedFile: file }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
                 deferred.resolve({ matrixSummary: null });
             }
@@ -95,7 +95,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
                 filterSecond: filterSecond && filter,
                 layout: vm.sdWithinTab.selectedLayout,
                 depth: depth,
-                fileName: vm.sharedData.correlationFileActual,
+                selectedFile: vm.sharedData.correlationFileActual,
                 selectedNetworkType: vm.sharedData.selectedNetworkType
             })
             .then(function(data) {
@@ -116,7 +116,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         RESTService.post('delta-interaction-explorer', {
             layout: vm.sdWithinTab.selectedLayout,
             selectedGenes: vm.genesOfInterest,
-            fileName: vm.sharedData.correlationFileActual,
+            selectedFile: vm.sharedData.correlationFileActual,
             selectedNetworkType: vm.sharedData.selectedNetworkType
         }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
@@ -137,7 +137,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         RESTService.post('delta-get-all-paths', {
             target: vm.pathExplorerTarget.value,
             source: vm.pathExplorerSource.value,
-            fileName: vm.sharedData.correlationFileActual, 
+            selectedFile: vm.sharedData.correlationFileActual, 
             selectedNetworkType: vm.sharedData.selectedNetworkType
         }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
