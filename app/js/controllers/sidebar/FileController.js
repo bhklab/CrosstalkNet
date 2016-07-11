@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('FileController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService,
+    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -18,6 +18,8 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
+
+        vm.matrixUpload = {normal: null, tumor: null, delta: null};
 
         vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
@@ -38,6 +40,10 @@ angular.module('myApp.controllers').controller('FileController', [
                 vm.sharedData.clearAllData = false;
                 vm.sdWithinTab.selectedTab = 1;
             });
+        };
+
+        vm.uploadFiles = function() {
+            FileUploadService.uploadFiles(vm.matrixUpload);
         };
 
         $scope.$watch(function() {

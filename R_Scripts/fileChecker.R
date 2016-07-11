@@ -2,10 +2,10 @@ library(jsonlite)
 library(Matrix)
 
 source('R_Scripts/helpers.R')
-setwd('R_Scripts/User_Matrices')
 
 args <- commandArgs(trailingOnly = TRUE)
-fileName <- args[2]
+settings <- fromJSON(args[2])
+fileName <- settings$fileName
 
 write('fileName:', stderr())
 write(fileName, stderr())

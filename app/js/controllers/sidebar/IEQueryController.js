@@ -3,8 +3,8 @@
 angular.module('myApp.controllers').controller('IEQueryController', [
     '$scope',
     '$rootScope', 'RESTService',
-    'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'InitializationService', 'ValidationService', 'ExportService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, InitializationService, ValidationService, ExportService, SharedService, TableService,
+    'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
+    function($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, InitializationService, ValidationService, SharedService, TableService,
         QueryService, $q, $timeout) {
         var vm = this;
         vm.scope = $scope;

@@ -1,8 +1,8 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('FileUploadService', function($http, $timeout, Upload, $rootScope) {
+myModule.factory('FileUploadService', function($http, $timeout, Upload, $rootScope, $cookies, RESTService) {
     var service = {};
 
-    service.uploadFiles = function(file, errFiles, scope) {
+    service.uploadFile = function(file, errFiles, scope) {
         $rootScope.state = $rootScope.states.uploadingFile;
         scope.f = file;
         scope.errFile = errFiles && errFiles[0];
@@ -41,7 +41,48 @@ myModule.factory('FileUploadService', function($http, $timeout, Upload, $rootSco
 
             r.readAsDataURL(file);
         }
+    };
+
+    service.uploadFiles = function(files) {
+        $rootScope.state = $rootScope.states.uploadingFile;
+
+        for (prop in files) {
+            if (files[prop]) {
+                uploadHelper(files[prop]);
+            }
+        }
+    };
+
+    function uploadHelper(file) {
+        if (file) {
+            var r = new FileReader();
+            r.onload = function(e) {
+                var contents = e.target.result;
+                var fileProperties = {};
+
+                for (prop in file) {
+                	if (prop.indexOf('$') < 0) {
+                		fileProperties[prop] = file[prop];
+                	}
+                }
+
+                fileProperties.data = r.result;
+                RESTService.post('upload-matrix', { file: fileProperties, token: $cookies.get('token') })
+                    .then(function(data) {
+                        if (!ValidationService.checkServerResponse(data)) {
+                            deferred.resolve({ fileList: null });
+                        }
+
+                        deferred.resolve({ fileList: data.fileList });
+                    }, function(response) {
+                    	console.log(response);
+                    });
+            }
+
+            r.readAsDataURL(file);
+        }
     }
+
 
     return service;
 });

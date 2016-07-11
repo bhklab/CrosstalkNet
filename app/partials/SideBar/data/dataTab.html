@@ -32,5 +32,17 @@
             </md-select>
         </md-input-container>
     </div>
+    <md-divider></md-divider>
+    <h4>Choose file(s) to upload</h4>
+    <form>
+        <input ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.normal" ngf-max-height="1000" ngf-max-size="20MB">
+        </input>
+        <input ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.tumor" ngf-max-height="1000" ngf-max-size="20MB">
+        </input>
+        <input ng-if="vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.delta" ngf-max-height="1000" ngf-max-size="20MB">
+        </input>
+        <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised">Upload Files</md-button>
+    </form>
+    <md-divider></md-divider>
     <md-button class="md-primary md-raised" ng-click="vm.getGenes()">Get Genes</md-button>
 </md-content>

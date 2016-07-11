@@ -1,30 +1,5 @@
 'use strict'
 
-function createEdgeDictionary(edges) {
-    var dictionary = {};
-
-    for (var i = 0; i < edges.length; i++) {
-        var id = edges[i].data.source;
-        if (id.endsWith('-E')) {
-            if (dictionary[id] == null) {
-                dictionary[id] = {};
-            }
-
-            dictionary[id][edges[i].data.target] = edges[i].data.weight;
-        } else {
-            id = edges[i].data.target;
-
-            if (dictionary[id] == null) {
-                dictionary[id] = {};
-            }
-
-            dictionary[id][edges[i].data.source] = edges[i].data.weight;
-        }
-    }
-
-    return dictionary;
-}
-
 function createEdgeDictionaryFromREdges(REdges) {
     var dictionary = {};
     dictionary.types = ["weight"];
@@ -96,7 +71,6 @@ function getSelfLoops(edges) {
 }
 
 module.exports = {
-    createEdgeDictionary: createEdgeDictionary,
     getSelfLoops: getSelfLoops,
     createEdgeDictionaryFromREdges: createEdgeDictionaryFromREdges
 };
