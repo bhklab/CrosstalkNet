@@ -26,6 +26,7 @@ var mkdirp = require('mkdirp');
 
 var availableMatrices = {};
 
+
 app.get('', function(req, res) {
     res.redirect('/app');
 });
@@ -99,12 +100,12 @@ app.post('/gene-list', function(req, res) {
     var argsString = "";
     var file;
 
-    if (req.body.fileName.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
+    if (req.body.selectedFile.delta != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, req.accessLevel);
     } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, req.accessLevel);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -549,15 +550,22 @@ app.post('/upload-matrix', function(req, res) {
     var file = req.body.file;
     var data = req.body.file.data;
     var user = authenticationUtils.getUserFromToken(req.body.token);
+    var type = req.body.type;
 
     if (user == null) {
         console.log("Unable to find user for token: " + req.body.token);
         res.send({ error: "Unable to find user for specified token" });
+        return;
+    }
+
+    if (type != 'normal' || type != 'tumor' || type != 'delta') {
+        res.send({ error: "Unable to determine type of file e.g. normal, tumor, delta" });
+        return;
     }
 
     data = data.replace(/^data:;base64,/, "");
 
-    mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name, function(err) {
+    mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type, function(err) {
         if (err) {
             res.send({ error: "Could not create directory for user." })
             console.error(err)
@@ -566,30 +574,41 @@ app.post('/upload-matrix', function(req, res) {
         }
     });
 
-    fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + file.name, data, 'base64', (err) => {
+    fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name, data, 'base64', (err) => {
         if (err) {
             console.log(err);
             res.send({ error: "Unable to upload file: " + file.name });
         }
-        checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + file.name);
+
+        checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name);
     });
 });
 
 app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
-    var types = req.body.types;
+    var subTypes = req.body.types;
     var fileNames = [];
     var matrices = {};
-    var accessibleMatrices;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var accessibleMatrices = fileUtils.filterMatricesByAccessLevel(result, user);
 
-    req.accessLevel == 0 || req.accessLevel == null ? accessibleMatrices = result.fake : accessibleMatrices = result.real;
+    for (var type in accessibleMatrices) {
+        for (var i = 0; i < subTypes.length; i++) {
+            if (Object.keys(accessibleMatrices[type]).indexOf(subTypes[i]) >= 0 && accessibleMatrices[type][subTypes[i]] != null) {
+                if (matrices[subTypes[i]] == null) {
+                    matrices[subTypes[i]] = accessibleMatrices[type][subTypes[i]];
+                } else {
+                    matrices[subTypes[i]] = matrices[subTypes[i]].concat(accessibleMatrices[type][subTypes[i]]);
+                }
 
-    for (var i = 0; i < types.length; i++) {
-        if (Object.keys(accessibleMatrices).indexOf(types[i]) >= 0 && accessibleMatrices[types[i]] != null) {
-            matrices[types[i]] = accessibleMatrices[types[i]];
-            matrices[types[i]] = matrices[types[i]].map(function(file) {
-                return file.fileName
-            });
+                matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
+                    return {
+                        name: file.fileName,
+                        type: file.type,
+                        subType: file.subType
+                    };
+                });
+            }
         }
     }
 
@@ -640,13 +659,26 @@ app.post('/overall-matrix-stats', function(req, res) {
 
 function getAvailableMatrices() {
     var fileList = [];
-    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] } };
+    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: {} };
 
     var directories = ['normal', 'tumor', 'delta'];
 
     for (var i = 0; i < directories.length; i++) {
-        result.real[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/User_Matrices/' + directories[i]);
-        result.fake[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/Fake_Matrices/' + directories[i]);
+        result.real[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/User_Matrices/' + directories[i], 'real', directories[i]);
+        result.fake[directories[i]] = fileUtils.getFilesInDirectory('R_Scripts/Fake_Matrices/' + directories[i], 'fake', directories[i]);
+    }
+
+    var personalDirectories = fs.readdirSync('R_Scripts/Uploaded_Matrices');
+
+    for (var i = 0; i < personalDirectories.length; i++) {
+        result.personal[personalDirectories[i]] = { normal: [], tumor: [], delta: [] };
+        for (var j = 0; j < directories.length; j++) {
+            fs.accessSync('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], fs.R_OK, function(err) {
+                if (!err) {
+                    result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
+                }
+            });
+        }
     }
 
     return result;
@@ -658,7 +690,7 @@ function checkFileIntegrity(req, res, fileName) {
 
     args.fileName = fileName
 
-        argsString = JSON.stringify(args);
+    argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
     var child = exec("Rscript R_Scripts/fileChecker.R --args \"" + argsString + "\"", function(error, stdout, stderr) {

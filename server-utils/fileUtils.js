@@ -1,15 +1,16 @@
 'use strict'
 const fs = require('fs');
+var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 
 function getRequestedFiles(req, availableMatrices, degree) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
     var file = null;
 
-    if (req == null || req.body == null || req.body.fileName == null) {
+    if (req == null || req.body == null || req.body.file == null) {
         return null;
     }
 
-    if (req.body.selectedNetworkType == 'normal' && req.body.fileName.normal != null) {
+    if (req.body.selectedNetworkType == 'normal' && req.body.file.normal.name != null) {
         file = matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
 
         if (file != null) {
@@ -68,7 +69,7 @@ function getRequestedFiles(req, availableMatrices, degree) {
     return result;
 }
 
-function getFilesInDirectory(directory) {
+function getFilesInDirectory(directory, type, subType) {
     var fileNames = null;
     var fileList = null;
 
@@ -82,30 +83,61 @@ function getFilesInDirectory(directory) {
         return {
             fileName: file,
             pValue: "",
-            path: directory + "/"
+            path: directory + "/",
+            type: type,
+            subType: subType
         };
     });
 
     return fileList;
 }
 
-function matchSelectedFile(fileName, availableMatrices, accessLevel) {
-    if (fileName == null) {
+function matchSelectedFile(file, availableMatrices, user) {
+    if (file == null || file.fileName == null || file.type == null || file.subType == null) {
         return null;
     }
 
-    var accessibleMatrices;
+    var accessibleMatrices = filterMatricesByAccessLevel(availableMatrices, user);
+
+
     accessLevel == 0 || accessLevel == null ? accessibleMatrices = availableMatrices.fake : accessibleMatrices = availableMatrices.real;
 
-    for (var prop in accessibleMatrices) {
-        for (var i = 0; i < accessibleMatrices[prop].length; i++) {
-            if (accessibleMatrices[prop][i].fileName == fileName) {
-                return accessibleMatrices[prop][i];
+    for (var type in accessibleMatrices) {
+        for (var subType in accessibleMatrices[type]) {
+            for (var i = 0; i < accessibleMatrices[type][subType].length; i++) {
+                if (accessibleMatrices[type][subType][i].fileName == fileName) {
+                    return accessibleMatrices[type][subType][i];
+                }
             }
         }
     }
 
     return null;
+}
+
+function filterMatricesByAccessLevel(availableMatrices, user) {
+    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: { normal: [], tumor: [], delta: [] } };
+
+    if (user != null) {
+        if (user.accessLevel == 'admin') {
+            result.real = availableMatrices.real;
+
+            for (var prop in availableMatrices.personal) {
+                result.personal.normal = availableMatrices.personal[prop].normal;
+                result.personal.tumor = availableMatrices.personal[prop].tumor;
+                result.personal.delta = availableMatrices.personal[prop].delta;
+            }
+
+            result.personal = availableMatrices.personal;
+        } else if (user.accessLevel == 1) {
+            result.real = availableMatrices.real;
+            result.personal = availableMatrices.personal[user.name];
+        }
+    } else {
+        result.fake = availableMatrices.fake;
+    }
+
+    return result;
 }
 
 
