@@ -22,18 +22,18 @@ function addTokenToUser(user, token) {
     }
 }
 
-function getAccessLevelToken(token) {
+function getUserFromToken(token) {
     if (token == null) {
-        return 0;
+        return null;
     }
 
     for (var i = 0; i < users.length; i++) {
         if (users[i].token == token) {
-            return users[i].accessLevel;
+            return users[i];
         }
     }
 
-    return 0;
+    return null;
 }
 
 function getUser(name, callback) {
@@ -54,5 +54,5 @@ loadUsers(file);
 module.exports = {
     getUser: getUser,
     addTokenToUser: addTokenToUser,
-    getAccessLevelToken: getAccessLevelToken
+    getUserFromToken: getUserFromToken
 };
