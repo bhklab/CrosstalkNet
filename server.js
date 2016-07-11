@@ -11,7 +11,6 @@ var configUtils = require('./server-utils/configUtils');
 var edgeUtils = require('./server-utils/edgeUtils');
 var styleUtils = require('./server-utils/styleUtils');
 var geneUtils = require('./server-utils/geneUtils');
-var execUtils = require('./server-utils/execUtils');
 var layoutUtils = require('./server-utils/layoutUtils');
 var authenticationUtils = require('./server-utils/authenticationUtils');
 var validationUtils = require('./server-utils/validationUtils');
@@ -23,6 +22,7 @@ var databaseConfigUtils = require('./server-utils/databaseConfigUtils');
 var fileUtils = require('./server-utils/fileUtils');
 var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
+var mkdirp = require('mkdirp');
 
 var availableMatrices = {};
 
@@ -33,11 +33,9 @@ app.get('', function(req, res) {
 app.use('/app', express.static(__dirname + '/app'));
 app.set('secretKey', databaseConfigUtils.secret);
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb', strict: false }));
 
 app.use(function(req, res, next) {
-    console.log(req.body);
     if (req.body.token == null) {
         if (req.body.user == null) {
             res.send({ error: "Failed to authenticate." });
@@ -47,20 +45,10 @@ app.use(function(req, res, next) {
                     if (!user) {
                         res.json({ success: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
-                        if (user.name == 'guest') {
-                            res.json({
-                                success: true,
-                                message: 'Enjoy your token!',
-                                token: 'guest'
-                            });
-
-                            return;
-                        }
-
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-                            var token = jwt.sign(user, app.get('secretKey'), {
+                            var token = jwt.sign({ user: user.name + user.password }, app.get('secretKey'), {
                                 expiresIn: '168h' // expires in 7 days
                             });
 
@@ -86,8 +74,13 @@ app.use(function(req, res, next) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
-                req.decoded = decoded;
-                req.accessLevel = authenticationUtils.getAccessLevelToken(req.body.token);
+                var user = authenticationUtils.getUserFromToken(req.body.token);
+
+                if (user) {
+                    req.accessLevel = user.accessLevel;
+                } else {
+                    req.accessLevel = 0;
+                }
                 next();
             }
         });
@@ -313,7 +306,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
 app.post('/delta-submatrix', function(req, res) {
     var args = {};
     var argsString = "";
-    var argsArray = [];
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
     var requestedLayout = req.body.layout;
@@ -498,7 +490,6 @@ app.post('/delta-submatrix', function(req, res) {
 app.post('/delta-get-all-paths', function(req, res) {
     var args = {};
     var argsString = "";
-    var argsArray = [];
     var source = req.body.source;
     var target = req.body.target;
     var files = null;
@@ -548,6 +539,40 @@ app.post('/delta-get-all-paths', function(req, res) {
         res.send({ paths: paths, types: types });
     });
 
+});
+
+app.post('/upload-matrix', function(req, res) {
+    if (req.accessLevel == 0) {
+        return;
+    }
+
+    var file = req.body.file;
+    var data = req.body.file.data;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+
+    if (user == null) {
+        console.log("Unable to find user for token: " + req.body.token);
+        res.send({ error: "Unable to find user for specified token" });
+    }
+
+    data = data.replace(/^data:;base64,/, "");
+
+    mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name, function(err) {
+        if (err) {
+            res.send({ error: "Could not create directory for user." })
+            console.error(err)
+        } else {
+            console.log('pow!')
+        }
+    });
+
+    fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + file.name, data, 'base64', (err) => {
+        if (err) {
+            console.log(err);
+            res.send({ error: "Unable to upload file: " + file.name });
+        }
+        checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + file.name);
+    });
 });
 
 app.post('/available-matrices', function(req, res) {
@@ -627,8 +652,16 @@ function getAvailableMatrices() {
     return result;
 }
 
-function checkFileIntegrity(req, res, file) {
-    var child = exec("Rscript R_Scripts/fileChecker.R --args " + file.name, function(error, stdout, stderr) {
+function checkFileIntegrity(req, res, fileName) {
+    var args = {};
+    var argsString = "";
+
+    args.fileName = fileName
+
+        argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/fileChecker.R --args \"" + argsString + "\"", function(error, stdout, stderr) {
         console.log('stderr: ' + stderr);
 
         if (error != null) {
