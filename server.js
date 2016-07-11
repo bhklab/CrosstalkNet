@@ -25,6 +25,11 @@ var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
 
 var availableMatrices = {};
+var fileUploadState = {
+    single: -1,
+    multipleCompleted: 3,
+    failed: -20
+};
 
 
 app.get('', function(req, res) {
@@ -34,7 +39,7 @@ app.get('', function(req, res) {
 app.use('/app', express.static(__dirname + '/app'));
 app.set('secretKey', databaseConfigUtils.secret);
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb', strict: false }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(function(req, res, next) {
     if (req.body.token == null) {
@@ -49,7 +54,7 @@ app.use(function(req, res, next) {
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-                            var token = jwt.sign({ user: user.name + user.password }, app.get('secretKey'), {
+                            var token = jwt.sign({ user: Date.now() }, app.get('secretKey'), {
                                 expiresIn: '168h' // expires in 7 days
                             });
 
@@ -99,13 +104,15 @@ app.post('/gene-list', function(req, res) {
     var args = { pValue: null, fileName: null };
     var argsString = "";
     var file;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    console.log(req.body);
 
     if (req.body.selectedFile.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, req.accessLevel);
-    } else if (req.body.fileName.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, req.accessLevel);
-    } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, req.accessLevel);
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
+    } else if (req.body.selectedFile.normal != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
+    } else if (req.body.selectedFile.tumor != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -166,8 +173,9 @@ app.post('/delta-interaction-explorer', function(req, res) {
     var requestedLayout = req.body.layout;
     var genesArg = "";
     var files = null;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, true);
+    files = fileUtils.getRequestedFiles(req, availableMatrices, true, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -311,11 +319,12 @@ app.post('/delta-submatrix', function(req, res) {
     var selectedGenes = req.body.selectedGenes;
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
+    var user = authenticationUtils.getUserFromToken(req.body.token);
     console.log(req.body);
 
     var files = null;
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, true);
+    files = fileUtils.getRequestedFiles(req, availableMatrices, true, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -494,8 +503,9 @@ app.post('/delta-get-all-paths', function(req, res) {
     var source = req.body.source;
     var target = req.body.target;
     var files = null;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, false);
+    files = fileUtils.getRequestedFiles(req, availableMatrices, false, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -543,14 +553,9 @@ app.post('/delta-get-all-paths', function(req, res) {
 });
 
 app.post('/upload-matrix', function(req, res) {
-    if (req.accessLevel == 0) {
-        return;
-    }
-
-    var file = req.body.file;
-    var data = req.body.file.data;
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    var type = req.body.type;
+    var files = req.body.files;
+    var uploadType = req.body.type;
 
     if (user == null) {
         console.log("Unable to find user for token: " + req.body.token);
@@ -558,30 +563,64 @@ app.post('/upload-matrix', function(req, res) {
         return;
     }
 
-    if (type != 'normal' || type != 'tumor' || type != 'delta') {
-        res.send({ error: "Unable to determine type of file e.g. normal, tumor, delta" });
+    if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
+        res.send({ error: "Not enough files specified for delta network" });
         return;
     }
 
-    data = data.replace(/^data:;base64,/, "");
+    var completed = { state: 0 };
 
-    mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type, function(err) {
-        if (err) {
-            res.send({ error: "Could not create directory for user." })
-            console.error(err)
-        } else {
-            console.log('pow!')
-        }
+    async.eachSeries(Object.keys(files), function iteratee(item) {
+
+    }))
+
+    async.eachSeries(Object.keys(files), function iteratee(item) {
+        fileUtils.writeFile(file, type, user); 
+    }, function done() {
+        //...
     });
 
-    fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name, data, 'base64', (err) => {
-        if (err) {
-            console.log(err);
-            res.send({ error: "Unable to upload file: " + file.name });
+    for (var type in files) {
+        if (type != 'normal' && type != 'tumor' && type != 'delta') {
+            res.send({ error: "Unable to determine type of file e.g. normal, tumor, delta" });
+            return;
         }
 
-        checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name);
-    });
+        if (files[type] == null) {
+            continue;
+        }
+
+        files[type].data = files[type].data.replace(/^data:;base64,/, "");
+
+        mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type, function(err) {
+            if (err) {
+                res.send({ error: "Could not create directory for user." })
+                console.error(err)
+                return;
+            }
+        });
+
+        fileUtils.writeFile(req, res, file, user, type, completed, checkFileIntegrity)
+        fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + files[type].name, files[type].data, 'base64', (err) => {
+            if (err) {
+                console.log(err);
+                res.send({ error: "Unable to upload file: " + files[type].name });
+                return;
+            }
+
+            checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, completed);
+        });
+
+        if (completed.state == fileUploadState.failed) {
+            break;
+        }
+    }
+
+    if (completed.state == fileUploadState.failed) {
+        for (var type in files[type]) {
+            fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type]);
+        }
+    }
 });
 
 app.post('/available-matrices', function(req, res) {
@@ -600,16 +639,18 @@ app.post('/available-matrices', function(req, res) {
                 } else {
                     matrices[subTypes[i]] = matrices[subTypes[i]].concat(accessibleMatrices[type][subTypes[i]]);
                 }
-
-                matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
-                    return {
-                        name: file.fileName,
-                        type: file.type,
-                        subType: file.subType
-                    };
-                });
             }
         }
+    }
+
+    for (var i = 0; i < subTypes.length; i++) {
+        matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
+            return {
+                name: file.fileName,
+                type: file.type,
+                subType: file.subType
+            };
+        });
     }
 
     res.send({ fileList: matrices });
@@ -618,13 +659,14 @@ app.post('/available-matrices', function(req, res) {
 app.post('/overall-matrix-stats', function(req, res) {
     var args = {};
     var file;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    if (req.body.fileName.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
-    } else if (req.body.fileName.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
-    } else if (req.body.fileName.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
+    if (req.body.selectedFile.delta != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
+    } else if (req.body.selectedFile.normal != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
+    } else if (req.body.selectedFile.tumor != null) {
+        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
     }
 
     if (file == null || file.path == null || file.fileName == null) {
@@ -669,25 +711,27 @@ function getAvailableMatrices() {
     }
 
     var personalDirectories = fs.readdirSync('R_Scripts/Uploaded_Matrices');
-
     for (var i = 0; i < personalDirectories.length; i++) {
         result.personal[personalDirectories[i]] = { normal: [], tumor: [], delta: [] };
         for (var j = 0; j < directories.length; j++) {
-            fs.accessSync('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], fs.R_OK, function(err) {
-                if (!err) {
-                    result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
-                }
-            });
+            try {
+                fs.accessSync('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], fs.R_OK)
+                result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
+
+            } catch (err) {
+                console.log(err);
+            }
         }
     }
 
     return result;
 }
 
-function checkFileIntegrity(req, res, fileName) {
+function checkFileIntegrity(req, res, filePath, fileName, completed) {
     var args = {};
     var argsString = "";
 
+    args.filePath = filePath;
     args.fileName = fileName
 
     argsString = JSON.stringify(args);
@@ -704,9 +748,18 @@ function checkFileIntegrity(req, res, fileName) {
         var parsedValue = JSON.parse(stdout);
         var status = parsedValue.status;
         var message = parsedValue.message;
-        var fileList = getAvailableMatrices();
+        var fileList;
+        availableMatrices = getAvailableMatrices();
+        fileList = availableMatrices;
 
-        res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
+        completed.state++;
+        console.log("completed.state: " + completed.state);
+        if (completed.state == fileUploadState.single || completed.state == fileUploadState.multipleCompleted) {
+            res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
+        } else if (status > 0) {
+            completed.state = fileUploadState.failed;
+            res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
+        }
     });
 }
 
