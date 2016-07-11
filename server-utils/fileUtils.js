@@ -2,39 +2,39 @@
 const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 
-function getRequestedFiles(req, availableMatrices, degree) {
+function getRequestedFiles(req, availableMatrices, degree, user) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
     var file = null;
 
-    if (req == null || req.body == null || req.body.file == null) {
+    if (req == null || req.body == null || req.body.selectedFile == null) {
         return null;
     }
 
-    if (req.body.selectedNetworkType == 'normal' && req.body.file.normal.name != null) {
-        file = matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
+    if (req.body.selectedNetworkType == 'normal' && req.body.selectedFile.normal.name != null) {
+        file = matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
 
         if (file != null) {
             result.normal = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
-    } else if (req.body.selectedNetworkType == 'tumor' && req.body.fileName.tumor != null) {
-        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
+    } else if (req.body.selectedNetworkType == 'tumor' && req.body.selectedFile.tumor != null) {
+        file = matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
 
         if (file != null) {
             result.tumor = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
-    } else if (req.body.selectedNetworkType == 'delta' && req.body.fileName.delta != null) {
-        file = matchSelectedFile(req.body.fileName.delta, availableMatrices, req.accessLevel);
+    } else if (req.body.selectedNetworkType == 'delta' && req.body.selectedFile.delta != null) {
+        file = matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
 
         if (file != null) {
             result.delta = file.path + file.fileName;
             result.degree = file.path + "degrees" + file.fileName;
         }
 
-        file = matchSelectedFile(req.body.fileName.normal, availableMatrices, req.accessLevel);
+        file = matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
         result.normal = file.path + file.fileName;
-        file = matchSelectedFile(req.body.fileName.tumor, availableMatrices, req.accessLevel);
+        file = matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
         result.tumor = file.path + file.fileName;
 
         if (result.tumor == null || result.normal == null) {
@@ -79,6 +79,10 @@ function getFilesInDirectory(directory, type, subType) {
         return fileName.indexOf('degree') < 0 && fileName.indexOf('gitkeep') < 0;
     });
 
+    if (type == 'personal') {
+        console.log(fileNames);
+    }
+
     fileList = fileNames.map(function(file) {
         return {
             fileName: file,
@@ -93,21 +97,20 @@ function getFilesInDirectory(directory, type, subType) {
 }
 
 function matchSelectedFile(file, availableMatrices, user) {
-    if (file == null || file.fileName == null || file.type == null || file.subType == null) {
+    console.log("file " + file);
+    console.log(file.name);
+    console.log(file.type);
+    console.log(file.subType);
+    if (file == null || file.name == null || file.type == null || file.subType == null) {
         return null;
     }
 
     var accessibleMatrices = filterMatricesByAccessLevel(availableMatrices, user);
 
-
-    accessLevel == 0 || accessLevel == null ? accessibleMatrices = availableMatrices.fake : accessibleMatrices = availableMatrices.real;
-
-    for (var type in accessibleMatrices) {
-        for (var subType in accessibleMatrices[type]) {
-            for (var i = 0; i < accessibleMatrices[type][subType].length; i++) {
-                if (accessibleMatrices[type][subType][i].fileName == fileName) {
-                    return accessibleMatrices[type][subType][i];
-                }
+    if (accessibleMatrices[file.type] != null && accessibleMatrices[file.type][file.subType] != null) {
+        for (var i = 0; i < accessibleMatrices[file.type][file.subType].length; i++) {
+            if (accessibleMatrices[file.type][file.subType][i].fileName == file.name) {
+                return accessibleMatrices[file.type][file.subType][i];
             }
         }
     }
@@ -127,11 +130,14 @@ function filterMatricesByAccessLevel(availableMatrices, user) {
                 result.personal.tumor = availableMatrices.personal[prop].tumor;
                 result.personal.delta = availableMatrices.personal[prop].delta;
             }
-
-            result.personal = availableMatrices.personal;
         } else if (user.accessLevel == 1) {
             result.real = availableMatrices.real;
-            result.personal = availableMatrices.personal[user.name];
+            if (availableMatrices.personal[user.name] != null) {
+                result.personal = availableMatrices.personal[user.name];
+
+            } else {
+                result.personal = { normal: [], tumor: [], delta: [] };
+            }
         }
     } else {
         result.fake = availableMatrices.fake;
@@ -140,9 +146,37 @@ function filterMatricesByAccessLevel(availableMatrices, user) {
     return result;
 }
 
+function removeFile(path, file) {
+    console.log(path);
+    console.log(file);
+    if (path != null && file != null) {
+        fs.unlink(path + file.name, function(err) {
+            console.log(err);
+        });
+        fs.unlink(path + 'degrees' + file.name, function(err) {
+            console.log(err);
+        });
+    }
+}
+
+function writeFile(req, res, file, user, type, completed, callback) {
+    completed.state++;
+    fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name, file.data, 'base64', (err) => {
+        if (err) {
+            console.log(err);
+            res.send({ error: "Unable to upload file: " + file.name });
+        }
+
+        callback(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", file.name, completed);
+    });
+}
+
 
 module.exports = {
     getRequestedFiles: getRequestedFiles,
     matchSelectedFile: matchSelectedFile,
-    getFilesInDirectory: getFilesInDirectory
+    getFilesInDirectory: getFilesInDirectory,
+    filterMatricesByAccessLevel: filterMatricesByAccessLevel,
+    removeFile: removeFile,
+    writeFile: writeFile
 };

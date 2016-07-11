@@ -32,14 +32,14 @@ angular.module('myApp.controllers').controller('LoginController', [
 
         $scope.showLoginDialog = function(ev) {
             $mdDialog.show({
-                    controller: function() { this.parent = $scope; },
-                    controllerAs: 'ctrl',
-                    templateUrl: '/app/partials/dialogs/loginDialog.html',
-                    parent: angular.element(document.body),
-                    clickOutsideToClose: false,
-                    fullscreen: false,
-                    targetEvent: ev
-                });
+                controller: function() { this.parent = $scope; },
+                controllerAs: 'ctrl',
+                templateUrl: '/app/partials/dialogs/loginDialog.html',
+                parent: angular.element(document.body),
+                clickOutsideToClose: false,
+                fullscreen: false,
+                targetEvent: ev
+            });
         };
 
         $scope.login = function() {
