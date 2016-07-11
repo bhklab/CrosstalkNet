@@ -1,5 +1,5 @@
 var myModule = angular.module("myApp.services");
-myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, GraphConfigService, RESTService, ValidationService, GlobalControls, TableService) {
+myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cookies, GraphConfigService, RESTService, ValidationService, GlobalControls, TableService, SharedService) {
     var service = {};
 
     service.getGeneList = getGeneList;
@@ -8,6 +8,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
     service.getRelevantGenes = getRelevantGenes;
     service.getInteractionExplorerConfig = getInteractionExplorerConfig;
     service.getAllPaths = getAllPaths;
+    service.uploadFiles = uploadFiles;
 
     function getGeneList(file) {
         $rootScope.state = $rootScope.states.gettingGeneList;
@@ -137,17 +138,30 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, Graph
         RESTService.post('delta-get-all-paths', {
             target: vm.pathExplorerTarget.value,
             source: vm.pathExplorerSource.value,
-            selectedFile: vm.sharedData.correlationFileActual, 
+            selectedFile: vm.sharedData.correlationFileActual,
             selectedNetworkType: vm.sharedData.selectedNetworkType
         }).then(function(data) {
             if (!ValidationService.checkServerResponse(data)) {
                 deferred.resolve({ allPaths: null });
             }
 
-            deferred.resolve({ allPaths: data.paths, types: data.types});
+            deferred.resolve({ allPaths: data.paths, types: data.types });
         });
 
         return deferred.promise;
+    }
+
+    function uploadFiles(files, type) {
+        RESTService.post('upload-matrix', { files: files, token: $cookies.get('token'), type: type })
+            .then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    return;
+                }
+
+                SharedService.data.global.reloadFileList = true;
+            }, function(response) {
+                console.log(response);
+            });
     }
 
     return service;

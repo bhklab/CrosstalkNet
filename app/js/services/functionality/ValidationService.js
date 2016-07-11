@@ -10,6 +10,8 @@ myModule.factory('ValidationService', function($http, $rootScope) {
         } else if (data.success == false) {
             alert(data.message);
             $rootScope.tokenSet = false;
+        } else if (data.fileStatus) {
+            alert(data.fileStatus);
         }
         else {
             return true;

@@ -12,7 +12,7 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.sharedData = SharedService.data.global;
         vm.fileList = { normal: null, tumor: null, delta: null };
 
-        vm.correlationFileDisplayed = null;
+        vm.correlationFileDisplayed = {normal: null, tumor: null, delta: null};
         vm.selectedNetworkType = vm.sharedData.selectedNetworkType;
 
         vm.getFileList = QueryService.getFileList;
@@ -29,6 +29,9 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getGenes = function() {
             vm.sharedData.clearAllData = true;
             vm.sharedData.selectedNetworkType = vm.selectedNetworkType;
+            vm.sharedData.correlationFileActual.normal = JSON.parse(vm.correlationFileDisplayed.normal);
+            vm.sharedData.correlationFileActual.tumor = JSON.parse(vm.correlationFileDisplayed.tumor);
+            vm.sharedData.correlationFileActual.delta = JSON.parse(vm.correlationFileDisplayed.delta);
             GlobalControls.resetInputFieldsGlobal(vm);
 
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
@@ -43,7 +46,7 @@ angular.module('myApp.controllers').controller('FileController', [
         };
 
         vm.uploadFiles = function() {
-            FileUploadService.uploadFiles(vm.matrixUpload);
+            FileUploadService.uploadFiles(vm.matrixUpload, vm.selectedNetworkType);
         };
 
         $scope.$watch(function() {

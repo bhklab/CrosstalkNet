@@ -2,7 +2,7 @@
     <div class="md-padding">
         <div>
             <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
-                Click Reset Genes To Add More Genes
+                Click Reset To Add More Genes
             </md-tooltip>
             <md-autocomplete ng-class="[vm.ctrl, vm.ctrl + 'gene-input']" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                 <md-item-template>
@@ -18,7 +18,7 @@
                 <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
             </div>
             <div flex="60">
-                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset Gene Selection</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset</md-button>
             </div>
         </div>
         <div>
