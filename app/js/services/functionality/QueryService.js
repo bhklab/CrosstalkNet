@@ -5,10 +5,12 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
     service.getGeneList = getGeneList;
     service.getFileList = getFileList;
     service.getMatrixSummary = getMatrixSummary;
-    service.getRelevantGenes = getRelevantGenes;
+    service.getMainGraph = getMainGraph;
     service.getInteractionExplorerConfig = getInteractionExplorerConfig;
     service.getAllPaths = getAllPaths;
     service.uploadFiles = uploadFiles;
+    service.deleteFile = deleteFile;
+    service.getUserPermission = getUserPermission;
 
     function getGeneList(file) {
         $rootScope.state = $rootScope.states.gettingGeneList;
@@ -53,7 +55,7 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
         return deferred.promise;
     }
 
-    function getRelevantGenes(vm, filter) {
+    function getMainGraph(vm, filter) {
         var deferred = $q.defer();
         var filterFirst = false;
         var filterSecond = false;
@@ -152,7 +154,24 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
     }
 
     function uploadFiles(files, type) {
-        RESTService.post('upload-matrix', { files: files, token: $cookies.get('token'), type: type })
+        var deferred = $q.defer();
+
+        RESTService.post('upload-matrix', { files: files, type: type })
+            .then(function(data) {
+                SharedService.data.global.reloadFileList = true;
+
+                ValidationService.checkServerResponse(data);
+                deferred.resolve({ result: null });
+
+            }, function(response) {
+                console.log(response);
+            });
+
+        return deferred.promise;
+    }
+
+    function deleteFile(file) {
+        RESTService.post('delete-file', { file: file })
             .then(function(data) {
                 SharedService.data.global.reloadFileList = true;
 
@@ -162,6 +181,23 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
             }, function(response) {
                 console.log(response);
             });
+    }
+
+    function getUserPermission() {
+        var deferred = $q.defer();
+
+        RESTService.post('get-user-permission', {})
+            .then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    deferred.resolve({permission: null});
+                }
+
+                deferred.resolve({permission: data.permission});
+            }, function(response) {
+                console.log(response);
+            });
+
+        return deferred.promise;
     }
 
     return service;
