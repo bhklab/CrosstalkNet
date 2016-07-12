@@ -552,77 +552,6 @@ app.post('/delta-get-all-paths', function(req, res) {
 
 });
 
-app.post('/upload-matrix', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var files = req.body.files;
-    var uploadType = req.body.type;
-
-    if (user == null) {
-        console.log("Unable to find user for token: " + req.body.token);
-        res.send({ error: "Unable to find user for specified token" });
-        return;
-    }
-
-    if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
-        res.send({ error: "Not enough files specified for delta network" });
-        return;
-    }
-
-    var completed = { state: 0 };
-
-    async.eachSeries(Object.keys(files), function iteratee(item) {
-
-    }))
-
-    async.eachSeries(Object.keys(files), function iteratee(item) {
-        fileUtils.writeFile(file, type, user); 
-    }, function done() {
-        //...
-    });
-
-    for (var type in files) {
-        if (type != 'normal' && type != 'tumor' && type != 'delta') {
-            res.send({ error: "Unable to determine type of file e.g. normal, tumor, delta" });
-            return;
-        }
-
-        if (files[type] == null) {
-            continue;
-        }
-
-        files[type].data = files[type].data.replace(/^data:;base64,/, "");
-
-        mkdirp.sync('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type, function(err) {
-            if (err) {
-                res.send({ error: "Could not create directory for user." })
-                console.error(err)
-                return;
-            }
-        });
-
-        fileUtils.writeFile(req, res, file, user, type, completed, checkFileIntegrity)
-        fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + files[type].name, files[type].data, 'base64', (err) => {
-            if (err) {
-                console.log(err);
-                res.send({ error: "Unable to upload file: " + files[type].name });
-                return;
-            }
-
-            checkFileIntegrity(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, completed);
-        });
-
-        if (completed.state == fileUploadState.failed) {
-            break;
-        }
-    }
-
-    if (completed.state == fileUploadState.failed) {
-        for (var type in files[type]) {
-            fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type]);
-        }
-    }
-});
-
 app.post('/available-matrices', function(req, res) {
     var result = getAvailableMatrices();
     var subTypes = req.body.types;
@@ -725,6 +654,106 @@ function getAvailableMatrices() {
     }
 
     return result;
+}
+
+app.post('/upload-matrix', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var files = req.body.files;
+    var uploadType = req.body.type;
+
+    if (user == null) {
+        console.log("Unable to find user for token: " + req.body.token);
+        res.send({ error: "Unable to find user for specified token" });
+        return;
+    }
+
+    if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
+        res.send({ error: "Not enough files specified for delta network" });
+        return;
+    }
+
+    var completed = { state: 0 };
+
+    async.eachSeries(Object.keys(files), function iteratee(type, callback) {
+        if (files[type] != null) {
+            console.log(files[type].name);
+            files[type].data = files[type].data.replace(/^data:;base64,/, "");
+            fileUtils.writeFile(files[type], type, user, callback);
+        }
+    }, function done() {
+        console.log("Finished writing files");
+    });
+
+
+    for (var type in files) {
+        var ret = { result: null };
+
+
+
+    }
+
+
+
+    async.eachSeries(Object.keys(files), function iteratee(type, cbOuter) {
+        if (files[type] != null) {
+            var ret = { result: null };
+            async.series([
+                    function(cbInner1) {
+                        verifyFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, ret, cbInner1);
+                        //callback(null, 'one');
+                    },
+                    function(cbInner2) {
+                        console.log("_________________________" + type + "___________________________");
+                        if (ret.status > 0) {
+                            fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", file)
+                        }
+                        cbInner2(null, 'two');
+                    }
+                ],
+                // optional callback
+                function(err, results) {
+                    cbOuter();
+                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+                    console.log(ret);
+                });
+        }
+    }, function done() {
+        console.log("Finished verifying files");
+    });
+});
+
+function verifyFile(filePath, fileName, ret, callback) {
+    var args = {};
+    var argsString = "";
+
+    args.filePath = filePath;
+    args.fileName = fileName
+
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/fileChecker.R --args \"" + argsString + "\"", function(error, stdout, stderr) {
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+        console.log(stdout);
+
+        var parsedValue = JSON.parse(stdout);
+        var status = parsedValue.status;
+        var message = parsedValue.message;
+
+        ret.result = message;
+        callback();
+        // if (status > 0) {
+        //     ret.result = message;
+        // } else {
+        //     ret.result = null;
+        // }
+        //res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
+
+    });
 }
 
 function checkFileIntegrity(req, res, filePath, fileName, completed) {
