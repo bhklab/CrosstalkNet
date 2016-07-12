@@ -154,11 +154,11 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
     function uploadFiles(files, type) {
         RESTService.post('upload-matrix', { files: files, token: $cookies.get('token'), type: type })
             .then(function(data) {
+                SharedService.data.global.reloadFileList = true;
+
                 if (!ValidationService.checkServerResponse(data)) {
                     return;
                 }
-
-                SharedService.data.global.reloadFileList = true;
             }, function(response) {
                 console.log(response);
             });

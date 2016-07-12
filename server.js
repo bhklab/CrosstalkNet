@@ -673,56 +673,45 @@ app.post('/upload-matrix', function(req, res) {
     }
 
     var completed = { state: 0 };
+    var nonEmptyFiles = [];
 
-    async.eachSeries(Object.keys(files), function iteratee(type, callback) {
-        if (files[type] != null) {
-            console.log(files[type].name);
-            files[type].data = files[type].data.replace(/^data:;base64,/, "");
-            fileUtils.writeFile(files[type], type, user, callback);
+    for (var prop in files) {
+        if (files[prop] != null) {
+            nonEmptyFiles.push(prop);
         }
+    }
+
+    async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
+        console.log(files[type].name);
+        files[type].data = files[type].data.replace(/^data:;base64,/, "");
+        fileUtils.writeFile(files[type], type, user, callback);
+
     }, function done() {
         console.log("Finished writing files");
     });
 
-
-    for (var type in files) {
-        var ret = { result: null };
-
-
-
-    }
-
-
-
-    async.eachSeries(Object.keys(files), function iteratee(type, cbOuter) {
-        if (files[type] != null) {
-            var ret = { result: null };
-            async.series([
-                    function(cbInner1) {
-                        verifyFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, ret, cbInner1);
-                        //callback(null, 'one');
-                    },
-                    function(cbInner2) {
-                        console.log("_________________________" + type + "___________________________");
-                        if (ret.status > 0) {
-                            fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", file)
-                        }
-                        cbInner2(null, 'two');
-                    }
-                ],
-                // optional callback
-                function(err, results) {
-                    cbOuter();
-                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
-                    console.log(ret);
-                });
+    async.mapSeries(nonEmptyFiles, function iteratee(type, callback) {
+        console.log("type:" + type);
+        verifyFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, callback);
+    }, function done(result) {
+        if (result != null) {
+            for (var i = 0; i < nonEmptyFiles.length; i++) {
+                fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]]);
+            }
+            
+            initializeAvaialbleMatrices();
+            res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
+        } else {
+            initializeAvaialbleMatrices();
+            res.send({ fileStatus: "Successfully uploaded file(s). Please check the dropdown to select new file(s). " })
         }
-    }, function done() {
+
         console.log("Finished verifying files");
     });
+
 });
 
-function verifyFile(filePath, fileName, ret, callback) {
+function verifyFile(filePath, fileName, callback) {
     var args = {};
     var argsString = "";
 
@@ -738,14 +727,17 @@ function verifyFile(filePath, fileName, ret, callback) {
         if (error != null) {
             console.log('error: ' + error);
         }
-        console.log(stdout);
+        //console.log(stdout);
 
         var parsedValue = JSON.parse(stdout);
         var status = parsedValue.status;
         var message = parsedValue.message;
 
-        ret.result = message;
-        callback();
+        if (status > 0) {
+            callback({ status: status, message: message });
+        } else {
+            callback();
+        }
         // if (status > 0) {
         //     ret.result = message;
         // } else {
