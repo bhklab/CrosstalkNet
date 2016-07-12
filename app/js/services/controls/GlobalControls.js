@@ -37,6 +37,7 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
     service.resetInputFieldsGlobal = resetInputFieldsGlobal;
     service.resetInputFieldsLocal = resetInputFieldsLocal;
     service.focusElement = focusElement;
+    service.clickElement = clickElement;
 
     service.setMethodsSideBar = setMethodsSideBar;
     service.setMethodsWholeTab = setMethodsWholeTab;
@@ -149,6 +150,13 @@ myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphCo
             var elem = angular.element(selector);
             elem.focus();
         }, 50);
+    }
+
+    function clickElement(selector) {
+        $timeout(function() {
+            var elem = angular.element(selector);
+            elem.click();
+        }, 40);
     }
 
     function closeEdgeInspector(vm) {

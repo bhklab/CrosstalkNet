@@ -9,38 +9,44 @@
     <div class="bottom-margin">
         <md-input-container ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Normal Matrix File</label>
-            <md-select ng-model="vm.correlationFileDisplayed.normal">
+            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.normal">
                 <md-option ng-repeat="file in vm.fileList.normal" value="{{file}}" ng-selected="0">
                     {{file.name}}
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
                 </md-option>
             </md-select>
         </md-input-container>
         <md-input-container ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Tumor Matrix File</label>
-            <md-select ng-model="vm.correlationFileDisplayed.tumor">
+            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.tumor">
                 <md-option ng-repeat="file in vm.fileList.tumor" value="{{file}}" ng-selected="0">
                     {{file.name}}
+                    <!-- <md-button class=>X</md-button> -->
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
                 </md-option>
             </md-select>
         </md-input-container>
         <md-input-container ng-if="vm.selectedNetworkType == 'delta'" class="select">
             <label>Select Delta Matrix File</label>
-            <md-select ng-model="vm.correlationFileDisplayed.delta">
+            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.delta">
                 <md-option ng-repeat="file in vm.fileList.delta" value="{{file}}" ng-selected="0">
                     {{file.name}}
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
                 </md-option>
             </md-select>
         </md-input-container>
     </div>
     <md-button class="md-primary md-raised" ng-click="vm.getGenes()">Get Genes</md-button>
-    <md-divider></md-divider>
-    <h4>Choose file(s) to upload</h4>
-    <form>
-        <input ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.normal" ngf-max-height="1000" ngf-max-size="20MB"> Choose normal tissue</input>
-        <input ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.tumor" ngf-max-height="1000" ngf-max-size="20MB">
-        </input>
-        <input ng-if="vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.delta" ngf-max-height="1000" ngf-max-size="20MB">
-        </input>
-        <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised">Upload Files</md-button>
-    </form>
+    <div ng-if="vm.permission > 0">
+        <md-divider></md-divider>
+        <h4>Choose file(s) to upload</h4>
+        <form>
+            <input ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.normal" ngf-max-height="1000" ngf-max-size="20MB"> Choose normal tissue</input>
+            <input ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.tumor" ngf-max-height="1000" ngf-max-size="20MB">
+            </input>
+            <input ng-if="vm.selectedNetworkType == 'delta'" type="file" ngf-select ng-model="vm.matrixUpload.delta" ngf-max-height="1000" ngf-max-size="20MB">
+            </input>
+            <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised">Upload Files</md-button>
+        </form>
+    </div>
 </md-content>

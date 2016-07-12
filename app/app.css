@@ -1,5 +1,9 @@
 /* app css stylesheet */
 
+.hide {
+    display: none !important;
+}
+
 md-dialog md-dialog-actions.login {
     display: block;
     justify-content: inherit;

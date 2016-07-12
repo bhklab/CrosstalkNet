@@ -73,7 +73,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         vm.refreshGraph = function(filter) {
             vm.clearLocatedGene();
             SharedService.resetWTM(vm);
-            QueryService.getRelevantGenes(vm, filter).then(function(result) {
+            QueryService.getMainGraph(vm, filter).then(function(result) {
                 if (result.data == null) {
                     return;
                 }

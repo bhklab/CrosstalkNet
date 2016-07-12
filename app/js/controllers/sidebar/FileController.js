@@ -2,9 +2,9 @@
 
 angular.module('myApp.controllers').controller('FileController', [
     '$scope',
-    '$rootScope', 'RESTService',
+    '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
     'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
+    function($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -12,14 +12,14 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.sharedData = SharedService.data.global;
         vm.fileList = { normal: null, tumor: null, delta: null };
 
-        vm.correlationFileDisplayed = {normal: null, tumor: null, delta: null};
+        vm.correlationFileDisplayed = { normal: null, tumor: null, delta: null };
         vm.selectedNetworkType = vm.sharedData.selectedNetworkType;
 
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
 
-        vm.matrixUpload = {normal: null, tumor: null, delta: null};
+        vm.matrixUpload = { normal: null, tumor: null, delta: null };
 
         vm.initialize = function(ctrl) {
             vm.ctrl = ctrl;
@@ -46,7 +46,42 @@ angular.module('myApp.controllers').controller('FileController', [
         };
 
         vm.uploadFiles = function() {
-            FileUploadService.uploadFiles(vm.matrixUpload, vm.selectedNetworkType);
+            $rootScope.state = $rootScope.states.uploadingFile;
+            FileUploadService.uploadFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
+                $rootScope.state = $rootScope.states.initial;
+            });
+            vm.matrixUpload = { normal: null, tumor: null, delta: null };
+        };
+
+        vm.deleteConfirm = function(ev, file) {
+            var toDelete = {};
+            
+            for (var prop in file) {
+                if (prop.indexOf("$") < 0) {
+                    toDelete[prop] = file[prop];
+                }
+            }
+
+            ev.stopPropagation();
+            $mdSelect.hide();
+
+            var confirm = $mdDialog.confirm()
+                .title('Confirm Delete?')
+                .textContent('Are you sure you want to delete the file: ' + file.name +  '?')
+                .ariaLabel('Lucky day')
+                .targetEvent(ev)
+                .clickOutsideToClose(false)
+                .escapeToClose(false)
+                .ok('Yes')
+                .cancel('No');
+            $mdDialog.show(confirm).then(function() {
+                QueryService.deleteFile(toDelete);
+                elem.removeClass('hide');
+            }, function() {
+                elem.removeClass('hide');
+            });
+
+            GlobalControls.focusElement("md-dialog button.ng-enter-active");
         };
 
         $scope.$watch(function() {
@@ -68,6 +103,10 @@ angular.module('myApp.controllers').controller('FileController', [
                     vm.fileList.normal = result.fileList.normal;
                     vm.fileList.tumor = result.fileList.tumor;
                     vm.fileList.delta = result.fileList.delta;
+                });
+
+                QueryService.getUserPermission().then(function(result) {
+                    vm.permission = result.permission;
                 });
                 vm.sharedData.reloadFileList = false;
             }

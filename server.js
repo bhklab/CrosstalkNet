@@ -24,6 +24,8 @@ var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
 
+var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
+
 var availableMatrices = {};
 var fileUploadState = {
     single: -1,
@@ -93,6 +95,15 @@ app.use(function(req, res, next) {
     }
 });
 
+app.post('/get-user-permission', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    if (user == null) {
+        res.send({permission: 0});
+    } else {
+        res.send({permission: 1});
+    }
+});
+
 app.post('/login', function(req, res) {
     res.json({
         success: true,
@@ -115,7 +126,9 @@ app.post('/gene-list', function(req, res) {
         file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
     }
 
-    if (file == null || file.path == null || file.fileName == null) {
+    // console.log("RETURNED FILE: %j", file);
+
+    if (file == null || file.path == null || file.name == null) {
         res.send({ error: "Please specify a file name" });
         return;
     }
@@ -123,7 +136,7 @@ app.post('/gene-list', function(req, res) {
     var geneList = [];
 
     args.pValue = file.pValue;
-    args.fileName = file.fileName;
+    args.fileName = file.name;
     args.path = file.path;
 
     argsString = JSON.stringify(args);
@@ -575,7 +588,7 @@ app.post('/available-matrices', function(req, res) {
     for (var i = 0; i < subTypes.length; i++) {
         matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
             return {
-                name: file.fileName,
+                name: file.name,
                 type: file.type,
                 subType: file.subType
             };
@@ -598,12 +611,12 @@ app.post('/overall-matrix-stats', function(req, res) {
         file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
     }
 
-    if (file == null || file.path == null || file.fileName == null) {
+    if (file == null || file.path == null || file.name == null) {
         res.send({ error: "Please specify a file name" });
         return;
     }
 
-    args.fileName = file.fileName;
+    args.fileName = file.name;
     args.path = file.path;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
@@ -644,17 +657,48 @@ function getAvailableMatrices() {
         result.personal[personalDirectories[i]] = { normal: [], tumor: [], delta: [] };
         for (var j = 0; j < directories.length; j++) {
             try {
-                fs.accessSync('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], fs.R_OK)
-                result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory('R_Scripts/Uploaded_Matrices/' + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
+                fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], fs.R_OK);
+                result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
 
             } catch (err) {
                 console.log(err);
+                fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], directories[j], null);
             }
         }
     }
 
     return result;
 }
+
+app.post('/delete-file', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var file;
+    console.log("delete file: %j", req.body.file);
+
+    file = fileUtils.matchSelectedFile(req.body.file, { personal: availableMatrices.personal }, user);
+    if (file == null) {
+        res.send({ fileStatus: "!!!!Failed to delete file: " })
+    }
+
+    if (file) {
+        async.series([
+                function(callback) {
+                    fileUtils.removeFile(file.path, file, callback);
+                }
+            ],
+            // optional callback
+            function(err, results) {
+                console.log("results in server.js: %j", results);
+                console.log("err: %j", err);
+
+                if (results != null && results.length > 0 && results[0] != null) {
+                    res.send({ fileStatus: "Failed to delete file: " + file.name });
+                } else {
+                    res.send({ fileStatus: "Successfully deleted file" });
+                }
+            });
+    }
+});
 
 app.post('/upload-matrix', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
@@ -670,9 +714,11 @@ app.post('/upload-matrix', function(req, res) {
     if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
         res.send({ error: "Not enough files specified for delta network" });
         return;
+    } else if (uploadType != 'delta' && uploadType != 'tumor' && uploadType != 'normal') {
+        res.send({ error: "Incorrect upload type specified" });
+        return;
     }
 
-    var completed = { state: 0 };
     var nonEmptyFiles = [];
 
     for (var prop in files) {
@@ -684,21 +730,22 @@ app.post('/upload-matrix', function(req, res) {
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log(files[type].name);
         files[type].data = files[type].data.replace(/^data:;base64,/, "");
-        fileUtils.writeFile(files[type], type, user, callback);
+        fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, user.name, type, callback);
+        fileUtils.writeFile(BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
 
     }, function done() {
         console.log("Finished writing files");
     });
 
-    async.mapSeries(nonEmptyFiles, function iteratee(type, callback) {
+    async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log("type:" + type);
-        verifyFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", files[type].name, callback);
+        verifyFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
-                fileUtils.removeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]]);
+                fileUtils.removeFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
             }
-            
+
             initializeAvaialbleMatrices();
             res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
         } else {

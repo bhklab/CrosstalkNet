@@ -7,8 +7,6 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
     function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
         $rootScope.selectedTab = 0;
-        $rootScope.states = angular.copy(GlobalControls.states);
-        $rootScope.state = $rootScope.states.initial;
 
         var vm = this;
         vm.scope = $scope;
