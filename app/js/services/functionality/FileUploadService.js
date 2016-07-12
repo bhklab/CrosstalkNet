@@ -3,13 +3,14 @@ myModule.factory('FileUploadService', function($http, $timeout, $q, Upload, $roo
     var service = {};
 
     service.uploadFiles = function(files, type) {
-        $rootScope.state = $rootScope.states.uploadingFile;
+        var deferred = $q.defer();
         var filesToUpload = { normal: null, tumor: null, delta: null };
-
 
         if (type == 'delta') {
             if (files.delta == null || files.normal == null || files.tumor == null) {
-                return "Please choose all 3 files";
+                alert("Please choose all 3 files");
+                deferred.resolve({ result: null });
+                return deferred.promise;
             }
 
             readHelper(files.delta).then(function(result) {
@@ -19,54 +20,37 @@ myModule.factory('FileUploadService', function($http, $timeout, $q, Upload, $roo
                     readHelper(files.tumor).then(function(result) {
                         filesToUpload.tumor = result.file;
 
-                        QueryService.uploadFiles(filesToUpload, type)
+                        QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                            deferred.resolve({ result: null });
+                        });
                     });
                 });
             });
-
         } else {
             readHelper(files[type]).then(function(result) {
-                filesToUpload[type] = result.file;
+                if (result.file == null) {
+                    alert("Please choose a file");
+                    deferred.resolve({ result: null });
+                    return deferred.promise;
+                }
 
-                QueryService.uploadFiles(filesToUpload, type)
+                filesToUpload[type] = result.file;
+                QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                    deferred.resolve({ result: null });
+                });
             });
         }
+
+        return deferred.promise;
     };
-
-    // function uploadFile(file, type) {
-    // 	var uploadFiles = { normal: null, tumor: null, delta: null };
-
-    //     if (file) {
-    //         var r = new FileReader();
-    //         r.onload = function(e) {
-    //             var contents = e.target.result;
-    //             var fileProperties = {};
-
-    //             for (prop in file) {
-    //                 if (prop.indexOf('$') < 0) {
-    //                     fileProperties[prop] = file[prop];
-    //                 }
-    //             }
-
-    //             fileProperties.data = r.result;
-    //             RESTService.post('upload-matrix', { files: fileProperties, token: $cookies.get('token'), type: type })
-    //                 .then(function(data) {
-    //                     if (!ValidationService.checkServerResponse(data)) {
-    //                         return;
-    //                     }
-
-    //                     SharedService.data.global.reloadFileList = true;
-    //                 }, function(response) {
-    //                     console.log(response);
-    //                 });
-    //         }
-
-    //         r.readAsDataURL(file);
-    //     }
-    // }
 
     function readHelper(file) {
         var deferred = $q.defer();
+
+        if (file == null) {
+            deferred.resolve({ file: null });
+            return deferred.promise;
+        }
 
         var r = new FileReader();
         r.onload = function(e) {

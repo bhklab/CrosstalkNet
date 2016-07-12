@@ -16,6 +16,22 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     service.data = { global: angular.copy(dataModel) };
 
+    service.states = {
+        initial: { id: 0, text: "Waiting for user to query..." },
+        loadingGraph: { id: 1, text: "Getting graph from server..." },
+        loadingConfig: { id: 2, text: "Initializing graph..." },
+        showingGraph: { id: 3, text: "Graph finished" },
+        gettingGeneList: { id: 4, text: "Getting gene list..." },
+        gettingAllPaths: { id: 5, text: "Getting all paths between source and target genes..." },
+        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" },
+        uploadingFile: { id: 7, text: "Uploading file to server..." },
+        finishedUploadingFile: { id: 8, text: "Successfully uploaded file to server" },
+        failedUploadingFile: { id: 9, text: "Failed to upload file to server" },
+    };
+
+    $rootScope.states = angular.copy(service.states);
+    $rootScope.state = service.states.initial;
+
     var withinTabModel = {
         cy: null,
         display: null,
