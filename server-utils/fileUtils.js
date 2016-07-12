@@ -148,7 +148,6 @@ function filterMatricesByAccessLevel(availableMatrices, user) {
 
 function removeFile(path, file) {
     console.log(path);
-    console.log(file);
     if (path != null && file != null) {
         fs.unlink(path + file.name, function(err) {
             console.log(err);
