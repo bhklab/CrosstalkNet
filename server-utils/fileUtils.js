@@ -159,15 +159,14 @@ function removeFile(path, file) {
     }
 }
 
-function writeFile(req, res, file, user, type, completed, callback) {
-    completed.state++;
+function writeFile(file, type, user, callback) {
     fs.writeFile('R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/" + file.name, file.data, 'base64', (err) => {
         if (err) {
             console.log(err);
-            res.send({ error: "Unable to upload file: " + file.name });
         }
 
-        callback(req, res, 'R_Scripts/Uploaded_Matrices/' + user.name + "/" + type + "/", file.name, completed);
+        console.log("Wrote: " + file.name);
+        callback();
     });
 }
 
