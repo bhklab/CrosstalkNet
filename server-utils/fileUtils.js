@@ -46,28 +46,6 @@ function getRequestedFiles(req, availableMatrices, degree, user) {
         return null;
     }
 
-    for (var prop in result) {
-        var val = null;
-
-        if (result[prop] != null) {
-            if (!degree) {
-                continue;
-            }
-
-            val = fs.accessSync(result[prop], fs.R_OK, function(err) {
-                if (err) {
-                    return { error: prop + " file does not exist!" };
-                } else {
-                    return null;
-                }
-            });
-        }
-
-        if (val != null) {
-            return vall;
-        }
-    }
-
     return result;
 }
 
