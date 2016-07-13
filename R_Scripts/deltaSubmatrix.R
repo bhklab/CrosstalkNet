@@ -24,8 +24,6 @@ corMatrices = list()
 if (!is.null(settings$fileNameMatrixNormal)) {
 	corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
 	corMatrices[["normal"]] = corMatrixNormal;
-	write("settings$fileNameMatrixNormal", stderr())
-	write(settings$fileNameMatrixNormal, stderr())
 }
 
 if (!is.null(settings$fileNameMatrixTumor)) {
