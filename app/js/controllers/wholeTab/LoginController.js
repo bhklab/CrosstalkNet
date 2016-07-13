@@ -74,9 +74,6 @@ angular.module('myApp.controllers').controller('LoginController', [
             $mdDialog.hide(answer);
         };
 
-                $cookies.remove('token');
-            
-
         $scope.checkToken();
     }
 ]);

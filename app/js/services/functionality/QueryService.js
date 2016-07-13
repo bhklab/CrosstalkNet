@@ -189,10 +189,10 @@ myModule.factory('QueryService', function($q, $http, $timeout, $rootScope, $cook
         RESTService.post('get-user-permission', {})
             .then(function(data) {
                 if (!ValidationService.checkServerResponse(data)) {
-                    deferred.resolve({permission: null});
+                    deferred.resolve({ permission: null });
                 }
 
-                deferred.resolve({permission: data.permission});
+                deferred.resolve({ permission: data.permission });
             }, function(response) {
                 console.log(response);
             });
