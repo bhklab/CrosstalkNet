@@ -8,24 +8,8 @@ settings <- fromJSON(args[2])
 selectedGenes <- settings$selectedGenes
 selectedNetworkType <- settings$selectedNetworkType
 
-corMatrices = list()
-
-if (!is.null(settings$fileNameMatrixNormal)) {
-	corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
-	corMatrices[["normal"]] = corMatrixNormal;
-}
-
-if (!is.null(settings$fileNameMatrixTumor)) {
-	corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
-	corMatrices[["tumor"]] = corMatrixTumor;
-}
-
-if (!is.null(settings$fileNameMatrixDelta)) {
-	corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
-	corMatrices[["delta"]] = corMatrixDelta;
-}
-
-degrees <- readRDS(settings$fileNameDegrees)
+corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
+degrees <- readFileWithValidation(settings$fileNameDegrees)
 
 exclusions <- c()	
 edges <- list()
@@ -35,7 +19,9 @@ nodes <- list()
 edgeTest <- c()
 
 for (i in 1:length(selectedGenes)) {
-    edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0, selectedNetworkType)
+    tryCatch({edges[[i]] <- createEdgesDFDelta(corMatrices, selectedGenes[i], edgeExclusion, 0, selectedNetworkType)},
+        error = function(err) {cat(format(toJSON(list(status = 1, message = as.character(err)), auto_unbox = TRUE))) ; write(err, stderr()); quit()})
+
     nodesToAdd <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edges[[i]], i, selectedGenes, exclusions)
     nodes[[i]] <- nodesToAdd
     

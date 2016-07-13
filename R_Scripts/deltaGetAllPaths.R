@@ -5,31 +5,15 @@ source('R_Scripts/pathExistHelpers.R')
 args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])
-fileName <- settings$fileName
-path <- settings$path
 source <- settings$source
 target <- settings$target
 
 selectedNetworkType <- settings$selectedNetworkType
 
-corMatrices = list()
+corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
 
-if (!is.null(settings$fileNameMatrixNormal)) {
-	corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
-	corMatrices[["normal"]] = corMatrixNormal;
-}
-
-if (!is.null(settings$fileNameMatrixTumor)) {
-	corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
-	corMatrices[["tumor"]] = corMatrixTumor;
-}
-
-if (!is.null(settings$fileNameMatrixDelta)) {
-	corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
-	corMatrices[["delta"]] = corMatrixDelta;
-}
-
-paths <- findAllPaths(source, target, corMatrices, selectedNetworkType)
+tryCatch({paths <- findAllPaths(source, target, corMatrices, selectedNetworkType)},
+	error = function(err) {cat(format(toJSON(list(status = 1, message = as.character(err)), auto_unbox = TRUE))) ; write(err, stderr()); quit()})
 
 result <- list(paths = paths)
 cat(format(toJSON(result)))

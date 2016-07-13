@@ -19,24 +19,8 @@ genesOfInterest <- settings$genesOfInterest
 
 selectedNetworkType <- settings$selectedNetworkType
 
-corMatrices = list()
-
-if (!is.null(settings$fileNameMatrixNormal)) {
-	corMatrixNormal <- readRDS(settings$fileNameMatrixNormal)
-	corMatrices[["normal"]] = corMatrixNormal;
-}
-
-if (!is.null(settings$fileNameMatrixTumor)) {
-	corMatrixTumor <- readRDS(settings$fileNameMatrixTumor)
-	corMatrices[["tumor"]] = corMatrixTumor;
-}
-
-if (!is.null(settings$fileNameMatrixDelta)) {
-	corMatrixDelta <- readRDS(settings$fileNameMatrixDelta)
-	corMatrices[["delta"]] = corMatrixDelta;
-}
-
-degrees <- readRDS(settings$fileNameDegrees)
+corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
+degrees <- readFileWithValidation(settings$fileNameDegrees)
 
 exclusions <- genesOfInterest
 firstNeighboursNodes <- list()
@@ -49,7 +33,9 @@ k <- 0
 edgeExclusions <- c()
 
 for (i in 1:length(genesOfInterest)) {
-    edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
+	tryCatch({edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)},
+		error = function(err) {cat(format(toJSON(list(status = 1, message = as.character(err)), auto_unbox = TRUE))) ; write(err, stderr()); quit()})
+    # edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
 
     if (weightFilterFirst == TRUE) {
     	edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -73,9 +59,16 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighboursNodes)) {
 		secondNeighboursNodes[[i]] = createEmptyNodes(0)
 		nodesToAdd = createEmptyNodes(0)
-		edgesToAdd <- createEmptyEdges(0)
+		edgesToAdd <- createEmptyDifferentialEdges(0)
+
+		if (length(firstNeighboursNodes[[i]]$name) == 0) {
+			edgesSecond[[i]] = edgesToAdd
+			next	
+		}
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
+			write("length(firstNeighboursNodes[[i]]$name", stderr())
+			write(length(firstNeighboursNodes[[i]]$name), stderr())
 			edgesToAdd <- rbind(edgesToAdd, createEdgesDFDelta(corMatrices, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30, selectedNetworkType))
 			if (weightFilterSecond == TRUE) {
 				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
@@ -95,6 +88,8 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		edgeTestSecond <- c(edgeTestSecond, edgesSecond[[i]]$weight)
 	}	
 }
+write("edgeTestSecond", stderr())
+write(edgeTestSecond, stderr())
 
 if (depth == 1) {
 	edgeTest <- edgeTestFirst
