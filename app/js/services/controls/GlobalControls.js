@@ -2,19 +2,6 @@ var myModule = angular.module("myApp.services");
 myModule.factory('GlobalControls', function($http, $rootScope, $timeout, GraphConfigService, SharedService) {
     var service = {};
 
-    service.states = {
-        initial: { id: 0, text: "Waiting for user to query..." },
-        loadingGraph: { id: 1, text: "Getting graph from server..." },
-        loadingConfig: { id: 2, text: "Initializing graph..." },
-        showingGraph: { id: 3, text: "Graph finished" },
-        gettingGeneList: { id: 4, text: "Getting gene list..." },
-        gettingAllPaths: { id: 5, text: "Getting all paths between source and target genes..." },
-        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" },
-        uploadingFile: { id: 7, text: "Uploading file to server..." },
-        finishedUploadingFile: { id: 8, text: "Successfully uploaded file to server" },
-        failedUploadingFile: { id: 9, text: "Failed to upload file to server" },
-    };
-
     service.pValues = [{ display: "0.001", value: "001" }, { display: "0.01", value: "01" },
         { display: "0.05", value: "05" }, { display: "0.1", value: "1" }
     ];

@@ -6,8 +6,6 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 	paths <- createPaths(0)
 	result <- list(paths = NULL)
 	
-	write("names(paths)", stderr())
-	write(names(paths), stderr())
 	if (getGeneSuffix(source) == getGeneSuffix(target)) {
 		for (i in names(corMatrices)) {
             neighbours[[i]] = getNeighbours(corMatrices[[i]], source, c())
