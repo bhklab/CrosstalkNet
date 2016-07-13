@@ -8,7 +8,7 @@ myModule.factory('FileUploadService', function($http, $timeout, $q, Upload, $roo
 
         if (type == 'delta') {
             if (files.delta == null || files.normal == null || files.tumor == null) {
-                alert("Please choose all 3 files");
+                alert("Please choose all 3 Rdata files");
                 deferred.resolve({ result: null });
                 return deferred.promise;
             }
@@ -29,7 +29,7 @@ myModule.factory('FileUploadService', function($http, $timeout, $q, Upload, $roo
         } else {
             readHelper(files[type]).then(function(result) {
                 if (result.file == null) {
-                    alert("Please choose a file");
+                    alert("Please choose an Rdata file");
                     deferred.resolve({ result: null });
                     return deferred.promise;
                 }

@@ -1,5 +1,21 @@
 /* app css stylesheet */
 
+.no-padding-top {
+    padding-top: 0px;
+}
+
+.no-padding-bottom {
+    padding-bottom: 0px;
+}
+
+.no-margin-top {
+    margin-top: 0px;
+}
+
+.select:first-child {
+    margin-top: 0px;
+}
+
 .hide {
     display: none !important;
 }
@@ -93,6 +109,10 @@ md-sidenav {
 
 .bottom-margin {
     margin-bottom: 10px;
+}
+
+.top-margin-10 {
+    margin-top: 10px;
 }
 
 .left-margin {

@@ -670,93 +670,102 @@ function getAvailableMatrices() {
     return result;
 }
 
-app.post('/delete-file', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var file;
-    console.log("delete file: %j", req.body.file);
+// app.post('/delete-file', function(req, res) {
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
+//     var file;
+//     console.log("delete file: %j", req.body.file);
 
-    file = fileUtils.matchSelectedFile(req.body.file, { personal: availableMatrices.personal }, user);
-    if (file == null) {
-        res.send({ fileStatus: "!!!!Failed to delete file: " })
-    }
+//     file = fileUtils.matchSelectedFile(req.body.file, { personal: availableMatrices.personal }, user);
+//     if (file == null) {
+//         res.send({ fileStatus: "!!!!Failed to delete file: " })
+//     }
 
-    if (file) {
-        async.series([
-                function(callback) {
-                    fileUtils.removeFile(file.path, file, callback);
-                }
-            ],
-            // optional callback
-            function(err, results) {
-                console.log("results in server.js: %j", results);
-                console.log("err: %j", err);
+//     if (file) {
+//         async.series([
+//                 function(callback) {
+//                     fileUtils.removeFile(file.path, file, callback);
+//                 }
+//             ],
+//             // optional callback
+//             function(err, results) {
+//                 console.log("results in server.js: %j", results);
+//                 console.log("err: %j", err);
 
-                if (results != null && results.length > 0 && results[0] != null) {
-                    res.send({ fileStatus: "Failed to delete file: " + file.name });
-                } else {
-                    res.send({ fileStatus: "Successfully deleted file" });
-                }
-            });
-    }
-});
+//                 if (results != null && results.length > 0 && results[0] != null) {
+//                     res.send({ fileStatus: "Failed to delete file: " + file.name });
+//                 } else {
+//                     res.send({ fileStatus: "Successfully deleted file" });
+//                 }
+//             });
+//     }
+// });
 
-app.post('/upload-matrix', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var files = req.body.files;
-    var uploadType = req.body.type;
+// app.post('/upload-matrix', function(req, res) {
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
+//     var files = req.body.files;
+//     var uploadType = req.body.type;
 
-    if (user == null) {
-        console.log("Unable to find user for token: " + req.body.token);
-        res.send({ error: "Unable to find user for specified token" });
-        return;
-    }
+//     if (user == null) {
+//         console.log("Unable to find user for token: " + req.body.token);
+//         res.send({ error: "Unable to find user for specified token" });
+//         return;
+//     }
 
-    if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
-        res.send({ error: "Not enough files specified for delta network" });
-        return;
-    } else if (uploadType != 'delta' && uploadType != 'tumor' && uploadType != 'normal') {
-        res.send({ error: "Incorrect upload type specified" });
-        return;
-    }
+//     if (uploadType == 'delta' && (files.delta == null || files.normal == null || files.tumor == null)) {
+//         res.send({ error: "Not enough files specified for delta network" });
+//         return;
+//     } else if (uploadType != 'delta' && uploadType != 'tumor' && uploadType != 'normal') {
+//         res.send({ error: "Incorrect upload type specified" });
+//         return;
+//     }
 
-    var nonEmptyFiles = [];
+//     var nonEmptyFiles = [];
 
-    for (var prop in files) {
-        if (files[prop] != null) {
-            nonEmptyFiles.push(prop);
-        }
-    }
+//     for (var prop in files) {
+//         if (files[prop] != null) {
+//             if (typeof files[prop].name =='string') {
+//                 if (!files[prop].name.toLowerCase().endsWith('.rdata')) {
+//                     res.send({error: "File upload failed. Please specify an Rdata file instead of: " + files[prop].name});
+//                     return;
+//                 }
+//             } else {
+//                 res.send({error: "File upload failed. Could not determine name of uploaded file(s)"})
+//                 return;
+//             }
+//             nonEmptyFiles.push(prop);
+//         }
+//     }
 
-    async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
-        console.log(files[type].name);
-        files[type].data = files[type].data.replace(/^data:;base64,/, "");
-        fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, user.name, type, callback);
-        fileUtils.writeFile(BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
+//     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
+//         console.log(files[type].name);
+//         files[type].data = files[type].data.replace(/^data:;base64,/, "");
+//         fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, user.name, type, callback);
+//         fileUtils.writeFile(BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
 
-    }, function done() {
-        console.log("Finished writing files");
-    });
+//     }, function done() {
+//         console.log("Finished writing files");
+//     });
 
-    async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
-        console.log("type:" + type);
-        verifyFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
-    }, function done(result) {
-        if (result != null) {
-            for (var i = 0; i < nonEmptyFiles.length; i++) {
-                fileUtils.removeFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
-            }
+//     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
+//         console.log("type:" + type);
+//         verifyFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
+//     }, function done(result) {
+//         if (result != null) {
+//             for (var i = 0; i < nonEmptyFiles.length; i++) {
+//                 fileUtils.removeFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
+//             }
 
-            initializeAvaialbleMatrices();
-            res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
-        } else {
-            initializeAvaialbleMatrices();
-            res.send({ fileStatus: "Successfully uploaded file(s). Please check the dropdown to select new file(s). " })
-        }
+//             initializeAvaialbleMatrices();
+//             res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
+//         } else {
+//             initializeAvaialbleMatrices();
+//             res.send({ fileStatus: "Successfully uploaded file(s). Please check the dropdown to select new file(s). " })
+//         }
 
-        console.log("Finished verifying files");
-    });
+//         console.log("Finished verifying files");
+//     });
 
-});
+// });
 
 function verifyFile(filePath, fileName, callback) {
     var args = {};
