@@ -1,7 +1,7 @@
 var myModule = angular.module("myApp.services");
 myModule.factory('RESTService', function($http, $cookies, SharedService) {
-    var SERVER_URL = "http://localhost:5000/";
-    //\var SERVER_URL = "http://epistroma.pmgenomics.ca/";
+    //var SERVER_URL = "http://localhost:5000/";
+    var SERVER_URL = "http://epistroma.pmgenomics.ca/";
 
     function get(url, params) {
         return $http.get(SERVER_URL + url, params).then(function(result) {
