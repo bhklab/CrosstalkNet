@@ -189,8 +189,6 @@ getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, select
 }
 
 getGeneSuffix <- function(gene) {
-    write("Gene", stderr())
-    write(gene, stderr())
     if (length(gene) == 0 || is.na(gene) || is.null(gene)) {
         printErrorAndQuit("Could not find gene in matrix")
     }

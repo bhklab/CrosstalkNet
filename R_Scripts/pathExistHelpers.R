@@ -27,8 +27,6 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 				paths[numRows + 1, "firstEdge.weight"] = neighbours[[networkType]][i]
 				paths[numRows + 1, "intermediateNode"] = names(neighbours[[networkType]][i])
 				paths[numRows + 1, "secondEdge.weight"] = secondLevelNeighbours[[networkType]][target]
-				write("networkType", stderr())
-				write(networkType, stderr())
 
 				if (networkType == 'delta') {
 					paths[numRows + 1, "firstEdge.normal"] = neighbours$normal[i]
@@ -49,11 +47,9 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 		}
 
 		if (target %in% names(neighbours[[networkType]])) {
-			paths[1, ]$firstEdge$weight <- neighbours[[networkType]][target]
+			paths[1, "firstEdge.weight"] <- neighbours[[networkType]][target]
 		}
 	}
-
-	write(warnings(), stderr())
 
 	paths
 }
