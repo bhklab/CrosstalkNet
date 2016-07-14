@@ -67,14 +67,15 @@ myModule.factory('ExportService', function($http, $filter) {
         var colDelim = ",";
         var csv = "";
         var header = colDelim + neighbours.stroma.map(function(s) {
-            return $filter('suffixTrim')(s);
+            return s;//return $filter('suffixTrim')(s);
         }).join();
         csv += header;
         csv += rowDelim;
 
         for (var i = 0; i < neighbours.epi.length; i++) {
             var temp = [];
-            temp.push($filter('suffixTrim')(neighbours.epi[i]));
+            //temp.push($filter('suffixTrim')(neighbours.epi[i]));
+            temp.push(neighbours.epi[i]);
             for (var j = 0; j < neighbours.stroma.length; j++) {
                 temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j], networkType));
             }
