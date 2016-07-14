@@ -1,3 +1,5 @@
+'use strict'
+
 var myModule = angular.module("myApp.services");
 myModule.factory('GraphConfigService', function($http) {
     var service = {};
@@ -25,6 +27,7 @@ myModule.factory('GraphConfigService', function($http) {
     service.destroyGraph = destroyGraph;
 
     function applyConfig(vm, config, containerID) {
+        var cy = null;
         vm.elemCopy = angular.copy(config.elements);
         vm.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
@@ -54,6 +57,8 @@ myModule.factory('GraphConfigService', function($http) {
                     edges[i].removeClass('highlighted-edge');
                 }
             });
+
+            cy.forceRender();
 
             service.selectedItem = null;
         });
