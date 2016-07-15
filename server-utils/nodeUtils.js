@@ -136,8 +136,8 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
     var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius);
     var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius);
 
-    console.log("largestClusterRadius: " + largestClusterRadius);
-    console.log("mainRadius: " + mainRadius);
+    // console.log("largestClusterRadius: " + largestClusterRadius);
+    // console.log("mainRadius: " + mainRadius);
 
     var selectedGeneAngle = ((2 * Math.PI) / totalClusters) * (clusterNumber + 1);
 
