@@ -12,8 +12,7 @@
             <label>Select Normal Matrix File</label>
             <md-select class="file-select" ng-model="vm.correlationFileDisplayed.normal">
                 <md-option ng-repeat="file in vm.fileList.normal" value="{{file}}" ng-selected="0">
-                    {{file.name}}
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
                 </md-option>
             </md-select>
         </md-input-container>
@@ -21,9 +20,8 @@
             <label>Select Tumor Matrix File</label>
             <md-select class="file-select" ng-model="vm.correlationFileDisplayed.tumor">
                 <md-option ng-repeat="file in vm.fileList.tumor" value="{{file}}" ng-selected="0">
-                    {{file.name}}
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
                     <!-- <md-button class=>X</md-button> -->
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
                 </md-option>
             </md-select>
         </md-input-container>
@@ -31,8 +29,7 @@
             <label>Select Delta Matrix File</label>
             <md-select class="file-select" ng-model="vm.correlationFileDisplayed.delta">
                 <md-option ng-repeat="file in vm.fileList.delta" value="{{file}}" ng-selected="0">
-                    {{file.name}}
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span>
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
                 </md-option>
             </md-select>
         </md-input-container>
