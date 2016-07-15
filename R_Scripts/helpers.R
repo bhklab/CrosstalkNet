@@ -121,8 +121,6 @@ getDegreesForGenes <- function(degrees, genes) {
     #
     # Returns: A vector containing the degrees of the specified genes.
     first <- genes[1]
-    # #write('first: ', stderr())
-    # #write(first, stderr())
 
     if (length(genes) < 1 || is.na(first)) {
         return(integer())
@@ -137,6 +135,25 @@ getDegreesForGenes <- function(degrees, genes) {
     resultDegrees
 }
 createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType) {
+    # Creates a data frame of cytoscape edges representing the interactions
+    # happening between the specified gene and its neighbours.
+    #
+    # Args:
+    #   corMatrices: A list of correlation matrices that the interactions will
+    #                be obtained from.
+    #   gene: The gene for which the edges will be created.
+    #   exclusion: A vector of genes that should not be the target of any edges.
+    #               This helps prevent creating edges that have been previously
+    #               created.
+    #   limit: The maximum number of edges to create. Only the top limit number of
+    #           interactions in terms of magnitude will be created. 
+    #   networkType: A string indicating what kind of network the edges are being 
+    #                   created for. This determines which matrices in corMatrices
+    #                   will be indexed into.
+    #            
+    # Returns: A data frame of cytoscape edges represnting int interactions happening 
+    #           between gene and its neighbours. If no interactions are present, an empty
+    #           data frame of edges is returned.
     edges <- createEmptyDifferentialEdges(0)
     neighbours <- list(normal = NULL, tumor = NULL, delta = NULL)
 
@@ -180,8 +197,6 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType)
         iterator <- length(neighbours$tumor)
     }
 
-
-
     for (i in 1:iterator) {       
         edges[i, "source"] <- gene
         edges[i, "target"] <- names(neighbours[[networkType]][i])
@@ -195,9 +210,29 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType)
     edges
 }
 
-getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, selectedGenes, exclusion) {
+getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, selectedGenes, exclusions) {
+    # Creates a data frame of cytoscape nodes representing the neighbours
+    # of the source gene from the provided edges.
+    #
+    # Args:
+    #   corMatrix: A correlation matrix that will be indexed into.
+    #   degrees: A list of degrees that will be used in order to obtain the 
+    #             degrees of the neighbour genes.
+    #   edges: A data frame of cytoscape edges. The targets of these edges will
+    #           be the genes that nodes are being created for.
+    #   level: An integer that will be added to every node. This integer represents 
+    #           which level of neighbours these nodes will be in the resulting graph.
+    #   selectedGenes: A vector of genes names that the user initially chose to obtain
+    #                   a graph for. If a created node has a gene name that is in
+    #                   this vector, the node will have its isSource field set to TRUE.
+    #                   Otherwise, the isSource field of the node is set to false.
+    #   exclusions: A vector of genes names that nodes should not be created for. This is
+    #               necessary in order to prevent the creation of duplicate nodes.
+    #            
+    # Returns: A data frame of cytoscape nodes based on the targets of the specified edges.
+    #           No gene name in exclusions will have a node created for it.
     neighboursNames <- edges$target
-    neighboursNames <- setdiff(neighboursNames, exclusion)
+    neighboursNames <- setdiff(neighboursNames, exclusions)
     neighboursDegrees <- getDegreesForGenes(degrees, neighboursNames)
     nodes <- createEmptyNodes(length(neighboursNames))
 
@@ -206,11 +241,8 @@ getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, select
     }
 
     for (i in 1:length(neighboursNames)) {
-        #write("name", stderr())
         nodes[i, "name"] <- neighboursNames[i]
-        #write("degree", stderr())
         nodes[i, "degree"] <- neighboursDegrees[i]
-        #write("level", stderr())
         nodes[i, "level"] <- level
 
         if (nodes[i, "name"] %in% selectedGenes) {
@@ -224,6 +256,13 @@ getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, select
 }
 
 getGeneSuffix <- function(gene) {
+    # Obtains the last letter of a gene name
+    #
+    # Args:
+    #   gene: The gene name to get the last letter for.
+    #
+    # Returns:
+    #   The last character of gene.
     if (length(gene) == 0 || is.na(gene) || is.null(gene)) {
         printErrorAndQuit("Could not find gene in matrix")
     }
@@ -274,6 +313,14 @@ filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
 }
 
 getMinMaxWeightValues <- function(weights) {
+    # Obtains the lowest negative, highest negative, lowest positive,
+    # and highest positive values for a vector of weights.
+    #
+    # Args:
+    #   weights: A vector of numbers between -1 and 1.
+    #   
+    #   returns: A list containing the lowest negative weight, highest negative
+    #               weight, lowest positive weight, and highest positive weight.
     minPositiveWeight <- min(weights[weights > 0])
     maxPositiveWeight <- max(weights[weights > 0])
 
@@ -289,12 +336,23 @@ getMinMaxWeightValues <- function(weights) {
     result <- list(minPositiveWeight = minPositiveWeight, maxPositiveWeight = maxPositiveWeight, minNegativeWeight = minNegativeWeight, maxNegativeWeight = maxNegativeWeight)
     result
 }
-getNeighbours <- function(corMatrix, gene, exclusion) {
+
+getNeighbours <- function(corMatrix, gene, exclusions) {
+    # Obtains a vector of correlations between the given gene and its neighbours.
+    # 
+    # Args:
+    #   corMatrix: A correlation matrix that will be indexed into.
+    #   gene: The gene name for which to obtain the neighbouring interactions.
+    #   exclusions: A vector of gene names that should not be included in the 
+    #               final reuslt.
+    #
+    # Returns: A vector of correlations between gene and its neighbours. The names
+    #           of the vector are the gene names of the neighbours.
     if (getGeneSuffix(gene) == '-e') {
-        checkGeneInGeneNames(gene, rownames(    corMatrix))
+        checkGeneInGeneNames(gene, rownames(corMatrix))
 
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
-        neighboursNames <- setdiff(neighboursNames, exclusion)
+        neighboursNames <- setdiff(neighboursNames, exclusions)
 
         neighbours <- corMatrix[gene, neighboursNames]
         names(neighbours) <- neighboursNames#names(corMatrix[gene, neighboursNames])
@@ -302,7 +360,7 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
         checkGeneInGeneNames(gene, colnames(corMatrix))
 
         neighboursNames <- names(which(corMatrix[, gene] != 0))
-        neighboursNames <- setdiff(neighboursNames, exclusion)
+        neighboursNames <- setdiff(neighboursNames, exclusions)
 
         neighbours <- corMatrix[neighboursNames, gene]
         names(neighbours) <- neighboursNames#names(corMatrix[neighboursNames , gene])
@@ -312,20 +370,41 @@ getNeighbours <- function(corMatrix, gene, exclusion) {
 }
 
 checkGeneInGeneNames <- function(gene, geneNames) {
+    # Checks if a given gene name exists in a vector of gene names.
+    # 
+    # Args:
+    #   gene: A gene name.
+    #   geneNames: A vector of gene names that gene will be tested against.
+    #
+    # Returns: Nothing if gene exists in geneNames. Otherwise, the script
+    #           prints an error and quits.
     if (is.na(gene) || is.null(gene) || (!gene %in% geneNames)) {
         printErrorAndQuit(paste("Could not find gene:", gene, "in matrix"))
     }
 }
 
 printErrorAndQuit <- function(error) {
+    # Writes an error to stderr, writes an in JSON format to stdout, and quits.
+    #
+    # Args:
+    #   error: The error message to write.
     write(error, stderr())
     cat(format(toJSON(list(status = 1, message = error), auto_unbox = TRUE)))
     quit()
 }
 
-readFileWithValidation <- function(fileName) {
-    tryCatch(fileResult <- readRDS(fileName),
-        error = function(cond) {cat(format(toJSON(list(status = 1, message = "Failed to read one or more files. Please make sure that it is an RData file containing a matrix."), auto_unbox = TRUE))) ; write(paste("failed read", cond, sep=""), stderr()); quit()}) 
+readFileWithValidation <- function(filePath) {
+    # Attempts to read a file with the provided file path into memory.
+    #
+    # Args:
+    #   filePath: The path of the RData file that is to be read in. The file should have
+    #               been saved with the saveRDS function.
+    #
+    # Returns: The object stored in the RData file specified by filePath. If there is
+    #           an issue reading in the file, an error message is printed and the script
+    #           quits.
+    tryCatch(fileResult <- readRDS(filePath),
+        error = function(cond) {printErrorAndQuit(paste("Failed to read file:", filePath, "Please make sure that it is an RData file containing a matrix."))})
 
     fileResult
 }
