@@ -1,5 +1,6 @@
 source('R_Scripts/dataModels.R')
 library(Matrix)
+options(warn = -1)
 
 readMatricesFromFiles <- function(normalFile, tumorFile, deltaFile) {
     # Creates a list of matrices by reading in specified files
@@ -37,26 +38,32 @@ getDegrees <- function(corMatrix) {
     # Computes the degrees of the genes for a given correlation matrix.
     #
     # Args:
-    #   corMatrix: The correlation matrix for which to compute the degrees.
+    #   corMatrix: The dgCMatrix for which to compute the degrees.
     #
     # Returns:
     #   A list of epi gene degrees and stroma gene degrees accessed by
     #   epiDegree and stromaDegree respectively. It is assumed that epi genes
     #   are the rownames and stroma genes are the colnames in the matrix.
-    deg.row <- as.numeric() 
-    for(k in 1:nrow(corMatrix)){
-        deg.row[k] <- length(which(corMatrix[k,] != 0))
-    }
-    #dim(deg.row) <- length(deg.row)
+
+    deg.col <- diff(corMatrix@p)
+    deg.row <- diff(t(corMatrix)@p)
+
     names(deg.row) <- rownames(corMatrix)
-    
-    # cols
-    deg.col <- as.numeric() 
-    for(k in 1:ncol(corMatrix)){
-        deg.col[k] <- length(which(corMatrix[,k] != 0))
-    }
-    #dim(deg.col) <- length(deg.col)
     names(deg.col) <- colnames(corMatrix)
+    # deg.row <- as.numeric() 
+    # for(k in 1:nrow(corMatrix)){
+    #     deg.row[k] <- length(which(corMatrix[k,] != 0))
+    # }
+    # #dim(deg.row) <- length(deg.row)
+    # names(deg.row) <- rownames(corMatrix)
+    
+    # # cols
+    # deg.col <- as.numeric() 
+    # for(k in 1:ncol(corMatrix)){
+    #     deg.col[k] <- length(which(corMatrix[,k] != 0))
+    # }
+    # #dim(deg.col) <- length(deg.col)
+    # names(deg.col) <- colnames(corMatrix)
     
     result <- list(epiDegree = deg.row, stromaDegree = deg.col)
 }
