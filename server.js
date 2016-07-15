@@ -118,7 +118,7 @@ app.post('/gene-list', function(req, res) {
     var argsString = "";
     var file;
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    console.log(req.body);
+    //console.log(req.body);
 
     if (req.body.selectedFile.delta != null) {
         file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
@@ -188,7 +188,7 @@ app.post('/gene-list', function(req, res) {
 });
 
 app.post('/delta-interaction-explorer', function(req, res) {
-    console.log("%j", req.body);
+    //console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -348,7 +348,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
 });
 
 app.post('/delta-submatrix', function(req, res) {
-    console.log("%j", req.body);
+    //console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -356,7 +356,6 @@ app.post('/delta-submatrix', function(req, res) {
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    console.log(req.body);
 
     var files = null;
 
@@ -904,9 +903,9 @@ var server = app.listen(5000, function() {
     console.log("Listening on port 5000");
     console.log("Initializing data and config");
 
-    var salt = bcrypt.genSaltSync(3);
-    var password = bcrypt.hashSync('', salt);
-    console.log("password: " + password);
+    // var salt = bcrypt.genSaltSync(3);
+    // var password = bcrypt.hashSync('', salt);
+    // console.log("password: " + password);
 
     initializeAvaialbleMatrices();
     console.log(availableMatrices);

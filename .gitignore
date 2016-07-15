@@ -3,7 +3,6 @@ database
 database/*
 node_modules/* 
 !node_modules/*.js
-Uploaded_Matrices
 R_Scripts/028004_D_AA_20140813.txt
 *.swo
 *.swp
