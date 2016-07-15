@@ -17,6 +17,10 @@ corMatrix <- c()
 tryCatch(corMatrix <- readRDS(paste(filePath, fileName, sep="")),
            error = function(cond) {cat(format(toJSON(list(status = 1, message = "Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix."), auto_unbox = TRUE))) ; write(paste("failed read", cond, sep=""), stderr()); quit()}) 
 
+if (class(corMatrix) != 'dgCMatrix') {
+	printErrorAndQuit("The specified file is not a dgCMatrix.")
+}
+
 write("nrow", stderr())
 write(nrow(corMatrix), stderr())
 write("ncol", stderr())
@@ -24,7 +28,9 @@ write(ncol(corMatrix), stderr())
 rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
 
-if (!is.na(rowNames) && !is.na(colNames) && all(rowNames == colNames)) {		
+if (anyNA(corMatrix)) {
+	printErrorAndQuit("The uploaded file contains NA's. Please remove them and try again")
+} else if (!anyNA(rowNames) && !anyNA(colNames) && all(rowNames == colNames)) {		
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
 	ptm <- proc.time()
