@@ -67,8 +67,6 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		}
 
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
-			write("length(firstNeighboursNodes[[i]]$name", stderr())
-			write(length(firstNeighboursNodes[[i]]$name), stderr())
 			edgesToAdd <- rbind(edgesToAdd, createEdgesDFDelta(corMatrices, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30, selectedNetworkType))
 			if (weightFilterSecond == TRUE) {
 				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
@@ -88,8 +86,6 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 		edgeTestSecond <- c(edgeTestSecond, edgesSecond[[i]]$weight)
 	}	
 }
-write("edgeTestSecond", stderr())
-write(edgeTestSecond, stderr())
 
 if (depth == 1) {
 	edgeTest <- edgeTestFirst
