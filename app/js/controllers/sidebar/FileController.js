@@ -18,6 +18,8 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
 
+        $rootScope.dataLoaded = false;
+
         function initializeVariables() {
             vm.correlationFileDisplayed = { normal: null, tumor: null, delta: null };
             vm.matrixUpload = { normal: null, tumor: null, delta: null };
@@ -119,9 +121,7 @@ angular.module('myApp.controllers').controller('FileController', [
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
                 QueryService.deleteFile(toDelete);
-                elem.removeClass('hide');
             }, function() {
-                elem.removeClass('hide');
             });
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
