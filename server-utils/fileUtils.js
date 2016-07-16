@@ -50,20 +50,26 @@ function getRequestedFiles(req, availableMatrices, degree, user) {
 }
 
 function getFilesInDirectory(directory, type, subType) {
-    var fileNames = null;
+    var filteredFileNames = null;
+    var originalFilesNames = null;
     var fileList = null;
 
-    fileNames = fs.readdirSync(directory);
+    originalFilesNames = fs.readdirSync(directory);
 
-    fileNames = fileNames.filter(function(fileName) {
-        return fileName.indexOf('degree') < 0 && fileName.indexOf('gitkeep') < 0;
+    filteredFileNames = originalFilesNames.filter(function(fileName) {
+        if (fileName.indexOf('degree') < 0 && originalFilesNames.indexOf('degrees' + fileName) >= 0
+            && fileName.indexOf('gitkeep') < 0) {
+            return true;
+        } else {
+            return false;
+        }
     });
 
     if (type == 'personal') {
-        console.log(fileNames);
+        console.log(filteredFileNames);
     }
 
-    fileList = fileNames.map(function(file) {
+    fileList = filteredFileNames.map(function(file) {
         return {
             name: file,
             pValue: "",
