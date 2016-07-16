@@ -35,7 +35,6 @@ var fileUploadState = {
     failed: -20
 };
 
-
 app.get('', function(req, res) {
     res.redirect('/app');
 });
@@ -713,6 +712,7 @@ app.post('/delete-file', function(req, res) {
     file = fileUtils.matchSelectedFile(req.body.file, { personal: availableMatrices.personal }, user);
     if (file == null) {
         res.send({ fileStatus: "!!!!Failed to delete file: " })
+        return;
     }
 
     if (file) {
@@ -761,6 +761,9 @@ app.post('/upload-matrix', function(req, res) {
             if (typeof files[prop].name == 'string') {
                 if (!files[prop].name.toLowerCase().endsWith('.rdata')) {
                     res.send({ error: "File upload failed. Please specify an Rdata file instead of: " + files[prop].name });
+                    return;
+                } else if (files[prop].name.startsWith("degree")) {
+                    res.send({ error: "File upload failed. Please change the file name so that it doesn't contain 'degree' in it. File name: " + files[prop].name });
                     return;
                 }
             } else {
