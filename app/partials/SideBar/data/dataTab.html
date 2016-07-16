@@ -2,60 +2,35 @@
     <div class="md-padding">
         <div class="md-subhead bottom-margin">Network Type:</div>
         <md-radio-group ng-model="vm.selectedNetworkType">
-            <!-- <md-radio-button value="normal" class="md-primary">Normal</md-radio-button> -->
+            <md-radio-button value="normal" class="md-primary">Normal</md-radio-button>
             <md-radio-button value="tumor" class="md-primary">Tumor</md-radio-button>
-            <!-- <md-radio-button value="delta" class="md-primary">Delta</md-radio-button> -->
+            <md-radio-button value="delta" class="md-primary">Delta</md-radio-button>
         </md-radio-group>
     </div>
     <div class="bottom-margin md-padding no-padding-top no-padding-bottom">
-        <md-input-container ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" class="select">
-            <label>Select Normal Matrix File</label>
-            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.normal">
-                <md-option ng-repeat="file in vm.fileList.normal" value="{{file}}" ng-selected="0">
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
-                </md-option>
-            </md-select>
-        </md-input-container>
-        <md-input-container ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" class="select">
-            <label>Select Tumor Matrix File</label>
-            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.tumor">
-                <md-option ng-repeat="file in vm.fileList.tumor" value="{{file}}" ng-selected="0">
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
-                    <!-- <md-button class=>X</md-button> -->
-                </md-option>
-            </md-select>
-        </md-input-container>
-        <md-input-container ng-if="vm.selectedNetworkType == 'delta'" class="select">
-            <label>Select Delta Matrix File</label>
-            <md-select class="file-select" ng-model="vm.correlationFileDisplayed.delta">
-                <md-option ng-repeat="file in vm.fileList.delta" value="{{file}}" ng-selected="0">
+        <md-input-container ng-repeat="(key, value) in vm.correlationFileDisplayed" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="select">
+            <label>Select {{key | capitalize}} Matrix File</label>
+            <md-select class="file-select" ng-model="vm.correlationFileDisplayed[key]">
+                <md-option ng-repeat="file in vm.fileList[key]" value="{{file}}" ng-selected="0">
                     <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
                 </md-option>
             </md-select>
         </md-input-container>
     </div>
     <div class="md-padding">
-        <md-button class="md-primary md-raised" ng-click="vm.getGenes()">Get Genes</md-button>
+        <md-button class="md-primary md-raised" ng-click="vm.getGenes()">Get Genes
+            <md-tooltip ng-if="vm.showTooltip.button" md-direction="right" md-visible="vm.showTooltip.button">
+                Click me to get genes for file!
+            </md-tooltip>
+        </md-button>
     </div>
     <md-divider></md-divider>
     <div ng-if="vm.permission > 0" class="md-padding">
         <div class="md-subhead bottom-margin">Choose file(s) to upload</div>
         <form>
-            <div ng-if="vm.selectedNetworkType == 'normal' || vm.selectedNetworkType == 'delta'" class="bottom-margin">
-                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload.normal" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose Normal File</md-button>
-                <div>Normal File: {{vm.matrixUpload.normal.name ? vm.matrixUpload.normal.name : "No file selected"}}</div>
-            </div>
-            <div ng-if="vm.selectedNetworkType == 'tumor' || vm.selectedNetworkType == 'delta'" class="bottom-margin">
-                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload.tumor" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">
-                    Choose Tumor File
-                </md-button>
-                <div>Tumor File: {{vm.matrixUpload.tumor.name ? vm.matrixUpload.tumor.name : "No file selected"}}</div>
-            </div>
-            <div ng-if="vm.selectedNetworkType == 'delta'" class="bottom-margin">
-                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload.delta" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">
-                    Choose Delta File
-                </md-button>
-                <div>Delta File: {{vm.matrixUpload.delta.name ? vm.matrixUpload.delta.name : "No file selected"}}</div>
+            <div ng-repeat="(key, value) in vm.matrixUpload" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="bottom-margin">
+                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload[key]" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose {{key | capitalize}} File</md-button>
+                <div>Normal File: {{vm.matrixUpload[key].name ? vm.matrixUpload[key].name : "No file selected"}}</div>
             </div>
             <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised top-margin-10">Upload Files</md-button>
         </form>
