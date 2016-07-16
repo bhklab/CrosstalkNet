@@ -49,6 +49,7 @@
     <script src="js/services/functionality/QueryService.js"></script>
     <script src="js/services/functionality/ValidationService.js"></script>
     <script src="js/services/functionality/TableService.js"></script>
+    <script src="js/filters/capitalizeFilter.js"></script>
     <script src="js/filters/degreeFilter.js"></script>
     <script src="js/filters/geneFilter.js"></script>
     <script src="js/filters/rangeFilter.js"></script>
@@ -94,7 +95,7 @@
                         </section>
                     </md-content>
                 </md-tab>
-                <md-tab label="Interaction Explorer">
+                <md-tab ng-if="dataLoaded" label="Interaction Explorer">
                     <md-content ng-controller="InteractionExplorerController as vm" ng-init="vm.initialize('interactionExplorer')">
                         <section layout="row">
                             <div static-include="partials/SideBar/interactionExplorer.html">
@@ -111,7 +112,7 @@
                         </section>
                     </md-content>
                 </md-tab>
-                <md-tab label="Path Existence Viewer">
+                <md-tab ng-if="dataLoaded" label="Path Existence Viewer">
                     <md-content ng-controller="PathExistenceController as vm" ng-init="vm.initialize('pathExistence')">
                         <section layout="row">
                             <div static-include="partials/SideBar/pathExistence.html">

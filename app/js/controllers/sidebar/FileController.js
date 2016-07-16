@@ -17,6 +17,7 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
+        vm.showTooltip = {button: false};
 
         $rootScope.dataLoaded = false;
 
@@ -68,6 +69,8 @@ angular.module('myApp.controllers').controller('FileController', [
                 return;
             }
 
+            stopTutorial();
+            vm.showTooltip.button = false;
             vm.sharedData.clearAllData = true;
             vm.sharedData.selectedNetworkType = vm.selectedNetworkType;
             vm.sharedData.correlationFileActual.normal = JSON.parse(vm.correlationFileDisplayed.normal);
@@ -77,12 +80,14 @@ angular.module('myApp.controllers').controller('FileController', [
 
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.geneList = result.geneList;
+                $rootScope.dataLoaded = true;
+                vm.sdWithinTab.selectedTab = 1;
+                getGenesGuide();
             });
 
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.matrixSummary = result.matrixSummary;
                 vm.sharedData.clearAllData = false;
-                vm.sdWithinTab.selectedTab = 1;
             });
         };
 
@@ -121,8 +126,7 @@ angular.module('myApp.controllers').controller('FileController', [
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
                 QueryService.deleteFile(toDelete);
-            }, function() {
-            });
+            }, function() {});
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
         };
@@ -155,5 +159,17 @@ angular.module('myApp.controllers').controller('FileController', [
                 vm.sharedData.reloadFileList = false;
             }
         });
+
+        var stopTutorial = $scope.$watch(function() {
+            return vm.correlationFileDisplayed;
+        }, function(newValue, oldValue) {
+            if (newValue.delta != null || newValue.normal != null || newValue.tumor != null) {
+                stopTutorial();
+                $timeout(function() {
+                    vm.showTooltip.button = true;
+                }, 250);
+
+            }
+        }, true);
     }
 ]);

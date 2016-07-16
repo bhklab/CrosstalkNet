@@ -14,10 +14,10 @@
             <md-tab label="Data" class="md-padding">
                 <div static-include="partials/SideBar/data/dataTab.html"></div>
             </md-tab>
-            <md-tab label="Query" class="md-padding">
+            <md-tab ng-if="dataLoaded" label="Query" class="md-padding">
                 <div static-include="partials/SideBar/query/main.html"></div>
             </md-tab>
-            <md-tab label="Styling">
+            <md-tab ng-if="dataLoaded" label="Styling">
                 <div ng-controller="LayoutController as vm" ng-init="initialize('main')" static-include="partials/SideBar/layout/main.html"></div>
             </md-tab>
         </md-tabs>
