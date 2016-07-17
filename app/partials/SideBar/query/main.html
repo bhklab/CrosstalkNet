@@ -1,35 +1,45 @@
 <md-content ng-controller="MGQueryController as vm" ng-init="vm.initialize('main')">
     <div class="md-padding">
         <div>
-            <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
-                Click Reset To Add More Genes
-            </md-tooltip>
-            <md-autocomplete ng-class="[vm.ctrl, vm.ctrl + 'gene-input']" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
-                <md-item-template>
-                    <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
-                </md-item-template>
-                <md-not-found>
-                    No states matching "{{vm.searchTextFirst}}" were found.
-                </md-not-found>
-            </md-autocomplete>
-        </div>
-        <div layout="row">
-            <div flex="40">
-                <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="vm.GOIState != vm.GOIStates.initial || vm.genesOfInterest.length == 0">Remove All</md-button>
+            <div layout="row">
+                <div class="flex-toolbar align-flex-vertical" flex="75">
+                    <md-autocomplete ng-class="[vm.ctrl, vm.ctrl + 'gene-input', 'no-margin-bottom', 'full-width']" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="vm.minDegree.first > 50 ? 1 : 2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
+                        <md-item-template>
+                            <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No states matching "{{vm.searchTextFirst}}" were found.
+                        </md-not-found>
+                    </md-autocomplete>
+                    <md-tooltip ng-if="vm.GOIState != vm.GOIStates.initial" md-direction="right">
+                        Click Reset To Add More Genes
+                    </md-tooltip>
+                </div>
+                <div class="flex-toolbar align-flex-vertical align-flex-right" flex="25">
+                    <md-button class="md-raised md-primary small-button" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial || state == states.loadingGraph || state == states.loadingConfig">Reset</md-button>
+                </div>
             </div>
-            <div flex="60">
-                <md-button class="md-raised md-primary" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial">Reset</md-button>
+            <div flex="100" layout layout-align="center center">
+                <span class="md-body-1">Min Degree</span>
+            </div>
+            <div layout="row">
+                <md-slider flex min="0" max="800" ng-model="vm.minDegree.first" aria-label="red" id="min-degree-first" class>
+                </md-slider>
+                <div flex="20" layout layout-align="center center">
+                    <input flex type="number" ng-model="vm.minDegree.first" aria-label="red" aria-controls="min-degree-first">
+                </div>
             </div>
         </div>
-        <div>
-            <span class="md-subhead">Selected Genes:</span>
+        <fieldset>
+            <legend class="fieldset-legend">Selected Genes:</legend>
             <md-list class="selected-genes-list">
                 <md-list-item ng-repeat="gene in vm.genesOfInterest">
                     <span ng-click="vm.removeGene(gene)" class="highlight right-margin red-text">X</span>
                     <span>{{gene.value}}</span>
                 </md-list-item>
             </md-list>
-        </div>
+            <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="state == states.loadingGraph || state == states.loadingConfig || vm.genesOfInterest.length == 0">Remove All Genes</md-button>
+        </fieldset>
         <div layout="row">
             <div flex="40">
                 <md-button class="md-raised md-primary" ng-click="vm.refreshGraph(true)" ng-disabled="vm.GOIState == vm.GOIStates.initial">Filter</md-button>
@@ -106,15 +116,5 @@
         </md-button>
     </div>
     <div ng-if="vm.sharedData.geneList.length > 0" layout-wrap class="md-padding">
-        <div flex="100" layout layout-align="center center">
-            <span class="md-body-1">Min Degree</span>
-        </div>
-        <div layout="row">
-            <md-slider flex min="0" max="800" ng-model="vm.minDegree.first" aria-label="red" id="min-degree-first" class>
-            </md-slider>
-            <div flex="20" layout layout-align="center center">
-                <input flex type="number" ng-model="vm.minDegree.first" aria-label="red" aria-controls="min-degree-first">
-            </div>
-        </div>
     </div>
 </md-content>
