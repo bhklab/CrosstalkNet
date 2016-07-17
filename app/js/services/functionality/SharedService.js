@@ -18,15 +18,15 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     service.states = {
         initial: { id: 0, text: "Waiting for user to query..." },
-        loadingGraph: { id: 1, text: "Getting graph from server..." },
-        loadingConfig: { id: 2, text: "Initializing graph..." },
-        showingGraph: { id: 3, text: "Graph finished" },
-        gettingGeneList: { id: 4, text: "Getting gene list..." },
-        gettingAllPaths: { id: 5, text: "Getting all paths between source and target genes..." },
-        finishedGettingAllPaths: { id: 6, text: "All paths have been obtained" },
-        uploadingFile: { id: 7, text: "Uploading file to server..." },
-        finishedUploadingFile: { id: 8, text: "Successfully uploaded file to server" },
-        failedUploadingFile: { id: 9, text: "Failed to upload file to server" },
+        showingGraph: { id: 1, text: "Graph finished" },
+        finishedGettingAllPaths: { id: 2, text: "All paths have been obtained" },
+        finishedUploadingFile: { id: 3, text: "Successfully uploaded file to server" },
+        failedUploadingFile: { id: 4, text: "Failed to upload file to server" },
+        loadingGraph: { id: 5, text: "Getting graph from server..." },
+        loadingConfig: { id: 6, text: "Initializing graph..." },
+        gettingGeneList: { id: 7, text: "Getting gene list..." },
+        gettingAllPaths: { id: 8, text: "Getting all paths between source and target genes..." },
+        uploadingFile: { id: 9, text: "Uploading file to server..." }
     };
 
     $rootScope.states = angular.copy(service.states);
@@ -45,7 +45,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
-    var tableOrderModel = { weight: null, normal: null, tumor: null };
+    var tableOrderModel = { weight: "'firstEdge.weight'", normal: "'firstEdge.normal'", tumor: "'firstEdge.tumor'" };
     var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel) };
 
     service.data.main = angular.copy(withinTabModel);

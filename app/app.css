@@ -12,8 +12,20 @@
     margin-top: 0px;
 }
 
+.no-margin-bottom {
+    margin-bottom: 0px;
+}
+
 .select:first-child {
     margin-top: 0px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.small-button {
+    min-width: 0px;
 }
 
 .hide {
@@ -53,6 +65,10 @@ md-list-item.md-clickable:hover {
 
 .align-flex-horizontal {
     justify-content: center;
+}
+
+.align-flex-right {
+    justify-content: flex-end;
 }
 
 .align-flex-vertical {
@@ -281,6 +297,10 @@ table-card-height {
 
 .graph-summary {
     width: 250px;
+}
+
+.legend {
+    width: 400px;
 }
 
 .card-title {

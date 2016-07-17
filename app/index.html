@@ -63,8 +63,9 @@
 <body md-no-ink>
     <md-toolbar ng-controller="LoginController" class=" md-primary md-hue-3">
         <div class="toolbar-height" layout="row">
-            <div class="flex-toolbar align-flex-vertical left-padded" flex="33">Status: {{state.text}}
-                <md-progress-circular ng-show="state == states.loading" md-mode="indeterminate"></md-progress-circular>
+            <div class="flex-toolbar align-flex-vertical left-padded" flex="33">
+                Status: {{state.text}}
+                <md-progress-circular class="md-warn" ng-show="state.id > states.failedUploadingFile.id" md-mode="indeterminate"></md-progress-circular>
             </div>
             <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="33">
                 <div class="title-font">BHK Lab</div>
@@ -87,6 +88,7 @@
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
                                     <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
                                 <div static-include="partials/tables/tableView.html"></div>
@@ -105,6 +107,7 @@
                                     <div class="graph-container" id="cyInteractionExplorer"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                     <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
+                                    <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
                                 <div static-include="partials/tables/tableView.html"></div>

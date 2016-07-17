@@ -1,4 +1,51 @@
-<div style="width: 150px; ">
+<md-card ng-show="vm.sharedData.matrixSummary != null" class="legend">
+    <md-card-title>
+        <md-card-title-text>
+            <div layout="row">
+                <div flex><span class="md-headline">Legend</span></div>
+            </div>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div layout="row">
+            <div flex="15">
+                <svg height="50" width="50">
+                    <circle cx="25" cy="25" r="20" fill="red" />
+                </svg>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="35">
+                <span>Epi</span>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="25">
+                <svg height="4" width="75">
+                    <line x1="0" y1="0" x2="75" y2="0" style="stroke: #ff9900;stroke-width:4" />
+                </svg>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="25">
+                <span>Negative</span>
+            </div>
+        </div>
+        <div layout="row">
+            <div flex="15">
+                <svg height="50" width="50">
+                    <circle cx="25" cy="25" r="20" fill="blue" />
+                </svg>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="35">
+                <span>Stroma</span>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="25">
+                <svg height="4" width="75">
+                    <line x1="0" y1="0" x2="75" y2="0" style="stroke: black;stroke-width:4" />
+                </svg>
+            </div>
+            <div class="flex-toolbar align-flex-vertical" flex="25">
+                <span>Positive</span>
+            </div>
+        </div>
+    </md-card-content>
+</md-card>
+<!-- <div style="width: 150px; ">
     <div layout="row">
         <div flex>
             <svg height="50" width="50">
@@ -20,3 +67,4 @@
         </div>
     </div>
 </div>
+ -->

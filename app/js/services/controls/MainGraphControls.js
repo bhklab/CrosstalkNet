@@ -63,6 +63,7 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
                 vm.removeGenesOfInterest();
             } else {
                 vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+                vm.refreshGraph();
             }
         };
 
