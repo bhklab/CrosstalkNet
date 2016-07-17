@@ -82,7 +82,7 @@ angular.module('myApp.controllers').controller('FileController', [
                 vm.sharedData.geneList = result.geneList;
                 $rootScope.dataLoaded = true;
                 vm.sdWithinTab.selectedTab = 1;
-                getGenesGuide();
+                stopTutorial();
             });
 
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
