@@ -173,7 +173,7 @@ app.post('/gene-list', function(req, res) {
 });
 
 app.post('/delta-interaction-explorer', function(req, res) {
-    //console.log("%j", req.body);
+    console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -185,26 +185,16 @@ app.post('/delta-interaction-explorer', function(req, res) {
 
     files = fileUtils.getRequestedFiles(req, true, user);
 
-    if (files == null) {
-        res.send({ error: "Please specify the necessary files." });
-        return;
-    } else if (files.error != null) {
-        res.send({ error: files.error });
+    var fileValidationres = validationUtils.validateFiles(files);
+    if (fileValidationres.error) {
+        res.send({ error: fileValidationres.error });
         return;
     }
 
-    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select a gene." });
+    selectedGeneNames = validationUtils.validateSelectedGenes(selectedGenes);
+    if (selectedGeneNames.error) {
+        res.send({ error: selectedGeneNames.error });
         return;
-    }
-
-    for (var i = 0; i < selectedGenes.length; i++) {
-        if (selectedGenes[i] == null || selectedGenes[i].value == null) {
-            res.json({ error: "Please select a gene." });
-            return;
-        }
-
-        selectedGeneNames.push(selectedGenes[i].value);
     }
 
     args.selectedNetworkType = req.body.selectedNetworkType;
@@ -243,7 +233,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var parentNodes = [];
             var edges = [];
             var elements = [];
-            var config = null;
+            var config = configUtils.createConfig();
             var layout = null;
             var edgeDictionary = {};
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
@@ -256,7 +246,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
 
             for (var i = 0; i < parsedEdges.length; i++) {
                 edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
-                //interactionsTableList.push()
             }
 
             for (var i = 0; i < parsedNodes.length; i++) {
@@ -264,38 +253,9 @@ app.post('/delta-interaction-explorer', function(req, res) {
             }
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
-
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-
-                for (var i = 0; i < selectedGenes.length + 1; i++) {
-                    if (i < 1) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
-                    } else if (nodes[i - 1].length > 0) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
-                    }
-                }
-
-                for (var j = 0; j < nodes.length; j++) {
-                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
-                }
-
+                layoutUtils.applyGridLayoutToConfig(config, nodes.concat(sourceNodes));
+                parentNodes = nodeUtils.createParentNodesIE(selectedGenes, nodes);
                 elements = elements.concat(parentNodes);
-
-                layout = layoutUtils.createPresetLayout();
-                config = configUtils.createConfig();
-
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
             } else {
                 for (var i = 0; i < nodes.length; i++) {
                     for (var j = 0; j < nodes[i].length; j++) {
@@ -310,6 +270,8 @@ app.post('/delta-interaction-explorer', function(req, res) {
 
                 nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
                 configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                configUtils.setConfigLayout(config, layout);
+
             }
 
             elements = elements.concat([].concat.apply([], nodes));
@@ -319,7 +281,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
             configUtils.addStyleToConfig(config, edgeStyleNegative);
             configUtils.addStyleToConfig(config, edgeStylePositive);
             configUtils.setConfigElements(config, elements);
-            configUtils.setConfigLayout(config, layout);
 
             selfLoops = clientTableUtils.getSelfLoops(edges);
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdges));
@@ -333,40 +294,33 @@ app.post('/delta-interaction-explorer', function(req, res) {
 });
 
 app.post('/delta-submatrix', function(req, res) {
-    //console.log("%j", req.body);
+    // console.log("%j", req.body);
     var args = {};
     var argsString = "";
+    var files = null;
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    var files = null;
-
     files = fileUtils.getRequestedFiles(req, true, user);
-
-    if (files == null) {
-        res.send({ error: "Please specify the necessary files." });
-        return;
-    } else if (files.error != null) {
-        res.send({ error: files.error });
-        return;
-    }
-
 
     if (filterValidationRes.error) {
         res.send(filterValidationRes);
         return;
     }
 
-    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select at least 1 gene of interest." });
+    var fileValidationres = validationUtils.validateFiles(files);
+    if (fileValidationres.error) {
+        res.send({ error: fileValidationres.error });
         return;
     }
 
-    for (var i = 0; i < selectedGenes.length; i++) {
-        selectedGeneNames.push(selectedGenes[i].value);
+    selectedGeneNames = validationUtils.validateSelectedGenes(selectedGenes);
+    if (selectedGeneNames.error) {
+        res.send({ error: selectedGeneNames.error });
+        return;
     }
 
     args.selectedNetworkType = req.body.selectedNetworkType;
@@ -469,17 +423,19 @@ app.post('/delta-submatrix', function(req, res) {
             config = configUtils.createConfig();
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+
+                nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
+                layout = layoutUtils.createPresetLayout();
+
+                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+
                 allNodes.push({
                     data: { id: "epi" }
                 });
                 allNodes.push({
                     data: { id: "stroma" }
                 });
-                nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
-                layout = layoutUtils.createPresetLayout();
-
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
             } else if (requestedLayout == 'clustered') {
                 var largestClusterSize = 0;
                 nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
@@ -635,7 +591,7 @@ app.post('/delete-file', function(req, res) {
     var file;
     console.log("delete file: %j", req.body.file);
 
-    file = fileUtils.getRequestedFile({arbitrary: req.body.file}, user)
+    file = fileUtils.getRequestedFile({ arbitrary: req.body.file }, user)
     if (file == null) {
         res.send({ fileStatus: "!!!!Failed to delete file: " })
         return;

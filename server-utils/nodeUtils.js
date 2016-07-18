@@ -109,6 +109,28 @@ function createNodesFromRNodes(rNodes, forExplorer) {
     return resultNodes;
 }
 
+function createParentNodesIE(selectedGenes, nodes) {
+    var parentNodes = [];
+
+    for (var i = 0; i < selectedGenes.length + 1; i++) {
+        if (i < 1) {
+            parentNodes.push({
+                data: {
+                    id: "par" + i
+                }
+            });
+        } else if (nodes[i - 1].length > 0) {
+            parentNodes.push({
+                data: {
+                    id: "par" + i
+                }
+            });
+        }
+    }
+
+    return parentNodes;
+}
+
 function positionNodesBipartite(nodes, epiX, stromaX, epiY, stromaY) {
     var epiIncrement = 0;
     var stromaIncrement = 0;
@@ -128,6 +150,17 @@ function positionNodesBipartite(nodes, epiX, stromaX, epiY, stromaY) {
             };
             stromaIncrement++;
         }
+    }
+}
+
+function positionNodesBipartiteGrid(nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].data.neighbourLevel != -1) {
+            nodes[i].data.col = nodes[i].data.neighbourLevel + 1;
+        } else {
+            nodes[i].data.col = 1;
+        }
+        nodes[i].data.row = i + 1;
     }
 }
 
@@ -179,7 +212,9 @@ module.exports = {
     addClassToNodes: addClassToNodes,
     createNodes: createNodes,
     createNodesFromRNodes: createNodesFromRNodes,
+    createParentNodesIE: createParentNodesIE,
     positionNodesBipartite: positionNodesBipartite,
+    positionNodesBipartiteGrid: positionNodesBipartiteGrid,
     positionNodesClustered: positionNodesClustered,
     getMinRadius: getMinRadius
 };
