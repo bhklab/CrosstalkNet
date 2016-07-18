@@ -70,6 +70,8 @@ angular.module('myApp.controllers').controller('FileController', [
             }
 
             stopTutorial();
+            SharedService.resetMatrixSummary();
+            SharedService.resetGeneList();
             vm.showTooltip.button = false;
             vm.sharedData.clearAllData = true;
             vm.sharedData.selectedNetworkType = vm.selectedNetworkType;
@@ -136,9 +138,10 @@ angular.module('myApp.controllers').controller('FileController', [
             },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
-                    SharedService.resetCorrelationFiles();
-                    vm.sharedData.clearAllData = true;
-                    SharedService.resetMatrixSummary();
+                    // SharedService.resetCorrelationFiles();
+                    // vm.sharedData.clearAllData = true;
+                    // SharedService.resetMatrixSummary();
+                    SharedService.resetGlobalData();
                     initializeVariables();
                 }
             });

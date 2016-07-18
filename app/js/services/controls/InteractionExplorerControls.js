@@ -39,6 +39,7 @@ myModule.factory('InteractionExplorerControls', function($http, $rootScope, $tim
             vm.explorerGenes = [];
             GlobalControls.resetInputFieldsLocal(vm, '');
             vm.clearLocatedGene();
+            SharedService.resetWTM(vm);
         };
 
         vm.loadExplorerDropdownOptions = function(selectedGenes) {
