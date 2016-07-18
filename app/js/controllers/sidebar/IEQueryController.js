@@ -80,9 +80,8 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 vm.genesOfInterest = [];
-                vm.resetDisplayedData();
                 GraphConfigService.destroyGraph(vm);
-                SharedService.resetWTM(vm);
+                vm.resetDisplayedData();
             }
         });
 

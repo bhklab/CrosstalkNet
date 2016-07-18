@@ -24,11 +24,6 @@ var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
 
-var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
-var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Proprietary_Matrices/';
-var BASE_FAKE_DIRECTORY = 'R_Scripts/Fake_Matrices/'
-
-var availableMatrices = {};
 var fileUploadState = {
     single: -1,
     multipleCompleted: 3,
@@ -119,15 +114,7 @@ app.post('/gene-list', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
     //console.log(req.body);
 
-    if (req.body.selectedFile.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
-    } else if (req.body.selectedFile.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
-    } else if (req.body.selectedFile.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
-    }
-
-    // console.log("RETURNED FILE: %j", file);
+    file = fileUtils.getRequestedFile(req.body.selectedFile, user);
 
     if (file == null || file.path == null || file.name == null) {
         res.send({ error: "Please specify a file name" });
@@ -196,7 +183,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, true, user);
+    files = fileUtils.getRequestedFiles(req, true, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -357,7 +344,7 @@ app.post('/delta-submatrix', function(req, res) {
 
     var files = null;
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, true, user);
+    files = fileUtils.getRequestedFiles(req, true, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -544,7 +531,7 @@ app.post('/delta-get-all-paths', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, availableMatrices, false, user);
+    files = fileUtils.getRequestedFiles(req, false, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -599,36 +586,11 @@ app.post('/delta-get-all-paths', function(req, res) {
 });
 
 app.post('/available-matrices', function(req, res) {
-    var result = getAvailableMatrices();
     var subTypes = req.body.types;
-    var fileNames = [];
-    var matrices = {};
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleMatrices = fileUtils.filterMatricesByAccessLevel(result, user);
+    var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(subTypes, user);
 
-    for (var type in accessibleMatrices) {
-        for (var i = 0; i < subTypes.length; i++) {
-            if (Object.keys(accessibleMatrices[type]).indexOf(subTypes[i]) >= 0 && accessibleMatrices[type][subTypes[i]] != null) {
-                if (matrices[subTypes[i]] == null) {
-                    matrices[subTypes[i]] = accessibleMatrices[type][subTypes[i]];
-                } else {
-                    matrices[subTypes[i]] = matrices[subTypes[i]].concat(accessibleMatrices[type][subTypes[i]]);
-                }
-            }
-        }
-    }
-
-    for (var i = 0; i < subTypes.length; i++) {
-        matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
-            return {
-                name: file.name,
-                type: file.type,
-                subType: file.subType
-            };
-        });
-    }
-
-    res.send({ fileList: matrices });
+    res.send({ fileList: accessibleMatrices });
 });
 
 app.post('/overall-matrix-stats', function(req, res) {
@@ -636,13 +598,7 @@ app.post('/overall-matrix-stats', function(req, res) {
     var file;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    if (req.body.selectedFile.delta != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.delta, availableMatrices, user);
-    } else if (req.body.selectedFile.normal != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.normal, availableMatrices, user);
-    } else if (req.body.selectedFile.tumor != null) {
-        file = fileUtils.matchSelectedFile(req.body.selectedFile.tumor, availableMatrices, user);
-    }
+    file = fileUtils.getRequestedFile(req.body.selectedFile, user);
 
     if (file == null || file.path == null || file.name == null) {
         res.send({ error: "Please specify a file name" });
@@ -674,41 +630,12 @@ app.post('/overall-matrix-stats', function(req, res) {
         });
 });
 
-function getAvailableMatrices() {
-    var fileList = [];
-    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: {} };
-
-    var directories = ['normal', 'tumor', 'delta'];
-
-    for (var i = 0; i < directories.length; i++) {
-        result.real[directories[i]] = fileUtils.getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY + directories[i], 'real', directories[i]);
-        result.fake[directories[i]] = fileUtils.getFilesInDirectory(BASE_FAKE_DIRECTORY + directories[i], 'fake', directories[i]);
-    }
-
-    var personalDirectories = fs.readdirSync('R_Scripts/Uploaded_Matrices');
-    for (var i = 0; i < personalDirectories.length; i++) {
-        result.personal[personalDirectories[i]] = { normal: [], tumor: [], delta: [] };
-        for (var j = 0; j < directories.length; j++) {
-            try {
-                fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], fs.R_OK);
-                result.personal[personalDirectories[i]][directories[j]] = fileUtils.getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
-
-            } catch (err) {
-                console.log(err);
-                fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], directories[j], null);
-            }
-        }
-    }
-
-    return result;
-}
-
 app.post('/delete-file', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var file;
     console.log("delete file: %j", req.body.file);
 
-    file = fileUtils.matchSelectedFile(req.body.file, { personal: availableMatrices.personal }, user);
+    file = fileUtils.getRequestedFile({arbitrary: req.body.file}, user)
     if (file == null) {
         res.send({ fileStatus: "!!!!Failed to delete file: " })
         return;
@@ -724,6 +651,7 @@ app.post('/delete-file', function(req, res) {
             function(err, results) {
                 console.log("results in server.js: %j", results);
                 console.log("err: %j", err);
+                fileUtils.updateAvailableMatrixCache();
 
                 if (results != null && results.length > 0 && results[0] != null) {
                     res.send({ fileStatus: "Failed to delete file: " + file.name });
@@ -776,8 +704,8 @@ app.post('/upload-matrix', function(req, res) {
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log(files[type].name);
         files[type].data = files[type].data.replace(/^data:;base64,/, "");
-        fileUtils.createDirectory(BASE_UPLOAD_DIRECTORY, user.name, type, callback);
-        fileUtils.writeFile(BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
+        fileUtils.createDirectory(fileUtils.BASE_UPLOAD_DIRECTORY, user.name, type, callback);
+        fileUtils.writeFile(fileUtils.BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
 
     }, function done() {
         console.log("Finished writing files");
@@ -785,23 +713,22 @@ app.post('/upload-matrix', function(req, res) {
 
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log("type:" + type);
-        verifyFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
+        verifyFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
-                fileUtils.removeFile(BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
+                fileUtils.removeFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
             }
 
-            initializeAvaialbleMatrices();
+            fileUtils.updateAvailableMatrixCache();
             res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
         } else {
-            initializeAvaialbleMatrices();
+            fileUtils.updateAvailableMatrixCache();
             res.send({ fileStatus: "Successfully uploaded file(s). Please check the dropdown to select new file(s). " })
         }
 
         console.log("Finished verifying files");
     });
-
 });
 
 function verifyFile(filePath, fileName, callback) {
@@ -834,12 +761,6 @@ function verifyFile(filePath, fileName, callback) {
     });
 }
 
-function initializeAvaialbleMatrices() {
-    var result = getAvailableMatrices();
-
-    availableMatrices = result;
-}
-
 function createSampleUser() {
     var salt = bcrypt.genSaltSync(3);
     var password = bcrypt.hashSync('', salt);
@@ -866,8 +787,7 @@ var server = app.listen(5000, function() {
     // var password = bcrypt.hashSync('', salt);
     // console.log("password: " + password);
 
-    initializeAvaialbleMatrices();
-    console.log(availableMatrices);
+    fileUtils.updateAvailableMatrixCache();
     //createSampleUser();
 });
 
