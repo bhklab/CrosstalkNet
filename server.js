@@ -113,7 +113,7 @@ app.post('/login', function(req, res) {
 });
 
 app.post('/gene-list', function(req, res) {
-    var args = { pValue: null, fileName: null };
+    var args = { fileName: null };
     var argsString = "";
     var file;
     var user = authenticationUtils.getUserFromToken(req.body.token);
@@ -136,7 +136,6 @@ app.post('/gene-list', function(req, res) {
 
     var geneList = [];
 
-    args.pValue = file.pValue;
     args.fileName = file.name;
     args.path = file.path;
 
@@ -831,49 +830,6 @@ function verifyFile(filePath, fileName, callback) {
             callback({ status: status, message: message });
         } else {
             callback();
-        }
-        // if (status > 0) {
-        //     ret.result = message;
-        // } else {
-        //     ret.result = null;
-        // }
-        //res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
-
-    });
-}
-
-function checkFileIntegrity(req, res, filePath, fileName, completed) {
-    var args = {};
-    var argsString = "";
-
-    args.filePath = filePath;
-    args.fileName = fileName
-
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-
-    var child = exec("Rscript R_Scripts/fileChecker.R --args \"" + argsString + "\"", function(error, stdout, stderr) {
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-        console.log(stdout);
-
-        var parsedValue = JSON.parse(stdout);
-        var status = parsedValue.status;
-        var message = parsedValue.message;
-        var fileList;
-        availableMatrices = getAvailableMatrices();
-        fileList = availableMatrices;
-
-        completed.state++;
-        console.log("completed.state: " + completed.state);
-        if (completed.state == fileUploadState.single || completed.state == fileUploadState.multipleCompleted) {
-            res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
-        } else if (status > 0) {
-            completed.state = fileUploadState.failed;
-            res.send({ fileStatus: message, fileList: fileList, errorStatus: status });
         }
     });
 }
