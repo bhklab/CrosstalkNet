@@ -20,6 +20,7 @@ genesOfInterest <- settings$genesOfInterest
 selectedNetworkType <- settings$selectedNetworkType
 
 corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
+# Read the degrees file associated with the selected network type
 degrees <- readFileWithValidation(settings$fileNameDegrees)
 
 exclusions <- genesOfInterest
@@ -32,10 +33,9 @@ edgeTestSecond <- c()
 k <- 0
 edgeExclusions <- c()
 
+# Creates nodes and edges for the first neighbours of the selected genes
 for (i in 1:length(genesOfInterest)) {
-	tryCatch({edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)},
-		error = function(err) {cat(format(toJSON(list(status = 1, message = as.character(err)), auto_unbox = TRUE))) ; write(err, stderr()); quit()})
-    # edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
+	edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
 
     if (weightFilterFirst == TRUE) {
     	edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -55,12 +55,14 @@ secondNeighboursNodes <- list()
 totalTimeEdges <- c(0,0,0,0,0)
 totalTimeNodes <- c(0,0,0,0,0)
 
+# Creates nodes and edges for the second neighbours of the selected genes
 if (length(firstNeighboursNodes) > 0 && depth == 2) {
 	for (i in 1:length(firstNeighboursNodes)) {
 		secondNeighboursNodes[[i]] = createEmptyNodes(0)
 		nodesToAdd = createEmptyNodes(0)
 		edgesToAdd <- createEmptyDifferentialEdges(0)
 
+		# Skip loop iteration if there are no nodes for current first neighbours group
 		if (length(firstNeighboursNodes[[i]]$name) == 0) {
 			edgesSecond[[i]] = edgesToAdd
 			next	
@@ -93,6 +95,7 @@ if (depth == 1) {
 	edgeTest <- edgeTestSecond
 }
 
+# Get the max and minimum weights to be used for gradient styling by server
 minMaxWeightDepth <- getMinMaxWeightValues(edgeTest)
 edgeTest <- c(edgeTestFirst, edgeTestSecond)
 minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
