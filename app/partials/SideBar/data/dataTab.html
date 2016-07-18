@@ -26,7 +26,7 @@
     </div>
     <md-divider></md-divider>
     <div ng-if="vm.permission > 0" class="md-padding">
-        <div class="md-subhead bottom-margin">Choose file(s) to upload</div>
+        <div class="md-subhead bottom-margin">Optional File Upload</div>
         <form>
             <div ng-repeat="(key, value) in vm.matrixUpload" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="bottom-margin">
                 <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload[key]" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose {{key | capitalize}} File</md-button>

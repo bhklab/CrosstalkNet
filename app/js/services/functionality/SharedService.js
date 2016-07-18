@@ -45,7 +45,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
-    var tableOrderModel = { weight: "'firstEdge.weight'", normal: "'firstEdge.normal'", tumor: "'firstEdge.tumor'" };
+    var tableOrderModel = { weight: "-'firstEdge.weight'", normal: "-'firstEdge.normal'", tumor: "-'firstEdge.tumor'" };
     var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel) };
 
     service.data.main = angular.copy(withinTabModel);
