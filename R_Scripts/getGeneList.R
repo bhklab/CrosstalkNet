@@ -8,11 +8,7 @@ pValue <- settings$pValue
 fileName <- settings$fileName
 path <- settings$path
 
-if (pValue != "") {
-	degrees <- readFileWithValidation(paste(path, 'fulldegrees.', pValue, ".RData", sep=""))	
-} else {
-	degrees <- readFileWithValidation(paste(path, 'degrees', fileName, sep=""))	
-}
+degrees <- readFileWithValidation(paste(path, 'degrees', fileName, sep=""))	
 
 output <- list(epiDegrees = degrees$epiDegree, epiDegreesNames = names(degrees$epiDegree), stromaDegrees = degrees$stromaDegree, stromaDegreesNames = names(degrees$stromaDegree))
 cat(format(toJSON(output, auto_unbox = TRUE)))
