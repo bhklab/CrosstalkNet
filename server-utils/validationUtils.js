@@ -40,9 +40,39 @@ function validateFilters(body) {
     return { error: null };
 }
 
+function validateFiles(files) {
+    if (files == null) {
+        return { error: "Please specify the necessary files." };
+    } else if (files.error != null) {
+        return { error: files.error };
+    }
+
+    return {};
+}
+
+function validateSelectedGenes(selectedGenes) {
+    var selectedGeneNames  = [];
+
+    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        return { error: "Please select at least 1 gene of interest." };
+    }
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        if (selectedGenes[i] == null || selectedGenes[i].value == null) {
+            return { error: "Please select a gene." };
+        }
+
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    return selectedGeneNames;
+}
+
 module.exports = {
     isNegative: isNegative,
     isPositive: isPositive,
     isNumeric: isNumeric,
-    validateFilters: validateFilters
+    validateFilters: validateFilters,
+    validateFiles: validateFiles,
+    validateSelectedGenes: validateSelectedGenes
 };
