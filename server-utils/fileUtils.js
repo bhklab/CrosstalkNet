@@ -78,8 +78,8 @@ function getRequestedFile(selectedFiles, user, filter) {
 
     if (filter == null) {
         matrices = availableMatrixCache;
-    } else if (Object.keys(availableMatrixCache).indexOf(filter) >= 0){
-        matrices = {personal: availableMatrixCache.personal};
+    } else if (Object.keys(availableMatrixCache).indexOf(filter) >= 0) {
+        matrices = { personal: availableMatrixCache.personal };
     } else {
         return null;
     }
@@ -128,9 +128,13 @@ function getRequestedFiles(req, degree, user) {
         }
 
         file = matchSelectedFile(req.body.selectedFile.normal, availableMatrixCache, user);
-        result.normal = file.path + file.name;
+        if (file != null) {
+            result.normal = file.path + file.name;
+        }
         file = matchSelectedFile(req.body.selectedFile.tumor, availableMatrixCache, user);
-        result.tumor = file.path + file.name;
+        if (file != null) {
+            result.tumor = file.path + file.name;
+        }
 
         if (result.tumor == null || result.normal == null) {
             return null;
