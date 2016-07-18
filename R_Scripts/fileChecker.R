@@ -15,10 +15,11 @@ write(filePath, stderr())
 
 corMatrix <- c()
 tryCatch(corMatrix <- readRDS(paste(filePath, fileName, sep="")),
-           error = function(cond) {cat(format(toJSON(list(status = 1, message = "Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix."), auto_unbox = TRUE))) ; write(paste("failed read", cond, sep=""), stderr()); quit()}) 
+           error = function(cond) {printMessageAndQuit("Failed to read the uploaded file. Please make sure that it is an RData file containing a matrix.")}) 
 
+# Checks to see if the read object is a dgCMatrix
 if (class(corMatrix) != 'dgCMatrix') {
-	printErrorAndQuit("The specified file is not a dgCMatrix.")
+	printMessageAndQuit("The specified file is not a dgCMatrix.")
 }
 
 write("nrow", stderr())
@@ -29,7 +30,8 @@ rowNames <- rownames(corMatrix)
 colNames <- colnames(corMatrix)
 
 if (anyNA(corMatrix)) {
-	printErrorAndQuit("The uploaded file contains NA's. Please remove them and try again")
+	# Prints an error if there exist any NA's in the dgCMatrix
+	printMessageAndQuit("The uploaded file contains NA's. Please remove them and try again")
 } else if (!anyNA(rowNames) && !anyNA(colNames) && all(rowNames == colNames)) {		
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
@@ -42,11 +44,11 @@ if (anyNA(corMatrix)) {
 	
 	saveRDS(corMatrix, paste(filePath, fileName, sep=""))
 	saveRDS(degrees, paste(filePath, "degrees", fileName, sep=""))
-	cat(format(toJSON(list(status = 0, message = "File upload successful! You can now choose your file from the dropdown."), auto_unbox = TRUE)))
+	printMessageAndQuit("File upload successful! You can now choose your file from the dropdown.", status = 0)
 
 } else {
-	#file.remove(paste(filePath, fileName, sep=""))
-	cat(format(toJSON(list(status = 1, message = "File upload failed. Row names and column names don't match"), auto_unbox = TRUE)))	
+	# Prints an error if the row names are not identical to the column names
+	printMessageAndQuit("File upload failed. Row names and column names don't match")
 }
 
 

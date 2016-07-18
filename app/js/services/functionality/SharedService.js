@@ -45,7 +45,7 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
         selfLoopSearch: ""
     };
 
-    var tableOrderModel = { weight: "'firstEdge.weight'", normal: "'firstEdge.normal'", tumor: "'firstEdge.tumor'" };
+    var tableOrderModel = { weight: "-'firstEdge.weight'", normal: "-'firstEdge.normal'", tumor: "-'firstEdge.tumor'" };
     var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel) };
 
     service.data.main = angular.copy(withinTabModel);
@@ -55,6 +55,8 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
     service.resetWTMPE = resetWTMPE;
     service.resetCorrelationFiles = resetCorrelationFiles;
     service.resetMatrixSummary = resetMatrixSummary;
+    service.resetGeneList = resetGeneList;
+    service.resetGlobalData = resetGlobalData;
 
     function resetWTM(vm) {
         for (var prop in withinTabModel) {
@@ -80,6 +82,17 @@ myModule.factory('SharedService', function($http, $timeout, $rootScope, GraphCon
 
     function resetMatrixSummary() {
         service.data.global.matrixSummary = null;
+    }
+
+    function resetGeneList() {
+        service.data.global.geneList = null;
+    }
+
+    function resetGlobalData() {
+        service.data.global.clearAllData = true;
+        resetCorrelationFiles();
+        resetMatrixSummary();
+        resetGeneList();
     }
 
     return service;
