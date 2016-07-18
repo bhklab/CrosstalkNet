@@ -17,7 +17,7 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
-        vm.showTooltip = {button: false};
+        vm.showTooltip = { button: false };
 
         $rootScope.dataLoaded = false;
 
@@ -163,13 +163,20 @@ angular.module('myApp.controllers').controller('FileController', [
         var stopTutorial = $scope.$watch(function() {
             return vm.correlationFileDisplayed;
         }, function(newValue, oldValue) {
-            if (newValue.delta != null || newValue.normal != null || newValue.tumor != null) {
-                stopTutorial();
-                $timeout(function() {
-                    vm.showTooltip.button = true;
-                }, 250);
-
+            if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta) {
+                if (newValue.delta != null && newValue.normal != null && newValue.tumor != null) {
+                    showTooltip();
+                }
+            } else if (newValue.delta != null || newValue.normal != null || newValue.tumor != null) {
+                showTooltip();
             }
         }, true);
+
+        function showTooltip() {
+            stopTutorial();
+            $timeout(function() {
+                vm.showTooltip.button = true;
+            }, 250);
+        }
     }
 ]);
