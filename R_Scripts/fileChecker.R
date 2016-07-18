@@ -47,6 +47,7 @@ if (anyNA(corMatrix)) {
 	printMessageAndQuit("File upload successful! You can now choose your file from the dropdown.", status = 0)
 
 } else {
+	# Prints an error if the row names are not identical to the column names
 	printMessageAndQuit("File upload failed. Row names and column names don't match")
 }
 

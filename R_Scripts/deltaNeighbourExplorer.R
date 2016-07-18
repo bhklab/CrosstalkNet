@@ -35,7 +35,7 @@ for (i in 1:length(selectedGenes)) {
     edgeTest <- c(edgeTest, edges[[i]]$weight)
 }
 
-# Get the max and minimum weights to be usedd for gradient styling by server
+# Get the max and minimum weights to be used for gradient styling by server
 minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
 result <- list(nodes = nodes, edges = edges, minMaxWeightOverall = minMaxWeightOverall)
 cat(format(toJSON(result)))

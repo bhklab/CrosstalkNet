@@ -35,9 +35,7 @@ edgeExclusions <- c()
 
 # Creates nodes and edges for the first neighbours of the selected genes
 for (i in 1:length(genesOfInterest)) {
-	tryCatch({edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)},
-		error = function(err) {cat(format(toJSON(list(status = 1, message = as.character(err)), auto_unbox = TRUE))) ; write(err, stderr()); quit()})
-    # edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
+	edgesToAdd <- createEdgesDFDelta(corMatrices, genesOfInterest[i], edgeExclusions, 0, selectedNetworkType)
 
     if (weightFilterFirst == TRUE) {
     	edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightFirst, minPositiveWeightFirst)
@@ -97,6 +95,7 @@ if (depth == 1) {
 	edgeTest <- edgeTestSecond
 }
 
+# Get the max and minimum weights to be used for gradient styling by server
 minMaxWeightDepth <- getMinMaxWeightValues(edgeTest)
 edgeTest <- c(edgeTestFirst, edgeTestSecond)
 minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
