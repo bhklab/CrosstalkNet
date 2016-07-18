@@ -67,7 +67,7 @@ myModule.factory('ExportService', function($http, $filter) {
         var colDelim = ",";
         var csv = "";
         var header = colDelim + neighbours.stroma.map(function(s) {
-            return s;//return $filter('suffixTrim')(s);
+            return s; //return $filter('suffixTrim')(s);
         }).join();
         csv += header;
         csv += rowDelim;
@@ -99,15 +99,28 @@ myModule.factory('ExportService', function($http, $filter) {
         }
 
         var fileName = "graph" + Date.now() + ".png";
-        var png64 = vm.sdWithinTab.cy.png({full: true});
+        var png64 = vm.sdWithinTab.cy.png({ full: true });
+        png64 = png64.substring("data:image/png;base64,".length);
+
+        var byteCharacters = atob(png64);
+
+        var byteNumbers = new Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        var blob = new Blob([byteArray], {type: "image/png"});
+        var dataURL = URL.createObjectURL(blob);
 
         var link = document.createElement("a");
-        link.setAttribute("href", png64);
+        link.style.display = 'none';
+        link.setAttribute("href", dataURL);
         link.setAttribute("download", fileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
     }
 
     return service;
