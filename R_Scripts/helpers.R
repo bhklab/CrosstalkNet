@@ -271,7 +271,7 @@ getGeneSuffix <- function(gene) {
     # Returns:
     #   The last character of gene.
     if (length(gene) == 0 || is.na(gene) || is.null(gene)) {
-        printErrorAndQuit("Could not find gene in matrix")
+        printMessageAndQuit("Could not find gene in matrix")
     }
 
     tolower(substr(gene, nchar(gene)-1, nchar(gene)))
@@ -386,17 +386,17 @@ checkGeneInGeneNames <- function(gene, geneNames) {
     # Returns: Nothing if gene exists in geneNames. Otherwise, the script
     #           prints an error and quits.
     if (is.na(gene) || is.null(gene) || (!gene %in% geneNames)) {
-        printErrorAndQuit(paste("Could not find gene:", gene, "in matrix"))
+        printMessageAndQuit(paste("Could not find gene:", gene, "in matrix"))
     }
 }
 
-printErrorAndQuit <- function(error) {
+printMessageAndQuit <- function(error, status=1) {
     # Writes an error to stderr, writes an in JSON format to stdout, and quits.
     #
     # Args:
     #   error: The error message to write.
     write(error, stderr())
-    cat(format(toJSON(list(status = 1, message = error), auto_unbox = TRUE)))
+    cat(format(toJSON(list(status = status, message = error), auto_unbox = TRUE)))
     quit()
 }
 
@@ -411,7 +411,7 @@ readFileWithValidation <- function(filePath) {
     #           an issue reading in the file, an error message is printed and the script
     #           quits.
     tryCatch(fileResult <- readRDS(filePath),
-        error = function(cond) {printErrorAndQuit(paste("Failed to read file:", filePath, "Please make sure that it is an RData file containing a matrix."))})
+        error = function(cond) {printMessageAndQuit(paste("Failed to read file:", filePath, "Please make sure that it is an RData file containing a matrix."))})
 
     fileResult
 }

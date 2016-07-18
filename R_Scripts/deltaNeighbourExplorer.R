@@ -8,13 +8,14 @@ settings <- fromJSON(args[2])
 selectedGenes <- settings$selectedGenes
 selectedNetworkType <- settings$selectedNetworkType
 
-corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
+corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, 
+                                     settings$fileNameMatrixTumor, settings$fileNameMatrixDelta)
+# Read the degrees file associated with the selected network type
 degrees <- readFileWithValidation(settings$fileNameDegrees)
 
 exclusions <- c()	
 edges <- list()
 edgeExclusion <- c()
-#nodes <- createEmptyNodes()
 nodes <- list()
 edgeTest <- c()
 
@@ -25,14 +26,16 @@ for (i in 1:length(selectedGenes)) {
     nodesToAdd <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edges[[i]], i, selectedGenes, exclusions)
     nodes[[i]] <- nodesToAdd
     
-    #edgeExclusion <- selectedGenes[i]
+    # Used to prevent creation of duplicate nodes
     exclusions <- c(exclusions, selectedGenes[i])
-    edgeExclusion <- c(edgeExclusion, selectedGenes[i])
     exclusions <- c(exclusions, nodesToAdd$name)
+    # Used to prevent creation of duplicate edges
+    edgeExclusion <- c(edgeExclusion, selectedGenes[i])
+    # Vector of weights to be used for extracting min and max from
     edgeTest <- c(edgeTest, edges[[i]]$weight)
 }
 
-
+# Get the max and minimum weights to be used for gradient styling by server
 minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
 result <- list(nodes = nodes, edges = edges, minMaxWeightOverall = minMaxWeightOverall)
 cat(format(toJSON(result)))
