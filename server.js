@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
                     if (!user) {
                         res.json({ success: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
-                        if (!bcrypt.compareSync(req.body.user.password, user.password)) {
+                        if (!bcrypt.compareSync(req.body.user.password, user.getPassword())) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
                             var token = jwt.sign({ user: Date.now() }, app.get('secretKey'), {
@@ -70,7 +70,6 @@ app.use(function(req, res, next) {
                 });
         }
     } else if (req.body.token == 'guest') {
-        req.accessLevel = 0;
         next();
     } else {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
@@ -78,13 +77,6 @@ app.use(function(req, res, next) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
-                var user = authenticationUtils.getUserFromToken(req.body.token);
-
-                if (user) {
-                    req.accessLevel = user.accessLevel;
-                } else {
-                    req.accessLevel = 0;
-                }
                 next();
             }
         });
@@ -227,6 +219,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
 
+            var allNodes = [];
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
@@ -252,8 +245,16 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
             }
 
+            allNodes = nodes.concat(sourceNodes);
+
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                layoutUtils.applyGridLayoutToConfig(config, nodes.concat(sourceNodes));
+                allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
+                layout = layoutUtils.createGridLayoutWithDimensions(allNodes);
+
+                config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                config = configUtils.setConfigLayout(config, layout);
+
                 parentNodes = nodeUtils.createParentNodesIE(selectedGenes, nodes);
                 elements = elements.concat(parentNodes);
             } else {
@@ -268,19 +269,19 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 config = configUtils.createConfig();
                 layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
 
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
-                configUtils.setConfigLayout(config, layout);
+                nodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                config = configUtils.setConfigLayout(config, layout);
 
             }
 
-            elements = elements.concat([].concat.apply([], nodes));
+            elements = elements.concat([].concat.apply([], allNodes));
             elements = elements.concat(edges);
-            elements.push(sourceNodes[0][0]);
+            // elements.push(sourceNodes[0][0]);
 
-            configUtils.addStyleToConfig(config, edgeStyleNegative);
-            configUtils.addStyleToConfig(config, edgeStylePositive);
-            configUtils.setConfigElements(config, elements);
+            config = configUtils.addStyleToConfig(config, edgeStyleNegative);
+            config = configUtils.addStyleToConfig(config, edgeStylePositive);
+            config = configUtils.setConfigElements(config, elements);
 
             selfLoops = clientTableUtils.getSelfLoops(edges);
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdges));
@@ -389,18 +390,15 @@ app.post('/delta-submatrix', function(req, res) {
             styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
 
             for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
-                allNodes.push(sourceNodes[i]);
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, 0, selectedGenes[i].object.degree, -1));
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
-                allNodes = allNodes.concat(firstNodes[i]);
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], true);
             }
 
             for (var i = 0; i < parsedNodesSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], false);
-                allNodes = allNodes.concat(secondNodes[i]);
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], true);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -423,22 +421,29 @@ app.post('/delta-submatrix', function(req, res) {
             config = configUtils.createConfig();
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                var maxRows = 1;
+                var maxCols = 3;
+                allNodes = [parseUtils.flatten(sourceNodes)].concat([parseUtils.flatten(firstNodes)]).concat([parseUtils.flatten(secondNodes)]);
 
-                nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
-                layout = layoutUtils.createPresetLayout();
+                for (var j = 0; j < allNodes.length; j++) {
+                    if (allNodes[j].length > maxRows) {
+                        maxRows = allNodes[j].length;
+                    }
+                }
 
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+                allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
+                layout = layoutUtils.createGridLayout(maxRows, maxCols);
 
-                allNodes.push({
-                    data: { id: "epi" }
-                });
-                allNodes.push({
-                    data: { id: "stroma" }
-                });
+                config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+
+                parentNodes = nodeUtils.createParentNodesMG(nodeUtils.isNodesArrayFull(sourceNodes) +
+                    nodeUtils.isNodesArrayFull(firstNodes) + nodeUtils.isNodesArrayFull(secondNodes));
+                allNodes.push(parentNodes);
+                allNodes = parseUtils.flatten(allNodes);
             } else if (requestedLayout == 'clustered') {
                 var largestClusterSize = 0;
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+                sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
                     var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
@@ -448,22 +453,41 @@ app.post('/delta-submatrix', function(req, res) {
                     }
                 }
 
+                var temp;
+
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+                    temp = nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+
+                    if (firstNodes[i] != null) {
+                        firstNodes[i] = temp.firstNeighbours;
+                    }
+
+                    if (secondNodes[i] != null) {
+                        secondNodes[i] = temp.secondNeighbours;
+                    }
+
+                    sourceNodes[i] = temp.selectedGene;
                 }
 
                 layout = layoutUtils.createPresetLayout();
-                configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+                config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+
+                allNodes = sourceNodes.concat(firstNodes).concat(secondNodes);
+                allNodes = parseUtils.flatten(allNodes);
             } else {
+                sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
+                allNodes = sourceNodes.concat(firstNodes).concat(secondNodes);
+                allNodes = parseUtils.flatten(allNodes);
                 layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
-                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);                
             }
 
-            configUtils.addStyleToConfig(config, edgeStyleNegative);
-            configUtils.addStyleToConfig(config, edgeStylePositive);
-            configUtils.setConfigElements(config, edges.concat(allNodes));
-            configUtils.setConfigLayout(config, layout);
+
+            config = configUtils.setConfigLayout(config, layout);
+            config = configUtils.addStyleToConfig(config, edgeStyleNegative);
+            config = configUtils.addStyleToConfig(config, edgeStylePositive);
+            config = configUtils.setConfigElements(config, edges.concat(allNodes));
+
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdgesAll));
             selfLoops = clientTableUtils.getSelfLoops(edges);
 
@@ -545,6 +569,8 @@ app.post('/available-matrices', function(req, res) {
     var subTypes = req.body.types;
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(subTypes, user);
+
+    console.log("getting available-matrices for user: %j", user);
 
     res.send({ fileList: accessibleMatrices });
 });
@@ -660,8 +686,8 @@ app.post('/upload-matrix', function(req, res) {
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log(files[type].name);
         files[type].data = files[type].data.replace(/^data:;base64,/, "");
-        fileUtils.createDirectory(fileUtils.BASE_UPLOAD_DIRECTORY, user.name, type, callback);
-        fileUtils.writeFile(fileUtils.BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
+        fileUtils.createDirectory(fileUtils.BASE_UPLOAD_DIRECTORY, user.getName(), type, callback);
+        fileUtils.writeFile(fileUtils.BASE_UPLOAD_DIRECTORY, files[type], user.getName(), type, callback);
 
     }, function done() {
         console.log("Finished writing files");
@@ -669,11 +695,11 @@ app.post('/upload-matrix', function(req, res) {
 
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log("type:" + type);
-        verifyFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
+        verifyFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.getName() + "/" + type + "/", files[type].name, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
-                fileUtils.removeFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
+                fileUtils.removeFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.getName() + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
             }
 
             fileUtils.updateAvailableMatrixCache();

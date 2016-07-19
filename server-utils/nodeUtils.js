@@ -1,6 +1,7 @@
 'use strict'
 
 var styleUtils = require('./styleUtils');
+var clone = require('clone');
 
 var classes = [];
 for (var key in styleUtils.classSuffixes) {
@@ -19,45 +20,9 @@ function createAllClasses(prefix) {
     return classesString;
 }
 
-function addPositionsToNodes(nodes, initialX, initialY, xPattern, yPattern) {
-    if (!(nodes instanceof Array)) {
-        nodes.position = {
-            x: initialX + (xPattern),
-            y: initialY + (yPattern)
-        };
-    } else {
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].position = {
-                x: initialX + (i * xPattern),
-                y: initialY + (i * yPattern)
-            };
-        }
-    }
-}
-
-function addStyleToNodes(nodes, width, height, textHAlign, textVAlign, backgroundColor) {
-    if (!(nodes instanceof Array)) {
-        nodes.style = {
-            'width': width + 'px',
-            'height': height + 'px',
-            'text-halign': textHAlign,
-            'text-valign': textVAlign,
-            'background-color': backgroundColor
-        };
-    } else {
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].style = {
-                'width': width + 'px',
-                'height': height + 'px',
-                'text-halign': textHAlign,
-                'text-valign': textVAlign,
-                'background-color': backgroundColor
-            };
-        }
-    }
-}
-
 function addClassToNodes(nodes, newClass) {
+    nodes = clone(nodes, false);
+
     if (!(nodes instanceof Array)) {
         nodes.classes = nodes.classes + " " + newClass;
     } else {
@@ -65,6 +30,8 @@ function addClassToNodes(nodes, newClass) {
             nodes[i].classes = nodes[i].classes + " " + newClass;
         }
     }
+
+    return nodes;
 }
 
 function createNodes(nodes, parent, column, degrees, neighbourLevel) {
@@ -81,8 +48,6 @@ function createNodes(nodes, parent, column, degrees, neighbourLevel) {
             },
             classes: parentFromNode + " " + createAllClasses(parentFromNode)
         });
-
-        //console.log(parentFromNode + " " + createAllClasses(parentFromNode));
     }
 
     return resultNodes;
@@ -97,7 +62,7 @@ function createNodesFromRNodes(rNodes, forExplorer) {
             data: {
                 id: rNodes[i].name,
                 degree: rNodes[i].degree,
-                parent: forExplorer == true ? 'par' + rNodes[i].level : parentFromNode, //parent == null ? parentFromNode : parent,
+                parent: forExplorer == true ? 'par' + rNodes[i].level : parentFromNode,
                 neighbourLevel: rNodes[i].level,
                 isSource: rNodes[i].isSource,
                 type: parentFromNode
@@ -131,29 +96,25 @@ function createParentNodesIE(selectedGenes, nodes) {
     return parentNodes;
 }
 
-function positionNodesBipartite(nodes, epiX, stromaX, epiY, stromaY) {
-    var epiIncrement = 0;
-    var stromaIncrement = 0;
+function createParentNodesMG(number) {
+    var parentNodes = [];
 
-    for (var i = 0; i < nodes.length; i++) {
-        //console.log(nodes[i].classes);
-        if (nodes[i].classes != null && nodes[i].classes.indexOf("epi") >= 0) {
-            nodes[i].position = {
-                x: epiX,
-                y: epiY + (30 * epiIncrement)
-            };
-            epiIncrement++;
-        } else {
-            nodes[i].position = {
-                x: stromaX,
-                y: stromaY + (30 * stromaIncrement)
-            };
-            stromaIncrement++;
-        }
+    for (var i = 0; i < number; i++) {
+        parentNodes.push({
+            data: {
+                id: "par" + i
+            }
+        });
     }
+
+    return parentNodes;
 }
 
-function positionNodesBipartiteGrid(nodes) {
+function positionNodesBipartiteGridHelper(nodes) {
+    if (!Array.isArray(nodes)) {
+        nodes  = [nodes];
+    }
+
     for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].data.neighbourLevel != -1) {
             nodes[i].data.col = nodes[i].data.neighbourLevel + 1;
@@ -162,6 +123,28 @@ function positionNodesBipartiteGrid(nodes) {
         }
         nodes[i].data.row = i + 1;
     }
+
+    return nodes;
+}
+
+function positionNodesBipartiteGrid(nodes) {
+    nodes = clone(nodes);
+
+    for (var j = 0; j < nodes.length; j++) {
+        nodes[j] = positionNodesBipartiteGridHelper(nodes[j]);
+    }
+
+    return nodes;
+}
+
+function isNodesArrayFull(nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].length > 0) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours, clusterNumber, totalClusters, nodeRadius, largestClusterRadius) {
@@ -169,10 +152,11 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
     var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius);
     var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius);
 
-    // console.log("largestClusterRadius: " + largestClusterRadius);
-    // console.log("mainRadius: " + mainRadius);
-
     var selectedGeneAngle = ((2 * Math.PI) / totalClusters) * (clusterNumber + 1);
+
+    selectedGene = clone(selectedGene);
+    firstNeighbours = clone(firstNeighbours);
+    secondNeighbours = clone(secondNeighbours);
 
     selectedGene.position = {
         x: mainRadius * Math.cos(selectedGeneAngle),
@@ -207,14 +191,13 @@ function getMinRadius(numNodes, nodeRadius) {
 }
 
 module.exports = {
-    addPositionsToNodes: addPositionsToNodes,
-    addStyleToNodes: addStyleToNodes,
     addClassToNodes: addClassToNodes,
     createNodes: createNodes,
     createNodesFromRNodes: createNodesFromRNodes,
     createParentNodesIE: createParentNodesIE,
-    positionNodesBipartite: positionNodesBipartite,
+    createParentNodesMG: createParentNodesMG,
     positionNodesBipartiteGrid: positionNodesBipartiteGrid,
     positionNodesClustered: positionNodesClustered,
-    getMinRadius: getMinRadius
+    getMinRadius: getMinRadius,
+    isNodesArrayFull: isNodesArrayFull
 };

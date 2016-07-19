@@ -11,8 +11,15 @@ function parseMinMaxWeights(weights) {
     return result;
 }
 
+function flatten(array) {
+  return array.reduce(function(memo, el) {
+    var items = Array.isArray(el) ? flatten(el) : [el];
+    return memo.concat(items);
+  }, []);
+}
 
 
 module.exports = {
-    parseMinMaxWeights: parseMinMaxWeights
+    parseMinMaxWeights: parseMinMaxWeights,
+    flatten: flatten
 };

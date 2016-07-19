@@ -205,7 +205,7 @@ function filterMatricesByAccessLevel(matrices, user) {
     var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: { normal: [], tumor: [], delta: [] } };
 
     if (user != null) {
-        if (user.accessLevel == 'admin') {
+        if (user.getAccessLevel() == 'admin') {
             if (matrices.real) {
                 result.real = matrices.real;
             }
@@ -215,10 +215,10 @@ function filterMatricesByAccessLevel(matrices, user) {
                 result.personal.tumor = result.personal.tumor.concat(matrices.personal[prop].tumor);
                 result.personal.delta = result.personal.delta.concat(matrices.personal[prop].delta);
             }
-        } else if (user.accessLevel == 1) {
+        } else if (user.getAccessLevel() == 1) {
             result.real = matrices.real;
-            if (matrices.personal[user.name] != null) {
-                result.personal = matrices.personal[user.name];
+            if (matrices.personal[user.getName()] != null) {
+                result.personal = matrices.personal[user.getName()];
 
             } else {
                 result.personal = { normal: [], tumor: [], delta: [] };
