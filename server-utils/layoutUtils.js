@@ -2,6 +2,7 @@
 var configUtils = require('./configUtils');
 var nodeUtils = require('./nodeUtils');
 var styleUtils = require('./styleUtils');
+var clone = require('clone');
 
 function createPresetLayout() {
     var layout = {
@@ -14,9 +15,9 @@ function createPresetLayout() {
 function createGridLayout(rows, cols) {
     var layout = {
         name: "grid",
-        padding: 5,
+        padding: 100,
         avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
-        avoidOverlapPadding: 10,
+        avoidOverlapPadding: 25,
         cols: cols,
         rows: rows,
         position: "grid"
@@ -40,10 +41,11 @@ function createRandomLayout(numNodes, nodeSize) {
     return layout;
 }
 
-function applyGridLayoutToConfig(config, nodes) {
+function createGridLayoutWithDimensions(nodes) {
     var layout;
     var maxRows = 1;
     var maxCols = 1 + nodes.length;
+
 
     for (var j = 0; j < nodes.length; j++) {
         if (nodes[j].length > maxRows) {
@@ -51,20 +53,14 @@ function applyGridLayoutToConfig(config, nodes) {
         }
     }
 
-    for (var j = 0; j < nodes.length; j++) {
-        nodeUtils.positionNodesBipartiteGrid(nodes[j]);
-    }
-
     layout = createGridLayout(maxRows, maxCols);
 
-    configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-    configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-    configUtils.setConfigLayout(config, layout);
+    return layout;
 }
 
 module.exports = {
     createPresetLayout: createPresetLayout,
     createRandomLayout: createRandomLayout,
     createGridLayout: createGridLayout,
-    applyGridLayoutToConfig: applyGridLayoutToConfig
+    createGridLayoutWithDimensions: createGridLayoutWithDimensions
 };
