@@ -1,5 +1,21 @@
 'use strict'
+/**
+ * This file contains functions that help create cytoscape.js configs. There
+ * are also methods for manipulating those configs by adding styles, layouts,
+ * and elements to them.
+ *
+ * @summary Methods for creating and manipulating configs.
+ */
 
+/**
+ * Creates a cytoscape.js config with most performance enhancing options
+ * enabled. The minimum zoom is set so that users don't get lost by zooming in
+ * too far. The config also contains some default styles.
+ *
+ * @summary Returns a basic cytoscape.js config.
+ *
+ * @return {Object} A cytoscape.js config.
+ */
 function createConfig() {
     var config = {
         motionBlur: true,
@@ -63,20 +79,28 @@ function setConfigElements(config, elements) {
 
         config.elements = temp;
     }
+
+    return config;
 }
 
 function setConfigLayout(config, layout) {
     config.layout = layout;
+
+    return config;
 }
 
 function addStyleToConfig(config, style) {
     config.style.push(style);
+
+    return config;
 }
 
 function addStylesToConfig(config, styles) {
     for (var i = 0; i < styles.length; i++) {
         config.style.push(styles[i]);
     }
+
+    return config;
 }
 
 module.exports = {
