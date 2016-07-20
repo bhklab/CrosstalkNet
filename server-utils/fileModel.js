@@ -1,14 +1,14 @@
 'use strict'
 
-/** Class representing a file. */
+/** Class representing a File. */
 class File {
     /**
-     * @summary Create a file representing an Rdata file on the server.
+     * @summary Create a File representing an Rdata File on the server.
      *
-     * @param {string} name The name of the file.
-     * @param {string} path The path of the file relative to server.js.
-     * @param {string} type The type of the file Can be: real, fake, personal.
-     * @param {string} subType The sub-type of the file. Can be: normal, tumor, delta.
+     * @param {string} name The name of the File.
+     * @param {string} path The path of the File relative to server.js.
+     * @param {string} type The type of the File Can be: real, fake, personal.
+     * @param {string} subType The sub-type of the File. Can be: normal, tumor, delta.
      */
     constructor(name, path, type, subType) {
         this._name = name;
@@ -18,18 +18,18 @@ class File {
     }
 
     /**
-     * @summary Sets the file's name.
+     * @summary Sets the File's name.
      *
-     * @param {string} name The new name for the file.
+     * @param {string} name The new name for the File.
      */
     set name(name) {
         this._name = name;
     }
 
     /**
-     * @summary Sets the file's path.
+     * @summary Sets the File's path.
      *
-     * @param {string} path The new path for the file relative to
+     * @param {string} path The new path for the File relative to
      * server.js.
      */
     set path(path) {
@@ -37,9 +37,9 @@ class File {
     }
 
     /**
-     * @summary Sets the file's type.
+     * @summary Sets the File's type.
 
-     * @param {string} type The new type for the file. Can be either:
+     * @param {string} type The new type for the File. Can be either:
      * real, fake, or personal.
      */
     set type(type) {
@@ -47,9 +47,9 @@ class File {
     }
 
     /**
-     * @summary Sets the file's subType.
+     * @summary Sets the File's subType.
      *.
-     * @param {string} subType The new subType for the file. Can be either:
+     * @param {string} subType The new subType for the File. Can be either:
      * normal, tumor, or delta.
      */
     set subType(subType) {
@@ -57,35 +57,53 @@ class File {
     }
 
     /**
-     * @summary Gets the file's name.
-     * @return {string} The file's name.
+     * @summary Gets the File's name.
+     *
+     * @return {string} The File's name.
      */
     get name() {
         return this._name;
     }
 
     /**
-     * Get the file's path.
-     * @return {string} The file's path.
+     * @summary Get the File's path.
+     *
+     * @return {string} The File's path.
      */
     get path() {
         return this._path;
     }
 
     /**
-     * Get the file's type.
-     * @return {string} The file's type.
+     * @summary Get the File's type.
+     *
+     * @return {string} The File's type.
      */
     get type() {
         return this._type;
     }
 
     /**
-     * Get the file's sub type.
-     * @return {string} The file's sub type.
+     * @summary Get the File's sub type.
+     *
+     * @return {string} The File's sub type.
      */
     get subType() {
         return this._subType;
+    }
+
+    /**
+     * @summary Returns File's client side representation.
+     *
+     * @return {Object} The client side representation of the File that 
+     * does not contain the File path.
+     */
+    toClientSide() {
+        return {
+            name: this._name,
+            type: this._type,
+            subType: this._subType
+        };
     }
 }
 
