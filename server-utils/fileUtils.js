@@ -7,10 +7,16 @@
  * @summary Methods for: reading, writing, deleting, and keeping track of Rdata files.
  */
 
+const TYPES = { real: "real", fake: "fake", personal: "personal" };
+const SUB_TYPES = { normal: "normal", tumor: "tumor", delta: "delta" };
+
 const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 var async = require('async');
 var mkdirp = require('mkdirp');
+var FileCache = require('./fileCache').FileCache;
+var FileGroup = require('./fileGroup').FileGroup;
+var File = require('./fileModel').File;
 var availableMatrixCache = null;
 
 var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
@@ -35,33 +41,8 @@ function updateAvailableMatrixCache() {
  * @return An object whose keys can be: normal, tumor, and delta. The values are arrays containing the
  * the file names of files avaialble for the specified user.
  */
-function getAccessibleMatricesForUser(subTypes, user) {
-    var accessibleMatrices = filterMatricesByAccessLevel(availableMatrixCache, user);
-    var matrices = {};
-
-    for (var type in accessibleMatrices) {
-        for (var i = 0; i < subTypes.length; i++) {
-            if (Object.keys(accessibleMatrices[type]).indexOf(subTypes[i]) >= 0 && accessibleMatrices[type][subTypes[i]] != null) {
-                if (matrices[subTypes[i]] == null) {
-                    matrices[subTypes[i]] = accessibleMatrices[type][subTypes[i]];
-                } else {
-                    matrices[subTypes[i]] = matrices[subTypes[i]].concat(accessibleMatrices[type][subTypes[i]]);
-                }
-            }
-        }
-    }
-
-    for (var i = 0; i < subTypes.length; i++) {
-        matrices[subTypes[i]] = matrices[subTypes[i]].map(function(file) {
-            return {
-                name: file.name,
-                type: file.type,
-                subType: file.subType
-            };
-        });
-    }
-
-    return matrices;
+function getAccessibleMatricesForUser(user) {
+    return availableMatrixCache.getAccessibleMatricesForUser(user);
 }
 
 /**
@@ -71,27 +52,25 @@ function getAccessibleMatricesForUser(subTypes, user) {
  * proprietary data, fake data, or user uploaded data. The values are objects 
  */
 function createavailableMatrixCache() {
-    var fileList = [];
-    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: {} };
+    var result = new FileCache();
 
-    var directories = ['normal', 'tumor', 'delta'];
-
-    for (var i = 0; i < directories.length; i++) {
-        result.real[directories[i]] = getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY + directories[i], 'real', directories[i]);
-        result.fake[directories[i]] = getFilesInDirectory(BASE_FAKE_DIRECTORY + directories[i], 'fake', directories[i]);
+    for (var subType in SUB_TYPES) {
+        result.real[SUB_TYPES[subType]] = getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY + SUB_TYPES[subType], TYPES.real, SUB_TYPES[subType]);
+        result.fake[SUB_TYPES[subType]] = getFilesInDirectory(BASE_FAKE_DIRECTORY + SUB_TYPES[subType], TYPES.fake, SUB_TYPES[subType]);
     }
 
     var personalDirectories = fs.readdirSync(BASE_UPLOAD_DIRECTORY);
-    for (var i = 0; i < personalDirectories.length; i++) {
-        result.personal[personalDirectories[i]] = { normal: [], tumor: [], delta: [] };
-        for (var j = 0; j < directories.length; j++) {
-            try {
-                fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], fs.R_OK);
-                result.personal[personalDirectories[i]][directories[j]] = getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + directories[j], 'personal', directories[j]);
 
+    for (var i = 0; i < personalDirectories.length; i++) {
+        result.personal[personalDirectories[i]] = new FileGroup();
+
+        for (var subType in SUB_TYPES) {
+            try {
+                fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + SUB_TYPES[subType], fs.R_OK);
+                result.personal[personalDirectories[i]][SUB_TYPES[subType]] = getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i] + "/" + SUB_TYPES[subType], TYPES.personal, SUB_TYPES[subType]);
             } catch (err) {
                 console.log(err);
-                createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], directories[j], null);
+                createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], SUB_TYPES[subType], null);
             }
         }
     }
@@ -99,67 +78,83 @@ function createavailableMatrixCache() {
     return result;
 }
 
-
-function getRequestedFile(selectedFiles, user, filter) {
-    var matrices;
+/**
+ * @summary Matches the front end file in the
+ * selected files that is not null and returns the
+ * corresponding File from the available matrix cache.
+ *
+ * @param {Object} selectedFiles An object whose keys are TYPES and whose
+ * values are a front-end specified file.
+ * @param {User} user The User for which to obtain the File.
+ * @return {File} A File from the availableMatrixCache that matches the front-end file
+ * specified in selectedFiles. 
+ */
+function getRequestedFile(selectedFiles, user) {
     var file;
 
-    if (filter == null) {
-        matrices = availableMatrixCache;
-    } else if (Object.keys(availableMatrixCache).indexOf(filter) >= 0) {
-        matrices = { personal: availableMatrixCache.personal };
-    } else {
-        return null;
-    }
-
     if (selectedFiles.delta != null) {
-        file = matchSelectedFile(selectedFiles.delta, matrices, user);
+        file = matchSelectedFile(selectedFiles.delta, availableMatrixCache, user);
     } else if (selectedFiles.normal != null) {
-        file = matchSelectedFile(selectedFiles.normal, matrices, user);
+        file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
     } else if (selectedFiles.tumor != null) {
-        file = matchSelectedFile(selectedFiles.tumor, matrices, user);
+        file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
     } else if (selectedFiles.arbitrary != null) {
-        file = matchSelectedFile(selectedFiles.arbitrary, matrices, user);
+        file = matchSelectedFile(selectedFiles.arbitrary, availableMatrixCache, user);
     }
 
     return file;
 }
 
-function getRequestedFiles(req, degree, user) {
+/**
+ * @summary Matches the front ends files in selected files and returns
+ * the corresponding Files from the availableMatrixCache.
+ *
+ * @param {Oject} selectedFiles An object whose keys are TYPES and whose
+ * values are a front-end specified files.
+ * @param {string} selectedNetworkType A string that should be one of the values
+ * in TYPES. This specifies what type of network the request, and the function 
+ * uses this in order to determine the right number of files to return.
+ * @param {User} user The User for which to obtain the Files. 
+ *
+ *
+ *
+ *
+ */
+function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
     var file = null;
 
-    if (req == null || req.body == null || req.body.selectedFile == null) {
+    if (selectedFiles == null) {
         return null;
     }
 
-    if (req.body.selectedNetworkType == 'normal' && req.body.selectedFile.normal.name != null) {
-        file = matchSelectedFile(req.body.selectedFile.normal, availableMatrixCache, user);
+    if (selectedNetworkType == 'normal' && selectedFiles.normal.name != null) {
+        file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
 
         if (file != null) {
             result.normal = file.path + file.name;
             result.degree = file.path + "degrees" + file.name;
         }
-    } else if (req.body.selectedNetworkType == 'tumor' && req.body.selectedFile.tumor != null) {
-        file = matchSelectedFile(req.body.selectedFile.tumor, availableMatrixCache, user);
+    } else if (selectedNetworkType == 'tumor' && selectedFiles.tumor != null) {
+        file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
 
         if (file != null) {
             result.tumor = file.path + file.name;
             result.degree = file.path + "degrees" + file.name;
         }
-    } else if (req.body.selectedNetworkType == 'delta' && req.body.selectedFile.delta != null) {
-        file = matchSelectedFile(req.body.selectedFile.delta, availableMatrixCache, user);
+    } else if (selectedNetworkType == 'delta' && selectedFiles.delta != null) {
+        file = matchSelectedFile(selectedFiles.delta, availableMatrixCache, user);
 
         if (file != null) {
             result.delta = file.path + file.name;
             result.degree = file.path + "degrees" + file.name;
         }
 
-        file = matchSelectedFile(req.body.selectedFile.normal, availableMatrixCache, user);
+        file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
         if (file != null) {
             result.normal = file.path + file.name;
         }
-        file = matchSelectedFile(req.body.selectedFile.tumor, availableMatrixCache, user);
+        file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
         if (file != null) {
             result.tumor = file.path + file.name;
         }
@@ -189,75 +184,18 @@ function getFilesInDirectory(directory, type, subType) {
         }
     });
 
-    if (type == 'personal') {
-        console.log(filteredFileNames);
-    }
+    console.log("type: " + type + " subType: " + subType);
+    console.log(filteredFileNames);
 
     fileList = filteredFileNames.map(function(file) {
-        return {
-            name: file,
-            path: directory + "/",
-            type: type,
-            subType: subType
-        };
+        return new File(file, directory + "/", type, subType);
     });
 
     return fileList;
 }
 
 function matchSelectedFile(file, matrices, user) {
-    if (file == null || file.name == null || file.type == null || file.subType == null) {
-        return null;
-    }
-
-    var accessibleMatrices = filterMatricesByAccessLevel(matrices, user);
-    // console.log("accessibleMatrices: %j", accessibleMatrices);
-
-    // console.log(file.name);
-    // console.log(file.type);
-    // console.log(file.subType);
-
-    if (accessibleMatrices[file.type] != null && accessibleMatrices[file.type][file.subType] != null) {
-        for (var i = 0; i < accessibleMatrices[file.type][file.subType].length; i++) {
-            if (accessibleMatrices[file.type][file.subType][i].name == file.name) {
-                return accessibleMatrices[file.type][file.subType][i];
-            }
-        }
-    }
-
-    return null;
-}
-
-function filterMatricesByAccessLevel(matrices, user) {
-    var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: { normal: [], tumor: [], delta: [] } };
-
-    if (user != null) {
-        if (user.accessLevel == 'admin') {
-            if (matrices.real) {
-                result.real = matrices.real;
-            }
-
-            for (var prop in matrices.personal) {
-                result.personal.normal = result.personal.normal.concat(matrices.personal[prop].normal);
-                result.personal.tumor = result.personal.tumor.concat(matrices.personal[prop].tumor);
-                result.personal.delta = result.personal.delta.concat(matrices.personal[prop].delta);
-            }
-        } else if (user.accessLevel == 1) {
-            result.real = matrices.real;
-            if (matrices.personal[user.name] != null) {
-                result.personal = matrices.personal[user.name];
-
-            } else {
-                result.personal = { normal: [], tumor: [], delta: [] };
-            }
-        }
-    } else {
-        if (matrices.fake) {
-            result.fake = matrices.fake;
-        }
-    }
-
-    return result;
+    return matrices.matchFile(file, user);
 }
 
 function removeFile(path, file, callback) {
@@ -337,9 +275,7 @@ module.exports = {
     BASE_FAKE_DIRECTORY: BASE_FAKE_DIRECTORY,
     getRequestedFile: getRequestedFile,
     getRequestedFiles: getRequestedFiles,
-    matchSelectedFile: matchSelectedFile,
     getFilesInDirectory: getFilesInDirectory,
-    filterMatricesByAccessLevel: filterMatricesByAccessLevel,
     removeFile: removeFile,
     writeFile: writeFile,
     createDirectory: createDirectory,
