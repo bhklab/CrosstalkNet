@@ -1,4 +1,12 @@
 'use strict'
+/**
+ * This file contains functions that help read, write, and delete files
+ * and directories. There are also functions that maintain an in memory cache
+ * of available matrix files for a given user based on their access level. 
+ * 
+ * @summary Methods for: reading, writing, deleting, and keeping track of Rdata files.
+ */
+
 const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 var async = require('async');
@@ -9,10 +17,24 @@ var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
 var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Proprietary_Matrices/';
 var BASE_FAKE_DIRECTORY = 'R_Scripts/Fake_Matrices/'
 
+/**
+ * @summary Updates the in-memory cache of avaialble files.
+ */
 function updateAvailableMatrixCache() {
     availableMatrixCache = createavailableMatrixCache();
 }
 
+/**
+ * @summary Returns an object containing the names of the files
+ * avaialble for a user.
+ *
+ * @param {Array} subTypes An array of strings representing the subtype of a file. Subtypes are
+ * normal, tumor, or delta.
+ * @oaram {User} user The user that will be used to filter down the avaialble files based on 
+ * that user's access level.
+ * @return An object whose keys can be: normal, tumor, and delta. The values are arrays containing the
+ * the file names of files avaialble for the specified user.
+ */
 function getAccessibleMatricesForUser(subTypes, user) {
     var accessibleMatrices = filterMatricesByAccessLevel(availableMatrixCache, user);
     var matrices = {};
@@ -42,6 +64,12 @@ function getAccessibleMatricesForUser(subTypes, user) {
     return matrices;
 }
 
+/**
+ * @summary Returns an object that represents all of the existing matrix files.
+ *
+ * @return An object whose keys are: real, fake, personal. This helps group files based on whether they are our 
+ * proprietary data, fake data, or user uploaded data. The values are objects 
+ */
 function createavailableMatrixCache() {
     var fileList = [];
     var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: {} };
@@ -168,7 +196,6 @@ function getFilesInDirectory(directory, type, subType) {
     fileList = filteredFileNames.map(function(file) {
         return {
             name: file,
-            pValue: "",
             path: directory + "/",
             type: type,
             subType: subType
@@ -205,7 +232,7 @@ function filterMatricesByAccessLevel(matrices, user) {
     var result = { real: { normal: [], tumor: [], delta: [] }, fake: { normal: [], tumor: [], delta: [] }, personal: { normal: [], tumor: [], delta: [] } };
 
     if (user != null) {
-        if (user.getAccessLevel() == 'admin') {
+        if (user.accessLevel == 'admin') {
             if (matrices.real) {
                 result.real = matrices.real;
             }
@@ -215,10 +242,10 @@ function filterMatricesByAccessLevel(matrices, user) {
                 result.personal.tumor = result.personal.tumor.concat(matrices.personal[prop].tumor);
                 result.personal.delta = result.personal.delta.concat(matrices.personal[prop].delta);
             }
-        } else if (user.getAccessLevel() == 1) {
+        } else if (user.accessLevel == 1) {
             result.real = matrices.real;
-            if (matrices.personal[user.getName()] != null) {
-                result.personal = matrices.personal[user.getName()];
+            if (matrices.personal[user.name] != null) {
+                result.personal = matrices.personal[user.name];
 
             } else {
                 result.personal = { normal: [], tumor: [], delta: [] };

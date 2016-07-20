@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
                     if (!user) {
                         res.json({ success: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
-                        if (!bcrypt.compareSync(req.body.user.password, user.getPassword())) {
+                        if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
                             var token = jwt.sign({ user: Date.now() }, app.get('secretKey'), {
@@ -686,8 +686,8 @@ app.post('/upload-matrix', function(req, res) {
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log(files[type].name);
         files[type].data = files[type].data.replace(/^data:;base64,/, "");
-        fileUtils.createDirectory(fileUtils.BASE_UPLOAD_DIRECTORY, user.getName(), type, callback);
-        fileUtils.writeFile(fileUtils.BASE_UPLOAD_DIRECTORY, files[type], user.getName(), type, callback);
+        fileUtils.createDirectory(fileUtils.BASE_UPLOAD_DIRECTORY, user.name, type, callback);
+        fileUtils.writeFile(fileUtils.BASE_UPLOAD_DIRECTORY, files[type], user.name, type, callback);
 
     }, function done() {
         console.log("Finished writing files");
@@ -695,11 +695,11 @@ app.post('/upload-matrix', function(req, res) {
 
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log("type:" + type);
-        verifyFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.getName() + "/" + type + "/", files[type].name, callback);
+        verifyFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
-                fileUtils.removeFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.getName() + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
+                fileUtils.removeFile(fileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + nonEmptyFiles[i] + "/", files[nonEmptyFiles[i]], null);
             }
 
             fileUtils.updateAvailableMatrixCache();

@@ -1,4 +1,20 @@
 'use strict'
+/**
+ * This file contains functions that help create cytoscape.js edges from pseudo-edges
+ * returned from R scripts.
+ * @summary Methods for creating cytoscape.js edges.
+ */
+
+/**
+ * @summary Returns an array of cytoscape.js edges generated from pseuo-edges
+ * returned from R scripts.
+ *
+ * @param {Array} REdges An array of pseudo-edges returned from an R script.
+ * @param {number} neighbourLevel A number indicating which level of neighbours
+ * these edges correspond to.
+ * @return {Array} An array of cytoscape.js edges with their neighbourLevel set
+ * to the specified neighbourLevel.
+ */
 
 function createEdgesFromREdges(REdges, neighbourLevel) {
     var edges = [];

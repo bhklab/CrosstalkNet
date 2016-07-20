@@ -63,6 +63,13 @@ function createConfig() {
     return config;
 }
 
+/**
+ * @summary Sets the elements of a cytoscape.js config.
+ *
+ * @param {Object} config A cytoscape.js config.
+ * @param {Array} elements An array of cytoscape.js edges and nodes to add to config.
+ * @return {Object} A cytoscape.js config with elements added to it.
+ */
 function setConfigElements(config, elements) {
     if (elements instanceof Array) {
         config.elements = elements;
@@ -83,18 +90,39 @@ function setConfigElements(config, elements) {
     return config;
 }
 
+/**
+ * @summary Sets the layout of a cytoscape.js config.
+ *
+ * @param {Object} config A cytoscape.js config.
+ * @param {Object} layout A cytoscape.js layout to add to config.
+ * @return {Object} A cytoscape.js config with a layout added to it.
+ */
 function setConfigLayout(config, layout) {
     config.layout = layout;
 
     return config;
 }
 
+/**
+ * @summary Adds a style to a cytoscape.js config.
+ *
+ * @param {Object} config A cytoscape.js config.
+ * @param {Object} style A cytoscape.js style to add to the config.
+ * @return {Object} A cytoscape.js config with a style added to it.
+ */
 function addStyleToConfig(config, style) {
     config.style.push(style);
 
     return config;
 }
 
+/**
+ * @summary Adds an array of styles to a cytoscape.js config.
+ *
+ * @param {Object} config A cytoscape.js config.
+ * @param {Object} styles An array of cytoscape.js styles to add to the config.
+ * @return {Object} A cytoscape.js config with styles added to it.
+ */
 function addStylesToConfig(config, styles) {
     for (var i = 0; i < styles.length; i++) {
         config.style.push(styles[i]);
