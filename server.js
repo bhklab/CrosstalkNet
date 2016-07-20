@@ -175,7 +175,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, true, user);
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
     var fileValidationres = validationUtils.validateFiles(files);
     if (fileValidationres.error) {
@@ -305,7 +305,7 @@ app.post('/delta-submatrix', function(req, res) {
     var filterValidationRes = validationUtils.validateFilters(req.body);
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, true, user);
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
     if (filterValidationRes.error) {
         res.send(filterValidationRes);
@@ -511,7 +511,7 @@ app.post('/delta-get-all-paths', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, false, user);
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -568,7 +568,7 @@ app.post('/delta-get-all-paths', function(req, res) {
 app.post('/available-matrices', function(req, res) {
     var subTypes = req.body.types;
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(subTypes, user);
+    var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(user);
 
     console.log("getting available-matrices for user: %j", user);
 

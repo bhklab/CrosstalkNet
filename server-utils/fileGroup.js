@@ -11,9 +11,15 @@ class FileGroup {
      * @param {Array} delta An array of type File representing the files for delta-networks.
      */
     constructor(normal, tumor, delta) {
-        this._normal = normal;
-        this._tumor = tumor;
-        this._delta = delta;
+        if (!arguments.length) {
+            this._normal = [];
+            this._tumor = [];
+            this._delta = [];
+        } else {
+            this._normal = normal;
+            this._tumor = tumor;
+            this._delta = delta;
+        }
     }
 
     /**
@@ -39,7 +45,7 @@ class FileGroup {
      *
      * @param {Array} normal An array of type File representing the files for delta-networks.
      */
-    set delta(delta `) {
+    set delta(delta) {
         return this._delta = delta;
     }
 

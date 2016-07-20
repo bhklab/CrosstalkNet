@@ -28,7 +28,7 @@ function loadUsers(file) {
         obj = obj.users;
         for (var prop in obj) {
             var temp = new user.User(obj[prop]._name, obj[prop]._password, obj[prop]._accessLevel, obj[prop]._token);
-            console.log(temp);
+            //console.log(temp);
             users[temp.name] = temp;
         }
 
