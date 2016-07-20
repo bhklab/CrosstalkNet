@@ -38,8 +38,8 @@ function updateAvailableMatrixCache() {
  * normal, tumor, or delta.
  * @oaram {User} user The user that will be used to filter down the avaialble files based on 
  * that user's access level.
- * @return An object whose keys can be: normal, tumor, and delta. The values are arrays containing the
- * the file names of files avaialble for the specified user.
+ * @return An object whose keys can be: normal, tumor, and delta. The values are arrays containing
+ * the  files avaialble for the specified user.
  */
 function getAccessibleMatricesForUser(user) {
     return availableMatrixCache.getAccessibleMatricesForUser(user);
@@ -115,10 +115,7 @@ function getRequestedFile(selectedFiles, user) {
  * in TYPES. This specifies what type of network the request, and the function 
  * uses this in order to determine the right number of files to return.
  * @param {User} user The User for which to obtain the Files. 
- *
- *
- *
- *
+ * @return A object containing the Files specified.
  */
 function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
@@ -169,6 +166,19 @@ function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
     return result;
 }
 
+/**
+ * @summary Reads the contents of a given directory
+ * and created an array of Files based on the file names
+ * found in the directory.
+ *
+ * @param {string} directory A path relative to server.js
+ * @param {string} type One of the values in TYPES. This will
+ * be added to every created File object.
+ * @param {string} subType One of the values in SUB_TYPES. This will
+ * be added to every created File object.
+ * @return {Array} An array of Files representing the files found in the specified
+ * directory. 
+ */
 function getFilesInDirectory(directory, type, subType) {
     var filteredFileNames = null;
     var originalFilesNames = null;
@@ -194,10 +204,28 @@ function getFilesInDirectory(directory, type, subType) {
     return fileList;
 }
 
-function matchSelectedFile(file, matrices, user) {
-    return matrices.matchFile(file, user);
+/**
+ * @summary Returns a File from the availableMatrixCache based
+ * on the fiven front-end file.
+ *
+ * @param {Object} file The front-end file specified.
+ * @param {FileCache} cache A FileCache to match the specified file in.
+ * @param {User} user The User for which to obtain the File.
+ * @return {File} A File based on the front-end file specified for 
+ * the given User.
+ */
+function matchSelectedFile(file, cache, user) {
+    return cache.matchFile(file, user);
 }
 
+/**
+ * @summary Removes a and its corresponding degrees file from the disk.
+ *
+ * @param {string} path The relative path to the file from server.js, not 
+ * including the file name.
+ * @param {string} file The name of the file to delete.
+ * @param {function} callback A function to call when the files have been deleted.
+ */
 function removeFile(path, file, callback) {
     var error = false;
     if (path != null && file != null) {
@@ -242,9 +270,23 @@ function removeFile(path, file, callback) {
     }
 }
 
-function writeFile(baseDirectory, file, userName, type, callback) {
+/**
+ * @summary Writes a file to the disk in the directory
+ * based on the concatentation of baseDirectory and userName.
+ *
+ * @param {string} baseDirectory A file path relative to server.js. This
+ * will be combined with userName to form the directory where the file will
+ * be saved.
+ * @param {Object} file An object containing the name of a file and its associated data
+ * encoded in Base64.
+ * @param {string} userName The user name of the user that uploaded the file.
+ * @param {string} subType The sub type of the file. This can take on one of the
+ * values in SUB_TYPES.
+ * @param {function} callback A function to call when the file is finished writing.
+ */
+function writeFile(baseDirectory, file, userName, subType, callback) {
     console.log("baseDirectory: " + baseDirectory);
-    fs.writeFile(baseDirectory + userName + "/" + type + "/" + file.name, file.data, 'base64', (err) => {
+    fs.writeFile(baseDirectory + userName + "/" + subType + "/" + file.name, file.data, 'base64', (err) => {
         if (err) {
             console.log(err);
             callback("Failed");
@@ -255,8 +297,19 @@ function writeFile(baseDirectory, file, userName, type, callback) {
     });
 }
 
-function createDirectory(baseDirectory, userName, type, callback) {
-    mkdirp.sync(baseDirectory + userName + "/" + type, function(err) {
+/**
+ * @summary Creates a directory, if it doesn't exist, with the path of baseDirectory,
+ * userName, and type concatenated in that order.
+ *
+ * @param {string} baseDirectory A file path relative to server.js. This will be combined 
+ * with userName and subType to obtain the full path of the directory to be created.
+ * @param {string} userName The name of the user for which to create the directory.
+ * @parasm {string} subType The sub type of the 
+ *
+ *
+ */
+function createDirectory(baseDirectory, userName, subType, callback) {
+    mkdirp.sync(baseDirectory + userName + "/" + subType, function(err) {
         if (err) {
             if (callback) {
                 callback("Failed");
