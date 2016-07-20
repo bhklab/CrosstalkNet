@@ -1,5 +1,10 @@
 'use strict'
 
+// var nameSymbol = Symbol();
+// var nameSymbol = Symbol();
+// var nameSymbol = Symbol();
+// var nameSymbol = Symbol();
+
 /** Class representing a user. */
 class User {
     /**
@@ -10,50 +15,74 @@ class User {
      * @param {string} token The JSON Web Token associated with the user .
      */
     constructor(name, password, accessLevel, token) {
-        this.name = name;
-        this.password = password;
-        this.accessLevel = accessLevel;
-        this.token = token;
+        this._name = name;
+        this._password = password;
+        this._accessLevel = accessLevel;
+        this._token = token;
+    }
+
+    /**
+     * Sets the users's name.
+     * @param {string} name The new name for the user.
+     */
+    set name(name) {
+        this._name = name;
+    }
+
+    /**
+     * Sets the users's password.
+     * @param {string} password The new password for the user.
+     */
+    set password(password) {
+        this._password = password;
+    }
+
+        /**
+     * Sets the users's access level.
+     * @param {string} accessLevel The new access level for the user.
+     */
+    set accessLevel(accessLevel) {
+        this._accessLevel = accessLevel;
     }
 
     /**
      * Sets the users's token.
      * @param {string} token The new JSON Web Token for the user.
      */
-    setToken(token) {
-        this.token = token;
+    set token(token) {
+        this._token = token;
     }
 
     /**
-     * Get the user's name.
+     * Gets the user's name.
      * @return {string} The user's name.
      */
-    getName() {
-        return this.name;
+    get name() {
+        return this._name;
     }
 
     /**
-     * Get the user's hashed password.
+     * Gets the user's hashed password.
      * @return {string} The user's hashed password.
      */
-    getPassword() {
-        return this.password;
+    get password() {
+        return this._password;
     }
 
     /**
-     * Get the user's access level.
+     * Gets the user's access level.
      * @return {string} The user's access level.
      */
-    getAccessLevel() {
-        return this.accessLevel;
+    get accessLevel() {
+        return this._accessLevel;
     }
 
     /**
-     * Get the user's token.
+     * Gets the user's token.
      * @return {string} The user's token.
      */
-    getToken() {
-        return this.token;
+    get token() {
+        return this._token;
     }
 }
 

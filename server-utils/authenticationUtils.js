@@ -27,8 +27,9 @@ function loadUsers(file) {
         //console.log(obj);
         obj = obj.users;
         for (var prop in obj) {
-            var temp = new user.User(obj[prop].name, obj[prop].password, obj[prop].accessLevel, obj[prop].token);
-            users[temp.getName()] = temp;
+            var temp = new user.User(obj[prop]._name, obj[prop]._password, obj[prop]._accessLevel, obj[prop]._token);
+            console.log(temp);
+            users[temp.name] = temp;
         }
 
         //console.log("Users: %j", users);
@@ -47,10 +48,10 @@ function loadUsers(file) {
  * @param {string} token The JSON Web Token to add to the user.
  */
 function addTokenToUser(user, token) {
-    console.log("Adding token to user: " + user.getName());
+    console.log("Adding token to user: " + user.name);
 
-    if (users[user.getName()] != null) {
-        users[user.getName()].setToken(token);
+    if (users[user.name] != null) {
+        users[user.name].token = token;
         jsonfile.writeFile(file, { users: users }, function(err) {
             console.log(err);
         });
@@ -71,7 +72,7 @@ function getUserFromToken(token) {
     }
 
     for (var name in users) {
-        if (users[name].getToken() == token) {
+        if (users[name].token == token) {
             return users[name];
         }
     }
@@ -90,7 +91,7 @@ function getUserFromToken(token) {
 function getUser(name, callback) {
     var user = null;
 
-    if (users[name] != null && users[name].getName() == name) {
+    if (users[name] != null && users[name].name == name) {
         user = users[name];
     }
 
