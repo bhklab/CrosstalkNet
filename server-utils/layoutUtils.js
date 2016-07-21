@@ -1,9 +1,20 @@
 'use strict'
+/**
+ * This file contains functions that create layouts for cytoscape.js.
+ * 
+ * @summary Functions for creating cytoscape.js layouts.
+ */
 var configUtils = require('./configUtils');
 var nodeUtils = require('./nodeUtils');
 var styleUtils = require('./styleUtils');
 var clone = require('clone');
 
+/**
+ * @summary Creates a preset layout.
+ *
+ * @return {Object} A preset cytoscape.js layout. This used when 
+ * the positions of nodes are set manually.
+ */
 function createPresetLayout() {
     var layout = {
         name: "preset"
@@ -12,11 +23,19 @@ function createPresetLayout() {
     return layout;
 }
 
+/**
+ * @summary Creates a grid layout.
+ *
+ * @param {number} rows The number of rows that the grid should have.
+ * @param {number} cols The number of columns that the grid should have.
+ * @return {Object} A cytoscape.js grid layout with the specified number of
+ * rows and columns.
+ */
 function createGridLayout(rows, cols) {
     var layout = {
         name: "grid",
         padding: 100,
-        avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
+        avoidOverlap: true,
         avoidOverlapPadding: 25,
         cols: cols,
         rows: rows,
@@ -26,6 +45,16 @@ function createGridLayout(rows, cols) {
     return layout;
 }
 
+/**
+ * @summary Creates a random layout.
+ *
+ * @param {number} numNodes The number of nodes that will be in the graph. This is
+ * used to determine the size of the bounding box.
+ * @param {number} nodeSize The average size of a node in pixels. This is used
+ * to determine the size of the bounding box.
+ * @return {Object} A cytoscape.js random layout. The size of the bounding box is 
+ * determined by a combination of numNodes and nodeSize.
+ */
 function createRandomLayout(numNodes, nodeSize) {
     var r = nodeSize / 2;
     var areaRequired = numNodes * Math.PI * (r * r) * 40;
@@ -41,26 +70,8 @@ function createRandomLayout(numNodes, nodeSize) {
     return layout;
 }
 
-function createGridLayoutWithDimensions(nodes) {
-    var layout;
-    var maxRows = 1;
-    var maxCols = 1 + nodes.length;
-
-
-    for (var j = 0; j < nodes.length; j++) {
-        if (nodes[j].length > maxRows) {
-            maxRows = nodes[j].length;
-        }
-    }
-
-    layout = createGridLayout(maxRows, maxCols);
-
-    return layout;
-}
-
 module.exports = {
     createPresetLayout: createPresetLayout,
     createRandomLayout: createRandomLayout,
     createGridLayout: createGridLayout,
-    createGridLayoutWithDimensions: createGridLayoutWithDimensions
 };

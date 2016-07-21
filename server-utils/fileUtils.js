@@ -115,7 +115,7 @@ function getRequestedFile(selectedFiles, user) {
  * in TYPES. This specifies what type of network the request, and the function 
  * uses this in order to determine the right number of files to return.
  * @param {User} user The User for which to obtain the Files. 
- * @return A object containing the Files specified.
+ * @return An object containing the Files specified.
  */
 function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
@@ -298,15 +298,13 @@ function writeFile(baseDirectory, file, userName, subType, callback) {
 }
 
 /**
- * @summary Creates a directory, if it doesn't exist, with the path of baseDirectory,
- * userName, and type concatenated in that order.
+ * @summary Creates a directory, if it doesn't exist, with the path being baseDirectory,
+ * userName, and subType concatenated in that order.
  *
  * @param {string} baseDirectory A file path relative to server.js. This will be combined 
  * with userName and subType to obtain the full path of the directory to be created.
  * @param {string} userName The name of the user for which to create the directory.
- * @parasm {string} subType The sub type of the 
- *
- *
+ * @param {string} subType The sub type of the directory.
  */
 function createDirectory(baseDirectory, userName, subType, callback) {
     mkdirp.sync(baseDirectory + userName + "/" + subType, function(err) {
