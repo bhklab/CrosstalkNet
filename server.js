@@ -70,7 +70,6 @@ app.use(function(req, res, next) {
                 });
         }
     } else if (req.body.token == 'guest') {
-        req.accessLevel = 0;
         next();
     } else {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
@@ -78,13 +77,6 @@ app.use(function(req, res, next) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
-                var user = authenticationUtils.getUserFromToken(req.body.token);
-
-                if (user) {
-                    req.accessLevel = user.accessLevel;
-                } else {
-                    req.accessLevel = 0;
-                }
                 next();
             }
         });
@@ -173,7 +165,7 @@ app.post('/gene-list', function(req, res) {
 });
 
 app.post('/delta-interaction-explorer', function(req, res) {
-    //console.log("%j", req.body);
+    console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -183,28 +175,18 @@ app.post('/delta-interaction-explorer', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, true, user);
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
-    if (files == null) {
-        res.send({ error: "Please specify the necessary files." });
-        return;
-    } else if (files.error != null) {
-        res.send({ error: files.error });
+    var fileValidationres = validationUtils.validateFiles(files);
+    if (fileValidationres.error) {
+        res.send({ error: fileValidationres.error });
         return;
     }
 
-    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select a gene." });
+    selectedGeneNames = validationUtils.validateSelectedGenes(selectedGenes);
+    if (selectedGeneNames.error) {
+        res.send({ error: selectedGeneNames.error });
         return;
-    }
-
-    for (var i = 0; i < selectedGenes.length; i++) {
-        if (selectedGenes[i] == null || selectedGenes[i].value == null) {
-            res.json({ error: "Please select a gene." });
-            return;
-        }
-
-        selectedGeneNames.push(selectedGenes[i].value);
     }
 
     args.selectedNetworkType = req.body.selectedNetworkType;
@@ -237,65 +219,54 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var parsedNodes = parsedValue.nodes
             var parsedEdges = parsedValue.edges;
 
+            var allNodes = [];
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
             var parentNodes = [];
             var edges = [];
             var elements = [];
-            var config = null;
+            var config = configUtils.createConfig();
             var layout = null;
             var edgeDictionary = {};
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
-            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+            edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
+            edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
-            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, selectedGenes[0].object.degree, -1));
 
             for (var i = 0; i < parsedEdges.length; i++) {
                 edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
-                //interactionsTableList.push()
             }
 
             for (var i = 0; i < parsedNodes.length; i++) {
-                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i]));
             }
 
+            allNodes = nodes.concat(sourceNodes);
+
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                nodeUtils.addPositionsToNodes(sourceNodes[0], 100,
-                    100, 0, 0);
+                var maxRows = 1;
+                var maxCols = allNodes.length + 1;
+                allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
 
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-
-                for (var i = 0; i < selectedGenes.length + 1; i++) {
-                    if (i < 1) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
-                    } else if (nodes[i - 1].length > 0) {
-                        parentNodes.push({
-                            data: {
-                                id: "par" + i
-                            }
-                        });
+                for (var j = 0; j < allNodes.length; j++) {
+                    if (allNodes[j].length > maxRows) {
+                        maxRows = allNodes[j].length;
                     }
                 }
 
-                for (var j = 0; j < nodes.length; j++) {
-                    nodeUtils.addPositionsToNodes(nodes[j], 400 * (j + 1), 100, 0, 30);
-                }
+                layout = layoutUtils.createGridLayout(maxRows, maxCols);
 
+                config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+                config = configUtils.setConfigLayout(config, layout);
+
+                parentNodes = nodeUtils.createParentNodesIE(selectedGenes, nodes);
                 elements = elements.concat(parentNodes);
-
-                layout = layoutUtils.createPresetLayout();
-                config = configUtils.createConfig();
-
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
             } else {
                 for (var i = 0; i < nodes.length; i++) {
                     for (var j = 0; j < nodes[i].length; j++) {
@@ -308,18 +279,19 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 config = configUtils.createConfig();
                 layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
 
-                nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                nodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                config = configUtils.setConfigLayout(config, layout);
+
             }
 
-            elements = elements.concat([].concat.apply([], nodes));
+            elements = elements.concat([].concat.apply([], allNodes));
             elements = elements.concat(edges);
-            elements.push(sourceNodes[0][0]);
+            // elements.push(sourceNodes[0][0]);
 
-            configUtils.addStyleToConfig(config, edgeStyleNegative);
-            configUtils.addStyleToConfig(config, edgeStylePositive);
-            configUtils.setConfigElements(config, elements);
-            configUtils.setConfigLayout(config, layout);
+            config = configUtils.addStyleToConfig(config, edgeStyleNegative);
+            config = configUtils.addStyleToConfig(config, edgeStylePositive);
+            config = configUtils.setConfigElements(config, elements);
 
             selfLoops = clientTableUtils.getSelfLoops(edges);
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdges));
@@ -333,40 +305,33 @@ app.post('/delta-interaction-explorer', function(req, res) {
 });
 
 app.post('/delta-submatrix', function(req, res) {
-    //console.log("%j", req.body);
+    // console.log("%j", req.body);
     var args = {};
     var argsString = "";
+    var files = null;
     var selectedGeneNames = [];
     var selectedGenes = req.body.selectedGenes;
     var requestedLayout = req.body.layout;
     var filterValidationRes = validationUtils.validateFilters(req.body);
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    var files = null;
-
-    files = fileUtils.getRequestedFiles(req, true, user);
-
-    if (files == null) {
-        res.send({ error: "Please specify the necessary files." });
-        return;
-    } else if (files.error != null) {
-        res.send({ error: files.error });
-        return;
-    }
-
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
     if (filterValidationRes.error) {
         res.send(filterValidationRes);
         return;
     }
 
-    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
-        res.json({ error: "Please select at least 1 gene of interest." });
+    var fileValidationres = validationUtils.validateFiles(files);
+    if (fileValidationres.error) {
+        res.send({ error: fileValidationres.error });
         return;
     }
 
-    for (var i = 0; i < selectedGenes.length; i++) {
-        selectedGeneNames.push(selectedGenes[i].value);
+    selectedGeneNames = validationUtils.validateSelectedGenes(selectedGenes);
+    if (selectedGeneNames.error) {
+        res.send({ error: selectedGeneNames.error });
+        return;
     }
 
     args.selectedNetworkType = req.body.selectedNetworkType;
@@ -432,21 +397,19 @@ app.post('/delta-submatrix', function(req, res) {
             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
             var depthWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightDepth);
 
-            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+            edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
+            edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
             for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], null, 0, selectedGenes[i].object.degree, -1)[0]);
-                allNodes.push(sourceNodes[i]);
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, selectedGenes[i].object.degree, -1));
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], false);
-                allNodes = allNodes.concat(firstNodes[i]);
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i]);
             }
 
             for (var i = 0; i < parsedNodesSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], false);
-                allNodes = allNodes.concat(secondNodes[i]);
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i]);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -469,20 +432,29 @@ app.post('/delta-submatrix', function(req, res) {
             config = configUtils.createConfig();
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                allNodes.push({
-                    data: { id: "epi" }
-                });
-                allNodes.push({
-                    data: { id: "stroma" }
-                });
-                nodeUtils.positionNodesBipartite(allNodes, 100, 300, 100, 100);
-                layout = layoutUtils.createPresetLayout();
+                var maxRows = 1;
+                var maxCols = 3;
+                allNodes = [parseUtils.flatten(sourceNodes)].concat([parseUtils.flatten(firstNodes)]).concat([parseUtils.flatten(secondNodes)]);
 
-                configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium)
+                for (var j = 0; j < allNodes.length; j++) {
+                    if (allNodes[j].length > maxRows) {
+                        maxRows = allNodes[j].length;
+                    }
+                }
+
+                allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
+                layout = layoutUtils.createGridLayout(maxRows, maxCols);
+
+                config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
+                config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
+
+                parentNodes = nodeUtils.createParentNodesMG(nodeUtils.isNodesArrayFull(sourceNodes) +
+                    nodeUtils.isNodesArrayFull(firstNodes) + nodeUtils.isNodesArrayFull(secondNodes));
+                allNodes.push(parentNodes);
+                allNodes = parseUtils.flatten(allNodes);
             } else if (requestedLayout == 'clustered') {
                 var largestClusterSize = 0;
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
+                sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
                     var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
@@ -492,22 +464,41 @@ app.post('/delta-submatrix', function(req, res) {
                     }
                 }
 
+                var temp;
+
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+                    temp = nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+
+                    if (firstNodes[i] != null) {
+                        firstNodes[i] = temp.firstNeighbours;
+                    }
+
+                    if (secondNodes[i] != null) {
+                        secondNodes[i] = temp.secondNeighbours;
+                    }
+
+                    sourceNodes[i] = temp.selectedGene;
                 }
 
                 layout = layoutUtils.createPresetLayout();
-                configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+                config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+
+                allNodes = sourceNodes.concat(firstNodes).concat(secondNodes);
+                allNodes = parseUtils.flatten(allNodes);
             } else {
+                sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
+                allNodes = sourceNodes.concat(firstNodes).concat(secondNodes);
+                allNodes = parseUtils.flatten(allNodes);
                 layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
-                nodeUtils.addClassToNodes(sourceNodes, "sourceNode");
-                configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
+                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
             }
 
-            configUtils.addStyleToConfig(config, edgeStyleNegative);
-            configUtils.addStyleToConfig(config, edgeStylePositive);
-            configUtils.setConfigElements(config, edges.concat(allNodes));
-            configUtils.setConfigLayout(config, layout);
+
+            config = configUtils.setConfigLayout(config, layout);
+            config = configUtils.addStyleToConfig(config, edgeStyleNegative);
+            config = configUtils.addStyleToConfig(config, edgeStylePositive);
+            config = configUtils.setConfigElements(config, edges.concat(allNodes));
+
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], parsedEdgesAll));
             selfLoops = clientTableUtils.getSelfLoops(edges);
 
@@ -531,7 +522,7 @@ app.post('/delta-get-all-paths', function(req, res) {
     var files = null;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    files = fileUtils.getRequestedFiles(req, false, user);
+    files = fileUtils.getRequestedFiles(req.body.selectedFile, req.body.selectedNetworkType, user);
 
     if (files == null) {
         res.send({ error: "Please specify the necessary files." });
@@ -588,7 +579,9 @@ app.post('/delta-get-all-paths', function(req, res) {
 app.post('/available-matrices', function(req, res) {
     var subTypes = req.body.types;
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(subTypes, user);
+    var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(user);
+
+    console.log("getting available-matrices for user: %j", user);
 
     res.send({ fileList: accessibleMatrices });
 });
@@ -635,7 +628,7 @@ app.post('/delete-file', function(req, res) {
     var file;
     console.log("delete file: %j", req.body.file);
 
-    file = fileUtils.getRequestedFile({arbitrary: req.body.file}, user)
+    file = fileUtils.getRequestedFile({ arbitrary: req.body.file }, user)
     if (file == null) {
         res.send({ fileStatus: "!!!!Failed to delete file: " })
         return;
