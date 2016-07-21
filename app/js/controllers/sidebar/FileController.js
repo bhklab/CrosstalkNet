@@ -69,7 +69,10 @@ angular.module('myApp.controllers').controller('FileController', [
                 return;
             }
 
-            stopTutorial();
+            if (stopTutorial) {
+                stopTutorial();
+            }
+
             SharedService.resetMatrixSummary();
             SharedService.resetGeneList();
             vm.showTooltip.button = false;
@@ -138,9 +141,6 @@ angular.module('myApp.controllers').controller('FileController', [
             },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
-                    // SharedService.resetCorrelationFiles();
-                    // vm.sharedData.clearAllData = true;
-                    // SharedService.resetMatrixSummary();
                     SharedService.resetGlobalData();
                     initializeVariables();
                 }

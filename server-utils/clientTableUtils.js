@@ -1,5 +1,23 @@
 'use strict'
+/**
+ * This file contains functions that help create data structures that
+ * are used in the table view of the web app. The edge dictionary is used
+ * to quickly determine the edge between two nodes, and the self loops are
+ * just an array of self loops. 
+ *
+ * @summary Methods for creating table view data structures for the client.
+ *
+ */
 
+/**
+ * @summary Returns a dictionary representing edge weights between genes.
+ *
+ * @param {Object} REdges An array of edges returned from an R script.
+ * @return {Object} A dictionary of dictionaries. The top level dictionary has
+ * keys that are the source nodes of edges, and the values of those keys are dictionaries.
+ * These bottom level dictionaries have keys that are the targets of edges and values
+ * that are the edge weight between the source and target nodes.
+ */
 function createEdgeDictionaryFromREdges(REdges) {
     var dictionary = {};
     dictionary.types = ["weight"];
@@ -51,6 +69,12 @@ function createEdgeDictionaryFromREdges(REdges) {
     return dictionary;
 }
 
+/**
+ * @summary Returns an array of self loops for given edges.
+ *
+ * @param {Object} edges An array of cytoscape to calculate self loops from.
+ * @return {Array} An array of string representing the self loops for the edges.
+ */
 function getSelfLoops(edges) {
     var result = [];
 
@@ -60,10 +84,6 @@ function getSelfLoops(edges) {
 
         if (source == target) {
             result.push(source);
-            /*
-            if (result.indexOf(source) < 0) {
-               
-            }*/
         }
     }
 

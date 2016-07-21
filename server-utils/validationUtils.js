@@ -1,4 +1,10 @@
 'use strict'
+/**
+ * This file contains functions for validating user input such as files, selected genes,
+ * and filter values.
+ *
+ * @summary Functions for validating user input
+ */
 
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -12,6 +18,13 @@ function isNegative(n) {
     return n <= 0;
 }
 
+/**
+ * @summary Validates the filter values specified by the user.
+ *
+ * @param {Object} body The body of the POST request.
+ * @return {Object} An object containing an error string if the filter values
+ * are invalid. If the values are valid, the error is null.
+ */
 function validateFilters(body) {
     if (body.minPositiveWeightFirst != "NA" || (body.minPositiveWeightFirst == "NA" && body.selectedFilterFirst.positive)) {
         if (!(isNumeric(body.minPositiveWeightFirst) && isPositive(body.minPositiveWeightFirst))) {
@@ -40,9 +53,58 @@ function validateFilters(body) {
     return { error: null };
 }
 
+/**
+ * @summary Checks if the files specified are null
+ * or if there was an error in obtaining the files.
+ *
+ * @param {Object} An object containing client-side
+ * files.
+ * @return {Object} An object containing an error
+ * if there is something wrong with the specified files.
+ * An empty object is returned if the files are valid.
+ */
+function validateFiles(files) {
+    if (files == null) {
+        return { error: "Please specify the necessary files." };
+    } else if (files.error != null) {
+        return { error: files.error };
+    }
+
+    return {};
+}
+
+/**
+ * @summary Checks if the selected genes are in the correct
+ * format.
+ *
+ * @param {Array} selectedGenes Assumed to be an array of Strings representing the 
+ * genes selected by the user.
+ * @return {Object} An object containing an error if there is something wrong with
+ * the selected genes. Otherwise, the selected genes are returned instead.
+ */
+function validateSelectedGenes(selectedGenes) {
+    var selectedGeneNames  = [];
+
+    if (selectedGenes == null || selectedGenes == "" || selectedGenes == []) {
+        return { error: "Please select at least 1 gene of interest." };
+    }
+
+    for (var i = 0; i < selectedGenes.length; i++) {
+        if (selectedGenes[i] == null || selectedGenes[i].value == null) {
+            return { error: "Please select a gene." };
+        }
+
+        selectedGeneNames.push(selectedGenes[i].value);
+    }
+
+    return selectedGeneNames;
+}
+
 module.exports = {
     isNegative: isNegative,
     isPositive: isPositive,
     isNumeric: isNumeric,
-    validateFilters: validateFilters
+    validateFilters: validateFilters,
+    validateFiles: validateFiles,
+    validateSelectedGenes: validateSelectedGenes
 };
