@@ -14,9 +14,9 @@ const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 var async = require('async');
 var mkdirp = require('mkdirp');
-var FileCache = require('./fileCache').FileCache;
-var FileGroup = require('./fileGroup').FileGroup;
-var File = require('./fileModel').File;
+var FileCache = require('./Models/fileCache').FileCache;
+var FileGroup = require('./Models/fileGroup').FileGroup;
+var File = require('./Models/fileModel').File;
 var availableMatrixCache = null;
 
 var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';

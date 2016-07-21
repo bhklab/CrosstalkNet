@@ -250,8 +250,15 @@ function isNodesArrayFull(nodes) {
  * the selected gene. These will be placed in the first ring around the selected gene.
  * @param {Array} secondNeighbours An array of cytoscape.js nodes representing the second neighbours of
  * the selected gene. These will be placed in the second ring around the selected gene.
- * @param {Number} clusterNumbe A number representing which cluster is currently being created. This is used 
- * to position clusters around each
+ * @param {Number} clusterNumber A number representing which cluster is currently being created. This is used 
+ * to position clusters around each.
+ * @param {Number} totalClusters The total amount of clusters that the graph will have. This is simply the number 
+ * of total selected genes.
+ * @param {Number} nodeRadius The average radius of each node in pixels. This will be used to determine the radii
+ * of the disks for this particular cluster.
+ * @param {Number} largestClusterRadius The radius of the largest cluster for the group of clusters being created.
+ * This is used to create a proper amount of separation between clusters.
+ * @return {Object} The selected gene, firstNeighbours, and secondNeighbours with the clustered position added to them.
  */
 function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours, clusterNumber, totalClusters, nodeRadius, largestClusterRadius) {
     var mainRadius = Math.max((totalClusters * (largestClusterRadius * 2) * 1.3) / (2 * Math.PI), largestClusterRadius + 100);
@@ -292,6 +299,15 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
     };
 }
 
+/**
+ * @summary Calculates the minimum radius required to display the given
+ * number of nodes of the specified size along a circle.
+ *
+ * @param {Number} numNodes The number of nodes that will be placed in a circular path.
+ * @param {Number} nodeRadius The average radius of the nodes being placed.
+ * @return {Number} The minimum radius required to display numNodes many nodes of
+ * size nodeRadius along a circle with no overlap between nodes.
+ */
 function getMinRadius(numNodes, nodeRadius) {
     return Math.max((3 * numNodes * (nodeRadius * 2)) / (2 * Math.PI), 120);
 }

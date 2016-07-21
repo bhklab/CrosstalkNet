@@ -1,5 +1,12 @@
 'use strict'
+/**
+ * This file contains functions and objects that help with the styling of 
+ * cytoscape.js elements. Styling objects exist for different layout types.
+ *
+ * @summary Functions and objects for styling cytoscape.js elements.
+ */
 
+var clone = require('clone');
 var classSuffixes = { nodeColor: 'node-color', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
 var nodeSizes = { small: 12, medium: 18, large: 20, source: 40 };
 var fontSizes = {source: 24};
@@ -151,6 +158,11 @@ var allConcentricFormats = [nodeSize.medium, nodeSize.source, bipartiteStyles.ep
     bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement, fontSize.source
 ];
 
+/**
+ * @summary Obtains an array of all styles required for a bipartite view of the graph.
+ *
+ * @return {Array} An array of cytoscape.js styles for a bipartite view of the graph.
+ */
 function getAllBipartiteStyles() {
     var styles = [];
 
@@ -165,6 +177,15 @@ function getAllBipartiteStyles() {
     return styles;
 }
 
+/**
+ * @summary Creates a dynamic style for the width of cytoscape.js edges.
+ *
+ * @param {String} property The property that will be mapped in order
+ * to dynamically obtain edge with.
+ * @param {Number} min The minimum value of the weight of an edge in a group of edges.
+ * @param {Number} min The maximum value of the weight of an edge in a group of edges.
+ * @return {String} A cytoscape.js style string for the width of edges.
+ */
 function getDynamicWidth(property, min, max) {
     if (Number(min) == Number(max)) {
         return "1px";
@@ -179,6 +200,15 @@ function getDynamicWidth(property, min, max) {
     }
 }
 
+/**
+ * @summary Creates a dynamic style for the color of cytoscape.js edges.
+ *
+ * @param {String} property The property that will be mapped in order
+ * to dynamically obtain edge with.
+ * @param {Number} min The minimum value of the weight of an edge in a group of edges.
+ * @param {Number} min The maximum value of the weight of an edge in a group of edges.
+ * @return {String} A cytoscape.js style string for the color of edges.
+ */
 function getDynamicColor(property, min, max) {
     if (min < 0) {
         if (Number(min) == Number(max)) {
@@ -195,13 +225,23 @@ function getDynamicColor(property, min, max) {
     }
 }
 
-function setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights) {
-    edgeStyleNegative.style.width = getDynamicWidth('weight', overallWeights.minNegative, overallWeights.maxNegative);
-    edgeStyleNegative.style['line-color'] = getDynamicColor('weight', overallWeights.minNegative, overallWeights.maxNegative);
+/**
+ * @summary Sets the width and the line-color of the given edge style 
+ * to dynamic values based on the overall weights.
+ *
+ * @param {Object} A cytoscape.js style object found in edgeWeights. The selector
+ * should be based on the weight of the edges.
+ * @param {Object} An object containing the min and max weight to use for styling.
+ * @return {Object} A cytoscape.hs style object for edges with dynamic styles for 
+ * width and line-color.
+ */
+function setDynamicEdgeStyles(edgeStyle, overallWeights) {
+    edgeStyle = clone(edgeStyle);
+    edgeStyle.style.width = getDynamicWidth('weight', overallWeights.min, overallWeights.max);
+    edgeStyle.style['line-color'] = getDynamicColor('weight', overallWeights.min, overallWeights.max);
 
-    edgeStylePositive.style.width = getDynamicWidth('weight', overallWeights.minPositive, overallWeights.maxPositive);
-    edgeStylePositive.style['line-color'] = getDynamicColor('weight', overallWeights.minPositive, overallWeights.maxPositive);
-}
+    return edgeStyle;
+} 
 
 module.exports = {
     getAllBipartiteStyles: getAllBipartiteStyles,
