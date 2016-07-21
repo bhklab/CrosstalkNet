@@ -31,6 +31,12 @@ myModule.factory('GraphConfigService', function($http) {
         vm.elemCopy = angular.copy(config.elements);
         vm.styleCopy = angular.copy(config.style);
         config.container = document.getElementById(containerID);
+
+        if (config.layout.position == "grid") {
+            config.layout.position = function( node ){ return {row:node.data('row'), col:node.data('col')}; };
+        }
+
+
         cy = cytoscape(config);
 
         vm.sdWithinTab.config = config;

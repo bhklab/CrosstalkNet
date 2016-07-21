@@ -2,6 +2,12 @@ source('R_Scripts/helpers.R')
 source('R_Scripts/dataModels.R')
 
 findAllPaths <- function(source, target, corMatrices, networkType) {
+	# Creates a data frame representing all of the paths that exist
+	# bewtween the source and target gene with a maximum of 1 hop
+	# in between.
+	#
+	# Args:
+	#	
 	neighbours <- list(normal = NULL, tumor = NULL, delta = NULL)
 	paths <- createPaths(0)
 	result <- list(paths = NULL)
