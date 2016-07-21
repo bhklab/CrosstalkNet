@@ -233,7 +233,8 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
 
             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
-            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+            edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
+            edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
             sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, selectedGenes[0].object.degree, -1));
 
@@ -396,7 +397,8 @@ app.post('/delta-submatrix', function(req, res) {
             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
             var depthWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightDepth);
 
-            styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
+            edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
+            edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
             for (var i = 0; i < selectedGenes.length; i++) {
                 sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, selectedGenes[i].object.degree, -1));

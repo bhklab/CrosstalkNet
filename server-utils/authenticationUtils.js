@@ -12,8 +12,8 @@
  */
 
 var jsonfile = require('jsonfile');
-var user = require('./user');
-var file = './server-utils/users.json';
+var user = require('./Models/user');
+var file = './server-utils/Models/users.json';
 var users = {};
 
 /**

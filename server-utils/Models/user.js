@@ -9,10 +9,10 @@
 class User {
     /**
      * Create a user.
-     * @param {string} name The name of the user. Names should be unique between users.
-     * @param {string} password The hashed password of the user.
-     * @param {string} accessLevel The access level for the user.
-     * @param {string} token The JSON Web Token associated with the user .
+     * @param {String} name The name of the user. Names should be unique between users.
+     * @param {String} password The hashed password of the user.
+     * @param {String} accessLevel The access level for the user.
+     * @param {String} token The JSON Web Token associated with the user .
      */
     constructor(name, password, accessLevel, token) {
         this._name = name;
@@ -23,7 +23,7 @@ class User {
 
     /**
      * Sets the users's name.
-     * @param {string} name The new name for the user.
+     * @param {String} name The new name for the user.
      */
     set name(name) {
         this._name = name;
@@ -31,7 +31,7 @@ class User {
 
     /**
      * Sets the users's password.
-     * @param {string} password The new password for the user.
+     * @param {String} password The new password for the user.
      */
     set password(password) {
         this._password = password;
@@ -39,7 +39,7 @@ class User {
 
         /**
      * Sets the users's access level.
-     * @param {string} accessLevel The new access level for the user.
+     * @param {String} accessLevel The new access level for the user.
      */
     set accessLevel(accessLevel) {
         this._accessLevel = accessLevel;
@@ -47,7 +47,7 @@ class User {
 
     /**
      * Sets the users's token.
-     * @param {string} token The new JSON Web Token for the user.
+     * @param {String} token The new JSON Web Token for the user.
      */
     set token(token) {
         this._token = token;
@@ -55,7 +55,7 @@ class User {
 
     /**
      * Gets the user's name.
-     * @return {string} The user's name.
+     * @return {String} The user's name.
      */
     get name() {
         return this._name;
@@ -63,7 +63,7 @@ class User {
 
     /**
      * Gets the user's hashed password.
-     * @return {string} The user's hashed password.
+     * @return {String} The user's hashed password.
      */
     get password() {
         return this._password;
@@ -71,7 +71,7 @@ class User {
 
     /**
      * Gets the user's access level.
-     * @return {string} The user's access level.
+     * @return {String} The user's access level.
      */
     get accessLevel() {
         return this._accessLevel;
@@ -79,7 +79,7 @@ class User {
 
     /**
      * Gets the user's token.
-     * @return {string} The user's token.
+     * @return {String} The user's token.
      */
     get token() {
         return this._token;
