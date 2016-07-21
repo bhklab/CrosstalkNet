@@ -6,7 +6,8 @@
  *
  * @summary Utilities for managing and authenticating users.
  *
- * @requires jsonfile
+ * @requires './user'
+ * @requires jsonfile 
  * @requires ./server-utils/users.json
  */
 

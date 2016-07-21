@@ -50,6 +50,10 @@ getDegrees <- function(corMatrix) {
 
     names(deg.row) <- rownames(corMatrix)
     names(deg.col) <- colnames(corMatrix)
+
+    deg.col <- sort(deg.col)
+    deg.row <- sort(deg.row)
+
     # deg.row <- as.numeric() 
     # for(k in 1:nrow(corMatrix)){
     #     deg.row[k] <- length(which(corMatrix[k,] != 0))

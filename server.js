@@ -235,21 +235,30 @@ app.post('/delta-interaction-explorer', function(req, res) {
             var overallWeights = parseUtils.parseMinMaxWeights(parsedValue.minMaxWeightOverall);
             styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
 
-            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, 0, selectedGenes[0].object.degree, -1));
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, selectedGenes[0].object.degree, -1));
 
             for (var i = 0; i < parsedEdges.length; i++) {
                 edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], i + 1));
             }
 
             for (var i = 0; i < parsedNodes.length; i++) {
-                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], true));
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i]));
             }
 
             allNodes = nodes.concat(sourceNodes);
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
+                var maxRows = 1;
+                var maxCols = allNodes.length + 1;
                 allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
-                layout = layoutUtils.createGridLayoutWithDimensions(allNodes);
+
+                for (var j = 0; j < allNodes.length; j++) {
+                    if (allNodes[j].length > maxRows) {
+                        maxRows = allNodes[j].length;
+                    }
+                }
+
+                layout = layoutUtils.createGridLayout(maxRows, maxCols);
 
                 config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
                 config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
@@ -390,15 +399,15 @@ app.post('/delta-submatrix', function(req, res) {
             styleUtils.setDynamicEdgeStyles(edgeStyleNegative, edgeStylePositive, overallWeights);
 
             for (var i = 0; i < selectedGenes.length; i++) {
-                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, 0, selectedGenes[i].object.degree, -1));
+                sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, selectedGenes[i].object.degree, -1));
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], true);
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i]);
             }
 
             for (var i = 0; i < parsedNodesSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], true);
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i]);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -479,7 +488,7 @@ app.post('/delta-submatrix', function(req, res) {
                 allNodes = sourceNodes.concat(firstNodes).concat(secondNodes);
                 allNodes = parseUtils.flatten(allNodes);
                 layout = layoutUtils.createRandomLayout(allNodes.length, styleUtils.nodeSizes.medium);
-                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);                
+                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
             }
 
 
