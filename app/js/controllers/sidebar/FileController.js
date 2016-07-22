@@ -1,10 +1,22 @@
 'use strict';
+/**
+ * Controller for the DATA sub-tab in the MAIN GRAPH tab.
+ * @namespace 
+ */
+(function() {
+    angular.module('myApp.controllers').controller('FileController', [
+        '$scope',
+        '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
+        'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
+        FileController
+    ]);
 
-angular.module('myApp.controllers').controller('FileController', [
-    '$scope',
-    '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
-    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
-    function($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
+    /**
+     * @namespace FileController
+     * @desc Controller for getting, uploading, and deleting files.
+     * @memberOf controllers
+     */
+    function FileController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -26,17 +38,37 @@ angular.module('myApp.controllers').controller('FileController', [
         vm.initializeController = initializeController;
         vm.uploadFiles = uploadFiles;
 
+        /**
+         * @summary Initializes variables used within the tab for referring to selected
+         * files.
+         *
+         * @memberOf controllers.FileController
+         */
         function initializeVariables() {
             vm.correlationFileDisplayed = { normal: null, tumor: null, delta: null };
             vm.matrixUpload = { normal: null, tumor: null, delta: null };
         }
 
+        /**
+         * @summary Assigns the ctrl property of the controller and sets the appropriate within 
+         * tab model based on the ctrl property.
+         *
+         * @param {String} ctrl A name to associate this controller with.
+         * @memberOf controllers.FileController
+         */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
         }
 
+        /**
+         * @summary Checks to see if the all of the necessary files have been selected
+         * in order to retrieve data for the selected network type.
+         *
+         * @return {Boolean} true if all the necessary files have been specified, false otherwise.
+         * @memberOf controllers.FileController
+         */
         function checkFilesSelected() {
             if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta &&
                 (!vm.correlationFileDisplayed.normal || !vm.correlationFileDisplayed.tumor || !vm.correlationFileDisplayed.delta)) {
@@ -53,6 +85,13 @@ angular.module('myApp.controllers').controller('FileController', [
             return true;
         }
 
+        /**
+         * @summary Checks to see if all of the necessary files have been selected
+         * in order to upload the data to the server.
+         *
+         * @return {Boolean} true if all of the necessary files have been specified, false otherwise.
+         * @memberOf controllers.FileController
+         */
         function checkFilesToUpload() {
             if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta &&
                 (!vm.matrixUpload.normal || !vm.matrixUpload.tumor || !vm.matrixUpload.delta)) {
@@ -69,6 +108,15 @@ angular.module('myApp.controllers').controller('FileController', [
             return true;
         }
 
+        /**
+         * @summary Spawns a confirm dialog asking the user if they really want to 
+         * delete the file they clicked on.
+         *
+         * @param {Event} ev The event associated with the click. This is used to prevent
+         * propogation.
+         * @param {Object} file The file that is to be deleted.
+         * @memberOf controllers.FileController
+         */
         function deleteConfirm(ev, file) {
             var toDelete = {};
 
@@ -97,6 +145,10 @@ angular.module('myApp.controllers').controller('FileController', [
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
         }
 
+        /**
+         * @summary Obtains necessary information for the selected files and network type.
+         * @memberOf controllers.FileController
+         */
         function getGenes() {
             if (!checkFilesSelected()) {
                 return;
@@ -116,19 +168,40 @@ angular.module('myApp.controllers').controller('FileController', [
             vm.sharedData.correlationFileActual.delta = JSON.parse(vm.correlationFileDisplayed.delta);
             GlobalControls.resetInputFieldsGlobal(vm);
 
+            getGeneList();
+            getMatrixSummary();
+        }
+
+        /**
+         * @summary Sends a request to the server to obtain the gene list for the selected files
+         * and network type.
+         * @memberOf controllers.FileController
+         */
+        function getGeneList() {
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.geneList = result.geneList;
                 $rootScope.dataLoaded = true;
                 vm.sdWithinTab.selectedTab = 1;
                 stopTutorial();
             });
+        }
 
+        /**
+         * @summary Sends a request to the server to obtain the matrix summary for the selected files
+         * and network type.
+         * @memberOf controllers.FileController
+         */
+        function getMatrixSummary() {
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.matrixSummary = result.matrixSummary;
                 vm.sharedData.clearAllData = false;
             });
         }
 
+        /**
+         * @summary Shows a tooltip from the GET GENES button.
+         * @memberOf controllers.FileController
+         */
         function showTooltip() {
             stopTutorial();
             $timeout(function() {
@@ -136,6 +209,10 @@ angular.module('myApp.controllers').controller('FileController', [
             }, 250);
         }
 
+        /**
+         * @summary Uploads the specified files to the server.
+         * @memberOf controllers.FileController
+         */
         function uploadFiles() {
             if (!checkFilesToUpload()) {
                 return;
@@ -148,6 +225,11 @@ angular.module('myApp.controllers').controller('FileController', [
             });
         }
 
+        /**
+         * @summary Watched for changes in the network type and resets data in all tabs in the case
+         * of a change.
+         * @memberOf controllers.FileController
+         */
         $scope.$watch(function() {
                 return vm.selectedNetworkType;
             },
@@ -158,6 +240,11 @@ angular.module('myApp.controllers').controller('FileController', [
                 }
             });
 
+        /**
+         * @summary Wacthes for changes in the reloadFileList variable and reloads the available
+         * file dropdowns as well as the user permission level when reloadFileList becomes true.
+         * @memberOf controllers.FileController
+         */
         $scope.$watch(function() {
             return vm.sharedData.reloadFileList;
         }, function(newValue, oldValue) {
@@ -175,6 +262,11 @@ angular.module('myApp.controllers').controller('FileController', [
             }
         });
 
+        /**
+         * @summary Watches for changes in the correlationFileDisplayed variable and shows a tooltip
+         * once the appropriate files are selected.
+         * @memberOf controllers.FileController
+         */
         var stopTutorial = $scope.$watch(function() {
             return vm.correlationFileDisplayed;
         }, function(newValue, oldValue) {
@@ -187,4 +279,4 @@ angular.module('myApp.controllers').controller('FileController', [
             }
         }, true);
     }
-]);
+})();

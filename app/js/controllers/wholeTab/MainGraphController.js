@@ -1,27 +1,29 @@
 'use strict';
 /**
- * Controller for the INTERACTION EXPLORER TAB tab.
+ * Controller for the MAIN GRAPH tab.
  * @namespace controllers
  */
 (function() {
-    angular.module('myApp.controllers').controller('InteractionExplorerController', ['$scope',
+    angular.module('myApp.controllers').controller('MainGraphController', ['$scope',
         '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
         '$mdDialog',
-        InteractionExplorerController
+        MainGraphController
     ]);
 
     /**
-     * @namespace InteractionExplorerController
-     * @desc Controller for the INTERACTION EXPLORER tab. Its main
+     * @namespace MainGraphController
+     * @desc Controller for the MAIN GRAPH tab. Its main
      * purpose is to allow the sharing of data throughout the different 
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function InteractionExplorerController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
+    function MainGraphController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
         var vm = this;
         vm.scope = $scope;
+
+        $rootScope.selectedTab = 0;
 
         vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
@@ -33,14 +35,12 @@
         vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
-        GlobalControls.setMethodsWholeTab(vm);
-
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
-         * @memberOf controllers.InteractionExplorerController
+         * @memberOf controllers.MainGraphController
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;

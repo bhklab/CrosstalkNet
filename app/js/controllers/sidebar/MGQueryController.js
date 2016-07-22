@@ -1,10 +1,22 @@
 'use strict';
+/**
+ * Controller for the QUERY sub-tab MAIN GRAPH tab.
+ * @namespace controllers
+ */
+(function() {
+    angular.module('myApp.controllers').controller('MGQueryController', [
+        '$scope',
+        '$rootScope', 'RESTService',
+        'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
+        MGQueryController
+    ]);
 
-angular.module('myApp.controllers').controller('MGQueryController', [
-    '$scope',
-    '$rootScope', 'RESTService',
-    'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService, TableService,
+    /**
+     * @namespace MGQueryController
+     * @desc Controller for the QUERY sub-tab in the MAIN GRAPH tab.
+     * @memberOf controllers
+     */
+    function MGQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService, TableService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -20,12 +32,24 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         MainGraphControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 
+        /**
+         * @summary Assigns the ctrl property of the controller and sets the appropriate within 
+         * tab model based on the ctrl property.
+         *
+         * @param {String} ctrl A name to associate this controller with.
+         * @memberOf controllers.MGQueryController
+         */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             intializeVariables();
         }
 
+        /**
+         * @summary Initializes variables used within the tab for binding to the controls.
+         *
+         * @memberOf controllers.MGQueryController
+         */
         function intializeVariables() {
             vm.selectedItemFirst = null;
             vm.selectedGOI = null;
@@ -73,9 +97,25 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             vm.sdWithinTab.showGraphSummary = false;
         }
 
+        /**
+         * @summary Resets the data shown within the MAIN GRAPH tab and
+         * obtains a cytoscape.js config for the current user query.
+         *
+         * @memberOf controllers.MGQueryController
+         */
         function refreshGraph(filter) {
             vm.clearLocatedGene();
             SharedService.resetWTM(vm);
+            getConfigForGraph(filter);
+        }
+
+        /**
+         * @summary Obtains a cytoscpape.js config from the server for the current
+         * user query.
+         *
+         * @memberOf controllers.MGQueryController
+         */
+        function getConfigForGraph(filter) {
             QueryService.getMainGraph(vm, filter).then(function(result) {
                 if (result.data == null) {
                     return;
@@ -91,7 +131,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
 
                 vm.sdWithinTab.edgeDictionary = result.data.edgeDictionary;
                 vm.sdWithinTab.selfLoops = result.data.selfLoops;
-                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm);
+                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
                 vm.sdWithinTab.showGraphSummary = true;
                 $rootScope.state = $rootScope.states.showingGraph;
 
@@ -100,6 +140,28 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             });
         }
 
+        /**
+         * @summary Watches the clearAllData variable and clears the data within the tab when 
+         * it changes to true.
+         *
+         * @memberOf controllers.MGQueryController
+         */
+        $scope.$watch(function() {
+            return vm.sharedData.clearAllData;
+        }, function(newValue, oldValue) {
+            if (newValue == true && newValue != oldValue) {
+                intializeVariables();
+                GraphConfigService.destroyGraph(vm);
+                SharedService.resetWTM(vm);
+            }
+        });
+
+        /** 
+         * @summary Watches the selectedLayout variable and refreshes the graph when the 
+         * layout changes.
+         *
+         * @memberOf controllers.MGQueryController
+         */
         $scope.$watch(function() {
             if (vm.sdWithinTab && (vm.genesOfInterest != null && vm.genesOfInterest.length > 0) ||
                 (vm.sdWithinTab != null && vm.sdWithinTab.selectedLayout != null && vm.GOIState != vm.GOIStates.initial)) {
@@ -112,16 +174,12 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             }
         });
 
-        $scope.$watch(function() {
-            return vm.sharedData.clearAllData;
-        }, function(newValue, oldValue) {
-            if (newValue == true && newValue != oldValue) {
-                intializeVariables();
-                GraphConfigService.destroyGraph(vm);
-                SharedService.resetWTM(vm);
-            }
-        });
-
+        /** 
+         * @summary Watches the display variable and redraws the graph when switching
+         * from the Tables view to the Graph view.
+         *
+         * @memberOf controllers.MGQueryController
+         */ 
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
                 return vm.sdWithinTab.display;
@@ -139,4 +197,4 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             }
         });
     }
-]);
+})();

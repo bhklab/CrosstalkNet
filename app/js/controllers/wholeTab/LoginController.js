@@ -1,11 +1,24 @@
 'use strict';
+/**
+ * Controller for the the login dialog.
+ * @namespace controllers
+ */
 
-angular.module('myApp.controllers').controller('LoginController', [
-    '$scope',
-    '$rootScope', 'RESTService',
-    'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
-    '$mdDialog',
-    function($scope, $rootScope, RESTService, ValidationService, SharedService,
+(function() {
+    angular.module('myApp.controllers').controller('LoginController', [
+        '$scope',
+        '$rootScope', 'RESTService',
+        'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
+        '$mdDialog',
+        LoginController
+    ]);
+
+        /**
+     * @namespace LoginController
+     * @desc Controller for the login dialog.
+     * @memberOf controllers
+     */
+    function LoginController($scope, $rootScope, RESTService, ValidationService, SharedService,
         $q, $timeout, $cookies, $mdDialog) {
         var vm = this;
         vm.ctrl = "login";
@@ -15,14 +28,15 @@ angular.module('myApp.controllers').controller('LoginController', [
 
         vm.sharedData = SharedService.data.global;
 
-        vm.answer = answer;
         vm.guestLogin = guestLogin;
         vm.login = login;
 
-        function answer(answer) {
-            $mdDialog.hide(answer);
-        }
-
+        /**
+         * @summary Signs in the user as a guest giving them access to only
+         * fake data and no ability to upload files.
+         *
+         * @memberOf controllers.LoginController
+         */
         function guestLogin() {
             $rootScope.tokenSet = true;
             vm.sharedData.guest = true;
@@ -30,6 +44,12 @@ angular.module('myApp.controllers').controller('LoginController', [
             $mdDialog.hide('');
         }
 
+        /**
+         * @summary Sends a request to server to sign the user in given the current
+         * username and password typed in the login dialog.
+         *
+         * @memberOf controllers.LoginController
+         */
         function login() {
             RESTService.post('login', { user: vm.user })
                 .then(function(data) {
@@ -51,6 +71,13 @@ angular.module('myApp.controllers').controller('LoginController', [
                 });
         }
 
+        /**
+         * @summary Checks to see if the JSON Web Token is found in the cookies. If so,
+         * it attempts to login using it, otherwise it prompts the user to enter the name
+         * and password.
+         *
+         * @memberOf controllers.LoginController
+         */
         function checkToken() {
             if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
                 $rootScope.tokenSet = true;
@@ -60,6 +87,11 @@ angular.module('myApp.controllers').controller('LoginController', [
             }
         }
 
+        /**
+         * @summary Displays the login dialog.
+         *
+         * @memberOf controllers.LoginController
+         */
         function showLoginDialog(ev) {
             $mdDialog.show({
                 controller: function() { this.vm = vm },
@@ -72,6 +104,12 @@ angular.module('myApp.controllers').controller('LoginController', [
             });
         }
 
+        /**
+         * @summary Watches the tokenSet variable for changes. When it becomes false,
+         * the token is removed from the cookies and the user is prompted to login again.
+         *
+         * @memberOf controllers.LoginController
+         */
         $rootScope.$watch('tokenSet', function(newValue, oldValue) {
             if (newValue == false && oldValue == true) {
                 $cookies.remove('token');
@@ -79,7 +117,6 @@ angular.module('myApp.controllers').controller('LoginController', [
             }
         });
 
-        $cookies.remove('token');
         checkToken();
     }
-]);
+})();
