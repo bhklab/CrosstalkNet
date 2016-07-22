@@ -172,7 +172,7 @@
          * clear the autocomplete controls within that tab.
          */
         function resetInputFieldsLocal(tabName, extraClass) {
-            angular.forEach(angular.element("md-autocomplete." + ctrl + extraClass + " input"), function(value, key) {
+            angular.forEach(angular.element("md-autocomplete." + tabName + extraClass + " input"), function(value, key) {
                 var a = angular.element(value);
                 a.val('');
                 if (document.activeElement != null) {
@@ -180,7 +180,7 @@
                 }
             });
 
-            angular.forEach(angular.element("md-autocomplete." + ctrl + extraClass + " button"), function(value, key) {
+            angular.forEach(angular.element("md-autocomplete." + tabName + extraClass + " button"), function(value, key) {
                 $timeout(function() {
                     var a = angular.element(value);
                     a.click();

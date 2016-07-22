@@ -1,89 +1,148 @@
-var myModule = angular.module("myApp.services");
-myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, GraphConfigService, SharedService, GlobalControls) {
-    var service = {};
+'use strict';
+/**
+ * Main graph controls factory. Contains functions that are used for 
+ * maniupulating and resetting data within the MGQueryController.
+ * @namespace services
+ */
+(function() {
 
-    service.layouts = [{ display: "Bipartite", value: "preset" }, {
-        display: "Concentric",
-        value: "clustered"
-    }, { display: "Random", value: "random" }];
+    angular.module("myApp.services").factory('MainGraphControls', MainGraphControls);
 
-    service.setMethods = setMethods;
+    /**
+     * @namespace MainGraphControls
+     * @desc Factory for maniupulating and resetting data in the MGQueryController;
+     * @memberOf services
+     */
+    function MainGraphControls($http, $rootScope, $timeout, GraphConfigService, SharedService, GlobalControls) {
+        var service = {};
 
-    function setMethods(vm) {
-        vm.addGeneOfInterest = function(gene) {
-            if (gene != null) {
-                if (vm.genesOfInterest.indexOf(gene) < 0) {
-                    vm.genesOfInterest.push(gene);
+        service.layouts = [{ display: "Bipartite", value: "preset" }, {
+            display: "Concentric",
+            value: "clustered"
+        }, { display: "Random", value: "random" }];
+
+        service.setMethods = setMethods;
+
+        /**
+         * @summary Attaches a group of functions to the given
+         * view model. This helps keep controllers slim.
+         *
+         * @param {Object} vm A view model from a controller.
+         */
+        function setMethods(vm) {
+            vm.addGeneOfInterest = addGeneOfInterest;
+            vm.advanceGOIState = advanceGOIState;
+            vm.resetGeneSelection = resetGeneSelection;
+            vm.resetFilters = resetFilters;
+            vm.removeGene = removeGene;
+            vm.removeGenesOfInterest = removeGenesOfInterest;
+            vm.returnToFirstNeighboursFilter = returnToFirstNeighboursFilter;
+            vm.setFilterMinMax = setFilterMinMax;
+
+            /**
+             * @summary Adds a gene object to the array of genes of interest.
+             *
+             * @param {Object} The gene to add.
+             */
+            function addGeneOfInterest(gene) {
+                if (gene != null) {
+                    if (vm.genesOfInterest.indexOf(gene) < 0) {
+                        vm.genesOfInterest.push(gene);
+                    }
+
+                    GlobalControls.resetInputFieldsLocal(vm.ctrl, 'gene-input');
+                    GlobalControls.focusElement("md-autocomplete." + vm.ctrl + "gene-input" + " input");
                 }
-
-                GlobalControls.resetInputFieldsLocal(vm.ctrl, 'gene-input');
-                GlobalControls.focusElement("md-autocomplete." + vm.ctrl + "gene-input" + " input");
             }
-        };
 
-        vm.getNodesWithMinDegree = function() {
-            var nodes = vm.sdWithinTab.cy.nodes();
-            var result = [];
-
-            for (var i = 0; i < nodes.length; i++) {
-                if (nodes[i].data('degree') > vm.minDegree.first) {
-                    result.push(nodes[i]);
+            /**
+             * @summary Advances the GOI state to the next stage.
+             *
+             * @param {Number} depth A number indicating which level of neighbours the data 
+             * was obtained for.
+             */
+            function advanceGOIState(depth) {
+                if (vm.GOIState == vm.GOIStates.initial) {
+                    vm.GOIState = vm.GOIStates.filterFirst;
+                } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
+                    vm.GOIState = vm.GOIStates.getSecondNeighbours;
+                } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
+                    vm.GOIState = vm.GOIStates.filterSecond;
                 }
             }
 
-            return result;
-        };
+            /**
+             * @summary Sets the min and max filter bounds for the appropriate
+             * filter level based on the given depth.
+             *
+             * @param {Number} depth A number indicating which level of neighbours the data 
+             * was obtained for.
+             * @param {Number} min The minimum weight possible.
+             * @param {Number} min The maximum weight possible.
+             */
+            function setFilterMinMax(depth, min, max) {
+                if (vm.GOIState == vm.GOIStates.initial) {
+                    vm.correlationFilterFirst.min = min;
+                    vm.correlationFilterFirst.max = max;
+                } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
+                    vm.correlationFilterSecond.min = min;
+                    vm.correlationFilterSecond.max = max;
+                }
+            }
 
-        vm.advanceGOIState = function(data, depth) {
-            if (vm.GOIState == vm.GOIStates.initial) {
-                vm.correlationFilterFirst.min = data.minNegativeWeight;
-                vm.correlationFilterFirst.max = data.maxPositiveWeight;
+            /**
+             * @summary Re-enables the addition of genes.
+             */
+            function resetGeneSelection() {
+                vm.GOIState = vm.GOIStates.initial;
+                vm.resetFilters();
+            }
+
+            /**
+             * @summary Resets the filters including their limits to the initial
+             * values.
+             */
+            function resetFilters() {
+                vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+                vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+            }
+
+            /**
+             * @summary Removes a gene object from the array of genes of interest. 
+             * Clears the displayed data in the case of genesOfInterest becoming empty,
+             * refreshes the graph otherwise.
+             *
+             * @param {Object} gene The gene to remove.
+             */
+            function removeGene(gene) {
+                if (vm.genesOfInterest.length == 1) {
+                    vm.removeGenesOfInterest();
+                } else {
+                    vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+                    vm.refreshGraph();
+                }
+            }
+
+            
+            function removeGenesOfInterest() {
+                vm.GOIState = vm.GOIStates.initial;
+                vm.genesOfInterest = [];
+                vm.allVisibleGenes = [];
+                GraphConfigService.destroyGraph(vm);
+                GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
+                GlobalControls.closeEdgeInspector(vm);
+                vm.clearLocatedGene();
+                vm.resetFilters();
+                SharedService.resetWTM(vm);
+            }
+
+            function returnToFirstNeighboursFilter() {
                 vm.GOIState = vm.GOIStates.filterFirst;
-            } else if (vm.GOIState == vm.GOIStates.filterFirst && depth == 2) {
-                vm.correlationFilterSecond.min = data.minNegativeWeight;
-                vm.correlationFilterSecond.max = data.maxPositiveWeight;
-                vm.GOIState = vm.GOIStates.getSecondNeighbours;
-            } else if (vm.GOIState == vm.GOIStates.getSecondNeighbours) {
-                vm.GOIState = vm.GOIStates.filterSecond;
+                vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
             }
-        };
+        }
 
-        vm.resetGeneSelection = function() {
-            vm.GOIState = vm.GOIStates.initial;
-            vm.resetFilters();
-        };
-
-        vm.resetFilters = function() {
-            vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
-            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-        };
-
-        vm.removeGene = function(gene) {
-            if (vm.genesOfInterest.length == 1) {
-                vm.removeGenesOfInterest();
-            } else {
-                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-                vm.refreshGraph();
-            }
-        };
-
-        vm.removeGenesOfInterest = function() {
-            vm.GOIState = vm.GOIStates.initial;
-            vm.genesOfInterest = [];
-            vm.allVisibleGenes = [];
-            GraphConfigService.destroyGraph(vm);
-            GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
-            GlobalControls.closeEdgeInspector(vm);
-            vm.clearLocatedGene();
-            vm.resetFilters();
-            SharedService.resetWTM(vm);
-        };
-
-        vm.returnToFirstNeighboursFilter = function() {
-            vm.GOIState = vm.GOIStates.filterFirst;
-            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-        };
+        return service;
     }
 
-    return service;
-});
+})();
