@@ -166,7 +166,7 @@
             vm.sharedData.correlationFileActual.normal = JSON.parse(vm.correlationFileDisplayed.normal);
             vm.sharedData.correlationFileActual.tumor = JSON.parse(vm.correlationFileDisplayed.tumor);
             vm.sharedData.correlationFileActual.delta = JSON.parse(vm.correlationFileDisplayed.delta);
-            GlobalControls.resetInputFieldsGlobal(vm);
+            GlobalControls.resetInputFieldsGlobal();
 
             getGeneList();
             getMatrixSummary();
@@ -235,6 +235,7 @@
             },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
+                    GlobalControls.resetInputFieldsGlobal();
                     SharedService.resetGlobalData();
                     initializeVariables();
                 }

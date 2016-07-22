@@ -135,7 +135,9 @@
                 vm.sdWithinTab.showGraphSummary = true;
                 $rootScope.state = $rootScope.states.showingGraph;
 
-                vm.advanceGOIState(result.data, result.depth);
+                vm.setFilterMinMax(result.depth, result.data.minNegativeWeight, result.data.maxPositiveWeight);
+                vm.advanceGOIState(result.depth);
+                
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
             });
         }
