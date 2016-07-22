@@ -8,21 +8,24 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         QueryService, $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
+        vm.allowAdditionalGenes = true;
 
-        vm.initialize = function(ctrl) {
-            vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
-            initializeVariables();
-        };
+        vm.initializeController = initializeController;
+        vm.refreshGraph = refreshGraph;
 
         vm.sharedData = SharedService.data.global;
 
         InteractionExplorerControls.setMethods(vm);
-
         GlobalControls.setMethodsSideBar(vm);
 
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
+
+        function initializeController(ctrl) {
+            vm.ctrl = ctrl;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            initializeVariables();
+        }
 
         function initializeVariables() {
             vm.zoomGene = null;
@@ -44,16 +47,14 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             vm.sdWithinTab.showGraphSummary = false;
         }
 
-        vm.allowAdditionalGenes = true;
-
-        vm.refreshGraph = function() {
+        function refreshGraph() {
             vm.resetDisplayedData();
             SharedService.resetWTM(vm);
             QueryService.getInteractionExplorerConfig(vm).then(function(result) {
                 if (result.data == null) {
                     return;
                 }
-                
+
                 $rootScope.state = $rootScope.states.loadingConfig;
                 if (vm.display == vm.displayModes.table) {
                     vm.needsRedraw = true;
@@ -73,7 +74,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
 
                 vm.sdWithinTab.showGraphSummary = true;
             });
-        };
+        }
 
         $scope.$watch(function() {
             return vm.sharedData.clearAllData;

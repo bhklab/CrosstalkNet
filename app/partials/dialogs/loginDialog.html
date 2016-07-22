@@ -9,22 +9,22 @@
             <div class="md-dialog-content">
                 <md-input-container style="margin-top: 5px;">
                     <label>User</label>
-                    <input ng-model="ctrl.parent.user.name">
+                    <input ng-model="ctrl.vm.user.name">
                 </md-input-container>
                 <br>
                 <md-input-container style="margin-top: 5px;">
                     <label>Password</label>
-                    <input type="password" ng-model="ctrl.parent.user.password">
+                    <input type="password" ng-model="ctrl.vm.user.password">
                 </md-input-container>
             </div>
         </md-dialog-content>
         <md-dialog-actions class="login">
             <div>
                 <div class="login-controls-container">
-                    <md-button class="md-raised md-primary" ng-click="ctrl.parent.login()">Login</md-button>
+                    <md-button class="md-raised md-primary" ng-click="ctrl.vm.login()">Login</md-button>
                 </div>
                 <div class="login-controls-container">
-                    <md-button md-no-ink class="md-primary" ng-click="ctrl.parent.guestLogin()">Sign in as Guest</md-button>
+                    <md-button md-no-ink class="md-primary" ng-click="ctrl.vm.guestLogin()">Sign in as Guest</md-button>
                 </div>
             </div>
         </md-dialog-actions>

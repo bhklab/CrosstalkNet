@@ -6,17 +6,12 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
     '$mdDialog',
     function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
-        $rootScope.selectedTab = 0;
-
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl) {
-            vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
-            vm.sdWithinTab.display = vm.displayModes.graph;
-        };
+        $rootScope.selectedTab = 0;
 
+        vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.switchModel = false;
         vm.sharedData = SharedService.data.global;
@@ -25,5 +20,11 @@ angular.module('myApp.controllers').controller('MainController', ['$scope',
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
         vm.exportNeighboursToCSV = ExportService.exportNeighboursToCSV;
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
+
+        function initializeController(ctrl) {
+            vm.ctrl = ctrl;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab.display = vm.displayModes.graph;
+        }
     }
 ]);

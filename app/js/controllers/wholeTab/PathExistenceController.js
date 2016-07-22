@@ -9,17 +9,20 @@ angular.module('myApp.controllers').controller('PathExistenceController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl) {
-            vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
-            vm.sdWithinTab.display = vm.displayModes.table;
-        };
-
-        vm.exportTableToCSV = function(tableID) {
-            $("." + tableID).tableToCSV();
-        };
+        vm.exportTableToCSV = exportTableToCSV;
+        vm.initializeController = initializeController;
 
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.sharedData = SharedService.data.global;
+
+        function initializeController(ctrl) {
+            vm.ctrl = ctrl;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab.display = vm.displayModes.table;
+        }
+
+        function exportTableToCSV(tableID) {
+            $("." + tableID).tableToCSV();
+        }
     }
 ]);

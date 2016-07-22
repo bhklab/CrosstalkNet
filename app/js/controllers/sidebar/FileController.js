@@ -21,9 +21,20 @@ angular.module('myApp.controllers').controller('FileController', [
 
         $rootScope.dataLoaded = false;
 
+        vm.deleteConfirm = deleteConfirm;
+        vm.getGenes = getGenes;
+        vm.initializeController = initializeController;
+        vm.uploadFiles = uploadFiles;
+
         function initializeVariables() {
             vm.correlationFileDisplayed = { normal: null, tumor: null, delta: null };
             vm.matrixUpload = { normal: null, tumor: null, delta: null };
+        }
+
+        function initializeController(ctrl) {
+            vm.ctrl = ctrl;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            initializeVariables();
         }
 
         function checkFilesSelected() {
@@ -58,13 +69,35 @@ angular.module('myApp.controllers').controller('FileController', [
             return true;
         }
 
-        vm.initialize = function(ctrl) {
-            vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
-            initializeVariables();
-        };
+        function deleteConfirm(ev, file) {
+            var toDelete = {};
 
-        vm.getGenes = function() {
+            for (var prop in file) {
+                if (prop.indexOf("$") < 0) {
+                    toDelete[prop] = file[prop];
+                }
+            }
+
+            ev.stopPropagation();
+            $mdSelect.hide();
+
+            var confirm = $mdDialog.confirm()
+                .title('Confirm Delete?')
+                .textContent('Are you sure you want to delete the file: ' + file.name + '?')
+                .ariaLabel('Lucky day')
+                .targetEvent(ev)
+                .clickOutsideToClose(false)
+                .escapeToClose(false)
+                .ok('Yes')
+                .cancel('No');
+            $mdDialog.show(confirm).then(function() {
+                QueryService.deleteFile(toDelete);
+            }, function() {});
+
+            GlobalControls.focusElement("md-dialog button.ng-enter-active");
+        }
+
+        function getGenes() {
             if (!checkFilesSelected()) {
                 return;
             }
@@ -94,9 +127,16 @@ angular.module('myApp.controllers').controller('FileController', [
                 vm.sharedData.matrixSummary = result.matrixSummary;
                 vm.sharedData.clearAllData = false;
             });
-        };
+        }
 
-        vm.uploadFiles = function() {
+        function showTooltip() {
+            stopTutorial();
+            $timeout(function() {
+                vm.showTooltip.button = true;
+            }, 250);
+        }
+
+        function uploadFiles() {
             if (!checkFilesToUpload()) {
                 return;
             }
@@ -106,35 +146,7 @@ angular.module('myApp.controllers').controller('FileController', [
                 $rootScope.state = $rootScope.states.initial;
                 vm.matrixUpload = { normal: null, tumor: null, delta: null };
             });
-        };
-
-        vm.deleteConfirm = function(ev, file) {
-            var toDelete = {};
-
-            for (var prop in file) {
-                if (prop.indexOf("$") < 0) {
-                    toDelete[prop] = file[prop];
-                }
-            }
-
-            ev.stopPropagation();
-            $mdSelect.hide();
-
-            var confirm = $mdDialog.confirm()
-                .title('Confirm Delete?')
-                .textContent('Are you sure you want to delete the file: ' + file.name + '?')
-                .ariaLabel('Lucky day')
-                .targetEvent(ev)
-                .clickOutsideToClose(false)
-                .escapeToClose(false)
-                .ok('Yes')
-                .cancel('No');
-            $mdDialog.show(confirm).then(function() {
-                QueryService.deleteFile(toDelete);
-            }, function() {});
-
-            GlobalControls.focusElement("md-dialog button.ng-enter-active");
-        };
+        }
 
         $scope.$watch(function() {
                 return vm.selectedNetworkType;
@@ -174,12 +186,5 @@ angular.module('myApp.controllers').controller('FileController', [
                 showTooltip();
             }
         }, true);
-
-        function showTooltip() {
-            stopTutorial();
-            $timeout(function() {
-                vm.showTooltip.button = true;
-            }, 250);
-        }
     }
 ]);
