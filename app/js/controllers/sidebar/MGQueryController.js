@@ -9,13 +9,22 @@ angular.module('myApp.controllers').controller('MGQueryController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl) {
+        vm.sharedData = SharedService.data.global;
+
+        vm.initializeController = initializeController;
+        vm.refreshGraph = refreshGraph;
+
+        vm.resize = GraphConfigService.resetZoom;
+        vm.locateGene = GraphConfigService.locateGene;
+
+        MainGraphControls.setMethods(vm);
+        GlobalControls.setMethodsSideBar(vm);
+
+        function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             intializeVariables();
-        };
-
-        vm.sharedData = SharedService.data.global;
+        }
 
         function intializeVariables() {
             vm.selectedItemFirst = null;
@@ -64,13 +73,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             vm.sdWithinTab.showGraphSummary = false;
         }
 
-        MainGraphControls.setMethods(vm);
-        GlobalControls.setMethodsSideBar(vm);
-
-        vm.resize = GraphConfigService.resetZoom;
-        vm.locateGene = GraphConfigService.locateGene;
-
-        vm.refreshGraph = function(filter) {
+        function refreshGraph(filter) {
             vm.clearLocatedGene();
             SharedService.resetWTM(vm);
             QueryService.getMainGraph(vm, filter).then(function(result) {
@@ -80,7 +83,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
 
                 $rootScope.state = $rootScope.states.loadingConfig;
                 vm.totalInteractions = result.data.totalInteractions;
-                
+
                 if (vm.sdWithinTab.display == GlobalControls.displayModes.table) {
                     vm.needsRedraw = true;
                 }
@@ -95,7 +98,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
                 vm.advanceGOIState(result.data, result.depth);
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
             });
-        };
+        }
 
         $scope.$watch(function() {
             if (vm.sdWithinTab && (vm.genesOfInterest != null && vm.genesOfInterest.length > 0) ||
@@ -105,7 +108,7 @@ angular.module('myApp.controllers').controller('MGQueryController', [
             return null;
         }, function(newValue, oldValue) {
             if (newValue != null && oldValue != null && newValue != oldValue) {
-                vm.refreshGraph(true);    
+                vm.refreshGraph(true);
             }
         });
 

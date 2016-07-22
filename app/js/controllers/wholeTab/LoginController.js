@@ -7,45 +7,33 @@ angular.module('myApp.controllers').controller('LoginController', [
     '$mdDialog',
     function($scope, $rootScope, RESTService, ValidationService, SharedService,
         $q, $timeout, $cookies, $mdDialog) {
-        $scope.ctrl = "login";
+        var vm = this;
+        vm.ctrl = "login";
 
         $rootScope.tokenSet = false;
-        $scope.user = { name: null, password: null, token: null };
+        vm.user = { name: null, password: null, token: null };
 
-        $scope.sharedData = SharedService.data.global;
+        vm.sharedData = SharedService.data.global;
 
-        $rootScope.$watch('tokenSet', function(newValue, oldValue) {
-            if (newValue == false && oldValue == true) {
-                $cookies.remove('token');
-                $scope.showLoginDialog();
-            }
-        });
+        vm.answer = answer;
+        vm.guestLogin = guestLogin;
+        vm.login = login;
 
-        $scope.checkToken = function() {
-            if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
-                $rootScope.tokenSet = true;
-                $scope.login();
-            } else {
-                $scope.showLoginDialog();
-            }
-        };
+        function answer(answer) {
+            $mdDialog.hide(answer);
+        }
 
-        $scope.showLoginDialog = function(ev) {
-            $mdDialog.show({
-                    controller: function() { this.parent = $scope; },
-                    controllerAs: 'ctrl',
-                    templateUrl: '/app/partials/dialogs/loginDialog.html',
-                    parent: angular.element(document.body),
-                    clickOutsideToClose: false,
-                    fullscreen: false,
-                    targetEvent: ev
-                });
-        };
+        function guestLogin() {
+            $rootScope.tokenSet = true;
+            vm.sharedData.guest = true;
+            vm.sharedData.reloadFileList = true;
+            $mdDialog.hide('');
+        }
 
-        $scope.login = function() {
-            RESTService.post('login', { user: $scope.user })
+        function login() {
+            RESTService.post('login', { user: vm.user })
                 .then(function(data) {
-                    $scope.user = { name: null, password: null, token: null };
+                    vm.user = { name: null, password: null, token: null };
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
                     } else {
@@ -57,23 +45,41 @@ angular.module('myApp.controllers').controller('LoginController', [
                             $cookies.put('token', data.token, { expires: exp });
                         }
 
-                        $scope.sharedData.reloadFileList = true;
+                        vm.sharedData.reloadFileList = true;
                         $mdDialog.hide('');
                     }
                 });
-        };
+        }
 
-        $scope.guestLogin = function() {
-            $rootScope.tokenSet = true;
-            $scope.sharedData.guest = true;
-            $scope.sharedData.reloadFileList = true;
-            $mdDialog.hide('');
-        };
+        function checkToken() {
+            if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
+                $rootScope.tokenSet = true;
+                login();
+            } else {
+                showLoginDialog();
+            }
+        }
 
-        $scope.answer = function(answer) {
-            $mdDialog.hide(answer);
-        };
+        function showLoginDialog(ev) {
+            $mdDialog.show({
+                controller: function() { this.vm = vm },
+                controllerAs: 'ctrl',
+                templateUrl: '/app/partials/dialogs/loginDialog.html',
+                parent: angular.element(document.body),
+                clickOutsideToClose: false,
+                fullscreen: false,
+                targetEvent: ev
+            });
+        }
 
-        $scope.checkToken();
+        $rootScope.$watch('tokenSet', function(newValue, oldValue) {
+            if (newValue == false && oldValue == true) {
+                $cookies.remove('token');
+                showLoginDialog();
+            }
+        });
+
+        $cookies.remove('token');
+        checkToken();
     }
 ]);

@@ -9,12 +9,7 @@ angular.module('myApp.controllers').controller('InteractionExplorerController', 
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl) {
-            vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
-            vm.sdWithinTab.display = vm.displayModes.graph;
-        };
-
+        vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.switchModel = false;
         vm.sharedData = SharedService.data.global;
@@ -25,5 +20,11 @@ angular.module('myApp.controllers').controller('InteractionExplorerController', 
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
 
         GlobalControls.setMethodsWholeTab(vm);
+        
+        function initializeController(ctrl) {
+            vm.ctrl = ctrl;
+            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab.display = vm.displayModes.graph;
+        }
     }
 ]);
