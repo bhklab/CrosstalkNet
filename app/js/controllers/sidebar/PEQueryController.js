@@ -9,11 +9,19 @@ angular.module('myApp.controllers').controller('PEQueryController', [
         var vm = this;
         vm.scope = $scope;
 
-        vm.initialize = function(ctrl) {
+        vm.initializeController = initializeController;
+        vm.refreshPaths = refreshPaths;
+        vm.setPathExplorerGene = setPathExplorerGene;
+
+        vm.sharedData = SharedService.data.global;
+        PathExistenceControls.setMethods(vm);
+        GlobalControls.setMethodsSideBar(vm);
+
+        function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
-        };
+        }
 
         function initializeVariables() {
             vm.pathExplorerSource = null;
@@ -25,11 +33,7 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             vm.sdWithinTab.allPaths = null;
         }
 
-        vm.sharedData = SharedService.data.global;
-        PathExistenceControls.setMethods(vm);
-        GlobalControls.setMethodsSideBar(vm);
-
-        vm.setPathExplorerGene = function(gene, which) {
+        function setPathExplorerGene(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
                     vm.pathExplorerSource = gene;
@@ -37,9 +41,9 @@ angular.module('myApp.controllers').controller('PEQueryController', [
                     vm.pathExplorerTarget = gene;
                 }
             }
-        };
+        }
 
-        vm.refreshPaths = function() {
+        function refreshPaths() {
             if (vm.pathExplorerTarget == null || vm.pathExplorerSource == null) {
                 alert("Please select a source and target gene.");
                 return;
