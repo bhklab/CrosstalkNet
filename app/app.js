@@ -7,6 +7,7 @@ angular.module('myApp', [
   'ngFileUpload',
   'md.data.table',
   'myApp.controllers',
+  'myApp.directives',
   'myApp.filters',
   'myApp.services',
 ]).config(function($mdThemingProvider) {
@@ -20,6 +21,7 @@ angular.module('myApp', [
     .accentPalette('orange');
 });
 
+angular.module('myApp.directives', []);
 angular.module('myApp.filters', []);
 angular.module('myApp.controllers', []);
 angular.module('myApp.services', []);

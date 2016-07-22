@@ -1,10 +1,22 @@
 'use strict';
+/**
+ * Controller for the QUERY sub-tab PATH EXISTENCE CHECKER tab.
+ * @namespace controllers
+ */
+(function() {
+    angular.module('myApp.controllers').controller('PEQueryController', [
+        '$scope',
+        '$rootScope', 'RESTService',
+        'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
+        PEQueryController
+    ]);
 
-angular.module('myApp.controllers').controller('PEQueryController', [
-    '$scope',
-    '$rootScope', 'RESTService',
-    'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, PathExistenceControls,
+    /**
+     * @namespace PEQueryController
+     * @desc Controller for the QUERY sub-tab in the PATH EXISTENCE CHECKER tab.
+     * @memberOf controllers
+     */
+    function PEQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, PathExistenceControls,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -17,12 +29,24 @@ angular.module('myApp.controllers').controller('PEQueryController', [
         PathExistenceControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 
+        /**
+         * @summary Assigns the ctrl property of the controller and sets the appropriate within 
+         * tab model based on the ctrl property.
+         *
+         * @param {String} ctrl A name to associate this controller with.
+         * @memberOf controllers.PEQueryController
+         */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
         }
 
+        /**
+         * @summary Initializes variables used within the tab for binding to the controls.
+         *
+         * @memberOf controllers.PEQueryController
+         */
         function initializeVariables() {
             vm.pathExplorerSource = null;
             vm.pathExplorerTarget = null;
@@ -33,6 +57,17 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             vm.sdWithinTab.allPaths = null;
         }
 
+        /**
+         * @summary Sets the path explorer gene source or target based 
+         * on the argument indicating the autocomplete box associated
+         * with the function call.
+         *
+         * @param {Object} gene The gene selected from the autocomplete control.
+         * @param {String} which An indicator variable used to determine which autocomplete
+         * control the selection came from. This in turn is used to decide between assigning
+         * either the source or target gene.
+         * @memberOf controllers.PEQueryController
+         */
         function setPathExplorerGene(gene, which) {
             if (gene != null) {
                 if (which == 'source') {
@@ -43,6 +78,13 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             }
         }
 
+        /**
+         * @summary Resets the data shown within the PATH EXISTENCE CHECKER
+         * tab and obtains all paths between the currently selected genes from
+         * the server.
+         *
+         * @memberOf controllers.PEQueryController
+         */
         function refreshPaths() {
             if (vm.pathExplorerTarget == null || vm.pathExplorerSource == null) {
                 alert("Please select a source and target gene.");
@@ -52,6 +94,15 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             SharedService.resetWTMPE(vm);
             vm.sdWithinTab.pathTargetCached = vm.pathExplorerTarget.value;
             vm.sdWithinTab.pathSourceCached = vm.pathExplorerSource.value;
+            getPathsFromServer();
+        }
+
+        /**
+         * @summary Obtains all paths between the currently selected genes from the server.
+         *
+         * @memberOf controllers.PEQueryController
+         */
+        function getPathsFromServer() {
             QueryService.getAllPaths(vm).then(function(result) {
                 if (result.allPaths == null) {
                     return;
@@ -63,6 +114,12 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             });
         }
 
+        /**
+         * @summary Watches the clearAllData variable and clears the data within the tab when 
+         * it changes to true.
+         *
+         * @memberOf controllers.PEQueryController
+         */
         $scope.$watch(function() {
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
@@ -72,4 +129,4 @@ angular.module('myApp.controllers').controller('PEQueryController', [
             }
         });
     }
-]);
+})();

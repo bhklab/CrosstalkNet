@@ -1,10 +1,23 @@
 'use strict';
+/**
+ * Controller for the DATA sub-tab in the MAIN GRAPH tab.
+ * @namespace controllers
+ */
 
-angular.module('myApp.controllers').controller('IEQueryController', [
-    '$scope',
-    '$rootScope', 'RESTService',
-    'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
-    function($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, InitializationService, ValidationService, SharedService, TableService,
+(function() {
+    angular.module('myApp.controllers').controller('IEQueryController', [
+        '$scope',
+        '$rootScope', 'RESTService',
+        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
+        IEQueryController
+    ]);
+
+    /**
+     * @namespace IEQueryController
+     * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
+     * @memberOf controllers
+     */
+    function IEQueryController($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, InitializationService, ValidationService, SharedService, TableService,
         QueryService, $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -21,12 +34,24 @@ angular.module('myApp.controllers').controller('IEQueryController', [
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
 
+        /**
+         * @summary Assigns the ctrl property of the controller and sets the appropriate within 
+         * tab model based on the ctrl property.
+         *
+         * @param {String} ctrl A name to associate this controller with.
+         * @memberOf controllers.IEQueryController
+         */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = SharedService.data[vm.ctrl];
             initializeVariables();
         }
 
+        /**
+         * @summary Initializes variables used within the tab for binding to the controls.
+         *
+         * @memberOf controllers.IEQueryController
+         */
         function initializeVariables() {
             vm.zoomGene = null;
             vm.searchTextGOI = "";
@@ -47,9 +72,25 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             vm.sdWithinTab.showGraphSummary = false;
         }
 
+        /**
+         * @summary Resets the data shown within the INTERACTION EXPLORER tab and
+         * obtains a cytoscape.js config for the current user query.
+         *
+         * @memberOf controllers.IEQueryController
+         */
         function refreshGraph() {
             vm.resetDisplayedData();
             SharedService.resetWTM(vm);
+            getConfigForGraph();
+        }
+
+        /**
+         * @summary Obtains a cytoscpape.js config from the server for the current
+         * user query.
+         *
+         * @memberOf controllers.IEQueryController
+         */
+        function getConfigForGraph() {
             QueryService.getInteractionExplorerConfig(vm).then(function(result) {
                 if (result.data == null) {
                     return;
@@ -66,7 +107,7 @@ angular.module('myApp.controllers').controller('IEQueryController', [
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
                 vm.explorerGenes = vm.loadExplorerDropdownOptions(vm.genesOfInterest);
-                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm);
+                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
                 $rootScope.state = $rootScope.states.showingGraph;
 
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.level, true);
@@ -76,6 +117,12 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             });
         }
 
+        /**
+         * @summary Watches the clearAllData variable and clears the data within the tab when 
+         * it changes to true.
+         *
+         * @memberOf controllers.IEQueryController
+         */
         $scope.$watch(function() {
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
@@ -86,6 +133,12 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             }
         });
 
+        /** 
+         * @summary Watches the selectedLayout variable and refreshes the graph when the 
+         * layout changes.
+         *
+         * @memberOf controllers.IEQueryController
+         */
         $scope.$watch(function() {
             if (vm.sdWithinTab && (vm.genesOfInterest != null && vm.genesOfInterest.length > 0)) {
                 return vm.sdWithinTab.selectedLayout;
@@ -97,6 +150,12 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             }
         });
 
+        /** 
+         * @summary Watches the display variable and redraws the graph when switching
+         * from the Tables view to the Graph view.
+         *
+         * @memberOf controllers.IEQueryController
+         */ 
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
                 return vm.sdWithinTab.display;
@@ -114,4 +173,5 @@ angular.module('myApp.controllers').controller('IEQueryController', [
             }
         });
     }
-]);
+
+})();

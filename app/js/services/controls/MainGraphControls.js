@@ -16,7 +16,7 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
                     vm.genesOfInterest.push(gene);
                 }
 
-                GlobalControls.resetInputFieldsLocal(vm, 'gene-input');
+                GlobalControls.resetInputFieldsLocal(vm.ctrl, 'gene-input');
                 GlobalControls.focusElement("md-autocomplete." + vm.ctrl + "gene-input" + " input");
             }
         };
@@ -72,7 +72,7 @@ myModule.factory('MainGraphControls', function($http, $rootScope, $timeout, Grap
             vm.genesOfInterest = [];
             vm.allVisibleGenes = [];
             GraphConfigService.destroyGraph(vm);
-            GlobalControls.resetInputFieldsLocal(vm, '');
+            GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
             GlobalControls.closeEdgeInspector(vm);
             vm.clearLocatedGene();
             vm.resetFilters();
