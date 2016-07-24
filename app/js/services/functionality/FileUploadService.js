@@ -1,78 +1,111 @@
-var myModule = angular.module("myApp.services");
-myModule.factory('FileUploadService', function($http, $timeout, $q, Upload, $rootScope, $cookies, RESTService, SharedService, QueryService) {
-    var service = {};
+'use strict';
+/**
+ * File uploading factory. Contains functions for reading files from the disk and 
+ * uplaoding them to the server.
+ * @namespace services
+ */
+(function() {
+    angular.module("myApp.services").factory('FileUploadService', FileUploadService);
 
-    service.uploadFiles = function(files, type) {
-        var deferred = $q.defer();
-        var filesToUpload = { normal: null, tumor: null, delta: null };
+    /**
+     * @namespace FileUploadService
+     * @desc Factory for uploading files to the server.
+     * @memberOf services
+     */
+    function FileUploadService($http, $timeout, $q, Upload, $rootScope, $cookies, RESTService, SharedService, QueryService) {
+        var service = {};
 
-        if (type == 'delta') {
-            if (files.delta == null || files.normal == null || files.tumor == null) {
-                alert("Please choose all 3 Rdata files");
-                deferred.resolve({ result: null });
-                return deferred.promise;
-            }
+        service.uploadFiles = uploadFiles;
 
-            readHelper(files.delta).then(function(result) {
-                filesToUpload.delta = result.file;
-                readHelper(files.normal).then(function(result) {
-                    filesToUpload.normal = result.file;
-                    readHelper(files.tumor).then(function(result) {
-                        filesToUpload.tumor = result.file;
+        /**
+         * @summary Checks to see if all files for the selected network
+         * type are selected, reads them from the disk, and uploads to the server.
+         *
+         * @param {Object} files An object containing the files selected by the user.
+         * @param {String} type The type of network that the user wants to upload.
+         * @return {Promise} A promise to be resolved when the request to the server is 
+         * complete.
+         */
+        function uploadFiles(files, type) {
+            var deferred = $q.defer();
+            var filesToUpload = { normal: null, tumor: null, delta: null };
 
-                        QueryService.uploadFiles(filesToUpload, type).then(function(result) {
-                            deferred.resolve({ result: null });
-                        });
-                    });
-                });
-            });
-        } else {
-            readHelper(files[type]).then(function(result) {
-                if (result.file == null) {
-                    alert("Please choose an Rdata file");
+            if (type == 'delta') {
+                if (files.delta == null || files.normal == null || files.tumor == null) {
+                    alert("Please choose all 3 Rdata files");
                     deferred.resolve({ result: null });
                     return deferred.promise;
                 }
 
-                filesToUpload[type] = result.file;
-                QueryService.uploadFiles(filesToUpload, type).then(function(result) {
-                    deferred.resolve({ result: null });
+                readHelper(files.delta).then(function(result) {
+                    filesToUpload.delta = result.file;
+                    readHelper(files.normal).then(function(result) {
+                        filesToUpload.normal = result.file;
+                        readHelper(files.tumor).then(function(result) {
+                            filesToUpload.tumor = result.file;
+
+                            QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                                deferred.resolve({ result: null });
+                            });
+                        });
+                    });
                 });
-            });
-        }
+            } else {
+                readHelper(files[type]).then(function(result) {
+                    if (result.file == null) {
+                        alert("Please choose an Rdata file");
+                        deferred.resolve({ result: null });
+                        return deferred.promise;
+                    }
 
-        return deferred.promise;
-    };
+                    filesToUpload[type] = result.file;
+                    QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                        deferred.resolve({ result: null });
+                    });
+                });
+            }
 
-    function readHelper(file) {
-        var deferred = $q.defer();
-
-        if (file == null) {
-            deferred.resolve({ file: null });
             return deferred.promise;
         }
 
-        var r = new FileReader();
-        r.onload = function(e) {
-            var contents = e.target.result;
-            var fileProperties = {};
+        /**
+         * @summary Reads the specified file's contents from the disk
+         * and into the browser.
+         *
+         * @param {File} file The file object representing the file to
+         * be read.
+         * @return {Promise} A promise to be resolved when the contents of
+         * the file are finished being read by the browser.
+         */
+        function readHelper(file) {
+            var deferred = $q.defer();
 
-            for (prop in file) {
-                if (prop.indexOf('$') < 0) {
-                    fileProperties[prop] = file[prop];
-                }
+            if (file == null) {
+                deferred.resolve({ file: null });
+                return deferred.promise;
             }
 
-            fileProperties.data = r.result;
+            var r = new FileReader();
+            r.onload = function(e) {
+                var contents = e.target.result;
+                var fileProperties = {};
 
-            deferred.resolve({ file: fileProperties });
+                for (var prop in file) {
+                    if (prop.indexOf('$') < 0) {
+                        fileProperties[prop] = file[prop];
+                    }
+                }
+
+                fileProperties.data = r.result;
+
+                deferred.resolve({ file: fileProperties });
+            }
+
+            r.readAsDataURL(file);
+
+            return deferred.promise;
         }
 
-        r.readAsDataURL(file);
-
-        return deferred.promise;
+        return service;
     }
-
-
-    return service;
-});
+})();
