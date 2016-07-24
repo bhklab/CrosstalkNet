@@ -8,7 +8,7 @@
     angular.module('myApp.controllers').controller('IEQueryController', [
         '$scope',
         '$rootScope', 'RESTService',
-        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
+        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
         IEQueryController
     ]);
 
@@ -17,7 +17,7 @@
      * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
      * @memberOf controllers
      */
-    function IEQueryController($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, InitializationService, ValidationService, SharedService, TableService,
+    function IEQueryController($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, ValidationService, SharedService, TableService,
         QueryService, $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
