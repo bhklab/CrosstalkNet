@@ -1,8 +1,4 @@
 'use strict';
-/**
- * Controller for the the login dialog.
- * @namespace controllers
- */
 
 (function() {
     angular.module('myApp.controllers').controller('LoginController', [
@@ -116,6 +112,8 @@
                 showLoginDialog();
             }
         });
+
+        $cookies.remove('token');
 
         checkToken();
     }

@@ -6,7 +6,7 @@
 (function() {
     angular.module('myApp.controllers').controller('MainGraphController', ['$scope',
         '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'InitializationService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
+        'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
         '$mdDialog',
         MainGraphController
     ]);
@@ -18,7 +18,7 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function MainGraphController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, InitializationService, ValidationService, SharedService, TableService, QueryService,
+    function MainGraphController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, ValidationService, SharedService, TableService, QueryService,
         $q, $timeout, $cookies, $mdDialog) {
         var vm = this;
         vm.scope = $scope;
