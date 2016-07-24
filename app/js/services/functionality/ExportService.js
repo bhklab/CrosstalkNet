@@ -1,127 +1,101 @@
-var myModule = angular.module("myApp.services");
-myModule.factory('ExportService', function($http, $filter) {
-    var service = {};
+'use strict';
+/**
+ * Exporting factory. Contains functions that are used to export tables to csv
+ * files and graphs to png's.
+ * @namespace services
+ */
+(function() {
+    angular.module("myApp.services").factory('ExportService', ExportService);
 
-    service.exportTableToCSV = exportTableToCSV;
-    service.exportNeighboursToCSV = exportNeighboursToCSV;
-    service.exportGraphToPNG = exportGraphToPNG;
+    /**
+     * @namespace ExportService
+     * @desc Factory for exporting data to files.
+     * @memberOf services
+     */
+    function ExportService($http, $filter) {
+        var service = {};
 
-    function exportTableToCSV($table, filename) {
-        var filename = "allPaths" + Date.now() + ".csv";
-        var $headers = $table.find('tr:has(th)'),
-            $rows = $table.find('tr:has(td)')
-            // Temporary delimiter characters unlikely to be typed by keyboard
-            // This is to avoid accidentally splitting the actual contents
-            ,
-            tmpColDelim = String.fromCharCode(11) // vertical tab character
-            ,
-            tmpRowDelim = String.fromCharCode(0) // null character
-            // actual delimiter characters for CSV format
-            ,
-            colDelim = '","',
-            rowDelim = '"\r\n"';
-        // Grab text from table into CSV formatted string
-        var csv = '"';
-        csv += formatRows($headers.map(grabRow));
-        csv += rowDelim;
-        csv += formatRows($rows.map(grabRow)) + '"';
-        // Data URI
-        var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
-        $(this)
-            .attr({
-                'download': filename,
-                'href': csvData
-                    //,'target' : '_blank' //if you want it to open in a new window
-            });
-        //------------------------------------------------------------
-        // Helper Functions 
-        //------------------------------------------------------------
-        // Format the output so it has the appropriate delimiters
-        function formatRows(rows) {
-            return rows.get().join(tmpRowDelim)
-                .split(tmpRowDelim).join(rowDelim)
-                .split(tmpColDelim).join(colDelim);
-        }
-        // Grab and format a row from the table
-        function grabRow(i, row) {
+        service.exportNeighboursToCSV = exportNeighboursToCSV;
+        service.exportGraphToPNG = exportGraphToPNG;
 
-            var $row = $(row);
-            //for some reason $cols = $row.find('td') || $row.find('th') won't work...
-            var $cols = $row.find('td');
-            if (!$cols.length) $cols = $row.find('th');
-            return $cols.map(grabCol)
-                .get().join(tmpColDelim);
-        }
-        // Grab and format a column from the table 
-        function grabCol(j, col) {
-            var $col = $(col),
-                $text = $col.text();
-            return $text.replace('"', '""'); // escape double quotes
-        }
-    }
+        /**
+         * @summary Exports a specified table of data to a csv file.
+         *
+         * @param {Object} vm A view model for a controller. This is used
+         * to obtain the interactions for that controller.
+         * @param {Number} index The level of neighbours that are desired.
+         * @param {String} networkType A string indicating whether the network type is
+         * weight, normal, or tumor. 
+         */
+        function exportNeighboursToCSV(vm, index, networkType) {
+            var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
+            var neighbours = vm.sdWithinTab.neighbours[index];
+            var rowDelim = "\r\n";
+            var colDelim = ",";
+            var csv = "";
+            var header = colDelim + neighbours.stroma.map(function(s) {
+                return s; //return $filter('suffixTrim')(s);
+            }).join();
+            csv += header;
+            csv += rowDelim;
 
-    function exportNeighboursToCSV(vm, index, networkType) {
-        var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
-        var neighbours = vm.sdWithinTab.neighbours[index];
-        var rowDelim = "\r\n";
-        var colDelim = ",";
-        var csv = "";
-        var header = colDelim + neighbours.stroma.map(function(s) {
-            return s; //return $filter('suffixTrim')(s);
-        }).join();
-        csv += header;
-        csv += rowDelim;
+            for (var i = 0; i < neighbours.epi.length; i++) {
+                var temp = [];
+                //temp.push($filter('suffixTrim')(neighbours.epi[i]));
+                temp.push(neighbours.epi[i]);
+                for (var j = 0; j < neighbours.stroma.length; j++) {
+                    temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j], networkType));
+                }
 
-        for (var i = 0; i < neighbours.epi.length; i++) {
-            var temp = [];
-            //temp.push($filter('suffixTrim')(neighbours.epi[i]));
-            temp.push(neighbours.epi[i]);
-            for (var j = 0; j < neighbours.stroma.length; j++) {
-                temp.push(vm.getInteractionViaDictionary(vm, neighbours.epi[i], neighbours.stroma[j], networkType));
+                csv += temp.join();
+                csv += rowDelim;
             }
 
-            csv += temp.join();
-            csv += rowDelim;
+            var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+            var link = document.createElement("a");
+            link.setAttribute("href", csvData);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
-        var link = document.createElement("a");
-        link.setAttribute("href", csvData);
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        /** 
+         * @summary Downloads the currently displayed graph as a png.
+         *
+         * @param {Object} vm A view model for the current controller
+         * that has a cytoscape object in its within-tab shared data.
+         */
+        function exportGraphToPNG(vm) {
+            if (vm.sdWithinTab.cy == null) {
+                return;
+            }
+
+            var fileName = "graph" + Date.now() + ".png";
+            var png64 = vm.sdWithinTab.cy.png({ full: true });
+            png64 = png64.substring("data:image/png;base64,".length);
+
+            var byteCharacters = atob(png64);
+
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            var blob = new Blob([byteArray], { type: "image/png" });
+            var dataURL = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.style.display = 'none';
+            link.setAttribute("href", dataURL);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        return service;
     }
-
-    function exportGraphToPNG(vm) {
-        if (vm.sdWithinTab.cy == null) {
-            return;
-        }
-
-        var fileName = "graph" + Date.now() + ".png";
-        var png64 = vm.sdWithinTab.cy.png({ full: true });
-        png64 = png64.substring("data:image/png;base64,".length);
-
-        var byteCharacters = atob(png64);
-
-        var byteNumbers = new Array(byteCharacters.length);
-        for (var i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-
-        var byteArray = new Uint8Array(byteNumbers);
-
-        var blob = new Blob([byteArray], {type: "image/png"});
-        var dataURL = URL.createObjectURL(blob);
-
-        var link = document.createElement("a");
-        link.style.display = 'none';
-        link.setAttribute("href", dataURL);
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    return service;
-});
+})();

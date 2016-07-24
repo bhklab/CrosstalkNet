@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('MGQueryController', [
         '$scope',
         '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
+        'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
         MGQueryController
     ]);
 
@@ -16,7 +16,7 @@
      * @desc Controller for the QUERY sub-tab in the MAIN GRAPH tab.
      * @memberOf controllers
      */
-    function MGQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, InitializationService, ValidationService, SharedService, QueryService, TableService,
+    function MGQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, ValidationService, SharedService, QueryService, TableService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;

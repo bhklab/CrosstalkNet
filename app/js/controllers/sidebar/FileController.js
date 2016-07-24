@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('FileController', [
         '$scope',
         '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
+        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
         FileController
     ]);
 
@@ -16,7 +16,7 @@
      * @desc Controller for getting, uploading, and deleting files.
      * @memberOf controllers
      */
-    function FileController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, FileUploadService,
+    function FileController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, FileUploadService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
