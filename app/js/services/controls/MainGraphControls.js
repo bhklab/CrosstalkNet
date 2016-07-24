@@ -123,10 +123,20 @@
                 }
             }
 
-            
+            /**
+             * @summary Removes all genes of interest and resets all data within the
+             * tab.
+             */
             function removeGenesOfInterest() {
-                vm.GOIState = vm.GOIStates.initial;
                 vm.genesOfInterest = [];
+                resetAllData();
+            }
+
+            /**
+             * @summary Resets all data within the tab.
+             */
+            function resetAllData() {
+                vm.GOIState = vm.GOIStates.initial;
                 vm.allVisibleGenes = [];
                 GraphConfigService.destroyGraph(vm);
                 GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
@@ -136,6 +146,10 @@
                 SharedService.resetWTM(vm);
             }
 
+            /**
+             * @summary Enables the user to go back to filtering first
+             * neighbours after having already obtained second neighbours.
+             */
             function returnToFirstNeighboursFilter() {
                 vm.GOIState = vm.GOIStates.filterFirst;
                 vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
