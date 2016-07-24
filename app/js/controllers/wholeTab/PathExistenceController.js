@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('PathExistenceController', [
         '$scope',
         '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'ExportService', '$q', '$timeout',
+        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'ExportService', '$q', '$timeout',
         PathExistenceController
     ]);
 
@@ -18,7 +18,7 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function PathExistenceController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, ExportService,
+    function PathExistenceController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, ExportService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;

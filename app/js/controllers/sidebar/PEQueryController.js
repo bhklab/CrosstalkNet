@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('PEQueryController', [
         '$scope',
         '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'InitializationService', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
+        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
         PEQueryController
     ]);
 
@@ -16,7 +16,7 @@
      * @desc Controller for the QUERY sub-tab in the PATH EXISTENCE CHECKER tab.
      * @memberOf controllers
      */
-    function PEQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, InitializationService, ValidationService, SharedService, QueryService, PathExistenceControls,
+    function PEQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, PathExistenceControls,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
