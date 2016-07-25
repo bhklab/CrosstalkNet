@@ -6,8 +6,9 @@
 (function() {
     angular.module('myApp.controllers').controller('PEQueryController', [
         '$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
+        '$rootScope',
+        'GlobalControls', 'SharedService', 'QueryService', 'PathExistenceControls',
+        'PESharedData',
         PEQueryController
     ]);
 
@@ -16,8 +17,8 @@
      * @desc Controller for the QUERY sub-tab in the PATH EXISTENCE CHECKER tab.
      * @memberOf controllers
      */
-    function PEQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, PathExistenceControls,
-        $q, $timeout) {
+    function PEQueryController($scope, $rootScope, GlobalControls, SharedService, QueryService, PathExistenceControls,
+        PESharedData) {
         var vm = this;
         vm.scope = $scope;
 
@@ -38,7 +39,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = PESharedData.data;
             initializeVariables();
         }
 
@@ -91,7 +92,7 @@
                 return;
             }
 
-            SharedService.resetWTMPE(vm);
+            PESharedData.resetWTM(vm);
             vm.sdWithinTab.pathTargetCached = vm.pathExplorerTarget.value;
             vm.sdWithinTab.pathSourceCached = vm.pathExplorerSource.value;
             getPathsFromServer();
@@ -125,7 +126,7 @@
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 initializeVariables();
-                SharedService.resetWTMPE(vm);
+                PESharedData.resetWTM(vm);
             }
         });
     }

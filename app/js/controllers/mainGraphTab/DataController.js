@@ -8,6 +8,7 @@
         '$scope',
         '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
+        'MGSharedData',
         DataController
     ]);
 
@@ -17,7 +18,7 @@
      * @memberOf controllers
      */
     function DataController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, FileUploadService,
-        $q, $timeout) {
+        $q, $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
@@ -58,7 +59,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = MGSharedData.data;
             initializeVariables();
         }
 

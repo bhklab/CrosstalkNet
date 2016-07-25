@@ -8,6 +8,7 @@
         '$scope',
         '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
+        'MGSharedData',
         MGQueryController
     ]);
 
@@ -17,7 +18,7 @@
      * @memberOf controllers
      */
     function MGQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, ValidationService, SharedService, QueryService, TableService,
-        $q, $timeout) {
+        $q, $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
@@ -41,7 +42,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = MGSharedData.data;
             intializeVariables();
         }
 
@@ -105,7 +106,7 @@
          */
         function refreshGraph(filter) {
             vm.clearLocatedGene();
-            SharedService.resetWTM(vm);
+            MGSharedData.resetWTM(vm);
             getConfigForGraph(filter);
         }
 
@@ -154,7 +155,7 @@
             if (newValue == true && newValue != oldValue) {
                 intializeVariables();
                 GraphConfigService.destroyGraph(vm);
-                SharedService.resetWTM(vm);
+                MGSharedData.resetWTM(vm);
             }
         });
 

@@ -49,6 +49,9 @@
     <script src="js/services/functionality/RESTService.js"></script>
     <script src="js/services/functionality/FileUploadService.js"></script>
     <script src="js/services/functionality/SharedService.js"></script>
+    <script src="js/services/functionality/IESharedData.js"></script>
+    <script src="js/services/functionality/MGSharedData.js"></script>
+    <script src="js/services/functionality/PESharedData.js"></script>
     <script src="js/services/functionality/QueryService.js"></script>
     <script src="js/services/functionality/ValidationService.js"></script>
     <script src="js/services/functionality/TableService.js"></script>
@@ -93,7 +96,7 @@
                                     <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div static-include="partials/MGTab/tableView.html"></div>
+                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/MGTab/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
@@ -112,7 +115,7 @@
                                     <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div static-include="partials/IETab/tableView.html"></div>
+                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/IETab/tableView.html"></div>
                             </md-content>
                         </section>
                     </md-content>

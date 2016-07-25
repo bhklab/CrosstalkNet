@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('MainGraphController', ['$scope',
         '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
-        '$mdDialog',
+        '$mdDialog', 'MGSharedData',
         MainGraphController
     ]);
 
@@ -19,7 +19,7 @@
      * @memberOf controllers
      */
     function MainGraphController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, ValidationService, SharedService, TableService, QueryService,
-        $q, $timeout, $cookies, $mdDialog) {
+        $q, $timeout, $cookies, $mdDialog, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
@@ -44,7 +44,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = MGSharedData.data;
             vm.sdWithinTab.display = vm.displayModes.graph;
         }
     }
