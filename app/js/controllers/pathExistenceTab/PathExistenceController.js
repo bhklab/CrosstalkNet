@@ -5,9 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('PathExistenceController', [
-        '$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'ExportService', '$q', '$timeout',
+        'GraphConfigService', 'GlobalControls', 'SharedService', 'PESharedData',
         PathExistenceController
     ]);
 
@@ -18,10 +16,8 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function PathExistenceController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, ExportService,
-        $q, $timeout) {
+    function PathExistenceController(GraphConfigService, GlobalControls, SharedService, PESharedData) {
         var vm = this;
-        vm.scope = $scope;
 
         vm.exportTableToCSV = exportTableToCSV;
         vm.initializeController = initializeController;
@@ -38,7 +34,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = PESharedData.data;
             vm.sdWithinTab.display = vm.displayModes.table;
         }
 

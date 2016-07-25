@@ -7,8 +7,9 @@
 (function() {
     angular.module('myApp.controllers').controller('IEQueryController', [
         '$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout',
+        '$rootScope',
+        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'SharedService', 'TableService', 'QueryService', '$timeout',
+        'IESharedData',
         IEQueryController
     ]);
 
@@ -17,8 +18,8 @@
      * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
      * @memberOf controllers
      */
-    function IEQueryController($scope, $rootScope, RESTService, GraphConfigService, InteractionExplorerControls, GlobalControls, ValidationService, SharedService, TableService,
-        QueryService, $q, $timeout) {
+    function IEQueryController($scope, $rootScope, GraphConfigService, InteractionExplorerControls, GlobalControls, SharedService, TableService,
+        QueryService, $timeout, IESharedData) {
         var vm = this;
         vm.scope = $scope;
         vm.allowAdditionalGenes = true;
@@ -43,7 +44,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = IESharedData.data;
             initializeVariables();
         }
 
@@ -80,7 +81,7 @@
          */
         function refreshGraph() {
             vm.resetDisplayedData();
-            SharedService.resetWTM(vm);
+            IESharedData.resetWTM(vm);
             getConfigForGraph();
         }
 
