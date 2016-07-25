@@ -113,8 +113,6 @@
             }
         });
 
-        $cookies.remove('token');
-
         checkToken();
     }
 })();

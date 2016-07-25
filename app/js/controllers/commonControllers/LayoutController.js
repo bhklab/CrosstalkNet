@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('LayoutController', [
-        '$scope',
+        'vm',
         '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', '$q', '$timeout',
         LayoutController
@@ -16,11 +16,8 @@
      * @desc Controller for the LAYOUT sub-tab.
      * @memberOf controllers
      */
-    function LayoutController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService,
+    function LayoutController(vm, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService,
         $q, $timeout) {
-        var vm = this;
-        vm.scope = $scope;
-
         vm.resize = GraphConfigService.resetZoom;
         vm.initializeController = initializeController;
 

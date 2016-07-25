@@ -1,0 +1,22 @@
+<md-content>
+    <div class="md-padding">
+        <h2 class="md-subhead">Top {{vm.topXSlider}} Genes By Degree</h2>
+        <div layout="row">
+            <md-slider class="right-padded-25" flex min="1" max="{{vm.sharedData.geneList.length/2}}" ng-model="vm.topXSlider" aria-label="red" id="top-x-genes" class>
+            </md-slider>
+            <div flex="20" layout layout-align="center center">
+                <input flex type="number" min="1" max="{{vm.sharedData.geneList.length/2}}" ng-model="vm.topXSlider" aria-label="red" aria-controls="top-x-genes">
+            </div>
+        </div>
+        <md-button class="md-raised md-primary" ng-click="vm.getTopGenes('top')">Get Top Genes</md-button>
+        <h2 class="md-subhead">Genes With Degree {{vm.minDegreeSlider}} Or Higher</h2>
+        <div layout="row">
+            <md-slider class="right-padded-25" flex="75" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" id="min-degree-genes" class>
+            </md-slider>
+            <div flex="20" layout layout-align="center center">
+                <input flex type="number" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" aria-controls="min-degree-genes">
+            </div>
+        </div>
+        <md-button class="md-raised md-primary" ng-click="vm.getTopGenes('min')">Get Top Genes</md-button>
+    </div>
+</md-content>
