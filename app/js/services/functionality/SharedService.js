@@ -24,6 +24,7 @@
             reloadFileList: false,
             correlationFileActual: angular.copy(correlationFileModel),
             geneList: null,
+            maxDegree: 0,
             matrixSummary: null,
             selectedNetworkType: networkTypes.tumor,
             clearAllData: false,
@@ -32,6 +33,8 @@
         };
 
         service.data = { global: angular.copy(globalDataModel) };
+
+        service.geneCardURL = "http://www.genecards.org/cgi-bin/carddisp.pl?gene=";
 
         // Object representing the different states that the app can be in.
         service.states = {
@@ -71,13 +74,34 @@
         /** Object representing variables to be available between the various controllers
          * within the PATH EXISTENCE CHECKER tab.
          */
+        var paginationModel = {
+            options: {
+                rowSelection: true,
+                multiSelect: true,
+                autoSelect: true,
+                decapitate: false,
+                largeEditDialog: false,
+                boundaryLinks: false,
+                limitSelect: true,
+                pageSelect: true
+            },
+            query: {
+                limit: 50,
+                page: 1
+            },
+            limitOptions: [50, 100, 200]
+        };
+
         var withinTabModelPE = { pathSourceCached: null, pathTargetCached: null, allPaths: null, display: null, types: null, tableOrder: angular.copy(tableOrderModel) };
+        var withinTabModelDE = { filterAmount: 1, filterType: null, topGenes: null, pagination: {epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel)}};
 
         service.data.main = angular.copy(withinTabModelGraph);
         service.data.interactionExplorer = angular.copy(withinTabModelGraph);
         service.data.pathExistence = angular.copy(withinTabModelPE);
+        service.data.degreeExplorer = angular.copy(withinTabModelDE);
         service.resetWTM = resetWTM;
         service.resetWTMPE = resetWTMPE;
+        service.resetWTMDE = resetWTMDE;
         service.resetCorrelationFiles = resetCorrelationFiles;
         service.resetMatrixSummary = resetMatrixSummary;
         service.resetGeneList = resetGeneList;
@@ -113,6 +137,23 @@
                 } else if (prop != "display") {
                     vm.sdWithinTab[prop] = withinTabModelPE[prop];
                 }
+            }
+        }
+
+        /**
+         * @summary Resets the within tab variables for a given view model.
+         * This is used for the MIN DEGREE EXPLORER tab.
+         *
+         * @param {Object} vm A view model whose within-tab shared data will
+         * be reset to the initial state.
+         */
+        function resetWTMDE(vm) {
+            for (var prop in withinTabModelDE) {
+                if (prop == "pagination") {
+                    vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
+                    vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
+                }
+                vm.sdWithinTab[prop] = withinTabModelDE[prop];
             }
         }
 

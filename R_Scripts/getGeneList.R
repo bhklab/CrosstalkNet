@@ -8,7 +8,13 @@ pValue <- settings$pValue
 fileName <- settings$fileName
 path <- settings$path
 
-degrees <- readFileWithValidation(paste(path, 'degrees', fileName, sep=""))	
+degrees <- readFileWithValidation(paste(path, fileName, sep=""))	
+if (degrees$epiDegree[1] > degrees$stromaDegree[1])  {
+	maxDegree <- degrees$epiDegree[1]
+} else {
+	maxDegree <- degrees$stromaDegree[1]
+}
 
-output <- list(epiDegrees = degrees$epiDegree, epiDegreesNames = names(degrees$epiDegree), stromaDegrees = degrees$stromaDegree, stromaDegreesNames = names(degrees$stromaDegree))
+output <- list(epiDegrees = degrees$epiDegree, epiGeneNames = names(degrees$epiDegree), stromaDegrees = degrees$stromaDegree, stromaGeneNames = names(degrees$stromaDegree),
+			maxDegree = maxDegree)
 cat(format(toJSON(output, auto_unbox = TRUE)))

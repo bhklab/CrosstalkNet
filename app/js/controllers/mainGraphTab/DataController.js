@@ -4,19 +4,19 @@
  * @namespace 
  */
 (function() {
-    angular.module('myApp.controllers').controller('FileController', [
+    angular.module('myApp.controllers').controller('DataController', [
         '$scope',
         '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
         'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
-        FileController
+        DataController
     ]);
 
     /**
-     * @namespace FileController
+     * @namespace DataController
      * @desc Controller for getting, uploading, and deleting files.
      * @memberOf controllers
      */
-    function FileController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, FileUploadService,
+    function DataController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, FileUploadService,
         $q, $timeout) {
         var vm = this;
         vm.scope = $scope;
@@ -180,6 +180,7 @@
         function getGeneList() {
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.geneList = result.geneList;
+                vm.sharedData.maxDegree = result.maxDegree;
                 $rootScope.dataLoaded = true;
                 vm.sdWithinTab.selectedTab = 1;
                 stopTutorial();

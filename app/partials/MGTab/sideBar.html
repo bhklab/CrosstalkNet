@@ -12,13 +12,13 @@
     <md-content>
         <md-tabs md-selected="vm.sdWithinTab.selectedTab" md-dynamic-height md-border-bottom md-disable-animation>
             <md-tab label="Data" class="md-padding">
-                <div ng-controller="FileController as vm" ng-init="vm.initializeController('main')" static-include="partials/SideBar/data/dataTab.html"></div>
+                <div ng-controller="DataController as vm" ng-init="vm.initializeController('main')" static-include="partials/MGTab/subTabs/data/data.html"></div>
             </md-tab>
             <md-tab ng-if="dataLoaded" label="Query" class="md-padding">
-                <div ng-controller="MGQueryController as vm" ng-init="vm.initializeController('main')" static-include="partials/SideBar/query/main.html"></div>
+                <div ng-controller="MGQueryController as vm" ng-init="vm.initializeController('main')" static-include="partials/MGTab/subTabs/query/query.html"></div>
             </md-tab>
             <md-tab ng-if="dataLoaded" label="Styling">
-                <div ng-controller="LayoutController as vm" ng-init="vm.initializeController('main')" static-include="partials/SideBar/layout/main.html"></div>
+                <div ng-controller="MGLayoutController as vm" ng-init="vm.initializeController('main')" static-include="partials/MGTab/subTabs/layout/layout.html"></div>
             </md-tab>
         </md-tabs>
     </md-content>

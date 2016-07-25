@@ -9,6 +9,7 @@
 
 const TYPES = { real: "real", fake: "fake", personal: "personal" };
 const SUB_TYPES = { normal: "normal", tumor: "tumor", delta: "delta" };
+const DEGREES_FILE_PREFIX = "degrees";
 
 const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
@@ -105,6 +106,10 @@ function getRequestedFile(selectedFiles, user) {
     return file;
 }
 
+function getCorrespondingDegreesFileName(file) {
+    return DEGREES_FILE_PREFIX + file.name;
+}
+
 /**
  * @summary Matches the front ends files in selected files and returns
  * the corresponding Files from the availableMatrixCache.
@@ -115,7 +120,7 @@ function getRequestedFile(selectedFiles, user) {
  * in TYPES. This specifies what type of network the request, and the function 
  * uses this in order to determine the right number of files to return.
  * @param {User} user The User for which to obtain the Files. 
- * @return An object containing the Files specified.
+ * @return {Object} An object containing the Files specified.
  */
 function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
     var result = { normal: null, tumor: null, delta: null, degree: null };
@@ -332,5 +337,6 @@ module.exports = {
     createDirectory: createDirectory,
     updateAvailableMatrixCache: updateAvailableMatrixCache,
     getAccessibleMatricesForUser: getAccessibleMatricesForUser,
-    createavailableMatrixCache: createavailableMatrixCache
+    createavailableMatrixCache: createavailableMatrixCache,
+    getCorrespondingDegreesFileName: getCorrespondingDegreesFileName
 };
