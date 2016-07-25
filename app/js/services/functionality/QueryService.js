@@ -24,6 +24,7 @@
         service.uploadFiles = uploadFiles;
         service.deleteFile = deleteFile;
         service.getUserPermission = getUserPermission;
+        service.getTopGenes = getTopGenes;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -41,11 +42,11 @@
             RESTService.post('gene-list', { selectedFile: files })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
-                        deferred.resolve({ geneList: null });
+                        deferred.resolve({ geneList: null , maxDegree: 0});
                     }
 
                     $rootScope.state = $rootScope.states.initial;
-                    deferred.resolve({ geneList: data.geneList });
+                    deferred.resolve({ geneList: data.geneList, maxDegree: data.maxDegree });
                 });
             return deferred.promise;
         }
@@ -286,6 +287,27 @@
                     }
 
                     deferred.resolve({ permission: data.permission });
+                }, function(response) {
+                    console.log(response);
+                });
+
+            return deferred.promise;
+        }
+
+        function getTopGenes(vm) {
+            var deferred = $q.defer();
+
+            RESTService.post('min-degree-genes', {
+                    selectedFile: vm.sharedData.correlationFileActual,
+                    filterAmount: vm.sdWithinTab.filterAmount,
+                    filterType: vm.sdWithinTab.filterType
+                })
+                .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        deferred.resolve({ topGenes: null });
+                    }
+
+                    deferred.resolve({ topGenes: data.topGenes });
                 }, function(response) {
                     console.log(response);
                 });

@@ -8,8 +8,7 @@
         .filter('capitalize', capitalize);
 
     /**
-     * @namespace capitalize
-     * @desc Capitalization filter
+     * @desc Capitalization filter.
      * @memberOf filters
      */
     function capitalize() {
