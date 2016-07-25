@@ -4,10 +4,8 @@
  * @namespace controllers
  */
 (function() {
-    angular.module('myApp.controllers').controller('InteractionExplorerController', ['$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
-        '$mdDialog',
+    angular.module('myApp.controllers').controller('InteractionExplorerController', ['GlobalControls', 
+        'ExportService', 'SharedService', 'TableService', 'IESharedData',
         InteractionExplorerController
     ]);
 
@@ -18,10 +16,9 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function InteractionExplorerController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, ValidationService, SharedService, TableService, QueryService,
-        $q, $timeout, $cookies, $mdDialog) {
+    function InteractionExplorerController(GlobalControls, ExportService, SharedService, TableService,
+        IESharedData) {
         var vm = this;
-        vm.scope = $scope;
 
         vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
@@ -44,7 +41,7 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = IESharedData.data;
             vm.sdWithinTab.display = vm.displayModes.graph;
         }
     }
