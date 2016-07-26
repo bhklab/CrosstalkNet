@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('PEQueryController', [
         '$scope',
         '$rootScope',
-        'GlobalControls', 'SharedService', 'QueryService', 'PathExistenceControls',
+        'GlobalControls', 'GlobalSharedData', 'QueryService', 'PathExistenceControls',
         'PESharedData',
         PEQueryController
     ]);
@@ -17,7 +17,7 @@
      * @desc Controller for the QUERY sub-tab in the PATH EXISTENCE CHECKER tab.
      * @memberOf controllers
      */
-    function PEQueryController($scope, $rootScope, GlobalControls, SharedService, QueryService, PathExistenceControls,
+    function PEQueryController($scope, $rootScope, GlobalControls, GlobalSharedData, QueryService, PathExistenceControls,
         PESharedData) {
         var vm = this;
         vm.scope = $scope;
@@ -26,7 +26,7 @@
         vm.refreshPaths = refreshPaths;
         vm.setPathExplorerGene = setPathExplorerGene;
 
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
         PathExistenceControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 

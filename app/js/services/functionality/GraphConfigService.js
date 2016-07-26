@@ -12,7 +12,7 @@
      * @desc Factory for interacting with cytoscape.js graphs and resetting their state.
      * @memberOf services
      */
-    function GraphConfigService($http) {
+    function GraphConfigService() {
         var service = {};
 
         service.tabNames = { main: "main", neighbour: "neighbour" };

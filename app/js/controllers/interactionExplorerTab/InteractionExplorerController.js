@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('InteractionExplorerController', ['GlobalControls', 
-        'ExportService', 'SharedService', 'TableService', 'IESharedData',
+        'ExportService', 'GlobalSharedData', 'TableService', 'IESharedData',
         InteractionExplorerController
     ]);
 
@@ -16,14 +16,14 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function InteractionExplorerController(GlobalControls, ExportService, SharedService, TableService,
+    function InteractionExplorerController(GlobalControls, ExportService, GlobalSharedData, TableService,
         IESharedData) {
         var vm = this;
 
         vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.switchModel = false;
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
         vm.changeDisplay = GlobalControls.changeDisplay;
         vm.closeEdgeInspector = GlobalControls.closeEdgeInspector;
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;

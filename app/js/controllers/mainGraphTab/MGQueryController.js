@@ -6,8 +6,8 @@
 (function() {
     angular.module('myApp.controllers').controller('MGQueryController', [
         '$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'ValidationService', 'SharedService', 'QueryService', 'TableService', '$q', '$timeout',
+        '$rootScope',
+        'GraphConfigService', 'GlobalControls', 'MainGraphControls', 'GlobalSharedData', 'QueryService', 'TableService', '$timeout',
         'MGSharedData',
         MGQueryController
     ]);
@@ -17,12 +17,12 @@
      * @desc Controller for the QUERY sub-tab in the MAIN GRAPH tab.
      * @memberOf controllers
      */
-    function MGQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, MainGraphControls, ValidationService, SharedService, QueryService, TableService,
-        $q, $timeout, MGSharedData) {
+    function MGQueryController($scope, $rootScope, GraphConfigService, GlobalControls, MainGraphControls, GlobalSharedData, QueryService, TableService,
+        $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         vm.initializeController = initializeController;
         vm.refreshGraph = refreshGraph;

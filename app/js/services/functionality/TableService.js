@@ -15,7 +15,7 @@
      * @desc Factory for getting interactions to be displayed in tables.
      * @memberOf services
      */
-    function TableService($http, $rootScope) {
+    function TableService() {
         var service = {};
 
         service.getInteractionViaDictionary = getInteractionViaDictionary;

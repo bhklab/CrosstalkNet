@@ -5,8 +5,8 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('MainGraphController', ['$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ExportService', 'FileUploadService', 'ValidationService', 'SharedService', 'TableService', 'QueryService', '$q', '$timeout', '$cookies',
+        '$rootScope', 
+        'GlobalControls', 'ExportService', 'GlobalSharedData', 'TableService',
         '$mdDialog', 'MGSharedData',
         MainGraphController
     ]);
@@ -18,8 +18,8 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function MainGraphController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ExportService, FileUploadService, ValidationService, SharedService, TableService, QueryService,
-        $q, $timeout, $cookies, $mdDialog, MGSharedData) {
+    function MainGraphController($scope, $rootScope, GlobalControls, ExportService, GlobalSharedData, TableService,
+        $mdDialog, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
@@ -28,7 +28,7 @@
         vm.initializeController = initializeController;
         vm.displayModes = angular.copy(GlobalControls.displayModes);
         vm.switchModel = false;
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
         vm.changeDisplay = GlobalControls.changeDisplay;
         vm.closeEdgeInspector = GlobalControls.closeEdgeInspector;
         vm.getInteractionViaDictionary = TableService.getInteractionViaDictionary;
