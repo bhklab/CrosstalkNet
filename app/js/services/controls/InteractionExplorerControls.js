@@ -12,7 +12,7 @@
      * @desc Factory for maniupulating and resetting data in the IEQueryController;
      * @memberOf services
      */
-    function InteractionExplorerControls($http, $rootScope, $timeout, GraphConfigService, SharedService, GlobalControls) {
+    function InteractionExplorerControls(GraphConfigService, IESharedData, GlobalControls) {
         var service = {};
 
         service.layouts = [{ display: "Bipartite", value: "preset" }, { display: "Random", value: "random" }];
@@ -83,7 +83,7 @@
                 vm.explorerGenes = [];
                 GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
                 vm.clearLocatedGene();
-                SharedService.resetWTM(vm);
+                IESharedData.resetWTM(vm);
             }
 
             /**

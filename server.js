@@ -115,7 +115,7 @@ app.post('/gene-list', function(req, res) {
 
     var geneList = [];
 
-    args.fileName = file.name;
+    args.fileName = fileUtils.getCorrespondingDegreesFileName(file);
     args.path = file.path;
 
     argsString = JSON.stringify(args);
@@ -136,6 +136,8 @@ app.post('/gene-list', function(req, res) {
             var parsedValue = JSON.parse(stdout);
             var message = parsedValue.message;
 
+            console.log("maxDegree: " + parsedValue.maxDegree);
+
             if (message) {
                 res.json({ error: message });
                 return;
@@ -146,21 +148,73 @@ app.post('/gene-list', function(req, res) {
             var epiDegrees = parsedValue.epiDegrees;
             var stromaDegrees = parsedValue.stromaDegrees;
 
-            var epiGeneNames = parsedValue.epiDegreesNames;
-            var stromaGeneNames = parsedValue.stromaDegreesNames;
+            var epiGeneNames = parsedValue.epiGeneNames;
+            var stromaGeneNames = parsedValue.stromaGeneNames;
+
+            var maxDegree = parsedValue.maxDegree;
 
             allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
             allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
 
-            geneList = allGenes.map(function(gene) {
-                return {
-                    value: gene.name,
-                    display: gene.name + ' ' + gene.degree,
-                    object: gene
-                };
-            });
+            res.send({ geneList: allGenes, maxDegree: maxDegree });
+        });
+});
 
-            res.send({ geneList: geneList });
+app.post('/min-degree-genes', function(req, res) {
+    var args = {};
+    var argsString = "";
+    var file;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+
+    file = fileUtils.getRequestedFile(req.body.selectedFile, user);
+
+    if (file == null || file.path == null || file.name == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
+    args.fileName = fileUtils.getCorrespondingDegreesFileName(file);
+    args.path = file.path;
+    args.filterAmount = req.body.filterAmount;
+    args.filterType = req.body.filterType;
+
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/getMinDegreeGenes.R --args \"" + argsString + "\"", {
+            maxBuffer: 1024 *
+                50000
+        },
+        function(error, stdout, stderr) {
+            //console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+
+            if (error != null) {
+                console.log('error: ' + error);
+            }
+
+            var parsedValue = JSON.parse(stdout);
+            var message = parsedValue.message;
+
+            if (message) {
+                res.json({ error: message });
+                return;
+            }
+
+            var epiGenes = [];
+            var stromaGenes = [];
+
+            var epiDegrees = parsedValue.epiDegrees;
+            var stromaDegrees = parsedValue.stromaDegrees;
+
+            var epiGeneNames = parsedValue.epiGeneNames;
+            var stromaGeneNames = parsedValue.stromaGeneNames;
+
+
+            epiGenes = geneUtils.createGeneList(epiGeneNames, epiDegrees);
+            stromaGenes = geneUtils.createGeneList(stromaGeneNames, stromaDegrees);
+
+            res.send({ topGenes: { epi: epiGenes, stroma: stromaGenes } });
         });
 });
 

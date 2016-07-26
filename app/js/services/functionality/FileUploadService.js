@@ -12,7 +12,7 @@
      * @desc Factory for uploading files to the server.
      * @memberOf services
      */
-    function FileUploadService($http, $timeout, $q, Upload, $rootScope, $cookies, RESTService, SharedService, QueryService) {
+    function FileUploadService($q, GlobalSharedData, QueryService) {
         var service = {};
 
         service.uploadFiles = uploadFiles;

@@ -34,7 +34,7 @@ readMatricesFromFiles <- function(normalFile, tumorFile, deltaFile) {
     corMatrices
 }
 
-getDegrees <- function(corMatrix) {
+createDegrees <- function(corMatrix) {
     # Computes the degrees of the genes for a given correlation matrix.
     #
     # Args:
@@ -51,8 +51,8 @@ getDegrees <- function(corMatrix) {
     names(deg.row) <- rownames(corMatrix)
     names(deg.col) <- colnames(corMatrix)
 
-    deg.col <- sort(deg.col)
-    deg.row <- sort(deg.row)
+    deg.col <- sort(deg.col, decreasing = TRUE)
+    deg.row <- sort(deg.row, decreasing = TRUE)
 
     # deg.row <- as.numeric() 
     # for(k in 1:nrow(corMatrix)){

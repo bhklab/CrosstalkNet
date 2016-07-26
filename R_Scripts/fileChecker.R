@@ -36,7 +36,7 @@ if (anyNA(corMatrix)) {
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
 	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
 	ptm <- proc.time()
-	degrees <- getDegrees(corMatrix)
+	degrees <- createDegrees(corMatrix)
 
 	timeDif <- proc.time() - ptm 
 	write("getting degrees took: ", stderr())
