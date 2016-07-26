@@ -19,8 +19,6 @@
     function DEQueryController($scope, $rootScope, GlobalSharedData, QueryService, DESharedData) {
         var vm = this;
 
-        vm.topXSlider = 1;
-        vm.minDegreeSlider = 0;
         vm.sharedData = GlobalSharedData.data;
 
         vm.getTopGenes = getTopGenes;
@@ -35,8 +33,18 @@
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = DESharedData.data;
+            initializeVariables();
         }
 
+        /**
+         * @summary Initializes variables used within the tab for binding to the controls.
+         *
+         * @memberOf controllers.DEQueryController
+         */
+        function initializeVariables() {
+            vm.topXSlider = 1;
+            vm.minDegreeSlider = 0;
+        }
 
         function getTopGenes(filterType) {
             DESharedData.resetWTM(vm);
@@ -60,13 +68,14 @@
          * @summary Watches the clearAllData variable and clears the data within the tab when 
          * it changes to true.
          *
-         * @memberOf controllers.PEQueryController
+         * @memberOf controllers.DEQueryController
          */
         $scope.$watch(function() {
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 DESharedData.resetWTM(vm);
+                initializeVariables();
             }
         });
     }
