@@ -42,7 +42,7 @@
             RESTService.post('gene-list', { selectedFile: files })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
-                        deferred.resolve({ geneList: null , maxDegree: 0});
+                        deferred.resolve({ geneList: null, maxDegree: 0 });
                     }
 
                     $rootScope.state = $rootScope.states.initial;
@@ -294,6 +294,14 @@
             return deferred.promise;
         }
 
+        /**
+         * @summary Gets the top genes based on their degree from the server.
+         *
+         * @param {Object} vm The view model for the DEQueryController. This contains
+         * filter amount and filter type to be used by the server.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
         function getTopGenes(vm) {
             var deferred = $q.defer();
 
