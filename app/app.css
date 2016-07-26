@@ -127,6 +127,10 @@ md-sidenav {
     margin-bottom: 10px;
 }
 
+.bottom-margin-25 {
+    margin-bottom: 25px;
+} 
+
 .top-margin-10 {
     margin-top: 10px;
 }
@@ -317,8 +321,16 @@ table-card-height {
     padding-left: 5px;
 }
 
+.right-padded-25 {
+    padding-right: 25px;
+}
+
 .top-padded {
     padding-top: 5px;
+}
+
+.top-padded-10 {
+    padding-top: 10px;
 }
 
 .card-side-by-side {

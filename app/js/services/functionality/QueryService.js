@@ -12,7 +12,7 @@
      * @desc Factory for querying the server for data.
      * @memberOf services
      */
-    function QueryService($q, $http, $timeout, $rootScope, $cookies, GraphConfigService, RESTService, ValidationService, GlobalControls, TableService, SharedService) {
+    function QueryService($q, $rootScope, RESTService, ValidationService, GlobalSharedData) {
         var service = {};
 
         service.getGeneList = getGeneList;
@@ -24,6 +24,7 @@
         service.uploadFiles = uploadFiles;
         service.deleteFile = deleteFile;
         service.getUserPermission = getUserPermission;
+        service.getTopGenes = getTopGenes;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -41,11 +42,11 @@
             RESTService.post('gene-list', { selectedFile: files })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
-                        deferred.resolve({ geneList: null });
+                        deferred.resolve({ geneList: null, maxDegree: 0 });
                     }
 
                     $rootScope.state = $rootScope.states.initial;
-                    deferred.resolve({ geneList: data.geneList });
+                    deferred.resolve({ geneList: data.geneList, maxDegree: data.maxDegree });
                 });
             return deferred.promise;
         }
@@ -238,7 +239,7 @@
 
             RESTService.post('upload-matrix', { files: files, type: type })
                 .then(function(data) {
-                    SharedService.data.global.reloadFileList = true;
+                    GlobalSharedData.data.reloadFileList = true;
 
                     ValidationService.checkServerResponse(data);
                     deferred.resolve({ result: null });
@@ -260,7 +261,7 @@
         function deleteFile(file) {
             RESTService.post('delete-file', { file: file })
                 .then(function(data) {
-                    SharedService.data.global.reloadFileList = true;
+                    GlobalSharedData.data.reloadFileList = true;
 
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -286,6 +287,35 @@
                     }
 
                     deferred.resolve({ permission: data.permission });
+                }, function(response) {
+                    console.log(response);
+                });
+
+            return deferred.promise;
+        }
+
+        /**
+         * @summary Gets the top genes based on their degree from the server.
+         *
+         * @param {Object} vm The view model for the DEQueryController. This contains
+         * filter amount and filter type to be used by the server.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function getTopGenes(vm) {
+            var deferred = $q.defer();
+
+            RESTService.post('min-degree-genes', {
+                    selectedFile: vm.sharedData.correlationFileActual,
+                    filterAmount: vm.sdWithinTab.filterAmount,
+                    filterType: vm.sdWithinTab.filterType
+                })
+                .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        deferred.resolve({ topGenes: null });
+                    }
+
+                    deferred.resolve({ topGenes: data.topGenes });
                 }, function(response) {
                     console.log(response);
                 });
