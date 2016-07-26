@@ -40,7 +40,8 @@
             filterAmount: 1,
             filterType: null,
             topGenes: null,
-            pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) }
+            pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) },
+            search: {epi: "", stroma: ""}
         };
 
         service.data = angular.copy(withinTabModel);
@@ -59,7 +60,7 @@
                     vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
                     vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
                 }
-                vm.sdWithinTab[prop] = withinTabModel[prop];
+                vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
             }
         }
 
