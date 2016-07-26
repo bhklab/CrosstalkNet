@@ -12,7 +12,7 @@
      * @desc Factory for querying the server for data.
      * @memberOf services
      */
-    function QueryService($q, $http, $timeout, $rootScope, $cookies, GraphConfigService, RESTService, ValidationService, GlobalControls, TableService, SharedService) {
+    function QueryService($q, $rootScope, RESTService, ValidationService, GlobalSharedData) {
         var service = {};
 
         service.getGeneList = getGeneList;
@@ -239,7 +239,7 @@
 
             RESTService.post('upload-matrix', { files: files, type: type })
                 .then(function(data) {
-                    SharedService.data.global.reloadFileList = true;
+                    GlobalSharedData.data.reloadFileList = true;
 
                     ValidationService.checkServerResponse(data);
                     deferred.resolve({ result: null });
@@ -261,7 +261,7 @@
         function deleteFile(file) {
             RESTService.post('delete-file', { file: file })
                 .then(function(data) {
-                    SharedService.data.global.reloadFileList = true;
+                    GlobalSharedData.data.reloadFileList = true;
 
                     if (!ValidationService.checkServerResponse(data)) {
                         return;

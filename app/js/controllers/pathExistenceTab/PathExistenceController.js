@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('PathExistenceController', [
-        'GraphConfigService', 'GlobalControls', 'SharedService', 'PESharedData',
+        'GlobalControls', 'GlobalSharedData', 'PESharedData',
         PathExistenceController
     ]);
 
@@ -16,14 +16,14 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function PathExistenceController(GraphConfigService, GlobalControls, SharedService, PESharedData) {
+    function PathExistenceController(GlobalControls, GlobalSharedData, PESharedData) {
         var vm = this;
 
         vm.exportTableToCSV = exportTableToCSV;
         vm.initializeController = initializeController;
 
         vm.displayModes = angular.copy(GlobalControls.displayModes);
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 

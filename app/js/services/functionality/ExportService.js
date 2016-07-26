@@ -12,7 +12,7 @@
      * @desc Factory for exporting data to files.
      * @memberOf services
      */
-    function ExportService($http, $filter) {
+    function ExportService($filter) {
         var service = {};
 
         service.exportNeighboursToCSV = exportNeighboursToCSV;
