@@ -13,7 +13,7 @@
      * @desc Factory for maniupulating and resetting data in the MGQueryController;
      * @memberOf services
      */
-    function MainGraphControls($http, $rootScope, $timeout, GraphConfigService, SharedService, GlobalControls) {
+    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls) {
         var service = {};
 
         service.layouts = [{ display: "Bipartite", value: "preset" }, {
@@ -143,7 +143,7 @@
                 GlobalControls.closeEdgeInspector(vm);
                 vm.clearLocatedGene();
                 vm.resetFilters();
-                SharedService.resetWTM(vm);
+                MGSharedData.resetWTM(vm);
             }
 
             /**

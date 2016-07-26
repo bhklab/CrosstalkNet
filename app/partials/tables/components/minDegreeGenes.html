@@ -1,0 +1,79 @@
+<md-card ng-if="vm.sdWithinTab.topGenes != null">
+    <md-card-title>
+        <md-card-title-text>
+            <div layout="row">
+                <div ng-if="vm.sdWithinTab.filterType == 'top'" flex>
+                    <span class="md-headline">Top {{vm.sdWithinTab.filterAmount}} genes</span>
+                </div>
+                <div ng-if="vm.sdWithinTab.filterType == 'min'" flex>
+                    <span class="md-headline">Genes with degree {{vm.sdWithinTab.filterAmount}} or greater</span>
+                </div>
+                <!-- <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Self Loops</label>
+                        <input ng-model="vm.sdWithinTab.selfLoopSearch">
+                    </md-input-container>
+                </div> -->
+            </div>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div class="bottom-margin-25">
+            <div class="top-padded-10" layout="row">
+                <div flex><span class="md-title">Epi Genes</span></div>
+                <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Epi Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.epi">
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-wrap>
+                <div flex="20" ng-repeat="gene in vm.sdWithinTab.topGenes.epi | filter: vm.sdWithinTab.search.epi | limitTo: vm.sdWithinTab.pagination.epi.query.limit : (vm.sdWithinTab.pagination.epi.query.page -1) * vm.sdWithinTab.pagination.epi.query.limit">
+                    <md-menu>
+                        <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
+                        <md-menu-content width="6">
+                            <md-menu-item>
+                                <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>
+                            </md-menu-item>
+                            <!--                             <md-menu-item>
+                                <md-button>Add To Main Graph</md-button>
+                            </md-menu-item> -->
+                        </md-menu-content>
+                    </md-menu>
+                </div>
+            </div>
+        </div>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.topGenes.epi.length}}" md-page-select="true" md-boundary-links="true"></md-table-pagination>
+        <div class="bottom-margin-25">
+            <div class="top-padded-10" layout="row">
+                <div flex>
+                    <span class="md-title">Stroma Genes</span>
+                </div>
+                <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Stroma Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.stroma">
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-wrap>
+                <div flex="20" ng-repeat="gene in vm.sdWithinTab.topGenes.stroma | filter: vm.sdWithinTab.search.stroma | limitTo: vm.sdWithinTab.pagination.stroma.query.limit : (vm.sdWithinTab.pagination.stroma.query.page -1) * vm.sdWithinTab.pagination.stroma.query.limit">
+                    <md-menu>
+                        <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
+                        <md-menu-content width="6">
+                            <md-menu-item>
+                                <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>
+                            </md-menu-item>
+                            <!-- <md-menu-item>
+                                <md-button>Add To Main Graph</md-button>
+                            </md-menu-item> -->
+                        </md-menu-content>
+                    </md-menu>
+                </div>
+            </div>
+        </div>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.topGenes.stroma.length}}" md-page-select="true" md-boundary-links="true"></md-table-pagination>
+        <md-button class="md-raised md-primary" ng-click="vm.exportTopGenesToCSV(vm)">Download As CSV</md-button>
+    </md-card-content>
+</md-card>
