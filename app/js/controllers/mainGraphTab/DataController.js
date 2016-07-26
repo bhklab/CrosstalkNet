@@ -6,8 +6,8 @@
 (function() {
     angular.module('myApp.controllers').controller('DataController', [
         '$scope',
-        '$mdDialog', '$mdSelect', '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'FileUploadService', '$q', '$timeout',
+        '$mdDialog', '$mdSelect', '$rootScope',
+        'GlobalControls', 'GlobalSharedData', 'QueryService', 'FileUploadService', '$timeout',
         'MGSharedData',
         DataController
     ]);
@@ -17,12 +17,12 @@
      * @desc Controller for getting, uploading, and deleting files.
      * @memberOf controllers
      */
-    function DataController($scope, $mdDialog, $mdSelect, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, FileUploadService,
-        $q, $timeout, MGSharedData) {
+    function DataController($scope, $mdDialog, $mdSelect, $rootScope, GlobalControls, GlobalSharedData, QueryService, FileUploadService,
+        $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
 
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
         vm.fileList = { normal: null, tumor: null, delta: null };
 
         vm.selectedNetworkType = vm.sharedData.selectedNetworkType;
@@ -159,8 +159,8 @@
                 stopTutorial();
             }
 
-            SharedService.resetMatrixSummary();
-            SharedService.resetGeneList();
+            GlobalSharedData.resetMatrixSummary();
+            GlobalSharedData.resetGeneList();
             vm.showTooltip.button = false;
             vm.sharedData.clearAllData = true;
             vm.sharedData.selectedNetworkType = vm.selectedNetworkType;
@@ -238,7 +238,7 @@
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
                     GlobalControls.resetInputFieldsGlobal();
-                    SharedService.resetGlobalData();
+                    GlobalSharedData.resetGlobalData();
                     initializeVariables();
                 }
             });

@@ -8,7 +8,7 @@
     angular.module('myApp.controllers').controller('IEQueryController', [
         '$scope',
         '$rootScope',
-        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'SharedService', 'TableService', 'QueryService', '$timeout',
+        'GraphConfigService', 'InteractionExplorerControls', 'GlobalControls', 'GlobalSharedData', 'TableService', 'QueryService', '$timeout',
         'IESharedData',
         IEQueryController
     ]);
@@ -18,7 +18,7 @@
      * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
      * @memberOf controllers
      */
-    function IEQueryController($scope, $rootScope, GraphConfigService, InteractionExplorerControls, GlobalControls, SharedService, TableService,
+    function IEQueryController($scope, $rootScope, GraphConfigService, InteractionExplorerControls, GlobalControls, GlobalSharedData, TableService,
         QueryService, $timeout, IESharedData) {
         var vm = this;
         vm.scope = $scope;
@@ -27,7 +27,7 @@
         vm.initializeController = initializeController;
         vm.refreshGraph = refreshGraph;
 
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         InteractionExplorerControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);

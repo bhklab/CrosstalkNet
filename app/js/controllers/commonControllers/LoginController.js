@@ -4,7 +4,7 @@
     angular.module('myApp.controllers').controller('LoginController', [
         '$scope',
         '$rootScope', 'RESTService',
-        'ValidationService', 'SharedService', '$q', '$timeout', '$cookies',
+        'ValidationService', 'GlobalSharedData', '$q', '$timeout', '$cookies',
         '$mdDialog',
         LoginController
     ]);
@@ -14,7 +14,7 @@
      * @desc Controller for the login dialog.
      * @memberOf controllers
      */
-    function LoginController($scope, $rootScope, RESTService, ValidationService, SharedService,
+    function LoginController($scope, $rootScope, RESTService, ValidationService, GlobalSharedData,
         $q, $timeout, $cookies, $mdDialog) {
         var vm = this;
         vm.ctrl = "login";
@@ -22,7 +22,7 @@
         $rootScope.tokenSet = false;
         vm.user = { name: null, password: null, token: null };
 
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         vm.guestLogin = guestLogin;
         vm.login = login;

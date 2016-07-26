@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('DegreeExplorerController', [
-        '$scope', '$window', '$filter', 'SharedService',
+        '$scope', '$window', '$filter', 'GlobalSharedData', 'DESharedData',
         DegreeExplorerController
     ]);
 
@@ -14,9 +14,9 @@
      * @desc Controller for the DEGREE EXPLORER tab.
      * @memberOf controllers
      */
-    function DegreeExplorerController($scope, $window, $filter, SharedService) {
+    function DegreeExplorerController($scope, $window, $filter, GlobalSharedData, DESharedData) {
         var vm = this;
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         vm.initializeController = initializeController;
         vm.goToGeneCard = goToGeneCard;
@@ -29,11 +29,11 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = DESharedData.data;
         }
 
         function goToGeneCard(gene) {
-            $window.open(SharedService.geneCardURL + $filter('suffixTrim')(gene.value));
+            $window.open(GlobalSharedData.geneCardURL + $filter('suffixTrim')(gene.value));
         }
     }
 })();

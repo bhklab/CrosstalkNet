@@ -13,7 +13,7 @@
      * @desc Factory for maniupulating and resetting data in the MGQueryController;
      * @memberOf services
      */
-    function MainGraphControls($http, $rootScope, $timeout, GraphConfigService, MGSharedData, GlobalControls) {
+    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls) {
         var service = {};
 
         service.layouts = [{ display: "Bipartite", value: "preset" }, {

@@ -6,8 +6,8 @@
 (function() {
     angular.module('myApp.controllers').controller('DEQueryController', [
         '$scope',
-        '$rootScope', 'RESTService',
-        'GraphConfigService', 'GlobalControls', 'ValidationService', 'SharedService', 'QueryService', 'PathExistenceControls', '$q', '$timeout',
+        '$rootScope',
+        'GlobalSharedData', 'QueryService', 'DESharedData',
         DEQueryController
     ]);
 
@@ -16,13 +16,12 @@
      * @desc Controller for the QUERY sub-tab in the DEGREE EXPLORER tab.
      * @memberOf controllers
      */
-    function DEQueryController($scope, $rootScope, RESTService, GraphConfigService, GlobalControls, ValidationService, SharedService, QueryService, PathExistenceControls,
-        $q, $timeout) {
+    function DEQueryController($scope, $rootScope, GlobalSharedData, QueryService, DESharedData) {
         var vm = this;
 
         vm.topXSlider = 1;
         vm.minDegreeSlider = 0;
-        vm.sharedData = SharedService.data.global;
+        vm.sharedData = GlobalSharedData.data;
 
         vm.getTopGenes = getTopGenes;
         vm.initializeController = initializeController;
@@ -35,12 +34,12 @@
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
-            vm.sdWithinTab = SharedService.data[vm.ctrl];
+            vm.sdWithinTab = DESharedData.data;
         }
 
 
         function getTopGenes(filterType) {
-            SharedService.resetWTMDE(vm);
+            DESharedData.resetWTM(vm);
             vm.sdWithinTab.filterType = filterType;
             if (filterType == "top") {
                 vm.sdWithinTab.filterAmount = vm.topXSlider;
@@ -67,7 +66,7 @@
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                SharedService.resetWTMDE(vm);
+                DESharedData.resetWTM(vm);
             }
         });
     }

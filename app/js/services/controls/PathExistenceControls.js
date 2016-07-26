@@ -12,7 +12,7 @@
      * @desc Factory for maniupulating and resetting data in the PEQueryController;
      * @memberOf services
      */
-    function PathExistenceControls($http, $rootScope, $timeout, GraphConfigService, SharedService, GlobalControls) {
+    function PathExistenceControls() {
         var service = {};
 
         service.setMethods = setMethods;
