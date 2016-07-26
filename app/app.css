@@ -329,6 +329,10 @@ table-card-height {
     padding-top: 5px;
 }
 
+.top-padded-10 {
+    padding-top: 10px;
+}
+
 .card-side-by-side {
     display: inline-block;
 }
