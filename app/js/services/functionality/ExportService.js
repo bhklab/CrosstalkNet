@@ -17,6 +17,7 @@
 
         service.exportNeighboursToCSV = exportNeighboursToCSV;
         service.exportGraphToPNG = exportGraphToPNG;
+        service.exportTopGenesToCSV = exportTopGenesToCSV;
 
         /**
          * @summary Exports a specified table of data to a csv file.
@@ -86,10 +87,10 @@
         }
 
         function exportTopGenesToCSV(vm) {
-            var epiGenes = vm.topGenes.epi;
-            var stromaGenes = vm.topGenes.stroma;
-            var maxLength = epiGenes.length > stromaGenes.length ? epiGenes.length : stroma.length;
-            var fileNames = "topGenes" + Date.now() + ".csv";
+            var epiGenes = vm.sdWithinTab.topGenes.epi;
+            var stromaGenes = vm.sdWithinTab.topGenes.stroma;
+            var maxLength = epiGenes.length > stromaGenes.length ? epiGenes.length : stromaGenes.length;
+            var fileName = "topGenes" + Date.now() + ".csv";
             var rowDelim = "\r\n";
             var colDelim = ",";
             var csv = "";
