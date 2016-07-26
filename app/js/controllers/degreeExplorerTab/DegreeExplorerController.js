@@ -33,6 +33,11 @@
             vm.sdWithinTab = DESharedData.data;
         }
 
+        /**
+         * @summary Opens the gene card for the specified gene in another tab.
+         *
+         * @param {Object} gene The gene to open the gene card for.
+         */
         function goToGeneCard(gene) {
             $window.open(GlobalSharedData.geneCardURL + $filter('suffixTrim')(gene.value));
         }
