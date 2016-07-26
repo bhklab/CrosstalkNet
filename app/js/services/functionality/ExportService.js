@@ -52,12 +52,7 @@
             }
 
             var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
-            var link = document.createElement("a");
-            link.setAttribute("href", csvData);
-            link.setAttribute("download", fileName);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            downloadFile(fileName, csvData);
         }
 
         /** 
@@ -87,9 +82,46 @@
             var blob = new Blob([byteArray], { type: "image/png" });
             var dataURL = URL.createObjectURL(blob);
 
+            downloadFile(fileName, dataURL);
+        }
+
+        function exportTopGenesToCSV(vm) {
+            var epiGenes = vm.topGenes.epi;
+            var stromaGenes = vm.topGenes.stroma;
+            var maxLength = epiGenes.length > stromaGenes.length ? epiGenes.length : stroma.length;
+            var fileNames = "topGenes" + Date.now() + ".csv";
+            var rowDelim = "\r\n";
+            var colDelim = ",";
+            var csv = "";
+            var header = "epi" + colDelim + "stroma";
+            csv += header;
+            csv += rowDelim;
+
+            for (var i = 0; i < maxLength; i++) {
+                if (i < epiGenes.length) {
+                    csv += $filter('suffixTrim')(epiGenes[i].value) + " " + epiGenes[i].object.degree;
+                    csv += colDelim;
+                } else {
+                    csv += "";
+                    csv += colDelim;
+                }
+
+                if (i < stromaGenes.length) {
+                    csv += $filter('suffixTrim')(stromaGenes[i].value) + " " + stromaGenes[i].object.degree;
+                } else {
+                    csv += "";
+                }
+
+                csv += rowDelim;
+            }
+
+            var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+            downloadFile(fileName, csvData);
+        }
+
+        function downloadFile(fileName, fileData) {
             var link = document.createElement("a");
-            link.style.display = 'none';
-            link.setAttribute("href", dataURL);
+            link.setAttribute("href", fileData);
             link.setAttribute("download", fileName);
             document.body.appendChild(link);
             link.click();
