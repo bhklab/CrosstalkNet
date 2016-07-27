@@ -1,6 +1,7 @@
-source('R_Scripts/dataModels.R')
-library(Matrix)
 options(warn = -1)
+library(methods)
+library(Matrix)
+source('R_Scripts/dataModels.R')
 
 readMatricesFromFiles <- function(normalFile, tumorFile, deltaFile) {
     # Creates a list of matrices by reading in specified files
@@ -208,14 +209,13 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType)
         iterator <- length(neighbours$tumor)
     }
 
-    for (i in 1:iterator) {       
-        edges[i, "source"] <- gene
-        edges[i, "target"] <- names(neighbours[[networkType]][i])
-        edges[i, "weight"] <- neighbours[[networkType]][i]
-        if (networkType == 'delta') {        
-            edges[i, "normal"] <- neighbours$normal[i]
-            edges[i, "tumor"] <- neighbours$tumor[i]   
-        }
+    edges$source = rep(gene, iterator)
+    edges$target = names(neighbours[[networkType]])
+    edges$weight = neighbours[[networkType]]
+
+    if (networkType == 'delta') {        
+            edges$normal <- neighbours$normal
+            edges$tumor <- neighbours$tumor   
     }
 
     edges
@@ -251,17 +251,11 @@ getNeighboursNodesFromEdges <- function(corMatrix, degrees, edges, level, select
         return(nodes)
     }
 
-    for (i in 1:length(neighboursNames)) {
-        nodes[i, "name"] <- neighboursNames[i]
-        nodes[i, "degree"] <- neighboursDegrees[i]
-        nodes[i, "level"] <- level
+    nodes$name = neighboursNames
+    nodes$degree = neighboursDegrees
+    nodes$level = rep(level, length(neighboursNames))
 
-        if (nodes[i, "name"] %in% selectedGenes) {
-            nodes[i, "isSource"] <- TRUE 
-        } else {
-            nodes[i, "isSource"] <- FALSE
-        }
-    }
+    nodes$isSource = nodes$name %in% selectedGenes
 
     nodes
 }

@@ -1,3 +1,5 @@
+options(warn = -1)
+
 createEmptyNodes <- function(amount) {
 	# Creates a data frame representing blank ctyoscape nodes.
 	#

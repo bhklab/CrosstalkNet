@@ -1,4 +1,7 @@
+options(warn = -1)
+library(methods)
 library(jsonlite)
+library(data.table)
 
 source('R_Scripts/helpers.R')
 
@@ -23,7 +26,7 @@ corMatrices <- readMatricesFromFiles(settings$fileNameMatrixNormal, settings$fil
 # Read the degrees file associated with the selected network type
 degrees <- readFileWithValidation(settings$fileNameDegrees)
 
-exclusions <- genesOfInterest
+nodeExclusions <- genesOfInterest
 firstNeighboursNodes <- list()
 edgesFirst <- list()
 edgesSecond <- list()
@@ -42,12 +45,12 @@ for (i in 1:length(genesOfInterest)) {
     }
 
     edgesFirst[[i]] <- edgesToAdd
-    nodesToAdd <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edgesFirst[[i]], 1, genesOfInterest, exclusions)
+    nodesToAdd <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edgesFirst[[i]], 1, genesOfInterest, nodeExclusions)
     firstNeighboursNodes[[i]] <- nodesToAdd
 
     k <- i
     edgeExclusions <- c(edgeExclusions, genesOfInterest[i])
-    exclusions <- c(exclusions, nodesToAdd$name)
+    nodeExclusions <- c(nodeExclusions, nodesToAdd$name)
     edgeTestFirst <- c(edgeTestFirst, edgesFirst[[i]]$weight)
 }
 
@@ -68,23 +71,30 @@ if (length(firstNeighboursNodes) > 0 && depth == 2) {
 			next	
 		}
 
+		
 		for (j in 1:length(firstNeighboursNodes[[i]]$name)) {
-			edgesToAdd <- rbind(edgesToAdd, createEdgesDFDelta(corMatrices, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30, selectedNetworkType))
+			tempEdges <- createEdgesDFDelta(corMatrices, firstNeighboursNodes[[i]][j,]$name, edgeExclusions, 30, selectedNetworkType)
+			edgesToAdd <- rbindlist(list(edgesToAdd, tempEdges))
+			
+
 			if (weightFilterSecond == TRUE) {
 				edgesToAdd <- filterEdgesByWeight(edgesToAdd, minNegativeWeightSecond, minPositiveWeightSecond)
 			}
 
-			nodesToAdd <- rbind(nodesToAdd, getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edgesToAdd, 2, genesOfInterest, exclusions))
+			tempNodes <- getNeighboursNodesFromEdges(corMatrices[[selectedNetworkType]], degrees, edgesToAdd, 2, genesOfInterest, nodeExclusions)
+			nodesToAdd <- rbindlist(list(nodesToAdd, tempNodes))
 
-			exclusions <- c(exclusions, edgesToAdd$target)
+			nodeExclusions <- c(nodeExclusions, edgesToAdd$target)
+			nodeExclusions <- unique(nodeExclusions)
+			
 			edgeExclusions <- c(edgeExclusions, firstNeighboursNodes[[i]][j,]$name)
 		}
 		
 		edgesSecond[[i]] = edgesToAdd
 		edgeExclusions <- unique(edgeExclusions)
 		secondNeighboursNodes[[i]] = nodesToAdd
-		exclusions <- c(exclusions, secondNeighboursNodes[[i]]$name)
-		exclusions <- unique(exclusions)
+		nodeExclusions <- c(nodeExclusions, secondNeighboursNodes[[i]]$name)
+		nodeExclusions <- unique(nodeExclusions)
 		edgeTestSecond <- c(edgeTestSecond, edgesSecond[[i]]$weight)
 	}	
 }
