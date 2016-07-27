@@ -16,14 +16,14 @@ CorTES.Normal <- cor(t(allmat.by.ctype.by.ES$No$Epi),t(allmat.by.ctype.by.ES$No$
 CorTES.BrP <- cor(t(allmat.by.ctype.by.ES$BrP$Epi),t(allmat.by.ctype.by.ES$BrP$Str))
 CorTES.BrN <- cor(t(allmat.by.ctype.by.ES$BrN$Epi),t(allmat.by.ctype.by.ES$BrN$Str))
 
-rownames(CorTES.Normal) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.Normal), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTES.Normal) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.Normal), (ProbeGeneMap$EntrezGeneID))]
+# rownames(CorTES.Normal) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.Normal), (ProbeGeneMap$EntrezGeneID))]
+# colnames(CorTES.Normal) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.Normal), (ProbeGeneMap$EntrezGeneID))]
 
-rownames(CorTES.BrP) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.BrP), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTES.BrP) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.BrP), (ProbeGeneMap$EntrezGeneID))]
+# rownames(CorTES.BrP) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.BrP), (ProbeGeneMap$EntrezGeneID))]
+# colnames(CorTES.BrP) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.BrP), (ProbeGeneMap$EntrezGeneID))]
 
-rownames(CorTES.BrN) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.BrN), (ProbeGeneMap$EntrezGeneID))]
-colnames(CorTES.BrN) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.BrN), (ProbeGeneMap$EntrezGeneID))]
+# rownames(CorTES.BrN) = ProbeGeneMap$GeneSymbol[match(rownames(CorTES.BrN), (ProbeGeneMap$EntrezGeneID))]
+# colnames(CorTES.BrN) = ProbeGeneMap$GeneSymbol[match(colnames(CorTES.BrN), (ProbeGeneMap$EntrezGeneID))]
 
 Signif.Normal <- r.test(22, CorTES.Normal)
 Signif.BrP <- r.test(54, CorTES.BrP)

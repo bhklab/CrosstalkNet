@@ -199,9 +199,6 @@ function getFilesInDirectory(directory, type, subType) {
         }
     });
 
-    console.log("type: " + type + " subType: " + subType);
-    console.log(filteredFileNames);
-
     fileList = filteredFileNames.map(function(file) {
         return new File(file, directory + "/", type, subType);
     });
@@ -290,7 +287,6 @@ function removeFile(path, file, callback) {
  * @param {function} callback A function to call when the file is finished writing.
  */
 function writeFile(baseDirectory, file, userName, subType, callback) {
-    console.log("baseDirectory: " + baseDirectory);
     fs.writeFile(baseDirectory + userName + "/" + subType + "/" + file.name, file.data, 'base64', (err) => {
         if (err) {
             console.log(err);
@@ -319,8 +315,6 @@ function createDirectory(baseDirectory, userName, subType, callback) {
             }
 
             console.error(err)
-        } else {
-            console.log('pow!')
         }
     });
 }

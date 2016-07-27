@@ -126,8 +126,9 @@ app.post('/gene-list', function(req, res) {
                 50000
         },
         function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
+            if (stderr != null && stderr != "") {
+                console.log('stderr: ' + stderr);    
+            }
 
             if (error != null) {
                 console.log('error: ' + error);
@@ -135,8 +136,6 @@ app.post('/gene-list', function(req, res) {
 
             var parsedValue = JSON.parse(stdout);
             var message = parsedValue.message;
-
-            console.log("maxDegree: " + parsedValue.maxDegree);
 
             if (message) {
                 res.json({ error: message });
@@ -186,8 +185,9 @@ app.post('/min-degree-genes', function(req, res) {
                 50000
         },
         function(error, stdout, stderr) {
-            //console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
+            if (stderr != null && stderr != "") {
+                console.log('stderr: ' + stderr);    
+            }
 
             if (error != null) {
                 console.log('error: ' + error);
@@ -219,7 +219,6 @@ app.post('/min-degree-genes', function(req, res) {
 });
 
 app.post('/delta-interaction-explorer', function(req, res) {
-    console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -254,7 +253,9 @@ app.post('/delta-interaction-explorer', function(req, res) {
 
     var child = exec("Rscript R_Scripts/deltaNeighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
-            console.log('stderr: ' + stderr);
+            if (stderr != null && stderr != "") {
+                console.log('stderr: ' + stderr);    
+            }
 
             if (error != null) {
                 console.log('error: ' + error);
@@ -358,7 +359,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
 });
 
 app.post('/delta-submatrix', function(req, res) {
-    // console.log("%j", req.body);
     var args = {};
     var argsString = "";
     var files = null;
@@ -409,7 +409,9 @@ app.post('/delta-submatrix', function(req, res) {
                 50000
         },
         function(error, stdout, stderr) {
-            console.log('stderr: ' + stderr);
+            if (stderr != null && stderr != "") {
+                console.log('stderr: ' + stderr);    
+            }
 
             if (error != null) {
                 console.log('error: ' + error);
@@ -604,7 +606,7 @@ app.post('/delta-get-all-paths', function(req, res) {
             console.log('error: ' + error);
         }
 
-        if (stderr != null) {
+        if (stderr != null && stderr != "") {
             console.log(stderr);
         }
 
@@ -633,8 +635,6 @@ app.post('/available-matrices', function(req, res) {
     var subTypes = req.body.types;
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var accessibleMatrices = fileUtils.getAccessibleMatricesForUser(user);
-
-    console.log("getting available-matrices for user: %j", user);
 
     res.send({ fileList: accessibleMatrices });
 });
