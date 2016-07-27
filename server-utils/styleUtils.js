@@ -192,10 +192,12 @@ function getDynamicWidth(property, min, max) {
     }
 
     if (min < 0) {
-        var width = Math.abs(Math.floor((min - max) * 10)) > 6 ? Math.abs(Math.floor((min - max) * 10)) : 6;
+        // var width = Math.abs(Math.floor((min - max) * 10)) > 6 ? Math.abs(Math.floor((min - max) * 10)) : 6;
+        var width = 6;
         return 'mapData(' + property + ',' + min + ',' + max + ',' + width + "px" + "," + "1px" + ")";
     } else {
-        var width = Math.abs(Math.floor((max - min) * 10)) > 6 ? Math.abs(Math.floor((max - min) * 10)) : 6;
+        // var width = Math.abs(Math.floor((max - min) * 10)) > 6 ? Math.abs(Math.floor((max - min) * 10)) : 6;
+        var width = 6;
         return 'mapData(' + property + ',' + min + ',' + max + ',' + "1px" + "," + width + "px" + ")";
     }
 }
