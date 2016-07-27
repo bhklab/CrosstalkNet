@@ -1,5 +1,10 @@
 library(psych)
+library(methods)
 library(Matrix)
+
+tempMat <- matrix(1:25, nrow=5, ncol=5)
+
+tempMat <- as(tempMat, "sparseMatrix")
 
 setwd('/mnt/work1/users/home2/aadam/R_Scripts')
 
