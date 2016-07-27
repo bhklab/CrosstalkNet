@@ -216,9 +216,6 @@ class FileCache {
         var result = new FileGroup();
 
         for (var name in this._personal) {
-            console.log(name);
-            console.log(subType);
-            console.log(this._personal[name][subType]);
             for (var subType in SUB_TYPES) {
                 result[subType] = result[subType].concat(this._personal[name][subType]);
             }

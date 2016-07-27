@@ -1,3 +1,5 @@
+options(warn = -1)
+library(methods)
 library(jsonlite)
 
 source('R_Scripts/helpers.R')
