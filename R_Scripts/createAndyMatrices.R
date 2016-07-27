@@ -1,4 +1,5 @@
 library(psych)
+library(methods)
 library(Matrix)
 
 setwd('/mnt/work1/users/home2/aadam/R_Scripts')

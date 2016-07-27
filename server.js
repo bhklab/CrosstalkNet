@@ -336,7 +336,6 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 nodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
                 config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
                 config = configUtils.setConfigLayout(config, layout);
-
             }
 
             elements = elements.concat([].concat.apply([], allNodes));
