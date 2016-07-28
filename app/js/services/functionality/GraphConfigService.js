@@ -97,7 +97,7 @@
                 resetEdges(vm);
             });
 
-            /*
+            
 
             cy.nodes().not(':parent').forEach(function(n) {
                 var g = n.data('id').slice(0, -2);
@@ -127,7 +127,7 @@
                         }
                     }
                 });
-            });*/
+            });
 
             return cy;
         }
@@ -256,7 +256,6 @@
             }
 
             vm.sdWithinTab.cy = null;
-            vm.sdWithinTab.config = null;
         }
 
         return service;
