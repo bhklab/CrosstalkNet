@@ -1,6 +1,6 @@
 <div ng-repeat="x in [] | range:vm.sdWithinTab.neighbours.length-1">
-    <div ng-repeat="matType in vm.sdWithinTab.edgeDictionary.types">
-        <md-card ng-if="::(vm.sdWithinTab.cy != null && vm.sdWithinTab.cy.edges() != null)">
+    <div ng-repeat="matType in ::vm.sdWithinTab.edgeDictionary.types">
+        <md-card>
             <md-card-title>
                 <md-card-title-text>
                     <div layout="row">
@@ -8,7 +8,7 @@
                             <span class="md-headline">
                                 {{x + 1 | ordinal}} Neighbour Interactions 
                             </span>
-                            <span class="md-headline" ng-if="vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta">
+                            <span class="md-headline" ng-if="::vm.sharedData.selectedNetworkType == vm.sharedData.networkTypes.delta">
                                 {{matType == 'weight' ? 'delta' : matType | uppercase}}
                             </span>
                         </div>
