@@ -96,7 +96,7 @@
                                     <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/MGTab/tableView.html"></div>
+                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table && selectedTab == 0" static-include="partials/MGTab/tableView.html"></div>
                                 <!--<div>{{genes}}</div>-->
                             </md-content>
                         </section>
@@ -115,7 +115,7 @@
                                     <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
                                     <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                                 </div>
-                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/IETab/tableView.html"></div>
+                                <div ng-show="vm.sdWithinTab.display == vm.displayModes.table && selectedTab == 1" static-include="partials/IETab/tableView.html"></div>
                             </md-content>
                         </section>
                     </md-content>
@@ -125,7 +125,7 @@
                         <section layout="row">
                             <div static-include="partials/PETab/sideBar.html">
                             </div>
-                            <md-content flex>
+                            <md-content ng-show="selectedTab == 2" flex>
                                 <div static-include="partials/PETab/tableView.html"></div>
                             </md-content>
                         </section>
@@ -136,7 +136,7 @@
                         <section layout="row">
                             <div static-include="partials/DETab/sideBar.html">
                             </div>
-                            <md-content flex>
+                            <md-content ng-show="selectedTab == 3" flex>
                                 <div static-include="partials/DETab/tableView.html"></div>
                             </md-content>
                         </section>
