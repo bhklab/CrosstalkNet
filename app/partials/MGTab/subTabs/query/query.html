@@ -19,16 +19,6 @@
                     <md-button class="md-raised md-primary small-button" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial || state == states.loadingGraph || state == states.loadingConfig">Reset</md-button>
                 </div>
             </div>
-            <div flex="100" layout layout-align="center center">
-                <span class="md-body-1">Min Degree</span>
-            </div>
-            <div layout="row">
-                <md-slider flex min="0" max="800" ng-model="vm.minDegree.first" aria-label="red" id="min-degree-first" class>
-                </md-slider>
-                <div flex="20" layout layout-align="center center">
-                    <input flex type="number" ng-model="vm.minDegree.first" aria-label="red" aria-controls="min-degree-first">
-                </div>
-            </div>
         </div>
         <fieldset>
             <legend class="fieldset-legend">Selected Genes:</legend>
