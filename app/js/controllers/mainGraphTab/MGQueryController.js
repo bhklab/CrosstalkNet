@@ -105,6 +105,7 @@
          * @memberOf controllers.MGQueryController
          */
         function refreshGraph(filter) {
+            GraphConfigService.destroyGraph(vm);
             vm.clearLocatedGene();
             MGSharedData.resetWTM(vm);
             getConfigForGraph(filter);
@@ -189,12 +190,18 @@
             }
             return null;
         }, function(newValue, oldValue) {
-            if (newValue == vm.displayModes.graph && newValue != oldValue) {
+            if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
                         GraphConfigService.destroyGraph(vm);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain");
+                    }
+                }, 250);
+            } else if (newValue == vm.displayModes.graph && newValue != oldValue && !vm.needsRedraw) {
+                $timeout(function() {
+                    if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
+                        vm.resize(vm);
                     }
                 }, 250);
             }

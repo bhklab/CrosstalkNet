@@ -38,8 +38,6 @@
          */
         function applyConfig(vm, config, containerID) {
             var cy = null;
-            vm.elemCopy = angular.copy(config.elements);
-            vm.styleCopy = angular.copy(config.style);
             config.container = document.getElementById(containerID);
 
             if (config.layout.position == "grid") {
@@ -99,6 +97,7 @@
                 resetEdges(vm);
             });
 
+            /*
 
             cy.nodes().not(':parent').forEach(function(n) {
                 var g = n.data('id').slice(0, -2);
@@ -128,7 +127,7 @@
                         }
                     }
                 });
-            });
+            });*/
 
             return cy;
         }
@@ -257,6 +256,7 @@
             }
 
             vm.sdWithinTab.cy = null;
+            vm.sdWithinTab.config = null;
         }
 
         return service;
