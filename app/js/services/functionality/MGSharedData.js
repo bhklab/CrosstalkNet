@@ -20,6 +20,8 @@
          */
         var withinTabModel = {
             cy: null,
+            config: null,
+            edgeDictionary: null,
             display: null,
             neighbours: null,
             selectedLayout: null,
@@ -45,7 +47,7 @@
         function resetWTM(vm) {
             for (var prop in withinTabModel) {
                 if (prop != "display" && prop != "selectedTab" && prop != "selectedLayout") {
-                    vm.sdWithinTab[prop] = withinTabModel[prop];
+                    vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
                 }
             }
         }

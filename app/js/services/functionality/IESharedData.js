@@ -20,6 +20,8 @@
          */
         var withinTabModel = {
             cy: null,
+            config: null,
+            edgeDictionary: null,
             display: null,
             neighbours: null,
             selectedLayout: null,

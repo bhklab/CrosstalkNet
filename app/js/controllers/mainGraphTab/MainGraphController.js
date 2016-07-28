@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('MainGraphController', ['$scope',
-        '$rootScope', 
+        '$rootScope',
         'GlobalControls', 'ExportService', 'GlobalSharedData', 'TableService',
         '$mdDialog', 'MGSharedData',
         MainGraphController

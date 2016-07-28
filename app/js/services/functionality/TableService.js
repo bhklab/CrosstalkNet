@@ -35,6 +35,10 @@
          * which of the network types to show the interaction strength for.
          */
         function getInteractionViaDictionary(vm, source, target, matType) {
+            if (vm.sdWithinTab.edgeDictionary == null) {
+                return;
+            }
+
             if (vm.sdWithinTab.edgeDictionary[source] != null && vm.sdWithinTab.edgeDictionary[source][target] != null) {
                 return vm.sdWithinTab.edgeDictionary[source][target][matType];
             } else if (vm.sdWithinTab.edgeDictionary[target] != null && vm.sdWithinTab.edgeDictionary[target][source] != null) {
