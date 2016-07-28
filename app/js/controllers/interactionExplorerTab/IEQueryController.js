@@ -98,7 +98,7 @@
                 }
 
                 $rootScope.state = $rootScope.states.loadingConfig;
-                if (vm.display == vm.displayModes.table) {
+                if (vm.sdWithinTab.display == vm.displayModes.table) {
                     vm.needsRedraw = true;
                 }
                 vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.data.config, "cyInteractionExplorer");
@@ -163,12 +163,18 @@
             }
             return null;
         }, function(newValue, oldValue) {
-            if (newValue == vm.displayModes.graph && newValue != oldValue) {
+            if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
                         GraphConfigService.destroyGraph(vm);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyInteractionExplorer");
+                    }
+                }, 250);
+            } else if (newValue == vm.displayModes.graph && newValue != oldValue && !vm.needsRedraw) {
+                $timeout(function() {
+                    if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
+                        vm.resize(vm);
                     }
                 }, 250);
             }
