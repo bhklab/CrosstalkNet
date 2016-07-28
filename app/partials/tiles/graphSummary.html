@@ -7,8 +7,8 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content>
-        <div class="md-subhead"># of Self Loops: {{vm.sdWithinTab.selfLoops.length}}</div>
-        <div class="md-subhead"># of Total Interactions: {{vm.sdWithinTab.cy.edges().length}}</div>
-        <div class="md-subhead"># of Total Genes: {{vm.sdWithinTab.cy.nodes().not(':parent').length}}</div>
+        <div class="md-subhead"># of Self Loops: {{::vm.sdWithinTab.selfLoops.length}}</div>
+        <div class="md-subhead"># of Total Interactions: {{::vm.sdWithinTab.cy.edges().length}}</div>
+        <div class="md-subhead"># of Total Genes: {{::vm.sdWithinTab.cy.nodes().not(':parent').length}}</div>
     </md-card-content>
 </md-card>

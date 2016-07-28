@@ -78,5 +78,21 @@
                 initializeVariables();
             }
         });
+
+        $scope.$watch(function() {
+            return vm.sdWithinTab.search.epi;
+        }, function(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                vm.sdWithinTab.pagination.epi.query.page = 1;
+            }
+        });
+
+        $scope.$watch(function() {
+            return vm.sdWithinTab.search.stroma;
+        }, function(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                vm.sdWithinTab.pagination.stroma.query.page = 1;
+            }
+        });
     }
 })();
