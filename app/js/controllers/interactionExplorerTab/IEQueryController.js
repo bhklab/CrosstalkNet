@@ -63,7 +63,6 @@
 
             vm.genesOfInterest = [];
             vm.explorerGenes = [];
-            vm.allVisibleGenes = [];
 
             vm.query = {
                 limit: 5,
@@ -108,7 +107,7 @@
                 // Only use the following method if the final selected node does not generate any new nodes. 
                 // Even if it does we might end up having issue though
                 vm.explorerGenes = vm.loadExplorerDropdownOptions(vm.genesOfInterest);
-                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
+                vm.sdWithinTab.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
                 $rootScope.state = $rootScope.states.showingGraph;
 
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.level, true);

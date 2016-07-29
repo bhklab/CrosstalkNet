@@ -43,7 +43,7 @@
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = MGSharedData.data;
-            intializeVariables();
+            initializeVariables();
         }
 
         /**
@@ -51,7 +51,7 @@
          *
          * @memberOf controllers.MGQueryController
          */
-        function intializeVariables() {
+        function initializeVariables() {
             vm.selectedItemFirst = null;
             vm.selectedGOI = null;
             vm.zoomGene = null;
@@ -88,7 +88,6 @@
             };
 
             vm.GOIState = vm.GOIStates.initial;
-            vm.allVisibleGenes = [];
 
             vm.query = {
                 limit: 5,
@@ -133,7 +132,7 @@
 
                 vm.sdWithinTab.edgeDictionary = result.data.edgeDictionary;
                 vm.sdWithinTab.selfLoops = result.data.selfLoops;
-                vm.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
+                vm.sdWithinTab.allVisibleGenes = GlobalControls.getAllVisibleGenes(vm.sdWithinTab.cy);
                 vm.sdWithinTab.showGraphSummary = true;
                 $rootScope.state = $rootScope.states.showingGraph;
 
@@ -154,7 +153,7 @@
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                intializeVariables();
+                initializeVariables();
                 GraphConfigService.destroyGraph(vm);
                 MGSharedData.resetWTM(vm);
             }

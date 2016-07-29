@@ -68,9 +68,9 @@
                 var deferred;
 
                 if (source == "locate") {
-                    if (vm.allVisibleGenes != null) {
-                        results = query ? vm.allVisibleGenes.filter(createFilterFor(query)) :
-                            vm.allVisibleGenes,
+                    if (vm.sdWithinTab.allVisibleGenes != null) {
+                        results = query ? vm.sdWithinTab.allVisibleGenes.filter(createFilterFor(query)) :
+                            vm.sdWithinTab.allVisibleGenes,
                             deferred;
                     }
                 } else if (source == "explorer") {

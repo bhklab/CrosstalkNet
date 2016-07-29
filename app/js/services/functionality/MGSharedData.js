@@ -23,6 +23,7 @@
             config: null,
             edgeDictionary: null,
             display: null,
+            allVisibleGenes: [],
             neighbours: null,
             selectedLayout: null,
             graphSummary: null,
