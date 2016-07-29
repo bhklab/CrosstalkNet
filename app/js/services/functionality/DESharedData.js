@@ -37,9 +37,11 @@
         };
 
         var withinTabModel = {
+            dataLoaded: false,
             filterAmount: 1,
             filterType: null,
             topGenes: null,
+            filtered: { epi : {genes: null, total: 0}, stroma: {genes: null, total: 0} },
             pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) },
             search: {epi: "", stroma: ""}
         };

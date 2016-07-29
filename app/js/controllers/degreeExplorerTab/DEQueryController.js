@@ -60,6 +60,7 @@
                 }
 
                 vm.sdWithinTab.topGenes = result.topGenes;
+                vm.sdWithinTab.dataLoaded = true;
                 //$rootScope.state = $rootScope.states.finishedGettingAllPaths;
             });
         }
@@ -76,22 +77,6 @@
             if (newValue == true && newValue != oldValue) {
                 DESharedData.resetWTM(vm);
                 initializeVariables();
-            }
-        });
-
-        $scope.$watch(function() {
-            return vm.sdWithinTab.search.epi;
-        }, function(newValue, oldValue) {
-            if (newValue !== oldValue) {
-                vm.sdWithinTab.pagination.epi.query.page = 1;
-            }
-        });
-
-        $scope.$watch(function() {
-            return vm.sdWithinTab.search.stroma;
-        }, function(newValue, oldValue) {
-            if (newValue !== oldValue) {
-                vm.sdWithinTab.pagination.stroma.query.page = 1;
             }
         });
     }

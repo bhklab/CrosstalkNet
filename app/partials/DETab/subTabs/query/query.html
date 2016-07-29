@@ -9,6 +9,9 @@
             </div>
         </div>
         <md-button class="md-raised md-primary" ng-click="vm.getTopGenes('top')">Get Top Genes</md-button>
+    </div>
+    <md-divider></md-divider>
+    <div class="md-padding">
         <h2 class="md-subhead">Genes With Degree {{vm.minDegreeSlider}} Or Higher</h2>
         <div layout="row">
             <md-slider class="right-padded-25" flex="75" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" id="min-degree-genes" class>
