@@ -28,7 +28,7 @@
                     <span>{{gene.value}}</span>
                 </md-list-item>
             </md-list>
-            <md-button class="md-raised md-primary" ng-click="vm.removeGenesOfInterest()" ng-disabled="state == states.loadingGraph || state == states.loadingConfig || vm.genesOfInterest.length == 0">Remove All Genes</md-button>
+            <md-button class="md-raised md-primary" ng-click="vm.removeAllGenes()" ng-disabled="state == states.loadingGraph || state == states.loadingConfig || vm.genesOfInterest.length == 0">Remove All Genes</md-button>
         </fieldset>
         <div layout="row">
             <div flex="40">
