@@ -47,6 +47,7 @@
         }
 
         function getTopGenes(filterType) {
+            $rootScope.state = $rootScope.states.loadingDegreeExplorer;
             DESharedData.resetWTM(vm);
             vm.sdWithinTab.filterType = filterType;
             if (filterType == "top") {
@@ -61,7 +62,7 @@
 
                 vm.sdWithinTab.topGenes = result.topGenes;
                 vm.sdWithinTab.dataLoaded = true;
-                //$rootScope.state = $rootScope.states.finishedGettingAllPaths;
+                $rootScope.state = $rootScope.states.finishedGettingTopGenes;
             });
         }
 

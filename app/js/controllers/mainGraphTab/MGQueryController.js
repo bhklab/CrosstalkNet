@@ -26,6 +26,8 @@
 
         vm.initializeController = initializeController;
         vm.refreshGraph = refreshGraph;
+        vm.removeGene = removeGene;
+        vm.removeAllGenes = removeAllGenes;
 
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
@@ -43,58 +45,42 @@
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = MGSharedData.data;
-            initializeVariables();
+            vm.initializeVariables();
         }
 
         /**
-         * @summary Initializes variables used within the tab for binding to the controls.
+         * @summary Removes a gene object from the array of genes of interest. 
+         * Clears the displayed data in the case of genesOfInterest becoming empty,
+         * refreshes the graph otherwise.
          *
-         * @memberOf controllers.MGQueryController
+         * @param {Object} gene The gene to remove.
          */
-        function initializeVariables() {
-            vm.selectedItemFirst = null;
-            vm.selectedGOI = null;
-            vm.zoomGene = null;
-            vm.searchTextGOI = "";
-            vm.searchTextFirst = "";
-            vm.searchTextZoom = "";
+        function removeGene(gene) {
+            if (vm.genesOfInterest.length == 1) {
+                vm.removeAllGenes();
+            } else {
+                vm.GOIState = vm.GOIStates.initial;
+                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+                vm.refreshGraph();
+            }
+        }
 
-            vm.minDegree = {
-                first: 0,
-                second: 0
-            };
+        /**
+         * @summary Removes all genes of interest and resets all data within the
+         * tab.
+         */
+        function removeAllGenes() {
+            resetAllData();
+        }
 
-            vm.correlationFilterModel = {
-                min: -1,
-                max: 1,
-                negativeFilter: 0,
-                positiveFilter: 0,
-                negativeEnabled: false,
-                positiveEnabled: false
-            };
-
-            vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
-            vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-
-            vm.displayModes = angular.copy(GlobalControls.displayModes);
-
-            vm.genesOfInterest = [];
-
-            vm.GOIStates = {
-                initial: 0,
-                filterFirst: 1,
-                getSecondNeighbours: 2,
-                filterSecond: 3
-            };
-
-            vm.GOIState = vm.GOIStates.initial;
-
-            vm.query = {
-                limit: 5,
-                page: 1
-            };
-
-            vm.sdWithinTab.showGraphSummary = false;
+        /**
+         * @summary Resets all data within the tab to the initial state
+         * as if no queries have been made.
+         */
+        function resetAllData() {
+            vm.initializeVariables();
+            GraphConfigService.destroyGraph(vm);
+            MGSharedData.resetWTM(vm);
         }
 
         /**
@@ -138,7 +124,7 @@
 
                 vm.setFilterMinMax(result.depth, result.data.minNegativeWeight, result.data.maxPositiveWeight);
                 vm.advanceGOIState(result.depth);
-                
+
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
             });
         }
@@ -153,9 +139,7 @@
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                initializeVariables();
-                GraphConfigService.destroyGraph(vm);
-                MGSharedData.resetWTM(vm);
+                resetAllData();
             }
         });
 
@@ -182,7 +166,7 @@
          * from the Tables view to the Graph view.
          *
          * @memberOf controllers.MGQueryController
-         */ 
+         */
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
                 return vm.sdWithinTab.display;

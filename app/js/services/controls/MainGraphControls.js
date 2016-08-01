@@ -34,10 +34,60 @@
             vm.advanceGOIState = advanceGOIState;
             vm.resetGeneSelection = resetGeneSelection;
             vm.resetFilters = resetFilters;
-            vm.removeGene = removeGene;
-            vm.removeGenesOfInterest = removeGenesOfInterest;
             vm.returnToFirstNeighboursFilter = returnToFirstNeighboursFilter;
             vm.setFilterMinMax = setFilterMinMax;
+            vm.initializeVariables = initializeVariables;
+
+            /**
+             * @summary Initializes variables used within the tab for binding to the controls.
+             *
+             * @memberOf controllers.MGQueryController
+             */
+            function initializeVariables() {
+                vm.selectedItemFirst = null;
+                vm.selectedGOI = null;
+                vm.zoomGene = null;
+                vm.searchTextGOI = "";
+                vm.searchTextFirst = "";
+                vm.searchTextZoom = "";
+
+                vm.minDegree = {
+                    first: 0,
+                    second: 0
+                };
+
+                vm.correlationFilterModel = {
+                    min: -1,
+                    max: 1,
+                    negativeFilter: 0,
+                    positiveFilter: 0,
+                    negativeEnabled: false,
+                    positiveEnabled: false
+                };
+
+                vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
+                vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
+
+                vm.displayModes = angular.copy(GlobalControls.displayModes);
+
+                vm.genesOfInterest = [];
+
+                vm.GOIStates = {
+                    initial: 0,
+                    filterFirst: 1,
+                    getSecondNeighbours: 2,
+                    filterSecond: 3
+                };
+
+                vm.GOIState = vm.GOIStates.initial;
+
+                vm.query = {
+                    limit: 5,
+                    page: 1
+                };
+
+                vm.sdWithinTab.showGraphSummary = false;
+            }
 
             /**
              * @summary Adds a gene object to the array of genes of interest.
@@ -105,45 +155,6 @@
             function resetFilters() {
                 vm.correlationFilterFirst = angular.copy(vm.correlationFilterModel);
                 vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
-            }
-
-            /**
-             * @summary Removes a gene object from the array of genes of interest. 
-             * Clears the displayed data in the case of genesOfInterest becoming empty,
-             * refreshes the graph otherwise.
-             *
-             * @param {Object} gene The gene to remove.
-             */
-            function removeGene(gene) {
-                if (vm.genesOfInterest.length == 1) {
-                    vm.removeGenesOfInterest();
-                } else {
-                    vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-                    vm.refreshGraph();
-                }
-            }
-
-            /**
-             * @summary Removes all genes of interest and resets all data within the
-             * tab.
-             */
-            function removeGenesOfInterest() {
-                vm.genesOfInterest = [];
-                resetAllData();
-            }
-
-            /**
-             * @summary Resets all data within the tab.
-             */
-            function resetAllData() {
-                vm.GOIState = vm.GOIStates.initial;
-                vm.allVisibleGenes = [];
-                GraphConfigService.destroyGraph(vm);
-                GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
-                GlobalControls.closeEdgeInspector(vm);
-                vm.clearLocatedGene();
-                vm.resetFilters();
-                MGSharedData.resetWTM(vm);
             }
 
             /**

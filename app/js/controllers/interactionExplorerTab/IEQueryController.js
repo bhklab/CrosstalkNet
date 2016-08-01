@@ -25,6 +25,8 @@
         vm.allowAdditionalGenes = true;
 
         vm.initializeController = initializeController;
+        vm.removeGene = removeGene;
+        vm.removeAllGenes = removeAllGenes;
         vm.refreshGraph = refreshGraph;
 
         vm.sharedData = GlobalSharedData.data;
@@ -45,31 +47,48 @@
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
             vm.sdWithinTab = IESharedData.data;
-            initializeVariables();
+            vm.initializeVariables();
         }
 
         /**
-         * @summary Initializes variables used within the tab for binding to the controls.
+         * @summary Removes a gene object from the array of genes of interest. 
+         * Clears the displayed data in the case of genesOfInterest becoming empty,
+         * refreshes the graph otherwise.
          *
-         * @memberOf controllers.IEQueryController
+         * @param {Object} gene The gene to remove.
          */
-        function initializeVariables() {
-            vm.zoomGene = null;
-            vm.searchTextGOI = "";
-            vm.searchTextFirst = "";
-            vm.searchTextZoom = "";
+        function removeGene(gene) {
+            vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
+            if (vm.genesOfInterest.length == 0) {
+                GraphConfigService.destroyGraph(vm);
+            } else {
+                vm.refreshGraph();
+            }
 
-            vm.displayModes = angular.copy(GlobalControls.displayModes);
+            vm.allowAdditionalGenes = true;
+            resetDisplayedData();
+        }
 
+        /**
+         * @summary Empties the genes of interest and
+         * resets data within the tab.
+         */
+        function removeAllGenes() {
+            vm.allowAdditionalGenes = true;
             vm.genesOfInterest = [];
+            GraphConfigService.destroyGraph(vm);
+            resetDisplayedData();
+        }
+
+        /**
+         * @summary Resets the data within the tab.
+         */
+        function resetDisplayedData() {
+            vm.allVisibleGenes = [];
             vm.explorerGenes = [];
-
-            vm.query = {
-                limit: 5,
-                page: 1
-            };
-
-            vm.sdWithinTab.showGraphSummary = false;
+            GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
+            vm.clearLocatedGene();
+            IESharedData.resetWTM(vm);
         }
 
         /**
@@ -79,7 +98,7 @@
          * @memberOf controllers.IEQueryController
          */
         function refreshGraph() {
-            vm.resetDisplayedData();
+            resetDisplayedData();
             IESharedData.resetWTM(vm);
             getConfigForGraph();
         }
@@ -129,7 +148,7 @@
             if (newValue == true && newValue != oldValue) {
                 vm.genesOfInterest = [];
                 GraphConfigService.destroyGraph(vm);
-                vm.resetDisplayedData();
+                resetDisplayedData();
             }
         });
 
@@ -155,7 +174,7 @@
          * from the Tables view to the Graph view.
          *
          * @memberOf controllers.IEQueryController
-         */ 
+         */
         $scope.$watch(function() {
             if (vm.sdWithinTab) {
                 return vm.sdWithinTab.display;

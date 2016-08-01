@@ -26,10 +26,33 @@
          */
         function setMethods(vm) {
             vm.addGeneOfInterest = addGeneOfInterest;
-            vm.removeGene = removeGene;
-            vm.removeAllGenes = removeAllGenes;
-            vm.resetDisplayedData = resetDisplayedData;
+            vm.initializeVariables = initializeVariables;
             vm.loadExplorerDropdownOptions = loadExplorerDropdownOptions;
+
+            /**
+             * @summary Initializes variables used within the tab for binding to the controls.
+             *
+             * @memberOf controllers.IEQueryController
+             */
+            function initializeVariables() {
+                vm.zoomGene = null;
+                vm.searchTextGOI = "";
+                vm.searchTextFirst = "";
+                vm.searchTextZoom = "";
+
+                vm.displayModes = angular.copy(GlobalControls.displayModes);
+
+                vm.genesOfInterest = [];
+                vm.explorerGenes = [];
+
+                vm.query = {
+                    limit: 5,
+                    page: 1
+                };
+
+                vm.sdWithinTab.showGraphSummary = false;
+                vm.allowAdditionalGenes = true;
+            }
 
             /**
              * @summary Adds a gene object to the array of genes of interest.
@@ -43,47 +66,6 @@
                         vm.allowAdditionalGenes = false;
                     }
                 }
-            }
-
-            /**
-             * @summary Removes a gene object from the array of genes of interest. 
-             * Clears the displayed data in the case of genesOfInterest becoming empty,
-             * refreshes the graph otherwise.
-             *
-             * @param {Object} gene The gene to remove.
-             */
-            function removeGene(gene) {
-                vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
-                if (vm.genesOfInterest.length == 0) {
-                    GraphConfigService.destroyGraph(vm);
-                } else {
-                    vm.refreshGraph();
-                }
-
-                vm.allowAdditionalGenes = true;
-                vm.resetDisplayedData();
-            }
-
-            /**
-             * @summary Empties the genes of interest and
-             * resets data within the tab.
-             */
-            function removeAllGenes() {
-                vm.allowAdditionalGenes = true;
-                vm.genesOfInterest = [];
-                GraphConfigService.destroyGraph(vm);
-                vm.resetDisplayedData();
-            }
-
-            /**
-             * @summary Resets the data within the tab.
-             */
-            function resetDisplayedData() {
-                vm.allVisibleGenes = [];
-                vm.explorerGenes = [];
-                GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
-                vm.clearLocatedGene();
-                IESharedData.resetWTM(vm);
             }
 
             /**

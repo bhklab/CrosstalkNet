@@ -43,11 +43,13 @@
             finishedGettingAllPaths: { id: 2, text: "All paths have been obtained" },
             finishedUploadingFile: { id: 3, text: "Successfully uploaded file to server" },
             failedUploadingFile: { id: 4, text: "Failed to upload file to server" },
-            loadingGraph: { id: 5, text: "Getting graph from server..." },
-            loadingConfig: { id: 6, text: "Initializing graph..." },
-            gettingGeneList: { id: 7, text: "Getting gene list..." },
-            gettingAllPaths: { id: 8, text: "Getting all paths between source and target genes..." },
-            uploadingFile: { id: 9, text: "Uploading file to server..." }
+            finishedGettingTopGenes: {id: 5, text: "Top genes have been obtained"},
+            loadingGraph: { id: 6, text: "Getting graph from server..." },
+            loadingConfig: { id: 7, text: "Initializing graph..." },
+            gettingGeneList: { id: 8, text: "Getting gene list..." },
+            gettingAllPaths: { id: 9, text: "Getting all paths between source and target genes..." },
+            uploadingFile: { id: 10, text: "Uploading file to server..." },
+            loadingDegreeExplorer: {id: 11, text: "Getting top genes from the server..."}
         };
 
         $rootScope.states = angular.copy(service.states);
