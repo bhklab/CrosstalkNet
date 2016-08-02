@@ -18,6 +18,7 @@
         service.exportNeighboursToCSV = exportNeighboursToCSV;
         service.exportGraphToPNG = exportGraphToPNG;
         service.exportTopGenesToCSV = exportTopGenesToCSV;
+        service.exportAllPathsToCSV = exportAllPathsToCSV;
 
         /**
          * @summary Exports a specified table of data to a csv file.
@@ -112,6 +113,42 @@
                 } else {
                     csv += "";
                 }
+
+                csv += rowDelim;
+            }
+
+            var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+            downloadFile(fileName, csvData);
+        }
+
+        function exportAllPathsToCSV(vm, matType) {
+            var source = vm.sdWithinTab.pathSourceCached;
+            var target = vm.sdWithinTab.pathTargetCached;
+            var allPaths = $filter("orderBy")(vm.sdWithinTab.allPaths, vm.sdWithinTab.pagination[matType].query.order);
+            var hop = false;
+            var fileName = "topGenes" + Date.now() + ".csv";
+            var rowDelim = "\r\n";
+            var colDelim = ",";
+            var csv = "";
+            var header = "Source" + colDelim;
+            header += "Correlation" + colDelim;
+
+            if (allPaths.length > 0 && allPaths[0].secondEdge) {
+                header += "Intermediate Node" + colDelim;
+                header += "Correlation" + colDelim;
+                hop = true;
+            }
+
+            header += "Target";
+            csv += header;
+            csv += rowDelim;
+
+            for (var i = 0; i < allPaths.length; i++) {
+                csv += source + colDelim;
+                csv += allPaths[i].firstEdge[matType] + colDelim;
+                csv += hop ? allPaths[i].intermediateNode + colDelim : "";
+                csv += hop ? allPaths[i].secondEdge[matType] + colDelim : "";
+                csv += target + colDelim;
 
                 csv += rowDelim;
             }

@@ -37,11 +37,11 @@
         };
 
         var weight = angular.copy(paginationModel);
-        weight.query.order = "-'firstEdge.weight'";
+        weight.query.order = "-firstEdge.weight";
         var normal = angular.copy(paginationModel); 
-        normal.query.order = "-'firstEdge.normal'";
+        normal.query.order = "-firstEdge.normal";
         var tumor = angular.copy(paginationModel);
-        tumor.query.order = "-'firstEdge.tumor'"; 
+        tumor.query.order = "-firstEdge.tumor"; 
 
         /** Object representing variables to be available between the various controllers within
          * the PATH EXISTENCE CHEKCER tab.
