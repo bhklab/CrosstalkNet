@@ -131,7 +131,7 @@
                 depth = 2;
             }
 
-            RESTService.post("delta-submatrix", {
+            RESTService.post("main-graph", {
                     selectedGenes: vm.genesOfInterest,
                     minNegativeWeightFirst: vm.correlationFilterFirst.negativeFilter ==
                         null || !vm.correlationFilterFirst.negativeEnabled ?
@@ -178,7 +178,7 @@
             var deferred = $q.defer();
             var level = vm.genesOfInterest.length;
             $rootScope.state = $rootScope.states.loadingGraph;
-            RESTService.post('delta-interaction-explorer', {
+            RESTService.post('interaction-explorer', {
                 layout: vm.sdWithinTab.selectedLayout,
                 selectedGenes: vm.genesOfInterest,
                 selectedFile: vm.sharedData.correlationFileActual,
@@ -208,7 +208,7 @@
 
             $rootScope.state = $rootScope.states.gettingAllPaths;
 
-            RESTService.post('delta-get-all-paths', {
+            RESTService.post('get-all-paths', {
                 target: vm.pathExplorerTarget.value,
                 source: vm.pathExplorerSource.value,
                 selectedFile: vm.sharedData.correlationFileActual,

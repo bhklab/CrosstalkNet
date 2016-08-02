@@ -354,7 +354,7 @@ getNeighbours <- function(corMatrix, gene, exclusions) {
     # Returns: A vector of correlations between gene and its neighbours. The names
     #           of the vector are the gene names of the neighbours.
     if (is.null(gene) || is.na(gene)) {
-        write("Gene specified to getNeighbours is null", stderr())
+        # write("Gene specified to getNeighbours is null", stderr())
         return(c())
     }
 
