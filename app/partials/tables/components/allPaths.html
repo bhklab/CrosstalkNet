@@ -1,5 +1,5 @@
 <div ng-if="vm.sdWithinTab.allPaths != null">
-    <md-card ng-repeat="matType in vm.sdWithinTab.types">
+    <md-card ng-repeat="matType in ::vm.sdWithinTab.types">
         <md-card-title>
             <md-card-title-text>
                 <div layout="row">
@@ -16,7 +16,7 @@
         <md-card-content>
             <md-table-container>
                 <table ng-class="'all-paths-table' + matType" md-table>
-                    <thead md-head md-order="vm.sdWithinTab.tableOrder[matType]">
+                    <thead md-head md-order="vm.sdWithinTab.pagination[matType].query.order">
                         <th md-column>Source</th>
                         <th md-column md-column md-order-by="{{'\'firstEdge.' + matType + '\''}}" md-numeric>Correlation</th>
                         <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
@@ -24,7 +24,7 @@
                         <th md-column>Destination</th>
                     </thead>
                     <tbody md-body>
-                        <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.sdWithinTab.tableOrder[matType]">
+                        <tr ng-repeat="path in vm.sdWithinTab.allPaths | orderBy: vm.sdWithinTab.pagination[matType].query.order | limitTo: vm.sdWithinTab.pagination[matType].query.limit : (vm.sdWithinTab.pagination[matType].query.page -1) * vm.sdWithinTab.pagination[matType].query.limit">
                             <td class="table-center" md-cell><a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{vm.sdWithinTab.pathSourceCached | suffixTrim}}">{{vm.sdWithinTab.pathSourceCached}}</a></td>
                             <td class="table-center" md-cell>{{path["firstEdge." + matType]}}</td>
                             <td class="table-center" md-cell ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null"><a target="_blank" ng-href="http://www.genecards.org/cgi-bin/carddisp.pl?gene={{path.intermediateNode | suffixTrim}}">{{path.intermediateNode}}</a></td>
@@ -34,7 +34,7 @@
                     </tbody>
                 </table>
             </md-table-container>
-            <!-- <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.filtered.epi.total}}" md-on-paginate="vm.paginateEpi" md-page-select="true" md-boundary-links="true"></md-table-pagination> -->
+            <md-table-pagination md-limit="vm.sdWithinTab.pagination[matType].query.limit" md-limit-options="vm.sdWithinTab.pagination[matType].limitOptions" md-page="vm.sdWithinTab.pagination[matType].query.page" md-total="{{vm.sdWithinTab.allPaths.length}}" md-page-select="true" md-boundary-links="true"></md-table-pagination>
             <md-button class="md-raised md-primary" ng-click="vm.exportTableToCSV('all-paths-table' + matType)">Download Interactions</md-button>
         </md-card-content>
     </md-card>
