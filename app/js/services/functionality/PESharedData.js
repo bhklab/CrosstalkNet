@@ -17,6 +17,32 @@
 
         var tableOrderModel = { weight: "-'firstEdge.weight'", normal: "-'firstEdge.normal'", tumor: "-'firstEdge.tumor'" };
 
+        var paginationModel = {
+            options: {
+                rowSelection: true,
+                multiSelect: true,
+                autoSelect: true,
+                decapitate: false,
+                largeEditDialog: false,
+                boundaryLinks: false,
+                limitSelect: true,
+                pageSelect: true
+            },
+            query: {
+                limit: 10,
+                page: 1,
+                order: ''
+            },
+            limitOptions: [10, 15, 20]
+        };
+
+        var weight = angular.copy(paginationModel);
+        weight.query.order = "-'firstEdge.weight'";
+        var normal = angular.copy(paginationModel); 
+        normal.query.order = "-'firstEdge.normal'";
+        var tumor = angular.copy(paginationModel);
+        tumor.query.order = "-'firstEdge.tumor'"; 
+
         /** Object representing variables to be available between the various controllers within
          * the PATH EXISTENCE CHEKCER tab.
          */
@@ -26,7 +52,7 @@
             allPaths: null,
             display: null,
             types: null,
-            tableOrder: angular.copy(tableOrderModel)
+            pagination: {weight: angular.copy(weight), normal: angular.copy(normal), tumor: angular.copy(tumor)}
         };
 
         service.data = angular.copy(withinTabModel);
@@ -42,10 +68,8 @@
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {
-                if (prop == "tableOrder") {
-                    vm.sdWithinTab[prop] = angular.copy(tableOrderModel);
-                } else if (prop != "display") {
-                    vm.sdWithinTab[prop] = withinTabModel[prop];
+                if (prop != "display") {
+                    vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
                 }
             }
         }

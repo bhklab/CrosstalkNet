@@ -14,6 +14,7 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 	
 	if (getGeneSuffix(source) == getGeneSuffix(target)) {
 		for (i in names(corMatrices)) {
+			write(paste("getting neighbours from", i, sep=" "), stderr())
             neighbours[[i]] = getNeighbours(corMatrices[[i]], source, c())
         }
 
@@ -35,11 +36,29 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 				paths[numRows + 1, "secondEdge.weight"] = secondLevelNeighbours[[networkType]][target]
 
 				if (networkType == 'delta') {
-					paths[numRows + 1, "firstEdge.normal"] = neighbours$normal[i]
-					paths[numRows + 1, "firstEdge.tumor"] = neighbours$tumor[i]
+					if (is.null(neighbours$normal[i]) || is.na(neighbours$normal[i])) {
+						paths[numRows + 1, "firstEdge.normal"] = 0
+					} else {
+						paths[numRows + 1, "firstEdge.normal"] = neighbours$normal[i]
+					}
 
-					paths[numRows + 1, "secondEdge.normal"] = secondLevelNeighbours$normal[target]
-					paths[numRows + 1, "secondEdge.tumor"] = secondLevelNeighbours$tumor[target]
+					if (is.null(neighbours$tumor[i]) || is.na(neighbours$tumor[i])) {
+						paths[numRows + 1, "firstEdge.tumor"] = 0	
+					} else {
+						paths[numRows + 1, "firstEdge.tumor"] = neighbours$tumor[i]
+					}
+
+					if (is.null(secondLevelNeighbours$normal[target]) || is.na(secondLevelNeighbours$normal[target])) {
+						paths[numRows + 1, "secondEdge.normal"] = 0
+					} else {
+						paths[numRows + 1, "secondEdge.normal"] = secondLevelNeighbours$normal[target]
+					}
+
+					if (is.null(secondLevelNeighbours$tumor[target]) || is.na(secondLevelNeighbours$tumor[target])) {
+						paths[numRows + 1, "secondEdge.tumor"] = 0
+					} else {
+						paths[numRows + 1, "secondEdge.tumor"] = secondLevelNeighbours$tumor[target]
+					}
 				}
 			}
 		}
