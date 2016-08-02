@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('PathExistenceController', [
-        'GlobalControls', 'GlobalSharedData', 'PESharedData',
+        'GlobalControls', 'GlobalSharedData', 'PESharedData', 'ExportService',
         PathExistenceController
     ]);
 
@@ -16,10 +16,10 @@
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function PathExistenceController(GlobalControls, GlobalSharedData, PESharedData) {
+    function PathExistenceController(GlobalControls, GlobalSharedData, PESharedData, ExportService) {
         var vm = this;
 
-        vm.exportTableToCSV = exportTableToCSV;
+        vm.exportAllPathsToCSV = ExportService.exportAllPathsToCSV;
         vm.initializeController = initializeController;
 
         vm.displayModes = angular.copy(GlobalControls.displayModes);

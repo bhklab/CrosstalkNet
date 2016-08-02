@@ -218,7 +218,7 @@ app.post('/min-degree-genes', function(req, res) {
         });
 });
 
-app.post('/delta-interaction-explorer', function(req, res) {
+app.post('/interaction-explorer', function(req, res) {
     var args = {};
     var argsString = "";
     var selectedGeneNames = [];
@@ -251,7 +251,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/deltaNeighbourExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
+    var child = exec("Rscript R_Scripts/interactionExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
                 console.log('stderr: ' + stderr);    
@@ -301,11 +301,12 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i]));
             }
 
-            allNodes = nodes.concat(sourceNodes);
-
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 var maxRows = 1;
-                var maxCols = allNodes.length + 1;
+                var maxCols = 1
+
+                allNodes = nodes.concat(sourceNodes);
+                maxCols = allNodes.length + 1;
                 allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
 
                 for (var j = 0; j < allNodes.length; j++) {
@@ -326,7 +327,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 for (var i = 0; i < nodes.length; i++) {
                     for (var j = 0; j < nodes[i].length; j++) {
                         if (nodes[i][j].data.isSource) {
-                            nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
+                            nodes[i][j] = nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
                         }
                     }
                 }
@@ -334,14 +335,14 @@ app.post('/delta-interaction-explorer', function(req, res) {
                 config = configUtils.createConfig();
                 layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
 
-                nodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                sourceNodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
+                allNodes = nodes.concat(sourceNodes);
                 config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
                 config = configUtils.setConfigLayout(config, layout);
             }
 
             elements = elements.concat([].concat.apply([], allNodes));
             elements = elements.concat(edges);
-            // elements.push(sourceNodes[0][0]);
 
             config = configUtils.addStyleToConfig(config, edgeStyleNegative);
             config = configUtils.addStyleToConfig(config, edgeStylePositive);
@@ -358,7 +359,7 @@ app.post('/delta-interaction-explorer', function(req, res) {
         });
 });
 
-app.post('/delta-submatrix', function(req, res) {
+app.post('/main-graph', function(req, res) {
     var args = {};
     var argsString = "";
     var files = null;
@@ -404,7 +405,7 @@ app.post('/delta-submatrix', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/deltaSubmatrix.R --args \"" + argsString + "\"", {
+    var child = exec("Rscript R_Scripts/mainGraph.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },
@@ -569,7 +570,7 @@ app.post('/delta-submatrix', function(req, res) {
         });
 });
 
-app.post('/delta-get-all-paths', function(req, res) {
+app.post('/get-all-paths', function(req, res) {
     var args = {};
     var argsString = "";
     var source = req.body.source;
@@ -598,7 +599,7 @@ app.post('/delta-get-all-paths', function(req, res) {
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/deltaGetAllPaths.R --args \"" + argsString + "\"", {
+    var child = exec("Rscript R_Scripts/getAllPaths.R --args \"" + argsString + "\"", {
         maxBuffer: 1024 *
             50000
     }, function(error, stdout, stderr) {
@@ -619,6 +620,7 @@ app.post('/delta-get-all-paths', function(req, res) {
         }
 
         var paths = parsedValue.paths;
+        paths = parseUtils.removeDotsFromPropertyNames(paths);
         var types = ["weight"];
 
         if (req.body.selectedNetworkType == 'delta') {
