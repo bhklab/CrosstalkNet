@@ -130,7 +130,7 @@ function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
         return null;
     }
 
-    if (selectedNetworkType == 'normal' && selectedFiles.normal.name != null) {
+    if (selectedNetworkType == 'normal' && selectedFiles.normal != null) {
         file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
 
         if (file != null) {

@@ -125,7 +125,7 @@
                         <section layout="row">
                             <div static-include="partials/PETab/sideBar.html">
                             </div>
-                            <md-content ng-show="selectedTab == 2" flex>
+                            <md-content ng-if="selectedTab == 2" flex>
                                 <div static-include="partials/PETab/tableView.html"></div>
                             </md-content>
                         </section>
