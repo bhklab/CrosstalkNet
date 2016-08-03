@@ -17,13 +17,13 @@ degrees <- readFileWithValidation(paste(path, fileName, sep=""))
 
 if (filterType == 'top') {
 	if (!is.integer(filterAmount) || (filterAmount < 1 || filterAmount > length(degrees$epiDegree))) {
-		printMessageAndQuit(paste("Top amount specified is incorrect. Please specify a number smaller than: ",  length(degrees$epiDegree), sep=" "))
+		printMessageAndQuit(paste("Top amount specified is incorrect. Please specify a positive integer smaller than: ",  length(degrees$epiDegree), sep=" "))
 	}
 
 	result <- getTopGenesByDegree(degrees, filterAmount)
 } else if (filterType == 'min') {
-	if (!is.integer(filterAmount)) {
-		printMessageAndQuit(paste("Top amount specified is incorrect. Please specify a number smaller than: ",  length(degrees$epiDegree), sep=" "))
+	if (!is.integer(filterAmount) || (filterAmount < 1 || filterAmount > max(c(degrees$epiDegree, degrees$stromaDegree)))) {
+		printMessageAndQuit(paste("Min degree specified is incorrect. Please specify a positive integer smaller than: ",  max(c(degrees$epiDegree, degrees$stromaDegree)), sep=" "))
 	}
 
 	result <- getGenesWithMinDegree(degrees, filterAmount)
