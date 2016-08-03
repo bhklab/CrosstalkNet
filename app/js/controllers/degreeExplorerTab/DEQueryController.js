@@ -56,13 +56,14 @@
                 vm.sdWithinTab.filterAmount = vm.minDegreeSlider;
             }
             QueryService.getTopGenes(vm).then(function(result) {
+                $rootScope.state = $rootScope.states.finishedGettingTopGenes;
+
                 if (result.topGenes == null) {
                     return;
                 }
 
                 vm.sdWithinTab.topGenes = result.topGenes;
                 vm.sdWithinTab.dataLoaded = true;
-                $rootScope.state = $rootScope.states.finishedGettingTopGenes;
             });
         }
 

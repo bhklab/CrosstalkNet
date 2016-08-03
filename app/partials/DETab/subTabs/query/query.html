@@ -14,7 +14,7 @@
     <div class="md-padding">
         <h2 class="md-subhead">Genes With Degree {{vm.minDegreeSlider}} Or Higher</h2>
         <div layout="row">
-            <md-slider class="right-padded-25" flex="75" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" id="min-degree-genes" class>
+            <md-slider class="right-padded-25" flex="75" min="0" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" id="min-degree-genes" class>
             </md-slider>
             <div flex="20" layout layout-align="center center">
                 <input flex type="number" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" aria-controls="min-degree-genes">
