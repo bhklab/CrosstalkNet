@@ -42,6 +42,10 @@ md-dialog md-dialog-actions .md-button {
     margin-right: 8px;
 }
 
+md-select-value { 
+    max-width: 300px;
+}
+
 .login-controls-container {
     width: 100%;
     display: flex;

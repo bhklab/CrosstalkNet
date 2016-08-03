@@ -22,7 +22,7 @@ if (filterType == 'top') {
 
 	result <- getTopGenesByDegree(degrees, filterAmount)
 } else if (filterType == 'min') {
-	if (!is.integer(filterAmount) || (filterAmount < 1 || filterAmount > max(c(degrees$epiDegree, degrees$stromaDegree)))) {
+	if (!is.integer(filterAmount) || (filterAmount < 0 || filterAmount > max(c(degrees$epiDegree, degrees$stromaDegree)))) {
 		printMessageAndQuit(paste("Min degree specified is incorrect. Please specify a positive integer smaller than: ",  max(c(degrees$epiDegree, degrees$stromaDegree)), sep=" "))
 	}
 
