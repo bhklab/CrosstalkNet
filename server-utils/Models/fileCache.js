@@ -5,10 +5,12 @@ var clone = require('clone');
 const TYPES = { real: "real", fake: "fake", personal: "personal" };
 const SUB_TYPES = { normal: "normal", tumor: "tumor", delta: "delta" };
 
-/** Class representing all available Rdata files. */
+/** 
+ * Class representing all available adjacency matrix Rdata files. 
+ */
 class FileCache {
     /**
-     * @summary Create a file cache representing existing Rdata files.
+     * @summary Create a file cache representing existing adjacency matrix Rdata files.
      *
      * @param {FileGroup} real The FileGroup containing all proprietary, public matrices.
      * @param {FileGroup} fake The FileGroup containing all fake matrices.
@@ -226,5 +228,7 @@ class FileCache {
 }
 
 module.exports = {
-    FileCache: FileCache
+    FileCache: FileCache,
+    SUB_TYPES: SUB_TYPES,
+    TYPES: TYPES
 };
