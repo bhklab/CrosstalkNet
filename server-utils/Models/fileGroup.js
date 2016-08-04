@@ -1,6 +1,8 @@
 'use strict'
 
-/** Class representing a group of files. */
+/** 
+ * Class representing a group of files. 
+ */
 class FileGroup {
     /**
      * @summary Creates a group of files organized by their network type. Network types include normal,
