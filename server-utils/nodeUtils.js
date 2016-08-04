@@ -133,13 +133,7 @@ function createParentNodesIE(selectedGenes, nodes) {
     var parentNodes = [];
 
     for (var i = 0; i < selectedGenes.length + 1; i++) {
-        if (i < 1) {
-            parentNodes.push({
-                data: {
-                    id: "par" + i
-                }
-            });
-        } else if (nodes[i - 1].length > 0) {
+        if (i < 1 || nodes[i - 1].length > 0) {
             parentNodes.push({
                 data: {
                     id: "par" + i
