@@ -67,7 +67,7 @@ app.use(function(req, res, next) {
         next();
     } else {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
-            if (err) {
+            if (err || authenticationUtils.getUserFromToken(req.body.token) == null) {
                 console.log(err);
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {

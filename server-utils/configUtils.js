@@ -35,7 +35,8 @@ function createConfig() {
         }, {
             selector: ':parent',
             style: {
-                'background-opacity': 0.6
+                'background-opacity': 0.6,
+                'label': ''
             }
         }, {
             selector: 'node:selected',
