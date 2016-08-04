@@ -6,9 +6,6 @@
  * 
  * @summary Methods for: reading, writing, deleting, and keeping track of Rdata files.
  */
-
-const TYPES = { real: "real", fake: "fake", personal: "personal" };
-const SUB_TYPES = { normal: "normal", tumor: "tumor", delta: "delta" };
 const DEGREES_FILE_PREFIX = "degrees";
 
 const fs = require('fs');
@@ -19,6 +16,9 @@ var FileCache = require('./Models/fileCache').FileCache;
 var FileGroup = require('./Models/fileGroup').FileGroup;
 var File = require('./Models/fileModel').File;
 var availableMatrixCache = null;
+
+const TYPES = require('./Models/fileCache').TYPES;
+const SUB_TYPES = require('./Models/fileCache').SUB_TYPES;
 
 var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
 var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Proprietary_Matrices/';
@@ -130,21 +130,21 @@ function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
         return null;
     }
 
-    if (selectedNetworkType == 'normal' && selectedFiles.normal != null) {
+    if (selectedNetworkType == SUB_TYPES.normal && selectedFiles.normal != null) {
         file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
 
         if (file != null) {
             result.normal = file.path + file.name;
             result.degree = file.path + "degrees" + file.name;
         }
-    } else if (selectedNetworkType == 'tumor' && selectedFiles.tumor != null) {
+    } else if (selectedNetworkType == SUB_TYPES.tumor && selectedFiles.tumor != null) {
         file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
 
         if (file != null) {
             result.tumor = file.path + file.name;
             result.degree = file.path + "degrees" + file.name;
         }
-    } else if (selectedNetworkType == 'delta' && selectedFiles.delta != null) {
+    } else if (selectedNetworkType == SUB_TYPES.delta && selectedFiles.delta != null) {
         file = matchSelectedFile(selectedFiles.delta, availableMatrixCache, user);
 
         if (file != null) {
