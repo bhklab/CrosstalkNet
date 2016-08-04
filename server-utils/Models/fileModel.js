@@ -1,6 +1,8 @@
 'use strict'
 
-/** Class representing a File. */
+/** 
+ * Class representing a File. 
+ */
 class File {
     /**
      * @summary Create a File representing an Rdata File on the server.
@@ -11,10 +13,15 @@ class File {
      * @param {string} subType The sub-type of the File. Can be: normal, tumor, delta.
      */
     constructor(name, path, type, subType) {
-        this._name = name;
-        this._path = path;
-        this._type = type;
-        this._subType = subType;
+        if (arguments.length == 4) {
+            this._name = name;
+            this._path = path;
+            this._type = type;
+            this._subType = subType;
+        } else if (arguments.length == 2) {
+            this._name = name;
+            this._path = path;
+        }
     }
 
     /**
