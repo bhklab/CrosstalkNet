@@ -25,6 +25,7 @@
         service.deleteFile = deleteFile;
         service.getUserPermission = getUserPermission;
         service.getTopGenes = getTopGenes;
+        service.getCommunities = getCommunities;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -321,6 +322,35 @@
                 });
 
             return deferred.promise;
+        }
+
+        /**
+         * @summaryt Gets the communities for a file specified on the view model
+         * from the server.
+         *
+         * @param {Object} vm The view model for the CEQueryController. This has
+         * a selected file in its sdWithinTab.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function getCommunities(vm) {
+            var deferred = $q.defer();
+
+            RESTService.post('community-explorer', {
+                    selectedFile: vm.sdWithinTab.communitiesFile
+                })
+                .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        deferred.resolve({ topGenes: null });
+                    }
+
+                    deferred.resolve({ communities: data.communities, config: data.config });
+                }, function(response) {
+                    console.log(response);
+                });
+
+            return deferred.promise;
+
         }
 
         return service;
