@@ -727,18 +727,26 @@ app.post('/upload-matrix', function(req, res) {
 
     for (var prop in files) {
         if (files[prop] != null) {
-            if (typeof files[prop].name == 'string') {
+            if (files[prop].name && typeof files[prop].name == 'string') {
                 if (!files[prop].name.toLowerCase().endsWith('.rdata')) {
                     res.send({ error: "File upload failed. Please specify an Rdata file instead of: " + files[prop].name });
                     return;
                 } else if (files[prop].name.startsWith("degree")) {
                     res.send({ error: "File upload failed. Please change the file name so that it doesn't contain 'degree' in it. File name: " + files[prop].name });
                     return;
+                } else if (files[prop].data == null) {
+                    res.send({ error: "File upload failed. File name: " + files[prop].name });
+                    return;
                 }
-            } else {
+            } else if (!files[prop].name) {
                 res.send({ error: "File upload failed. Could not determine name of uploaded file(s)" })
                 return;
             }
+
+            if (uploadType == 'delta') {
+                files[prop].name = "dLtA" + files[prop].name;    
+            }
+            
             nonEmptyFiles.push(prop);
         }
     }
