@@ -11,8 +11,8 @@
         <md-input-container ng-repeat="(key, value) in vm.correlationFileDisplayed" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="select">
             <label>Select {{key | capitalize}} Matrix File</label>
             <md-select class="file-select" ng-model="vm.correlationFileDisplayed[key]">
-                <md-option ng-repeat="file in vm.fileList[key]" value="{{file}}" ng-selected="0">
-                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
+                <md-option ng-repeat="file in vm.fileList[key] | showDeltaFiles:vm.selectedNetworkType" value="{{file}}" ng-selected="0">
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name | removeDeltaPrefix}}
                 </md-option>
             </md-select>
         </md-input-container>
