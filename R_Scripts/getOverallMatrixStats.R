@@ -6,10 +6,9 @@ source('R_Scripts/helpers.R')
 args <- commandArgs(trailingOnly = TRUE)
 settings <- fromJSON(args[2])
 
-fileName <- settings$fileName
-path <- settings$path
+filePath <- settings$filePath
 
-corMatrix <- readFileWithValidation(paste(path, fileName, sep=""))
+corMatrix <- readFileWithValidation(filePath)
 
 if (!(is.matrix(corMatrix))) {
 	selfLoops <- length(which(Matrix::diag(corMatrix) != 0))	

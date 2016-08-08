@@ -19,6 +19,7 @@ var parseUtils = require('./server-utils/parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
 var databaseConfigUtils = require('./server-utils/databaseConfigUtils');
+var communityFileUtils = require('./server-utils/communityFileUtils');
 var matrixFileUtils = require('./server-utils/matrixFileUtils');
 var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
@@ -121,7 +122,7 @@ app.post('/gene-list', function(req, res) {
         },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);    
+                console.log('stderr: ' + stderr);
             }
 
             if (error != null) {
@@ -180,7 +181,7 @@ app.post('/min-degree-genes', function(req, res) {
         },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);    
+                console.log('stderr: ' + stderr);
             }
 
             if (error != null) {
@@ -248,7 +249,7 @@ app.post('/interaction-explorer', function(req, res) {
     var child = exec("Rscript R_Scripts/interactionExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);    
+                console.log('stderr: ' + stderr);
             }
 
             if (error != null) {
@@ -405,7 +406,7 @@ app.post('/main-graph', function(req, res) {
         },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);    
+                console.log('stderr: ' + stderr);
             }
 
             if (error != null) {
@@ -507,7 +508,7 @@ app.post('/main-graph', function(req, res) {
                 sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2);
+                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2, 3) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2, 3);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -517,7 +518,7 @@ app.post('/main-graph', function(req, res) {
                 var temp;
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    temp = nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize);
+                    temp = nodeUtils.positionNodesClustered(sourceNodes[i], firstNodes[i] == null ? [] : firstNodes[i], secondNodes[i] == null ? [] : secondNodes[i], i, sourceNodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 3);
 
                     if (firstNodes[i] != null) {
                         firstNodes[i] = temp.firstNeighbours;
@@ -630,7 +631,7 @@ app.post('/get-all-paths', function(req, res) {
 app.post('/available-matrices', function(req, res) {
     var subTypes = req.body.types;
     var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleMatrices = matrixFileUtils.getAccessibleMatricesForUser(user);
+    var accessibleMatrices = matrixFileUtils.getAccessibleFilesForUser(user);
 
     res.send({ fileList: accessibleMatrices });
 });
@@ -647,8 +648,7 @@ app.post('/overall-matrix-stats', function(req, res) {
         return;
     }
 
-    args.fileName = file.name;
-    args.path = file.path;
+    args.filePath = file.path + file.name;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
 
@@ -744,9 +744,9 @@ app.post('/upload-matrix', function(req, res) {
             }
 
             if (uploadType == 'delta') {
-                files[prop].name = "dLtA" + files[prop].name;    
+                files[prop].name = "dLtA" + files[prop].name;
             }
-            
+
             nonEmptyFiles.push(prop);
         }
     }
@@ -782,7 +782,97 @@ app.post('/upload-matrix', function(req, res) {
 });
 
 app.post('/community-explorer', function(req, res) {
-    res.send({error: "Path not yet implemented."});
+    var args = { filePath: null };
+    var argsString = "";
+    var file;
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+
+    file = communityFileUtils.getRequestedFile(req.body.selectedFile, user);
+
+    if (file == null || file.path == null || file.name == null) {
+        res.send({ error: "Please specify a file name" });
+        return;
+    }
+
+    args.filePath = file.path + file.name;
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript R_Scripts/getCommunities.R --args \"" + argsString + "\"", {
+        maxBuffer: 1024 *
+            50000
+    }, function(error, stdout, stderr) {
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+
+        var parsedValue = JSON.parse(stdout);
+        var parsedNodes = parsedValue.nodes;
+        var parsedEdges = parsedValue.edges;
+
+        var nodes = [];
+        var edges = [];
+        var elements = [];
+        var config;
+        var layout;
+
+        for (var i = 0; i < parsedNodes.length; i++) {
+            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i]);
+        }
+
+        nodes = nodes.sort(function(a, b) {
+            return a.length - b.length;
+        })
+
+        for (var i = 0; i < parsedEdges.length; i++) {
+            edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], 1));
+        }
+
+        elements = elements.concat(edges);
+        config = configUtils.createConfig();
+
+        var clusterRadii = [];
+
+        for (var i = 0; i < nodes.length; i++) {
+            clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5);
+        }
+
+        var temp;
+
+
+        for (var i = 0; i < nodes.length; i++) {
+            // temp = nodeUtils.positionNodesClustered(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), [], i, nodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 0.8);
+            temp = nodeUtils.positionCommunities(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
+
+            if (nodes[i] != null) {
+                nodes[i] = [];
+                nodes[i][0] = temp.centerNode;
+                nodes[i] = nodes[i].concat(temp.nodes);
+            }
+        }
+
+        layout = layoutUtils.createPresetLayout();
+        config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+
+        nodes = parseUtils.flatten(nodes);
+
+        config = configUtils.setConfigLayout(config, layout);
+        config = configUtils.setConfigElements(config, nodes);
+
+        res.json({
+            config: config,
+            communities: null
+        });
+    });
+});
+
+app.post('/community-file-list', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var accessibleFiles = communityFileUtils.getAccessibleFilesForUser(user);
+
+    res.send({ fileList: accessibleFiles });
 });
 
 function verifyFile(filePath, fileName, callback) {
@@ -842,6 +932,7 @@ var server = app.listen(5000, function() {
     // console.log("password: " + password);
 
     matrixFileUtils.updateAvailableMatrixCache();
+    communityFileUtils.updateAvailableCommunitiesCache();
     //createSampleUser();
 });
 
