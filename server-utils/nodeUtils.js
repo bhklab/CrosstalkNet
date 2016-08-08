@@ -180,7 +180,7 @@ function createParentNodesMG(number) {
  */
 function positionNodesBipartiteGridHelper(nodes) {
     if (!Array.isArray(nodes)) {
-        nodes  = [nodes];
+        nodes = [nodes];
     }
 
     for (var i = 0; i < nodes.length; i++) {
@@ -254,10 +254,10 @@ function isNodesArrayFull(nodes) {
  * This is used to create a proper amount of separation between clusters.
  * @return {Object} The selected gene, firstNeighbours, and secondNeighbours with the clustered position added to them.
  */
-function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours, clusterNumber, totalClusters, nodeRadius, largestClusterRadius) {
+function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours, clusterNumber, totalClusters, nodeRadius, largestClusterRadius, fudge) {
     var mainRadius = Math.max((totalClusters * (largestClusterRadius * 2) * 1.3) / (2 * Math.PI), largestClusterRadius + 100);
-    var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius);
-    var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius);
+    var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius, fudge);
+    var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius, fudge);
 
     var selectedGeneAngle = ((2 * Math.PI) / totalClusters) * (clusterNumber + 1);
 
@@ -293,6 +293,50 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
     };
 }
 
+function positionCommunities(centerNode, nodes, clusterNumber, totalClusters, nodeRadius, clusterRadii, fudge) {
+    var radius = clusterRadii[clusterNumber];
+
+    centerNode = clone(centerNode);
+    nodes = clone(nodes);
+
+    var x = 0;
+    var top = 0;
+    var bottom = 0;
+    var iterator = clusterNumber;
+    if (clusterNumber % 2 == 1) {
+        iterator = clusterNumber - 1;
+    }
+    for (var i = 2; i < iterator; i++) {
+        if (i % 2 == 1) {
+            top += 3 * clusterRadii[i];    
+        } else {
+            bottom += 3 * clusterRadii[i];    
+        }
+    }
+
+    x = Math.max(top, bottom);
+
+    centerNode.position = {
+        x: x,
+        y: Math.round(clusterNumber % 2) * (2 * clusterRadii[clusterRadii.length - 1] + 100)
+    }
+
+
+
+    for (var i = 0; i < nodes.length; i++) {
+        var angle = ((2 * Math.PI) / nodes.length) * (i + 1);
+        nodes[i].position = {
+            x: (radius * Math.cos(angle)) + centerNode.position.x,
+            y: (radius * Math.sin(angle)) + centerNode.position.y
+        };
+    }
+
+    return {
+        centerNode: centerNode,
+        nodes: nodes
+    };
+}
+
 /**
  * @summary Calculates the minimum radius required to display the given
  * number of nodes of the specified size along a circle.
@@ -302,8 +346,8 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
  * @return {Number} The minimum radius required to display numNodes many nodes of
  * size nodeRadius along a circle with no overlap between nodes.
  */
-function getMinRadius(numNodes, nodeRadius) {
-    return Math.max((3 * numNodes * (nodeRadius * 2)) / (2 * Math.PI), 120);
+function getMinRadius(numNodes, nodeRadius, fudge) {
+    return Math.max((fudge * numNodes * (nodeRadius * 2)) / (2 * Math.PI), 120);
 }
 
 module.exports = {
@@ -315,5 +359,6 @@ module.exports = {
     positionNodesBipartiteGrid: positionNodesBipartiteGrid,
     positionNodesClustered: positionNodesClustered,
     getMinRadius: getMinRadius,
-    isNodesArrayFull: isNodesArrayFull
+    isNodesArrayFull: isNodesArrayFull,
+    positionCommunities: positionCommunities
 };

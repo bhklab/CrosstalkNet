@@ -4,20 +4,20 @@
  * @namespace 
  */
 (function() {
-    angular.module('myApp.controllers').controller('DataController', [
+    angular.module('myApp.controllers').controller('MGDataController', [
         '$scope',
         '$mdDialog', '$mdSelect', '$rootScope',
         'GlobalControls', 'GlobalSharedData', 'QueryService', 'FileUploadService', '$timeout',
         'MGSharedData',
-        DataController
+        MGDataController
     ]);
 
     /**
-     * @namespace DataController
+     * @namespace MGDataController
      * @desc Controller for getting, uploading, and deleting files.
      * @memberOf controllers
      */
-    function DataController($scope, $mdDialog, $mdSelect, $rootScope, GlobalControls, GlobalSharedData, QueryService, FileUploadService,
+    function MGDataController($scope, $mdDialog, $mdSelect, $rootScope, GlobalControls, GlobalSharedData, QueryService, FileUploadService,
         $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;

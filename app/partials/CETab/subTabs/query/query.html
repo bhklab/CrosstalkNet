@@ -2,5 +2,13 @@
     <div class="md-padding">
         <h2 class="md-subhead">Get Communities</h2>
         <md-button class="md-raised md-primary" ng-click="vm.getCommunities()">Get Communities</md-button>
+        <md-input-container class="select">
+            <label>Select Community File</label>
+            <md-select class="file-select" ng-model="vm.communityFile">
+                <md-option ng-repeat="file in vm.fileList" value="{{file}}" ng-selected="0">
+                    <span ng-if="file.type == 'personal'" ng-click="vm.deleteConfirm($event, file)" class="highlight right-margin red-text">X</span> {{file.name}}
+                </md-option>
+            </md-select>
+        </md-input-container>
     </div>
 </md-content>
