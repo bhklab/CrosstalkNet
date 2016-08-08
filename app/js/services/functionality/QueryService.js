@@ -26,6 +26,7 @@
         service.getUserPermission = getUserPermission;
         service.getTopGenes = getTopGenes;
         service.getCommunities = getCommunities;
+        service.getCommunityFileList = getCommunityFileList;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -333,15 +334,15 @@
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
          */
-        function getCommunities(vm) {
+        function getCommunities(file) {
             var deferred = $q.defer();
 
             RESTService.post('community-explorer', {
-                    selectedFile: vm.sdWithinTab.communitiesFile
+                    selectedFile: file
                 })
                 .then(function(data) {
                     if (!ValidationService.checkServerResponse(data)) {
-                        deferred.resolve({ topGenes: null });
+                        deferred.resolve({ communities: null });
                     }
 
                     deferred.resolve({ communities: data.communities, config: data.config });
@@ -351,6 +352,28 @@
 
             return deferred.promise;
 
+        }
+
+        /**
+         * @summary Gets the list of community files available to the user.
+         *
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function getCommunityFileList() {
+            var deferred = $q.defer();
+
+            RESTService.post("community-file-list", {}).then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    deferred.resolve({ fileList: null });
+                }
+
+                deferred.resolve({ fileList: data.fileList });
+            }, function(response) {
+                console.log(response);
+            });
+
+            return deferred.promise;
         }
 
         return service;

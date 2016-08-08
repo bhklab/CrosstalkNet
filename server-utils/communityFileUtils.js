@@ -6,117 +6,92 @@
  * 
  * @summary Methods for: reading, writing, deleting, and keeping track of Rdata files.
  */
+const DEGREES_FILE_PREFIX = "degrees";
+
 const fs = require('fs');
 var async = require('async');
 var mkdirp = require('mkdirp');
 var CommunityFileCache = require('./Models/communityFileCache').CommunityFileCache;
+var FileGroup = require('./Models/fileGroup').FileGroup;
 var File = require('./Models/fileModel').File;
 var availableCommunitiesCache = null;
 
-var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Communities/';
+const TYPES = require('./Models/communityFileCache').TYPES;
+
+var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Communities/Uploaded/';
+var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Communities/Proprietary/';
+var BASE_FAKE_DIRECTORY = 'R_Scripts/Communities/Fake/'
 
 /**
  * @summary Updates the in-memory cache of avaialble files.
  */
-function updateAvailableCommunityCache() {
-    availableCommunitiesCache = updateAvailableCommunityCache();
+function updateAvailableCommunitiesCache() {
+    availableCommunitiesCache = createAvailableCommunitiesCache();
+
+    console.log("%j", availableCommunitiesCache);
 }
 
 /**
- * @summary Returns an object that represents all of the existing matrix files.
+ * @summary Returns an object containing the names of the files
+ * avaialble for a user.
+ *
+ * @oaram {User} user The user that will be used to filter down the avaialble files based on 
+ * that user's access level.
+ * @return An array of Files available for the given User.
+ */
+function getAccessibleFilesForUser(user) {
+    return availableCommunitiesCache.getAccessibleFilesForUser(user);
+}
+
+/**
+ * @summary Returns an object that represents all of the existing communities files.
  *
  * @return An object whose keys are: real, fake, personal. This helps group files based on whether they are our 
- * proprietary data, fake data, or user uploaded data. The values are objects 
+ * proprietary data, fake data, or user uploaded data. 
  */
-function createAvailableCommunityCache() {
+function createAvailableCommunitiesCache() {
     var result = new CommunityFileCache();
 
+    
+    result.real = getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY, TYPES.real);
+    result.fake = getFilesInDirectory(BASE_FAKE_DIRECTORY, TYPES.fake);
+
+
+    var personalDirectories = fs.readdirSync(BASE_UPLOAD_DIRECTORY);
+
+    for (var i = 0; i < personalDirectories.length; i++) {
+        result.personal[personalDirectories[i]] = [];
+            
+        try {
+            fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i], fs.R_OK);
+            result.personal[personalDirectories[i]] = getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i], TYPES.personal);
+        } catch (err) {
+            console.log(err);
+            createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], null);
+        }
+    
+    }
+
+    return result;
 }
 
 /**
- * @summary Matches the front end file in the
- * selected files that is not null and returns the
+ * @summary Matches the front end file 
  * corresponding File from the available matrix cache.
  *
- * @param {Object} selectedFiles An object whose keys are TYPES and whose
- * values are a front-end specified file.
+ * @param {Object} selectedFiles An object representing a front-end specified file.
  * @param {User} user The User for which to obtain the File.
- * @return {File} A File from the availableMatrixCache that matches the front-end file
+ * @return {File} A File from the availableCommunitiesCache that matches the front-end file
  * specified in selectedFiles. 
  */
-function getRequestedFile(selectedFile) {
+function getRequestedFile(selectedFile, user) {
     var file;
 
     if (selectedFile != null) {
         file = matchSelectedFile(selectedFile, availableCommunitiesCache, user);
-    }
+    } 
 
     return file;
-}
-
-function getCorrespondingDegreesFileName(file) {
-    return DEGREES_FILE_PREFIX + file.name;
-}
-
-/**
- * @summary Matches the front ends files in selected files and returns
- * the corresponding Files from the availableMatrixCache.
- *
- * @param {Oject} selectedFiles An object whose keys are TYPES and whose
- * values are a front-end specified files.
- * @param {string} selectedNetworkType A string that should be one of the values
- * in TYPES. This specifies what type of network the request, and the function 
- * uses this in order to determine the right number of files to return.
- * @param {User} user The User for which to obtain the Files. 
- * @return {Object} An object containing the Files specified.
- */
-function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
-    var result = { normal: null, tumor: null, delta: null, degree: null };
-    var file = null;
-
-    if (selectedFiles == null) {
-        return null;
-    }
-
-    if (selectedNetworkType == SUB_TYPES.normal && selectedFiles.normal != null) {
-        file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
-
-        if (file != null) {
-            result.normal = file.path + file.name;
-            result.degree = file.path + "degrees" + file.name;
-        }
-    } else if (selectedNetworkType == SUB_TYPES.tumor && selectedFiles.tumor != null) {
-        file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
-
-        if (file != null) {
-            result.tumor = file.path + file.name;
-            result.degree = file.path + "degrees" + file.name;
-        }
-    } else if (selectedNetworkType == SUB_TYPES.delta && selectedFiles.delta != null) {
-        file = matchSelectedFile(selectedFiles.delta, availableMatrixCache, user);
-
-        if (file != null) {
-            result.delta = file.path + file.name;
-            result.degree = file.path + "degrees" + file.name;
-        }
-
-        file = matchSelectedFile(selectedFiles.normal, availableMatrixCache, user);
-        if (file != null) {
-            result.normal = file.path + file.name;
-        }
-        file = matchSelectedFile(selectedFiles.tumor, availableMatrixCache, user);
-        if (file != null) {
-            result.tumor = file.path + file.name;
-        }
-
-        if (result.tumor == null || result.normal == null) {
-            return null;
-        }
-    } else {
-        return null;
-    }
-
-    return result;
 }
 
 /**
@@ -132,7 +107,7 @@ function getRequestedFiles(selectedFiles, selectedNetworkType, user) {
  * @return {Array} An array of Files representing the files found in the specified
  * directory. 
  */
-function getFilesInDirectory(directory, type, subType) {
+function getFilesInDirectory(directory, type) {
     var filteredFileNames = null;
     var originalFilesNames = null;
     var fileList = null;
@@ -140,7 +115,7 @@ function getFilesInDirectory(directory, type, subType) {
     originalFilesNames = fs.readdirSync(directory);
 
     filteredFileNames = originalFilesNames.filter(function(fileName) {
-        if (fileName.indexOf('degree') < 0 && originalFilesNames.indexOf('degrees' + fileName) >= 0 && fileName.indexOf('gitkeep') < 0) {
+        if (fileName.indexOf('gitkeep') < 0) {
             return true;
         } else {
             return false;
@@ -148,18 +123,18 @@ function getFilesInDirectory(directory, type, subType) {
     });
 
     fileList = filteredFileNames.map(function(file) {
-        return new File(file, directory + "/", type, subType);
+        return new File(file, directory + "/", type, null);
     });
 
     return fileList;
 }
 
 /**
- * @summary Returns a File from the availableMatrixCache based
+ * @summary Returns a File from the availableCommunitiesCache based
  * on the fiven front-end file.
  *
  * @param {Object} file The front-end file specified.
- * @param {FileCache} cache A FileCache to match the specified file in.
+ * @param {CommunityFileCache} cache A CommunityFileCache to match the specified file in.
  * @param {User} user The User for which to obtain the File.
  * @return {File} A File based on the front-end file specified for 
  * the given User.
@@ -234,8 +209,8 @@ function removeFile(path, file, callback) {
  * values in SUB_TYPES.
  * @param {function} callback A function to call when the file is finished writing.
  */
-function writeFile(baseDirectory, file, callback) {
-    fs.writeFile(baseDirectory + userName + "/" + subType + "/" + file.name, file.data, 'base64', (err) => {
+function writeFile(baseDirectory, file, userName, callback) {
+    fs.writeFile(baseDirectory + userName + "/" + file.name, file.data, 'base64', (err) => {
         if (err) {
             console.log(err);
             callback("Failed");
@@ -255,8 +230,8 @@ function writeFile(baseDirectory, file, callback) {
  * @param {string} userName The name of the user for which to create the directory.
  * @param {string} subType The sub type of the directory.
  */
-function createDirectory(baseDirectory, userName, subType, callback) {
-    mkdirp.sync(baseDirectory + userName + "/" + subType, function(err) {
+function createDirectory(baseDirectory, userName, callback) {
+    mkdirp.sync(baseDirectory + userName, function(err) {
         if (err) {
             if (callback) {
                 callback("Failed");
@@ -272,13 +247,9 @@ module.exports = {
     BASE_PROPRIETARY_DIRECTORY: BASE_PROPRIETARY_DIRECTORY,
     BASE_FAKE_DIRECTORY: BASE_FAKE_DIRECTORY,
     getRequestedFile: getRequestedFile,
-    getRequestedFiles: getRequestedFiles,
-    getFilesInDirectory: getFilesInDirectory,
     removeFile: removeFile,
     writeFile: writeFile,
     createDirectory: createDirectory,
-    updateAvailableMatrixCache: updateAvailableMatrixCache,
-    getAccessibleMatricesForUser: getAccessibleMatricesForUser,
-    createavailableMatrixCache: createavailableMatrixCache,
-    getCorrespondingDegreesFileName: getCorrespondingDegreesFileName
+    updateAvailableCommunitiesCache: updateAvailableCommunitiesCache,
+    getAccessibleFilesForUser: getAccessibleFilesForUser
 };

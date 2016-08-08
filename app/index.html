@@ -27,7 +27,7 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/tabletoCSV/dist/jquery.tabletoCSV.js"></script>
     <script src="app.js"></script>
-    <script src="js/controllers/mainGraphTab/DataController.js"></script>
+    <script src="js/controllers/mainGraphTab/MGDataController.js"></script>
     <script src="js/controllers/mainGraphTab/MainGraphController.js"></script>
     <script src="js/controllers/mainGraphTab/MGQueryController.js"></script>
     <script src="js/controllers/mainGraphTab/MGLayoutController.js"></script>
@@ -152,8 +152,9 @@
                         <section layout="row">
                             <div static-include="partials/CETab/sideBar.html">
                             </div>
-                            <md-content ng-show="selectedTab == 3" flex>
-                                <div static-include="partials/CETab/tableView.html"></div>
+                            <md-content flex>
+                                <div class="graph-container" id="cyCommunityExplorer"></div>
+                                <!-- <div static-include="partials/CETab/tableView.html"></div> -->
                             </md-content>
                         </section>
                     </md-content>

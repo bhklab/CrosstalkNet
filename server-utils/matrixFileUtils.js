@@ -12,13 +12,13 @@ const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 var async = require('async');
 var mkdirp = require('mkdirp');
-var FileCache = require('./Models/fileCache').FileCache;
+var MatrixFileCache = require('./Models/matrixFileCache').MatrixFileCache;
 var FileGroup = require('./Models/fileGroup').FileGroup;
 var File = require('./Models/fileModel').File;
 var availableMatrixCache = null;
 
-const TYPES = require('./Models/fileCache').TYPES;
-const SUB_TYPES = require('./Models/fileCache').SUB_TYPES;
+const TYPES = require('./Models/MatrixFileCache').TYPES;
+const SUB_TYPES = require('./Models/MatrixFileCache').SUB_TYPES;
 
 var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
 var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Proprietary_Matrices/';
@@ -42,8 +42,8 @@ function updateAvailableMatrixCache() {
  * @return An object whose keys can be: normal, tumor, and delta. The values are arrays containing
  * the  files avaialble for the specified user.
  */
-function getAccessibleMatricesForUser(user) {
-    return availableMatrixCache.getAccessibleMatricesForUser(user);
+function getAccessibleFilesForUser(user) {
+    return availableMatrixCache.getAccessibleFilesForUser(user);
 }
 
 /**
@@ -53,7 +53,7 @@ function getAccessibleMatricesForUser(user) {
  * proprietary data, fake data, or user uploaded data. The values are objects 
  */
 function createavailableMatrixCache() {
-    var result = new FileCache();
+    var result = new MatrixFileCache();
 
     for (var subType in SUB_TYPES) {
         result.real[SUB_TYPES[subType]] = getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY + SUB_TYPES[subType], TYPES.real, SUB_TYPES[subType]);
@@ -211,7 +211,7 @@ function getFilesInDirectory(directory, type, subType) {
  * on the fiven front-end file.
  *
  * @param {Object} file The front-end file specified.
- * @param {FileCache} cache A FileCache to match the specified file in.
+ * @param {MatrixFileCache} cache A MatrixFileCache to match the specified file in.
  * @param {User} user The User for which to obtain the File.
  * @return {File} A File based on the front-end file specified for 
  * the given User.
@@ -325,12 +325,11 @@ module.exports = {
     BASE_FAKE_DIRECTORY: BASE_FAKE_DIRECTORY,
     getRequestedFile: getRequestedFile,
     getRequestedFiles: getRequestedFiles,
-    getFilesInDirectory: getFilesInDirectory,
     removeFile: removeFile,
     writeFile: writeFile,
     createDirectory: createDirectory,
     updateAvailableMatrixCache: updateAvailableMatrixCache,
-    getAccessibleMatricesForUser: getAccessibleMatricesForUser,
+    getAccessibleFilesForUser: getAccessibleFilesForUser,
     createavailableMatrixCache: createavailableMatrixCache,
     getCorrespondingDegreesFileName: getCorrespondingDegreesFileName
 };

@@ -8,7 +8,7 @@ const SUB_TYPES = { normal: "normal", tumor: "tumor", delta: "delta" };
 /** 
  * Class representing all available adjacency matrix Rdata files. 
  */
-class FileCache {
+class MatrixFileCache {
     /**
      * @summary Create a file cache representing existing adjacency matrix Rdata files.
      *
@@ -30,28 +30,28 @@ class FileCache {
     }
 
     /**
-     * @summary Sets the FileCache's real FileGroup.
+     * @summary Sets the MatrixFileCache's real FileGroup.
      *
-     * @param {FileGroup} real The new FileGroup for the FileCache's real FileGroup.
+     * @param {FileGroup} real The new FileGroup for the MatrixFileCache's real FileGroup.
      */
     set real(real) {
         this._real = real;
     }
 
     /**
-     * @summary Sets the FileCache's fake FileGroup.
+     * @summary Sets the MatrixFileCache's fake FileGroup.
      *
-     * @param {FileGroup} real The new FileGroup for the FileCache's fake FileGroup.
+     * @param {FileGroup} real The new FileGroup for the MatrixFileCache's fake FileGroup.
      */
     set fake(fake) {
         this._fake = fake;
     }
 
     /**
-     * @summary Sets the FileCache's personal object of FileGroups.
+     * @summary Sets the MatrixFileCache's personal object of FileGroups.
      *
      * @param {Object} personal The new object of FileGroups repersenting user uploaded files
-     * for the FileCache. The keys of this object are user names and the values are FileGroups
+     * for the MatrixFileCache. The keys of this object are user names and the values are FileGroups
      * for a user's uploaded files.
      */
     set personal(personal) {
@@ -59,27 +59,27 @@ class FileCache {
     }
 
     /**
-     * @summary Gets the FileCache's proprietary FileGroup.
+     * @summary Gets the MatrixFileCache's proprietary FileGroup.
      *
-     * @return {FileGroup} The FileCache's proprietary FileGroup of real data.
+     * @return {FileGroup} The MatrixFileCache's proprietary FileGroup of real data.
      */
     get real() {
         return this._real;
     }
 
     /**
-     * @summary Gets the FileCache's fake FileGroup.
+     * @summary Gets the MatrixFileCache's fake FileGroup.
      *
-     * @return {FileGroup} The FileCache's FileGroup of fake data.
+     * @return {FileGroup} The MatrixFileCache's FileGroup of fake data.
      */
     get fake() {
         return this._fake;
     }
 
     /**
-     * @summary Gets the FileCache's object of  FileGroup.
+     * @summary Gets the MatrixFileCache's object of  FileGroup.
      *
-     * @return {Object} The FileCache's object of FileGroups of personal data. The keys of this object are
+     * @return {Object} The MatrixFileCache's object of FileGroups of personal data. The keys of this object are
      * user names and the values are FileGroups for a user's uploaded files.
      */
     get personal() {
@@ -87,15 +87,15 @@ class FileCache {
     }
 
     /**
-     * @summary Returns a filtered version of the FileCache based on the access
+     * @summary Returns a filtered version of the MatrixFileCache based on the access
      * level of the specified user.
      *
-     * @param {User} user The user to use when filtering the FileCache.
-     * @return {FileCache} A filtered FileCache containing only the files which
+     * @param {User} user The user to use when filtering the MatrixFileCache.
+     * @return {MatrixFileCache} A filtered MatrixFileCache containing only the files which
      * the specified user has access to.
      */
     filterCacheByUser(user) {
-        var result = new FileCache();
+        var result = new MatrixFileCache();
 
         if (user == null) {
             if (this._fake) {
@@ -131,8 +131,8 @@ class FileCache {
      * @summary Returns a File based on the front-end file specified by the user.
      *
      * @param {Object} file The file specified by the user on the front end.
-     * @param {User} user The user to use when obtaining the filtered FileCache.
-     * @return {FileCache} A File matching the specified file for the given user. If
+     * @param {User} user The user to use when obtaining the filtered MatrixFileCache.
+     * @return {MatrixFileCache} A File matching the specified file for the given user. If
      * the specified file has an incorrect name, type, or subType, null is returned. If
      * the user doesn't exist or is trying to access a file they shouldn't be, null is returned.
      */
@@ -141,28 +141,28 @@ class FileCache {
             return null;
         }
 
-        var accessibleMatrices = this.filterCacheByUser(user);
+        var accessibleFiles = this.filterCacheByUser(user);
 
-        if (accessibleMatrices[file.type] != null) {
+        if (accessibleFiles[file.type] != null) {
             if (file.type == TYPES.personal) {
-                for (var name in accessibleMatrices[file.type]) {
-                    if (accessibleMatrices[file.type][name][file.subType] == null ||
-                        accessibleMatrices[file.type][name][file.subType].length == null) {
+                for (var name in accessibleFiles[file.type]) {
+                    if (accessibleFiles[file.type][name][file.subType] == null ||
+                        accessibleFiles[file.type][name][file.subType].length == null) {
                         continue;
                     }
 
-                    for (var i = 0; i < accessibleMatrices[file.type][name][file.subType].length; i++) {
-                        if (accessibleMatrices[file.type][name][file.subType][i].name == file.name) {
-                            return accessibleMatrices[file.type][name][file.subType][i];
+                    for (var i = 0; i < accessibleFiles[file.type][name][file.subType].length; i++) {
+                        if (accessibleFiles[file.type][name][file.subType][i].name == file.name) {
+                            return accessibleFiles[file.type][name][file.subType][i];
                         }
                     }
                 }
             } else {
-                if (accessibleMatrices[file.type][file.subType] != null &&
-                    accessibleMatrices[file.type][file.subType].length != null) {
-                    for (var i = 0; i < accessibleMatrices[file.type][file.subType].length; i++) {
-                        if (accessibleMatrices[file.type][file.subType][i].name == file.name) {
-                            return accessibleMatrices[file.type][file.subType][i];
+                if (accessibleFiles[file.type][file.subType] != null &&
+                    accessibleFiles[file.type][file.subType].length != null) {
+                    for (var i = 0; i < accessibleFiles[file.type][file.subType].length; i++) {
+                        if (accessibleFiles[file.type][file.subType][i].name == file.name) {
+                            return accessibleFiles[file.type][file.subType][i];
                         }
                     }
                 }
@@ -176,20 +176,20 @@ class FileCache {
      * @summary Returns an object of arrays containing the the files
      * available to the specified user.
      *
-     * @param {User} user The user to use when obtaining the filtered FileCache.
+     * @param {User} user The user to use when obtaining the filtered MatrixFileCache.
      * @return {Object} An object whose keys are SUB_TYPES and whose corresponding values
      * are arrays containing the client side representation of the Files part of a sub type.
      */
-    getAccessibleMatricesForUser(user) {
-        var accessibleMatrices = this.filterCacheByUser(user);
+    getAccessibleFilesForUser(user) {
+        var accessibleFiles = this.filterCacheByUser(user);
         var matrices = { normal: [], tumor: [], delta: [] };
         var temp;
 
         for (var type in TYPES) {
             if (type == TYPES.personal) {
-                temp = accessibleMatrices.flattenPersonalFileGroups();
+                temp = accessibleFiles.flattenPersonalFileGroups();
             } else {
-                temp = accessibleMatrices[type];
+                temp = accessibleFiles[type];
             }
 
             for (var subType in SUB_TYPES) {
@@ -228,7 +228,7 @@ class FileCache {
 }
 
 module.exports = {
-    FileCache: FileCache,
+    MatrixFileCache: MatrixFileCache,
     SUB_TYPES: SUB_TYPES,
     TYPES: TYPES
 };
