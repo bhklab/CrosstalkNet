@@ -256,8 +256,8 @@ function isNodesArrayFull(nodes) {
  */
 function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours, clusterNumber, totalClusters, nodeRadius, largestClusterRadius, fudge) {
     var mainRadius = Math.max((totalClusters * (largestClusterRadius * 2) * 1.3) / (2 * Math.PI), largestClusterRadius + 100);
-    var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius, fudge);
-    var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius, fudge);
+    var firstNeighbourRadius = getMinRadius(firstNeighbours.length, nodeRadius, fudge, 120);
+    var secondNeighbourRadius = firstNeighbourRadius + getMinRadius(secondNeighbours.length, nodeRadius, fudge, 120);
 
     var selectedGeneAngle = ((2 * Math.PI) / totalClusters) * (clusterNumber + 1);
 
@@ -346,8 +346,8 @@ function positionCommunities(centerNode, nodes, clusterNumber, totalClusters, no
  * @return {Number} The minimum radius required to display numNodes many nodes of
  * size nodeRadius along a circle with no overlap between nodes.
  */
-function getMinRadius(numNodes, nodeRadius, fudge) {
-    return Math.max((fudge * numNodes * (nodeRadius * 2)) / (2 * Math.PI), 120);
+function getMinRadius(numNodes, nodeRadius, fudge, min) {
+    return Math.max((fudge * numNodes * (nodeRadius * 2)) / (2 * Math.PI), min);
 }
 
 module.exports = {

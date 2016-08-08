@@ -508,7 +508,7 @@ app.post('/main-graph', function(req, res) {
                 sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2, 3) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2, 3);
+                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2, 3) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2, 3, 120);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -824,11 +824,9 @@ app.post('/community-explorer', function(req, res) {
 
         nodes = nodes.sort(function(a, b) {
             return a.length - b.length;
-        })
+        });
 
-        for (var i = 0; i < parsedEdges.length; i++) {
-            edges = edges.concat(edgeUtils.createEdgesFromREdges(parsedEdges[i], 1));
-        }
+        edges = edgeUtils.createEdgesFromREdges(parsedEdges, 1);
 
         elements = elements.concat(edges);
         config = configUtils.createConfig();
@@ -836,7 +834,7 @@ app.post('/community-explorer', function(req, res) {
         var clusterRadii = [];
 
         for (var i = 0; i < nodes.length; i++) {
-            clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5);
+            clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5, 60);
         }
 
         var temp;
@@ -853,13 +851,21 @@ app.post('/community-explorer', function(req, res) {
             }
         }
 
+        nodes = nodes.concat(nodeUtils.createParentNodesMG(nodes.length));
+
         layout = layoutUtils.createPresetLayout();
         config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+        conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
+        conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
+        conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
 
         nodes = parseUtils.flatten(nodes);
+        edges = parseUtils.flatten(edges);
 
+
+        console.log("edges.length: " + edges.length);
         config = configUtils.setConfigLayout(config, layout);
-        config = configUtils.setConfigElements(config, nodes);
+        config = configUtils.setConfigElements(config, nodes.concat(edges));
 
         res.json({
             config: config,
