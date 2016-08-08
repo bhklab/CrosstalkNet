@@ -26,6 +26,7 @@
         vm.sharedData = GlobalSharedData.data;
         vm.changeDisplay = GlobalControls.changeDisplay;
         
+        vm.exportGraphToPNG = ExportService.exportGraphToPNG;
         GlobalControls.setMethodsWholeTab(vm);
 
         /**

@@ -68,7 +68,7 @@
 
                 $rootScope.state = $rootScope.states.loadingConfig;
 
-                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, result.config, "cyCommunityExplorer");
+                vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
 
                 $rootScope.state = $rootScope.states.showingConfig;
 
