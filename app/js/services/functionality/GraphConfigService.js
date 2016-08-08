@@ -21,6 +21,7 @@
         service.firstSelectedGene = null;
 
         service.applyConfig = applyConfig;
+        service.applyConfigCommunities = applyConfigCommunities;
         service.locateGene = locateGene;
         service.clearLocatedGene = clearLocatedGene;
         service.resetZoom = resetZoom;
@@ -97,7 +98,7 @@
                 resetEdges(vm);
             });
 
-            
+
 
             cy.nodes().not(':parent').forEach(function(n) {
                 var g = n.data('id').slice(0, -2);
@@ -189,6 +190,36 @@
             vm.sdWithinTab.cy.center(node);
 
             vm.currentlyZoomed = { node: node, styleClass: colorClass };
+        }
+
+        /**
+         * @summary Applies the specified cytoscape.js config
+         * to a container with the given ID.
+         *
+         * @param {Object} vm A view model for the controller calling this function.
+         * @param {Object} config A cytoscape.js config received from the server.
+         * @param {String} containerID An HTML element ID for an empty container that
+         * can host a cytoscape.js graph.
+         * @return {Object} A cytoscape.js object representing a graph.
+         */
+        function applyConfigCommunities(vm, config, containerID) {
+            var cy = null;
+            config.container = document.getElementById(containerID);
+
+            if (config.layout.position == "grid") {
+                config.layout.position = function(node) {
+                    return { row: node.data('row'), col: node.data('col') };
+                };
+            }
+
+
+            cy = cytoscape(config);
+
+            vm.sdWithinTab.config = config;
+
+            cy.fit(cy.$("*"), 10);
+
+            return cy;
         }
 
         /**

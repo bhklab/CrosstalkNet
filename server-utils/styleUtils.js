@@ -9,7 +9,7 @@
 var clone = require('clone');
 var classSuffixes = { nodeColor: 'node-color', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
 var nodeSizes = { small: 12, medium: 18, large: 20, source: 40 };
-var fontSizes = {source: 24};
+var fontSizes = { source: 24 };
 
 var bipartiteStyles = {
     epi: {
@@ -150,6 +150,31 @@ var edgeWeights = {
     }
 };
 
+var noLabel = {
+    selector: 'node',
+    style: {
+        label: ""
+    }
+};
+
+var invisibleParent = {
+    selector: 'node:parent',
+    style: {
+        'background-opacity': 0,
+        'border-width': '0px',
+        'label': 'data(id)',
+        'font-size': '40px'
+    }
+};
+
+var communityEdge = {
+    selector: 'edge',
+    style: {
+        width: '1px',
+        'line-color': 'black'
+    }
+}
+
 var allRandomFormats = [nodeSize.medium, randomStyles.stripedSourceEpi, randomStyles.stripedSourceStroma, randomStyles.labelBackground, bipartiteStyles.epi.nodeColor,
     bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement
 ];
@@ -243,7 +268,7 @@ function setDynamicEdgeStyles(edgeStyle, overallWeights) {
     edgeStyle.style['line-color'] = getDynamicColor('weight', overallWeights.min, overallWeights.max);
 
     return edgeStyle;
-} 
+}
 
 module.exports = {
     getAllBipartiteStyles: getAllBipartiteStyles,
@@ -258,5 +283,8 @@ module.exports = {
     edgeWeights: edgeWeights,
     getDynamicWidth: getDynamicWidth,
     getDynamicColor: getDynamicColor,
-    setDynamicEdgeStyles: setDynamicEdgeStyles
+    setDynamicEdgeStyles: setDynamicEdgeStyles,
+    noLabel: noLabel,
+    invisibleParent: invisibleParent,
+    communityEdge: communityEdge
 };
