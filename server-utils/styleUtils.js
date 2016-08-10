@@ -163,7 +163,7 @@ var invisibleParent = {
         'background-opacity': 0,
         'border-width': '0px',
         'label': 'data(id)',
-        'font-size': '40px'
+        'font-size': '100px'
     }
 };
 

@@ -97,8 +97,10 @@ function createNodes(genes, parent, degrees, neighbourLevel) {
  * from these pseudo-nodes will be used to create the cytoscape.js nodes.
  * @return {Array} An array of cytoscape.js nodes based on pseudo-nodes returned from R.
  */
-function createNodesFromRNodes(rNodes) {
+function createNodesFromRNodes(rNodes, parent) {
     var resultNodes = [];
+
+
 
     for (var i = 0; i < rNodes.length; i++) {
         var parentFromNode = rNodes[i].name.endsWith('-E') ? "epi" : "stroma";
@@ -106,7 +108,7 @@ function createNodesFromRNodes(rNodes) {
             data: {
                 id: rNodes[i].name,
                 degree: rNodes[i].degree,
-                parent: 'par' + rNodes[i].level,
+                parent: parent + rNodes[i].level,
                 neighbourLevel: rNodes[i].level,
                 isSource: rNodes[i].isSource,
                 type: parentFromNode
@@ -151,13 +153,13 @@ function createParentNodesIE(selectedGenes, nodes) {
  * @param {Number} number The number of parent nodes to create.
  * @return {Array} An array of cytoscape.js parent nodes.
  */
-function createParentNodesMG(number) {
+function createParentNodesMG(prefix, number) {
     var parentNodes = [];
 
     for (var i = 0; i < number; i++) {
         parentNodes.push({
             data: {
-                id: "par" + i
+                id: prefix + i
             }
         });
     }
@@ -293,48 +295,198 @@ function positionNodesClustered(selectedGene, firstNeighbours, secondNeighbours,
     };
 }
 
-function positionCommunities(centerNode, nodes, clusterNumber, totalClusters, nodeRadius, clusterRadii, fudge) {
+function positionCommunities(nodes, allNodes, clusterNumber, totalClusters, nodeRadius, clusterRadii, fudge) {
     var radius = clusterRadii[clusterNumber];
 
-    centerNode = clone(centerNode);
     nodes = clone(nodes);
 
     var x = 0;
     var top = 0;
     var bottom = 0;
-    var iterator = clusterNumber;
-    if (clusterNumber % 2 == 1) {
-        iterator = clusterNumber - 1;
-    }
-    for (var i = 2; i < iterator; i++) {
+
+    for (var i = 2; i < clusterNumber - 1; i++) {
         if (i % 2 == 1) {
-            top += 3 * clusterRadii[i];    
+            bottom += 2.5 * clusterRadii[i];
         } else {
-            bottom += 3 * clusterRadii[i];    
+            top += 2.5 * clusterRadii[i];
         }
+    }
+
+    if (clusterNumber % 2 == 1 && clusterNumber > 2 && clusterNumber < clusterRadii.length - 1) {
+        bottom += Math.max(clusterRadii[clusterNumber - 1], clusterRadii[clusterNumber])
+        top += Math.max(clusterRadii[clusterNumber - 1], clusterRadii[clusterNumber])
+    } else if (clusterNumber % 2 == 0 && clusterNumber > 2 && clusterNumber < clusterRadii.length - 1) {
+        top += Math.max(clusterRadii[clusterNumber], clusterRadii[clusterNumber + 1]);
+        bottom += Math.max(clusterRadii[clusterNumber], clusterRadii[clusterNumber + 1]);
+    }
+
+    // if (clusterNumber > 1) {
+    //     if (clusterNumber % 2 == 1 && clusterNumber > 2) {
+    //         if (clusterNumber < clusterRadii.length - 1) {
+    //             bottom += allNodes[clusterNumber - 2][0].position.x + 3 * Math.max(clusterRadii[clusterNumber - 1], clusterRadii[clusterNumber]);
+    //             top += allNodes[clusterNumber - 3][0].position.x + 3 * Math.max(clusterRadii[clusterNumber - 1], clusterRadii[clusterNumber]);
+    //         } else {
+    //             bottom += allNodes[clusterNumber - 2][0].position.x + 3 * clusterRadii[clusterNumber];
+    //             top += allNodes[clusterNumber - 3][0].position.x + 3 * clusterRadii[clusterNumber];
+    //         }
+    //     } else {
+    //         if (clusterNumber < clusterRadii.length - 1) {
+    //             bottom += allNodes[clusterNumber - 1][0].position.x + 3 * Math.max(clusterRadii[clusterNumber], clusterRadii[clusterNumber + 1]);
+    //             top += allNodes[clusterNumber - 2][0].position.x + 3 * Math.max(clusterRadii[clusterNumber], clusterRadii[clusterNumber + 1]);
+    //         } else {
+    //             bottom += allNodes[clusterNumber - 1][0].position.x + 3 * clusterRadii[clusterNumber];
+    //             top += allNodes[clusterNumber - 2][0].position.x + 3 * clusterRadii[clusterNumber];
+    //         }
+    //     }
+    // }
+
+    var buffer = 0;
+
+    if (clusterNumber % 2 == 1) {
+        buffer = clusterRadii[clusterNumber] < 100 || clusterRadii[clusterNumber - 1] < 100 ? 200 : 0;
+    } else {
+        buffer = clusterRadii[clusterNumber] < 100 ? 200 : 0;
     }
 
     x = Math.max(top, bottom);
 
-    centerNode.position = {
-        x: x,
+    var center = {
+        x: x + buffer,
         y: Math.round(clusterNumber % 2) * (2 * clusterRadii[clusterRadii.length - 1] + 100)
     }
-
-
 
     for (var i = 0; i < nodes.length; i++) {
         var angle = ((2 * Math.PI) / nodes.length) * (i + 1);
         nodes[i].position = {
-            x: (radius * Math.cos(angle)) + centerNode.position.x,
-            y: (radius * Math.sin(angle)) + centerNode.position.y
+            x: (radius * Math.cos(angle)) + center.x,
+            y: (radius * Math.sin(angle)) + center.y
         };
     }
 
     return {
-        centerNode: centerNode,
         nodes: nodes
     };
+}
+
+function positionCommunitiesRandom(centerNode, nodes, allNodes, clusterNumber, totalClusters, nodeRadius, clusterRadii, fudge) {
+    var radius = clusterRadii[clusterNumber];
+    var totalNodes = 0;
+
+    for (var i = 0; i < allNodes.length; i++) {
+        totalNodes += allNodes[i].length;
+    }
+
+    var totalArea = 0;
+
+    for (var i = 0; i < clusterRadii.length; i++) {
+        totalArea += clusterRadii[i] * clusterRadii[i] * 4;
+    }
+
+    totalArea *= fudge;
+
+    centerNode = clone(centerNode);
+    nodes = clone(nodes);
+}
+
+function positionCommunitiesSpiral(allNodes, clusterRadii) {
+    allNodes = clone(allNodes);
+    var centerCluster = allNodes[allNodes.length - 1];
+    var radius = clusterRadii[clusterRadii.length - 1];
+
+    for (var i = 0; i < centerCluster.length; i++) {
+        var withinClusterAngle = ((2 * Math.PI) / centerCluster.length) * (i + 1);
+        centerCluster[i].position = {
+            x: (radius * Math.cos(withinClusterAngle)),
+            y: (radius * Math.sin(withinClusterAngle))
+        };
+    }
+
+    centerCluster[0].position = {x:0, y:0};
+
+    var totalRadius = clusterRadii[clusterRadii.length - 1] + clusterRadii[clusterRadii.length - 2] + 50;
+    var arcLength = totalRadius * 2 * Math.PI;
+    var lengthUsedSoFar = 0;
+    var rings = [];
+    var ringRadii = [];
+    var ring = 0;
+
+    ringRadii.push(totalRadius);
+
+
+    // We need to do some kind of lookahead to first see which clusters will need to
+    // be placed on a given ring. Once we have that info, we can interate again
+    // and detemine the angles for the clusters.
+
+    for (var i = allNodes.length - 2; i >= 0; i--) {
+        lengthUsedSoFar += clusterRadii[i] * 2;
+
+        if (lengthUsedSoFar >= arcLength) {
+            totalRadius += clusterRadii[i] + clusterRadii[rings[ring][0]] + 50;
+            arcLength = totalRadius * 2 * Math.PI;
+            lengthUsedSoFar = clusterRadii[i] * 2;
+            ringRadii.push(totalRadius);
+
+            rings.push([]);
+            ring++;
+            rings[ring].push(i);
+        } else {
+            if (!rings[ring]) {
+                rings.push([]);
+
+            }
+
+            rings[ring].push(i);
+        }
+    }
+
+    console.log("rings %j", rings);
+    console.log("ringRadii %j", ringRadii);
+
+    for (var i = 0; i < rings.length; i++) {
+        var betweenClusterAngle = 0;
+        for (var j = 0; j < rings[i].length; j++) {
+            var clusterNumber = rings[i][j];
+
+            // betweenClusterAngle = ((2 * Math.PI) / rings[i].length) * (j + 1);
+
+            var centerPoint = {
+                x: ringRadii[i] * Math.cos(betweenClusterAngle),
+                y: -ringRadii[i] * Math.sin(betweenClusterAngle)
+            };
+
+            betweenClusterAngle += 2 * clusterRadii[clusterNumber] / ringRadii[i];
+
+            console.log("centerPoint: %j", centerPoint);
+            // console.log("betweenClusterAngle: %j", betweenClusterAngle);
+            console.log("clusterNumber: " + clusterNumber);
+
+            console.log("allNodes[clusterNumber].length: " + allNodes[clusterNumber].length);
+            for (var k = 0; k < allNodes[clusterNumber].length; k++) {
+                withinClusterAngle = ((2 * Math.PI) / allNodes[clusterNumber].length) * (k + 1);
+                allNodes[clusterNumber][k].position = {
+                    x: centerPoint.x + (clusterRadii[clusterNumber] * Math.cos(withinClusterAngle)),
+                    y: centerPoint.y + (clusterRadii[clusterNumber] * Math.sin(withinClusterAngle))
+                };
+            }
+
+        }
+    }
+
+    return { allNodes: allNodes };
+
+
+    // First we position the biggest cluster at coordinates 0,0
+
+
+
+    // Then we figure out the circumference of that cluster and multiply if by a fudge factor
+    // This gives us the circumference of the first ring of cummunities
+
+    // Then we position those communities along the first ring we determined.
+
+    // Then we see what the biggest community was that we placed on this first ring. 
+    // The radius of this biggest community plus the radius of the center community,
+    // plus some fudge factor 
 }
 
 /**
@@ -360,5 +512,6 @@ module.exports = {
     positionNodesClustered: positionNodesClustered,
     getMinRadius: getMinRadius,
     isNodesArrayFull: isNodesArrayFull,
-    positionCommunities: positionCommunities
+    positionCommunities: positionCommunities,
+    positionCommunitiesSpiral: positionCommunitiesSpiral
 };

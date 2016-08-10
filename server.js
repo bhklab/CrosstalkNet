@@ -293,7 +293,7 @@ app.post('/interaction-explorer', function(req, res) {
             }
 
             for (var i = 0; i < parsedNodes.length; i++) {
-                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i]));
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], "par"));
             }
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
@@ -301,6 +301,7 @@ app.post('/interaction-explorer', function(req, res) {
                 var maxCols = 1
 
                 allNodes = nodes.concat(sourceNodes);
+
                 maxCols = allNodes.length + 1;
                 allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
 
@@ -456,11 +457,11 @@ app.post('/main-graph', function(req, res) {
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i]);
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], "par");
             }
 
             for (var i = 0; i < parsedNodesSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i]);
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], "par");
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -499,7 +500,7 @@ app.post('/main-graph', function(req, res) {
                 config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
                 config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
 
-                parentNodes = nodeUtils.createParentNodesMG(nodeUtils.isNodesArrayFull(sourceNodes) +
+                parentNodes = nodeUtils.createParentNodesMG("par", nodeUtils.isNodesArrayFull(sourceNodes) +
                     nodeUtils.isNodesArrayFull(firstNodes) + nodeUtils.isNodesArrayFull(secondNodes));
                 allNodes.push(parentNodes);
                 allNodes = parseUtils.flatten(allNodes);
@@ -819,7 +820,7 @@ app.post('/community-explorer', function(req, res) {
         var layout;
 
         for (var i = 0; i < parsedNodes.length; i++) {
-            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i]);
+            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], "c");
         }
 
         nodes = nodes.sort(function(a, b) {
@@ -842,16 +843,15 @@ app.post('/community-explorer', function(req, res) {
 
         for (var i = 0; i < nodes.length; i++) {
             // temp = nodeUtils.positionNodesClustered(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), [], i, nodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 0.8);
-            temp = nodeUtils.positionCommunities(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
+            temp = nodeUtils.positionCommunities(nodes[i] == null ? [] : nodes[i], nodes, i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
 
             if (nodes[i] != null) {
                 nodes[i] = [];
-                nodes[i][0] = temp.centerNode;
                 nodes[i] = nodes[i].concat(temp.nodes);
             }
         }
 
-        nodes = nodes.concat(nodeUtils.createParentNodesMG(nodes.length));
+        nodes = nodes.concat(nodeUtils.createParentNodesMG("c", nodes.length));
 
         layout = layoutUtils.createPresetLayout();
         config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
