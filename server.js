@@ -7,6 +7,7 @@ var cors = require('cors');
 var bodyParser = require('body-parser')
 var app = express();
 var nodeUtils = require('./server-utils/nodeUtils');
+var communityUtils = require('./server-utils/communityUtils');
 var configUtils = require('./server-utils/configUtils');
 var edgeUtils = require('./server-utils/edgeUtils');
 var styleUtils = require('./server-utils/styleUtils');
@@ -857,7 +858,7 @@ app.post('/community-explorer', function(req, res) {
 
 
         // Position nodes randomly in clusters
-        nodes = nodeUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
+        nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
 
 
         layout = layoutUtils.createPresetLayout();
