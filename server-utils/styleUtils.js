@@ -10,13 +10,15 @@ var clone = require('clone');
 var classSuffixes = { nodeColor: 'node-color', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
 var nodeSizes = { small: 12, medium: 18, large: 20, source: 40 };
 var fontSizes = { source: 24 };
+var epiColor = 'red';
+var stromaColor = 'blue';
 
 var bipartiteStyles = {
     epi: {
         nodeColor: {
             'selector': '.epi-' + classSuffixes.nodeColor,
             'style': {
-                'background-color': 'red',
+                'background-color': epiColor,
             }
         },
         labelPlacement: {
@@ -24,7 +26,7 @@ var bipartiteStyles = {
             'style': {
                 'text-halign': 'center',
                 'text-valign': 'center',
-                'text-outline-color': 'red',
+                'text-outline-color': epiColor,
                 'text-outline-width': 1,
                 'color': 'white',
                 'font-family': 'Verdana'
@@ -35,7 +37,7 @@ var bipartiteStyles = {
         nodeColor: {
             'selector': '.stroma-' + classSuffixes.nodeColor,
             'style': {
-                'background-color': 'blue',
+                'background-color': stromaColor,
             }
         },
         labelPlacement: {
@@ -43,7 +45,7 @@ var bipartiteStyles = {
             'style': {
                 'text-halign': 'center',
                 'text-valign': 'center',
-                'text-outline-color': 'blue',
+                'text-outline-color': stromaColor,
                 'text-outline-width': 1,
                 'color': 'white',
                 'font-family': 'Verdana'
@@ -59,7 +61,7 @@ var randomStyles = {
             'pie-size': '100%',
             'pie-1-background-color': '#D500F9',
             'pie-1-background-size': '50',
-            'pie-2-background-color': 'red',
+            'pie-2-background-color': epiColor,
             'pie-2-background-size': '50',
             'height': '40px',
             'width': '40px'
@@ -71,7 +73,7 @@ var randomStyles = {
             'pie-size': '100%',
             'pie-1-background-color': '#D500F9',
             'pie-1-background-size': '50',
-            'pie-2-background-color': 'blue',
+            'pie-2-background-color': stromaColor,
             'pie-2-background-size': '50',
             'height': '40px',
             'width': '40px'
@@ -270,7 +272,44 @@ function setDynamicEdgeStyles(edgeStyle, overallWeights) {
     return edgeStyle;
 }
 
+function createRandomColor(generated) {
+    var unique = false;
+    var iterations = 0;
+
+    while (!unique) {
+        if (iterations > 1000) {
+            break;
+        }
+
+        var r = Math.floor((Math.random() * 255) + 1);
+        var g = Math.floor((Math.random() * 255) + 1);
+        var b = Math.floor((Math.random() * 255) + 1);
+
+        var colorString = "rgb(" + r + ", " + g + ", " + b + ")";
+
+        if (generated.indexOf(colorString) < 0) {
+            unique = true;
+        }
+    }
+
+    return colorString;
+}
+
+function createCommunityStyle(geneType, nodeClass, color, shape) {
+    var style = {
+        selector: "." + nodeClass + "." + geneType,
+        style: {
+            'background-color': color,
+            'shape': shape
+        }
+    }
+
+    return style;
+}
+
 module.exports = {
+    epiColor: epiColor,
+    stromaColor: stromaColor,
     getAllBipartiteStyles: getAllBipartiteStyles,
     allRandomFormats: allRandomFormats,
     allConcentricFormats: allConcentricFormats,
@@ -286,5 +325,7 @@ module.exports = {
     setDynamicEdgeStyles: setDynamicEdgeStyles,
     noLabel: noLabel,
     invisibleParent: invisibleParent,
-    communityEdge: communityEdge
+    communityEdge: communityEdge,
+    createRandomColor: createRandomColor,
+    createCommunityStyle: createCommunityStyle
 };

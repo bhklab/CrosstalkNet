@@ -816,6 +816,7 @@ app.post('/community-explorer', function(req, res) {
         var nodes = [];
         var edges = [];
         var elements = [];
+        var generatedColors = [];
         var config;
         var layout;
 
@@ -832,32 +833,52 @@ app.post('/community-explorer', function(req, res) {
         elements = elements.concat(edges);
         config = configUtils.createConfig();
 
-        var clusterRadii = [];
+        // var clusterRadii = [];
 
-        for (var i = 0; i < nodes.length; i++) {
-            clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5, 60);
-        }
+        // for (var i = 0; i < nodes.length; i++) {
+        //     clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5, 60);
+        // }
 
-        var temp;
+        // var temp;
 
 
-        for (var i = 0; i < nodes.length; i++) {
-            // temp = nodeUtils.positionNodesClustered(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), [], i, nodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 0.8);
-            temp = nodeUtils.positionCommunities(nodes[i] == null ? [] : nodes[i], nodes, i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
+        // for (var i = 0; i < nodes.length; i++) {
+        //     // temp = nodeUtils.positionNodesClustered(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), [], i, nodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 0.8);
+        //     temp = nodeUtils.positionCommunities(nodes[i] == null ? [] : nodes[i], nodes, i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
 
-            if (nodes[i] != null) {
-                nodes[i] = [];
-                nodes[i] = nodes[i].concat(temp.nodes);
-            }
-        }
+        //     if (nodes[i] != null) {
+        //         nodes[i] = [];
+        //         nodes[i] = nodes[i].concat(temp.nodes);
+        //     }
+        // }
 
-        nodes = nodes.concat(nodeUtils.createParentNodesMG("c", nodes.length));
+        // nodes = nodes.concat(nodeUtils.createParentNodesMG("c", nodes.length));
+
+
+
+        // Position nodes randomly in clusters
+        nodes = nodeUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
+
 
         layout = layoutUtils.createPresetLayout();
-        config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+        //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
         conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
         conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
         conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
+
+        // Color nodes based on their community
+        for (var i = 0; i < nodes.length; i++) {
+            var colorClass = "c" + i;
+            var randomColor = styleUtils.createRandomColor(generatedColors);
+            generatedColors.push(randomColor);
+
+            var epiStyle = styleUtils.createCommunityStyle("epi", colorClass, randomColor, 'circle');
+            var stromaStyle = styleUtils.createCommunityStyle("stroma", colorClass, randomColor, 'triangle');
+
+            config = configUtils.addStyleToConfig(config, epiStyle);
+            config = configUtils.addStyleToConfig(config, stromaStyle);
+            nodes[i] = nodeUtils.addClassToNodes(nodes[i], colorClass);
+        }
 
         nodes = parseUtils.flatten(nodes);
         edges = parseUtils.flatten(edges);
