@@ -368,24 +368,94 @@ function positionCommunities(nodes, allNodes, clusterNumber, totalClusters, node
     };
 }
 
-function positionCommunitiesRandom(centerNode, nodes, allNodes, clusterNumber, totalClusters, nodeRadius, clusterRadii, fudge) {
-    var radius = clusterRadii[clusterNumber];
-    var totalNodes = 0;
-
-    for (var i = 0; i < allNodes.length; i++) {
-        totalNodes += allNodes[i].length;
-    }
-
-    var totalArea = 0;
-
-    for (var i = 0; i < clusterRadii.length; i++) {
-        totalArea += clusterRadii[i] * clusterRadii[i] * 4;
-    }
-
-    totalArea *= fudge;
-
-    centerNode = clone(centerNode);
+function positionCommunitiesRandom(nodes, nodeSize) {
     nodes = clone(nodes);
+    var totalNodes = 0;
+    var circleModel = {
+        x: 0,
+        y: 0,
+        radius: 0
+    }
+    var placedCircles = [];
+
+    for (var i = 0; i < nodes.length; i++) {
+        totalNodes += nodes[i].length;
+    }
+
+    var totalArea = totalNodes * (nodeSize * nodeSize) * Math.PI * 10;
+    var radius = Math.sqrt(totalArea / Math.PI);
+
+    for (var i = 0; i < nodes.length; i++) {
+        var randomRadius = Math.floor((Math.random() * radius) + 1);
+        var randomAngle = Math.random() * 2 * Math.PI;
+
+        var centerPoint = {
+            x: randomRadius * Math.cos(randomAngle),
+            y: randomRadius * Math.sin(randomAngle)
+        };
+
+        console.log("randomAngle: " + randomAngle);
+
+        var withinClusterArea = nodes[i].length * (nodeSize * nodeSize) * Math.PI * 4;
+        var withinClusterMaxRadius = Math.sqrt(withinClusterArea / Math.PI);
+        var avoidOverlapIterations = 0;
+
+        while (avoidOverlapIterations < 100000) {
+            var isOverlapping = false;
+
+            for (var k = 0; k < placedCircles.length; k++) {
+                var r0 = withinClusterMaxRadius;
+                var r1 = placedCircles[k].radius;
+
+                var x0 = centerPoint.x;
+                var y0 = centerPoint.y;
+
+                var x1 = placedCircles[k].x;
+                var y1 = placedCircles[k].y;
+
+                if (Math.pow(r0 - r1, 2) <= Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2) &&
+                    Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2) <= Math.pow(r0 + r1, 2)) {
+                    isOverlapping = true;
+                }
+            }
+
+            if (isOverlapping == false) {
+                break;
+            }
+            randomRadius = Math.floor((Math.random() * radius) + 1);
+            randomAngle = Math.random() * 2 * Math.PI;
+
+            centerPoint = {
+                x: randomRadius * Math.cos(randomAngle),
+                y: randomRadius * Math.sin(randomAngle)
+            };
+            avoidOverlapIterations++;
+
+        }
+
+        console.log("avoidOverlapIterations: " + avoidOverlapIterations);
+
+        for (var j = 0; j < nodes[i].length; j++) {
+            var randomWithinClusterRadius = Math.floor((Math.random() * withinClusterMaxRadius) + 1);
+            var randomWithinClusterAngle = Math.random() * 2 * Math.PI;
+
+            nodes[i][j].position = {
+                x: centerPoint.x + (randomWithinClusterRadius * Math.cos(randomWithinClusterAngle)),
+                y: centerPoint.y + (randomWithinClusterRadius * Math.sin(randomWithinClusterAngle))
+            };
+        }
+
+        var placedCircle = clone(circleModel);
+        placedCircle.x = centerPoint.x;
+        placedCircle.y = centerPoint.y;
+        placedCircle.radius = withinClusterMaxRadius + 100;
+
+        placedCircles.push(placedCircle);
+
+    }
+
+    return nodes;
+
 }
 
 function positionCommunitiesSpiral(allNodes, clusterRadii) {
@@ -401,7 +471,7 @@ function positionCommunitiesSpiral(allNodes, clusterRadii) {
         };
     }
 
-    centerCluster[0].position = {x:0, y:0};
+    centerCluster[0].position = { x: 0, y: 0 };
 
     var totalRadius = clusterRadii[clusterRadii.length - 1] + clusterRadii[clusterRadii.length - 2] + 50;
     var arcLength = totalRadius * 2 * Math.PI;
@@ -513,5 +583,6 @@ module.exports = {
     getMinRadius: getMinRadius,
     isNodesArrayFull: isNodesArrayFull,
     positionCommunities: positionCommunities,
-    positionCommunitiesSpiral: positionCommunitiesSpiral
+    positionCommunitiesSpiral: positionCommunitiesSpiral,
+    positionCommunitiesRandom: positionCommunitiesRandom
 };
