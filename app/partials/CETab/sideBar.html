@@ -2,6 +2,11 @@
     <md-toolbar class="md-primary md-hue-3">
         <div layout="row">
             <div flex class="left-padded top-padded">Navigation</div>
+            <div flex style="position: relative;">
+                <md-switch ng-model="vm.switchModel" aria-label="Switch 1" ng-change="vm.changeDisplay(vm)" style="position: absolute; right: 5px;">
+                    {{vm.sdWithinTab.display}}
+                </md-switch>
+            </div>
         </div>
     </md-toolbar>
     <md-content>

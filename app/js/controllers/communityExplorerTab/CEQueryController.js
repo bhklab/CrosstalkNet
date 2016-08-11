@@ -8,7 +8,7 @@
         '$scope',
         '$rootScope',
         'GlobalSharedData', 'QueryService', 'CESharedData', 'GraphConfigService', 'FileUploadService',
-        '$mdSelect', '$mdDialog', 'GlobalControls',
+        '$mdSelect', '$mdDialog', '$timeout', 'GlobalControls',
         CEQueryController
     ]);
 
@@ -18,16 +18,21 @@
      * @memberOf controllers
      */
     function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService,
-        FileUploadService, $mdSelect, $mdDialog, GlobalControls) {
+        FileUploadService, $mdSelect, $mdDialog, $timeout, GlobalControls) {
         var vm = this;
 
         vm.sharedData = GlobalSharedData.data;
+        vm.changeDisplay = GlobalControls.changeDisplay;
 
+        vm.displayModes = angular.copy(GlobalControls.displayModes);
 
         vm.getCommunities = getCommunities;
         vm.initializeController = initializeController;
         vm.uploadFile = uploadFile;
         vm.deleteConfirm = deleteConfirm;
+
+        vm.resize = GraphConfigService.resetZoom;
+        vm.needsRedraw = false;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
@@ -62,6 +67,14 @@
         function getCommunities(filterType) {
             var file = JSON.parse(vm.communityFile);
             $rootScope.state = $rootScope.states.loadingGraph;
+            if (vm.sdWithinTab.cy != null) {
+                angular.element("#cyCommunityExplorer").remove();
+                // var parent = angular.element("#community-explorer-graph-view");
+                // var newGraphContainer = angular.element('<div class="graph-container" id="cyCommunityExplorer"></div>');
+                // parent.prepend(newGraphContainer);
+            }
+
+            GraphConfigService.destroyGraph(vm);
             CESharedData.resetWTM(vm);
             QueryService.getCommunities(file).then(function(result) {
                 $rootScope.state = $rootScope.states.finishedGettingCommunities;
@@ -72,11 +85,15 @@
 
                 $rootScope.state = $rootScope.states.loadingConfig;
 
-                vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
+                var container = angular.element("#cyCommunityExplorer"); 
+                if (container.length != null && container.length != 0) {
+                    vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
+                }
 
                 $rootScope.state = $rootScope.states.showingConfig;
 
                 vm.sdWithinTab.communities = result.communities;
+                vm.sdWithinTab.communityNumbers = Object.keys(vm.sdWithinTab.communities);
                 vm.sdWithinTab.dataLoaded = true;
             });
         }
@@ -157,8 +174,38 @@
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
+                GraphConfigService.destroyGraph(vm);
                 CESharedData.resetWTM(vm);
                 initializeVariables();
+            }
+        });
+
+        /** 
+         * @summary Watches the display variable and redraws the graph when switching
+         * from the Tables view to the Graph view.
+         *
+         * @memberOf controllers.IEQueryController
+         */
+        $scope.$watch(function() {
+            if (vm.sdWithinTab) {
+                return vm.sdWithinTab.display;
+            }
+            return null;
+        }, function(newValue, oldValue) {
+            if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
+                $timeout(function() {
+                    if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
+                        GraphConfigService.destroyGraph(vm);
+                        vm.needsRedraw = false;
+                        vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyInteractionExplorer");
+                    }
+                }, 250);
+            } else if (newValue == vm.displayModes.graph && newValue != oldValue && !vm.needsRedraw) {
+                $timeout(function() {
+                    if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
+                        vm.resize(vm);
+                    }
+                }, 250);
             }
         });
     }

@@ -15,13 +15,37 @@
     function CESharedData() {
         var service = {};
 
+        var paginationModel = {
+            options: {
+                rowSelection: true,
+                multiSelect: true,
+                autoSelect: true,
+                decapitate: false,
+                largeEditDialog: false,
+                boundaryLinks: false,
+                limitSelect: true,
+                pageSelect: true
+            },
+            query: {
+                limit: 50,
+                page: 1
+            },
+            limitOptions: [50, 100, 200]
+        };
+
         /** Object representing variables to be available between the various controllers
          * within the COMMUNITY EXPLORER tab.
          */
         var withinTabModel = {
             dataLoaded: false,
             cy: null,
+            config: null,
             communities: null,
+            communityNumbers: null,
+            pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) },
+            filtered: { epi : {genes: null, total: 0}, stroma: {genes: null, total: 0} },
+            search: {epi: "", stroma: ""},
+            selectedCom: null
         };
 
         service.data = angular.copy(withinTabModel);
@@ -36,6 +60,11 @@
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {
+                if (prop == "pagination") {
+                    vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
+                    vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
+                }
+
                 vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
             }
         }

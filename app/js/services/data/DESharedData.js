@@ -62,6 +62,7 @@
                     vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
                     vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
                 }
+                
                 vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
             }
         }
