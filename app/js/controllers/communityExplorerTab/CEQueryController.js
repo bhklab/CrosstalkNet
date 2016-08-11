@@ -7,7 +7,7 @@
     angular.module('myApp.controllers').controller('CEQueryController', [
         '$scope',
         '$rootScope',
-        'GlobalSharedData', 'QueryService', 'CESharedData', 'GraphConfigService',
+        'GlobalSharedData', 'QueryService', 'CESharedData', 'GraphConfigService', 'FileUploadService',
         CEQueryController
     ]);
 
@@ -16,14 +16,16 @@
      * @desc Controller for the QUERY sub-tab in the COMMUNITY EXPLORER tab.
      * @memberOf controllers
      */
-    function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService) {
+    function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService,
+        FileUploadService) {
         var vm = this;
 
         vm.sharedData = GlobalSharedData.data;
-        
+
 
         vm.getCommunities = getCommunities;
         vm.initializeController = initializeController;
+        vm.uploadFile = uploadFile;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
@@ -45,8 +47,8 @@
          */
         function initializeVariables() {
             vm.communityFile = null;
+            vm.communityUpload = null;
             loadFileList();
-            loadPermission();
         }
 
         /**
@@ -83,11 +85,51 @@
             });
         }
 
-        function loadPermission() {
-            QueryService.getUserPermission().then(function(result) {
-                vm.permission = result.permission;
+        function uploadFile() {
+            $rootScope.state = $rootScope.states.uploadingFile;
+            FileUploadService.uploadCommunityFile(vm.communityUpload).then(function() {
+                $rootScope.state = $rootScope.states.initial;
+                vm.clearAllData = true;
             });
         }
+
+        /**
+         * @summary Spawns a confirm dialog asking the user if they really want to 
+         * delete the file they clicked on.
+         *
+         * @param {Event} ev The event associated with the click. This is used to prevent
+         * propogation.
+         * @param {Object} file The file that is to be deleted.
+         * @memberOf controllers.CEQueryController
+         */
+        function deleteConfirm(ev, file) {
+            var toDelete = {};
+
+            for (var prop in file) {
+                if (prop.indexOf("$") < 0) {
+                    toDelete[prop] = file[prop];
+                }
+            }
+
+            ev.stopPropagation();
+            $mdSelect.hide();
+
+            var confirm = $mdDialog.confirm()
+                .title('Confirm Delete?')
+                .textContent('Are you sure you want to delete the file: ' + file.name + '?')
+                .ariaLabel('Lucky day')
+                .targetEvent(ev)
+                .clickOutsideToClose(false)
+                .escapeToClose(false)
+                .ok('Yes')
+                .cancel('No');
+            $mdDialog.show(confirm).then(function() {
+                QueryService.deleteCommunityFile(toDelete);
+            }, function() {});
+
+            GlobalControls.focusElement("md-dialog button.ng-enter-active");
+        }
+
 
         /**
          * @summary Wacthes for changes in the reloadFileList variable and reloads the available

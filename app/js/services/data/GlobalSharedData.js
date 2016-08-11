@@ -29,7 +29,8 @@
             selectedNetworkType: networkTypes.tumor,
             clearAllData: false,
             networkTypes: networkTypes,
-            guest: false
+            guest: false, 
+            permission: 0
         };
 
         service.data = angular.copy(globalDataModel);

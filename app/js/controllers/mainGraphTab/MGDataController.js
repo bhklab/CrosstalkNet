@@ -140,7 +140,7 @@
                 .ok('Yes')
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
-                QueryService.deleteFile(toDelete);
+                QueryService.deleteMatrixFile(toDelete);
             }, function() {});
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
@@ -221,7 +221,7 @@
             }
 
             $rootScope.state = $rootScope.states.uploadingFile;
-            FileUploadService.uploadFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
+            FileUploadService.uploadMatrixFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
                 $rootScope.state = $rootScope.states.initial;
                 vm.matrixUpload = { normal: null, tumor: null, delta: null };
             });
@@ -259,7 +259,7 @@
                 });
 
                 QueryService.getUserPermission().then(function(result) {
-                    vm.permission = result.permission;
+                    vm.sharedData.permission = result.permission;
                 });
                 vm.sharedData.reloadFileList = false;
             }
