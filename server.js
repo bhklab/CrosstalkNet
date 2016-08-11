@@ -916,7 +916,43 @@ app.post('/upload-community-file', function(req, res) {
             console.log("File verification successful.");
             res.send({ fileStatus: "Successfully uploaded file. Please check the dropdown to select new file(s). " })
         }
+
+        communityFileUtils.updateAvailableCommunitiesCache();
     });
+});
+
+app.post('/delete-community-file', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var file;
+    console.log("delete file: %j", req.body.file);
+    console.log("req.body: %j", req.body);
+
+    file = communityFileUtils.getRequestedFile(req.body.file, user)
+
+    if (file == null) {
+        res.send({ fileStatus: "Failed to delete file" })
+        return;
+    }
+
+    if (file) {
+        async.series([
+                function(callback) {
+                    communityFileUtils.removeFile(file.path, file, callback);
+                }
+            ],
+            // optional callback
+            function(err, results) {
+                console.log("results in server.js: %j", results);
+                console.log("err: %j", err);
+                communityFileUtils.updateAvailableCommunitiesCache();
+
+                if (results != null && results.length > 0 && results[0] != null) {
+                    res.send({ fileStatus: "Failed to delete file: " + file.name });
+                } else {
+                    res.send({ fileStatus: "Successfully deleted file" });
+                }
+            });
+    }
 });
 
 function createSampleUser() {
