@@ -154,24 +154,12 @@ function matchSelectedFile(file, cache, user) {
 function removeFile(path, file, callback) {
     var error = false;
     if (path != null && file != null) {
-
         async.series([
                 function(cbInner) {
-
                     fs.unlink(path + file.name, function(err) {
                         if (err) {
                             console.log(err);
                             cbInner(null, "Failed1");
-                        } else {
-                            cbInner();
-                        }
-                    });
-                },
-                function(cbInner) {
-                    fs.unlink(path + 'degrees' + file.name, function(err) {
-                        if (err) {
-                            console.log(err);
-                            cbInner(null, "Failed2");
                         } else {
                             cbInner();
                         }
@@ -238,6 +226,8 @@ function createDirectory(baseDirectory, userName, callback) {
             }
 
             console.error(err)
+        } else if (callback) {
+            callback();
         }
     });
 }
