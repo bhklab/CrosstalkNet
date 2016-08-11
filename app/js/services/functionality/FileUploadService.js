@@ -15,7 +15,8 @@
     function FileUploadService($q, GlobalSharedData, QueryService) {
         var service = {};
 
-        service.uploadFiles = uploadFiles;
+        service.uploadMatrixFiles = uploadMatrixFiles;
+        service.uploadCommunityFile = uploadCommunityFile;
 
         /**
          * @summary Checks to see if all files for the selected network
@@ -26,7 +27,7 @@
          * @return {Promise} A promise to be resolved when the request to the server is 
          * complete.
          */
-        function uploadFiles(files, type) {
+        function uploadMatrixFiles(files, type) {
             var deferred = $q.defer();
             var filesToUpload = { normal: null, tumor: null, delta: null };
 
@@ -64,6 +65,38 @@
                     });
                 });
             }
+
+            return deferred.promise;
+        }
+
+        /**
+         * @summary Checks to see if a community file is selected,
+         * reads it from the disk, and uploads it to the server.
+         *
+         * @param {Object} file A file selected by the user.
+         * @return {Promise} A promise to be resolved when the request to the server is
+         * complete.
+         */
+        function uploadCommunityFile(file) {
+            var deferred = $q.defer();
+
+            if (file == null) {
+                alert("Please choose an Rdata file.");
+                deferred.resolve({ result: null });
+                return deferred.promise;
+            }
+
+            readHelper(file).then(function(result) {
+                if (result.file == null) {
+                    alert("Please choose an Rdata file.");
+                    deferred.resolve({ result: null });
+                    return deferred.promise;
+                }
+
+                QueryService.uploadCommunityFile(result.file).then(function(result) {
+                    deferred.resolve({ result: null });
+                });
+            });
 
             return deferred.promise;
         }

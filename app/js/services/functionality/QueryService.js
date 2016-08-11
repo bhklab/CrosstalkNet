@@ -22,11 +22,12 @@
         service.getInteractionExplorerConfig = getInteractionExplorerConfig;
         service.getAllPaths = getAllPaths;
         service.uploadFiles = uploadFiles;
-        service.deleteFile = deleteFile;
+        service.deleteMatrixFile = deleteMatrixFile;
         service.getUserPermission = getUserPermission;
         service.getTopGenes = getTopGenes;
         service.getCommunities = getCommunities;
         service.getCommunityFileList = getCommunityFileList;
+        service.uploadCommunityFile = uploadCommunityFile;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -260,8 +261,8 @@
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
          */
-        function deleteFile(file) {
-            RESTService.post('delete-file', { file: file })
+        function deleteMatrixFile(file) {
+            RESTService.post('delete-matrix-file', { file: file })
                 .then(function(data) {
                     GlobalSharedData.data.reloadFileList = true;
 
@@ -371,6 +372,19 @@
                 deferred.resolve({ fileList: data.fileList });
             }, function(response) {
                 console.log(response);
+            });
+
+            return deferred.promise;
+        }
+
+        function uploadCommunityFile(file) {
+            var deferred = $q.defer();
+
+            RESTService.post("upload-community-file", { file: file }).then(function(data) {
+                //GlobalSharedData.data.reloadCommunityFileList = true;
+
+                ValidationService.checkServerResponse(data);
+                deferred.resolve({ result: null });
             });
 
             return deferred.promise;

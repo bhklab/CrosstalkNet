@@ -56,7 +56,6 @@ function positionCommunitiesRandom(nodes, nodeSize) {
     }
 
     return nodes;
-
 }
 
 function avoidOverlap(centerPoint, clusterRadius, containerRadius, placedCircles) {

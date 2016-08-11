@@ -25,7 +25,7 @@
         </md-button>
     </div>
     <md-divider></md-divider>
-    <div ng-if="vm.permission > 0" class="md-padding">
+    <div ng-if="vm.sharedData.permission > 0" class="md-padding">
         <div class="md-subhead bottom-margin">Optional File Upload</div>
         <form>
             <div ng-repeat="(key, value) in vm.matrixUpload" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="bottom-margin">

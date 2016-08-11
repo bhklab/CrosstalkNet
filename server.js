@@ -674,7 +674,7 @@ app.post('/overall-matrix-stats', function(req, res) {
         });
 });
 
-app.post('/delete-file', function(req, res) {
+app.post('/delete-matrix-file', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var file;
     console.log("delete file: %j", req.body.file);
@@ -765,7 +765,7 @@ app.post('/upload-matrix', function(req, res) {
 
     async.eachSeries(nonEmptyFiles, function iteratee(type, callback) {
         console.log("type:" + type);
-        verifyFile(matrixFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
+        verifyFile("R_Scripts/matrixFileChecker.R", matrixFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
@@ -834,32 +834,8 @@ app.post('/community-explorer', function(req, res) {
         elements = elements.concat(edges);
         config = configUtils.createConfig();
 
-        // var clusterRadii = [];
-
-        // for (var i = 0; i < nodes.length; i++) {
-        //     clusterRadii[i] = nodeUtils.getMinRadius(nodes[i] == null ? 0 : nodes[i].length, styleUtils.nodeSizes.medium / 2, 0.5, 60);
-        // }
-
-        // var temp;
-
-
-        // for (var i = 0; i < nodes.length; i++) {
-        //     // temp = nodeUtils.positionNodesClustered(nodes[i][0], nodes[i] == null ? [] : nodes[i].slice(1, nodes[i].length), [], i, nodes.length, styleUtils.nodeSizes.medium / 2, largestClusterSize, 0.8);
-        //     temp = nodeUtils.positionCommunities(nodes[i] == null ? [] : nodes[i], nodes, i, nodes.length, styleUtils.nodeSizes.medium / 2, clusterRadii, 0.5);
-
-        //     if (nodes[i] != null) {
-        //         nodes[i] = [];
-        //         nodes[i] = nodes[i].concat(temp.nodes);
-        //     }
-        // }
-
-        // nodes = nodes.concat(nodeUtils.createParentNodesMG("c", nodes.length));
-
-
-
         // Position nodes randomly in clusters
         nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
-
 
         layout = layoutUtils.createPresetLayout();
         //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
@@ -885,7 +861,6 @@ app.post('/community-explorer', function(req, res) {
         edges = parseUtils.flatten(edges);
 
 
-        console.log("edges.length: " + edges.length);
         config = configUtils.setConfigLayout(config, layout);
         config = configUtils.setConfigElements(config, nodes.concat(edges));
 
@@ -903,35 +878,46 @@ app.post('/community-file-list', function(req, res) {
     res.send({ fileList: accessibleFiles });
 });
 
-function verifyFile(filePath, fileName, callback) {
-    var args = {};
-    var argsString = "";
+app.post('/upload-community-file', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var file = req.body.file;
 
-    args.filePath = filePath;
-    args.fileName = fileName
+    if (user == null) {
+        res.send({ error: "Upload failed. Failed to authenticate user." })
+        return;
+    }
 
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
+    if (file == null || file.name == null || file.data == null) {
+        res.send({ error: "Upload failed. File name or data missing." })
+        return;
+    }
 
-    var child = exec("Rscript R_Scripts/fileChecker.R --args \"" + argsString + "\"", function(error, stdout, stderr) {
-        console.log('stderr: ' + stderr);
-
-        if (error != null) {
-            console.log('error: ' + error);
-        }
-        //console.log(stdout);
-
-        var parsedValue = JSON.parse(stdout);
-        var status = parsedValue.status;
-        var message = parsedValue.message;
-
-        if (status > 0) {
-            callback({ status: status, message: message });
+    async.series([function(callback) {
+        file.data = file.data.replace(/^data:;base64,/, "");
+        communityFileUtils.createDirectory(communityFileUtils.BASE_UPLOAD_DIRECTORY, user.name, callback);
+        communityFileUtils.writeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY, file, user.name, callback);
+    }], function(result) {
+        if (result != null) {
+            res.send({ error: result });
+            return;
         } else {
-            callback();
+            console.log("Wrote file: " + file.name + " to disk");
         }
     });
-}
+
+    async.series([function(callback) {
+        verifyFile("R_Scripts/communityFileChecker.R", communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file.name, callback);
+    }], function(result) {
+        if (result != null) {
+            communityFileUtils.removeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file, null);
+            console.log("Failed file verification.");
+            res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
+        } else {
+            console.log("File verification successful.");
+            res.send({ fileStatus: "Successfully uploaded file. Please check the dropdown to select new file(s). " })
+        }
+    });
+});
 
 function createSampleUser() {
     var salt = bcrypt.genSaltSync(3);
@@ -948,6 +934,36 @@ function createSampleUser() {
 
         console.log('User saved successfully');
         // res.json({ success: true });
+    });
+}
+
+function verifyFile(script, filePath, fileName, callback) {
+    var args = {};
+    var argsString = "";
+
+    args.filePath = filePath;
+    args.fileName = fileName
+
+    argsString = JSON.stringify(args);
+    argsString = argsString.replace(/"/g, '\\"');
+
+    var child = exec("Rscript " + script + " --args \"" + argsString + "\"", function(error, stdout, stderr) {
+        console.log('stderr: ' + stderr);
+
+        if (error != null) {
+            console.log('error: ' + error);
+        }
+        //console.log(stdout);
+
+        var parsedValue = JSON.parse(stdout);
+        var status = parsedValue.status;
+        var message = parsedValue.message;
+
+        if (status > 0) {
+            callback({ status: status, message: message });
+        } else {
+            callback();
+        }
     });
 }
 
