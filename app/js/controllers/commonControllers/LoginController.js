@@ -36,7 +36,8 @@
         function guestLogin() {
             $rootScope.tokenSet = true;
             vm.sharedData.guest = true;
-            vm.sharedData.reloadFileList = true;
+            vm.sharedData.reloadMatrixFileList = true;
+            vm.sharedData.reloadCommunityFileList = true;
             $mdDialog.hide('');
         }
 
@@ -61,7 +62,8 @@
                             $cookies.put('token', data.token, { expires: exp });
                         }
 
-                        vm.sharedData.reloadFileList = true;
+                        vm.sharedData.reloadMatrixFileList = true;
+                        vm.sharedData.reloadCommunityFileList = true;
                         $mdDialog.hide('');
                     }
                 });

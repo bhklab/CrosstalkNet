@@ -21,7 +21,8 @@
         var correlationFileModel = { normal: null, tumor: null, delta: null };
         // Object containing different variables to be available between all controllers in the app.
         var globalDataModel = {
-            reloadFileList: false,
+            reloadCommunityFileList: false,
+            reloadMatrixFileList: false,
             correlationFileActual: angular.copy(correlationFileModel),
             geneList: null,
             maxDegree: 0,
