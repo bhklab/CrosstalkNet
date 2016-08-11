@@ -1,5 +1,9 @@
 /* app css stylesheet */
 
+.community-select-width {
+    width: 100px;
+}
+
 .no-padding-top {
     padding-top: 0px;
 }

@@ -1,0 +1,72 @@
+<md-card ng-if="vm.sdWithinTab.communities != null">
+    <md-card-title>
+        <md-card-title-text>
+            <md-input-container class="select bottom-margin-25">
+                <label>Choose A Community</label>
+                <md-select ng-model="vm.sdWithinTab.selectedCom" ng-change="vm.selectCommunity()">
+                    <md-option ng-repeat="communityNumber in ::vm.sdWithinTab.communityNumbers" value="{{communityNumber}}" ng-selected="0">
+                        {{communityNumber}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+            <div layout="row">
+                <div flex>
+                    <span class="md-headline">Communitiy: {{vm.sdWithinTab.selectedCom}}</span>
+                </div>
+            </div>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div class="bottom-margin-25">
+            <div class="top-padded-10" layout="row">
+                <div flex><span class="md-title">Epi Genes: {{vm.sdWithinTab.filtered.epi.genes.length}}</span></div>
+                <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Epi Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.epi" ng-change="vm.search('epi')" ng-model-options="{ debounce: {'default': 50}}">
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-wrap>
+                <div flex="20" ng-repeat="gene in vm.sdWithinTab.filtered.epi.genes track by $index">
+                    <md-menu>
+                        <md-button ng-click="$mdOpenMenu($event)">{{gene}}</md-button>
+                        <md-menu-content width="6">
+                            <md-menu-item>
+                                <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
+                </div>
+            </div>
+        </div>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.filtered.epi.total}}" md-on-paginate="vm.paginateEpi" md-page-select="true" md-boundary-links="true"></md-table-pagination>
+        <div class="bottom-margin-25">
+            <div class="top-padded-10" layout="row">
+                <div flex>
+                    <span class="md-title">Stroma Genes: {{vm.sdWithinTab.filtered.stroma.genes.length}}</span>
+                </div>
+                <div flex style="position: relative;">
+                    <md-input-container class="no-margin right-aligned">
+                        <label>Filter Stroma Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.stroma" ng-change="vm.search('stroma')" ng-model-options="{ debounce: {'default': 50}}">
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-wrap>
+                <div flex="20" ng-repeat="gene in vm.sdWithinTab.filtered.stroma.genes track by $index">
+                    <md-menu>
+                        <md-button ng-click="$mdOpenMenu($event)">{{gene}}</md-button>
+                        <md-menu-content width="6">
+                            <md-menu-item>
+                                <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
+                </div>
+            </div>
+        </div>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.filtered.stroma.total}}" md-on-paginate="vm.paginateStroma" md-page-select="true" md-boundary-links="true"></md-table-pagination>
+        <md-button class="md-raised md-primary" ng-click="vm.exportTopGenesToCSV(vm)">Download As CSV</md-button>
+    </md-card-content>
+</md-card>
