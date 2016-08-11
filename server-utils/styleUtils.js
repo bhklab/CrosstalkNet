@@ -173,7 +173,8 @@ var communityEdge = {
     selector: 'edge',
     style: {
         width: '1px',
-        'line-color': 'black'
+        'line-color': 'black',
+        'events': 'no'
     }
 }
 

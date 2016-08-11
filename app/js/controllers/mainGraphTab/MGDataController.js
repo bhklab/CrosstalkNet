@@ -244,12 +244,12 @@
             });
 
         /**
-         * @summary Wacthes for changes in the reloadFileList variable and reloads the available
-         * file dropdowns as well as the user permission level when reloadFileList becomes true.
+         * @summary Wacthes for changes in the reloadMatrixFileList variable and reloads the available
+         * file dropdowns as well as the user permission level when reloadMatrixFileList becomes true.
          * @memberOf controllers.FileController
          */
         $scope.$watch(function() {
-            return vm.sharedData.reloadFileList;
+            return vm.sharedData.reloadMatrixFileList;
         }, function(newValue, oldValue) {
             if (newValue == true) {
                 QueryService.getFileList(['tumor', 'normal', 'delta']).then(function(result) {
@@ -261,7 +261,7 @@
                 QueryService.getUserPermission().then(function(result) {
                     vm.sharedData.permission = result.permission;
                 });
-                vm.sharedData.reloadFileList = false;
+                vm.sharedData.reloadMatrixFileList = false;
             }
         });
 

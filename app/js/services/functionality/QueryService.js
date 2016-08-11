@@ -28,6 +28,7 @@
         service.getCommunities = getCommunities;
         service.getCommunityFileList = getCommunityFileList;
         service.uploadCommunityFile = uploadCommunityFile;
+        service.deleteCommunityFile = deleteCommunityFile;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -242,7 +243,7 @@
 
             RESTService.post('upload-matrix', { files: files, type: type })
                 .then(function(data) {
-                    GlobalSharedData.data.reloadFileList = true;
+                    GlobalSharedData.data.reloadMatrixFileList = true;
 
                     ValidationService.checkServerResponse(data);
                     deferred.resolve({ result: null });
@@ -264,7 +265,7 @@
         function deleteMatrixFile(file) {
             RESTService.post('delete-matrix-file', { file: file })
                 .then(function(data) {
-                    GlobalSharedData.data.reloadFileList = true;
+                    GlobalSharedData.data.reloadMatrixFileList = true;
 
                     if (!ValidationService.checkServerResponse(data)) {
                         return;
@@ -381,13 +382,33 @@
             var deferred = $q.defer();
 
             RESTService.post("upload-community-file", { file: file }).then(function(data) {
-                //GlobalSharedData.data.reloadCommunityFileList = true;
+                GlobalSharedData.data.reloadCommunityFileList = true;
 
                 ValidationService.checkServerResponse(data);
                 deferred.resolve({ result: null });
             });
 
             return deferred.promise;
+        }
+
+        /**
+         * @summary Deletes the specified file from the server.
+         *
+         * @param {Obeject} file The file to be deleted from the server.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function deleteCommunityFile(file) {
+            RESTService.post('delete-community-file', { file: file })
+                .then(function(data) {
+                    GlobalSharedData.data.reloadCommunityFileList = true;
+
+                    if (!ValidationService.checkServerResponse(data)) {
+                        return;
+                    }
+                }, function(response) {
+                    console.log(response);
+                });
         }
 
         return service;

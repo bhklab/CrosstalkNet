@@ -8,6 +8,7 @@
         '$scope',
         '$rootScope',
         'GlobalSharedData', 'QueryService', 'CESharedData', 'GraphConfigService', 'FileUploadService',
+        '$mdSelect', '$mdDialog', 'GlobalControls',
         CEQueryController
     ]);
 
@@ -17,7 +18,7 @@
      * @memberOf controllers
      */
     function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService,
-        FileUploadService) {
+        FileUploadService, $mdSelect, $mdDialog, GlobalControls) {
         var vm = this;
 
         vm.sharedData = GlobalSharedData.data;
@@ -26,6 +27,7 @@
         vm.getCommunities = getCommunities;
         vm.initializeController = initializeController;
         vm.uploadFile = uploadFile;
+        vm.deleteConfirm = deleteConfirm;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
@@ -132,16 +134,16 @@
 
 
         /**
-         * @summary Wacthes for changes in the reloadFileList variable and reloads the available
-         * file dropdowns as well as the user permission level when reloadFileList becomes true.
+         * @summary Wacthes for changes in the reloadCommunityFileList variable and reloads the available
+         * file dropdowns as well as the user permission level when reloadCommunityFileList becomes true.
          * @memberOf controllers.CEQueryController
          */
         $scope.$watch(function() {
-            return vm.sharedData.reloadFileList;
+            return vm.sharedData.reloadCommunityFileList;
         }, function(newValue, oldValue) {
             if (newValue == true) {
                 loadFileList();
-                loadPermission();
+                vm.sharedData.reloadCommunityFileList = false;
             }
         });
 

@@ -167,9 +167,6 @@ function removeFile(path, file, callback) {
                 }
             ],
             function(err, results) {
-                // console.log("results in fileUtils.js: %j", results);
-                // console.log("err: %j", err);
-
                 if (results != null && results.length > 0 && (results[0] != null || results[1] != null) || err != null) {
                     if (callback) {
                         callback(null, "Failed");
