@@ -813,39 +813,21 @@ app.post('/community-explorer', function(req, res) {
         var parsedValue = JSON.parse(stdout);
         var parsedNodes = parsedValue.nodes;
         var parsedEdges = parsedValue.edges;
+        var communities = parsedValue.communities;
+        var communityNumbers = parsedValue.communityNumbers;
+
+        console.log(communities);
 
         var nodes = [];
         var edges = [];
-        var elements = [];
         var generatedColors = [];
-        var config;
+        var config = configUtils.createConfig();
         var layout;
 
         for (var i = 0; i < parsedNodes.length; i++) {
             nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], "c");
-        }
 
-        nodes = nodes.sort(function(a, b) {
-            return a.length - b.length;
-        });
-
-        edges = edgeUtils.createEdgesFromREdges(parsedEdges, 1);
-
-        elements = elements.concat(edges);
-        config = configUtils.createConfig();
-
-        // Position nodes randomly in clusters
-        nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
-
-        layout = layoutUtils.createPresetLayout();
-        //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
-        conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
-        conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
-        conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
-
-        // Color nodes based on their community
-        for (var i = 0; i < nodes.length; i++) {
-            var colorClass = "c" + i;
+            var colorClass = communityNumbers[i];
             var randomColor = styleUtils.createRandomColor(generatedColors);
             generatedColors.push(randomColor);
 
@@ -857,16 +839,33 @@ app.post('/community-explorer', function(req, res) {
             nodes[i] = nodeUtils.addClassToNodes(nodes[i], colorClass);
         }
 
+        nodes = nodes.sort(function(a, b) {
+            return a.length - b.length;
+        });
+
+        edges = edgeUtils.createEdgesFromREdges(parsedEdges, 1);
+
+        
+
+        // Position nodes randomly in clusters
+        nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
+
+        layout = layoutUtils.createPresetLayout();
+        //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+        conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
+        conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
+        conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
+
         nodes = parseUtils.flatten(nodes);
         edges = parseUtils.flatten(edges);
-
 
         config = configUtils.setConfigLayout(config, layout);
         config = configUtils.setConfigElements(config, nodes.concat(edges));
 
         res.json({
             config: config,
-            communities: null
+            communities: communities,
+            communityNumbers: communityNumbers
         });
     });
 });

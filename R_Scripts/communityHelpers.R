@@ -1,4 +1,5 @@
 source('R_Scripts/dataModels.R')
+source('R_Scripts/helpers.R')
 
 createDFEdgesCommunities <- function(communityInteractions) {
 	# Creates a data frame of cytoscape edges representing the interactions
@@ -23,7 +24,7 @@ createDFEdgesCommunities <- function(communityInteractions) {
 }
 
 createCommunitiesNodes <- function(communityInteractions) {
-    communityNumbers = unique(union(communityInteractions$epiCommunity, communityInteractions$stromaCommunity))
+    communityNumbers = sort(unique(union(communityInteractions$epiCommunity, communityInteractions$stromaCommunity)))
     result <- vector("list", length(unique(communityNumbers)))
     exclusion <- c()
 
@@ -51,5 +52,21 @@ createCommunitiesNodes <- function(communityInteractions) {
         exclusion <- c(exclusion, genesInCommunity)
     }
     
+    result
+}
+
+createCommunitiesList <- function(communityInteractions) {
+    communityNumbers = sort(unique(union(communityInteractions$epiCommunity, communityInteractions$stromaCommunity)))
+
+    result <- list()#vector("list", length(unique(communityNumbers)))
+
+    for (i in communityNumbers) {
+        genesInCommunity <- list(epi =  unique(communityInteractions[which(communityInteractions$epiCommunity == i), "epi"]),
+                                 stroma = unique(communityInteractions[which(communityInteractions$stromaCommunity == i), "stroma"]))
+
+
+        result[[paste("C", as.character(i), sep="")]] = genesInCommunity
+    }
+
     result
 }

@@ -28,8 +28,6 @@ function positionCommunitiesRandom(nodes, nodeSize) {
             y: mainRadius * Math.sin(mainAngle)
         };
 
-        console.log("mainAngle: " + mainAngle);
-
         var withinClusterArea = nodes[i].length * (nodeSize * nodeSize) * Math.PI * 4;
         var withinClusterMaxRadius = Math.sqrt(withinClusterArea / Math.PI);
         var avoidOverlapIterations = 0;
