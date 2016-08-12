@@ -510,7 +510,7 @@ app.post('/main-graph', function(req, res) {
                 sourceNodes = nodeUtils.addClassToNodes(parseUtils.flatten(sourceNodes), "sourceNode");
 
                 for (var i = 0; i < sourceNodes.length; i++) {
-                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2, 3) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2, 3, 120);
+                    var clusterSize = nodeUtils.getMinRadius(firstNodes[i] == null ? 0 : firstNodes[i].length, styleUtils.nodeSizes.medium / 2, 3, 120) + nodeUtils.getMinRadius(secondNodes[i] == null ? 0 : secondNodes[i].length, styleUtils.nodeSizes.medium / 2, 3, 120);
 
                     if (clusterSize > largestClusterSize) {
                         largestClusterSize = clusterSize;
@@ -816,8 +816,6 @@ app.post('/community-explorer', function(req, res) {
         var communities = parsedValue.communities;
         var communityNumbers = parsedValue.communityNumbers;
 
-        console.log(communities);
-
         var nodes = [];
         var edges = [];
         var generatedColors = [];
@@ -844,8 +842,6 @@ app.post('/community-explorer', function(req, res) {
         });
 
         edges = edgeUtils.createEdgesFromREdges(parsedEdges, 1);
-
-        
 
         // Position nodes randomly in clusters
         nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);

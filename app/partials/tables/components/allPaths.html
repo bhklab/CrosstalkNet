@@ -18,9 +18,9 @@
                 <table ng-class="'all-paths-table' + matType" md-table>
                     <thead md-head md-order="vm.sdWithinTab.pagination[matType].query.order">
                         <th md-column>Source</th>
-                        <th md-column md-column md-order-by="{{'firstEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th md-column md-column md-order-by="{{'firstEdge.' + matType}}" md-numeric>Interaction</th>
                         <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="intermediateNode">Intermediate Gene</th>
-                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="{{'secondEdge.' + matType}}" md-numeric>Correlation</th>
+                        <th ng-if="vm.sdWithinTab.allPaths[0].intermediateNode != null" md-column md-order-by="{{'secondEdge.' + matType}}" md-numeric>Interaction</th>
                         <th md-column>Destination</th>
                     </thead>
                     <tbody md-body>

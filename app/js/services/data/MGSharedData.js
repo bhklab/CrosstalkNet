@@ -16,7 +16,7 @@
         var service = {};
 
         /** Object representing variables to be available between the various controllers within
-         * the INTERACTION EXPLORER tab.
+         * the MAIN GRAPH tab.
          */
         var withinTabModel = {
             cy: null,

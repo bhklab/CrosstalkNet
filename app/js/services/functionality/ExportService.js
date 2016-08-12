@@ -19,6 +19,8 @@
         service.exportGraphToPNG = exportGraphToPNG;
         service.exportTopGenesToCSV = exportTopGenesToCSV;
         service.exportAllPathsToCSV = exportAllPathsToCSV;
+        service.exportSingleCommunityToCSV = exportSingleCommunityToCSV;
+        service.exportAllCommunitiesToCSV = exportAllCommunitiesToCSV;
 
         /**
          * @summary Exports a specified table of data to a csv file.
@@ -87,6 +89,12 @@
             downloadFile(fileName, dataURL);
         }
 
+        /** 
+         * @summary Downloads the top genes as a csv file.
+         *
+         * @param {Object} vm A view model for the DegreeExplorerController
+         * that has an object of top genes attached to it.
+         */
         function exportTopGenesToCSV(vm) {
             var epiGenes = vm.sdWithinTab.topGenes.epi;
             var stromaGenes = vm.sdWithinTab.topGenes.stroma;
@@ -121,6 +129,13 @@
             downloadFile(fileName, csvData);
         }
 
+        /** 
+         * @summary Downloads the list of paths between 2 genes
+         *  as a csv file.
+         *
+         * @param {Object} vm A view model for the PathExistenceController
+         * that has an array of all paths attached to it.
+         */
         function exportAllPathsToCSV(vm, matType) {
             var source = vm.sdWithinTab.pathSourceCached;
             var target = vm.sdWithinTab.pathTargetCached;
@@ -131,11 +146,11 @@
             var colDelim = ",";
             var csv = "";
             var header = "Source" + colDelim;
-            header += "Correlation" + colDelim;
+            header += "Interaction" + colDelim;
 
             if (allPaths.length > 0 && allPaths[0].secondEdge) {
                 header += "Intermediate Node" + colDelim;
-                header += "Correlation" + colDelim;
+                header += "Interaction" + colDelim;
                 hop = true;
             }
 
@@ -157,6 +172,109 @@
             downloadFile(fileName, csvData);
         }
 
+        /** 
+         * @summary Downloads the list of communities 
+         * as a csv file.
+         *
+         * @param {Object} vm A view model for the CommunityExplorerController
+         */
+        function exportSingleCommunityToCSV(vm) {
+            var communities = vm.sdWithinTab.communities;
+            var fileName = "communities" + Date.now() + ".csv";
+            var rowDelim = "\r\n";
+            var colDelim = ",";
+            var csv = "";
+            var header = "Epi" + colDelim;
+            header += "Stroma" + colDelim;
+            header += "Community";
+
+            csv += header;
+            csv += rowDelim;
+
+            if (vm.sdWithinTab.selectedCom == null || communities[vm.sdWithinTab.selectedCom] == null) {
+                var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+                downloadFile(fileName, csvData);
+                return;
+            }
+
+            var community = communities[vm.sdWithinTab.selectedCom];
+            var epi = community.epi;
+            var stroma = community.stroma;
+
+            var maxLength = Math.max(epi.length, stroma.length);
+
+            for (var i = 0; i < maxLength; i++) {
+                if (i < epi.length) {
+                    csv += epi[i]
+                }
+
+                csv += colDelim;
+
+                if (i < stroma.length) {
+                    csv += stroma[i]
+                }
+
+                csv += colDelim;
+
+                csv += vm.sdWithinTab.selectedCom + colDelim;
+                csv += rowDelim;
+            }
+
+            var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+            downloadFile(fileName, csvData);
+        }
+
+        function exportAllCommunitiesToCSV(vm) {
+            var communities = vm.sdWithinTab.communities;
+            var fileName = "communities" + Date.now() + ".csv";
+            var rowDelim = "\r\n";
+            var colDelim = ",";
+            var csv = "";
+            var header = "";
+
+            var maxLength = 0;
+
+            var communityNumbers = Object.keys(communities)
+
+            for (var i = 0; i < communityNumbers.length; i++) {
+                var length = communities[communityNumbers[i]].epi.length + communities[communityNumbers[i]].stroma.length;
+
+                if (length > maxLength) {
+                    maxLength = length;
+                }
+
+                header += communityNumbers[i] + colDelim;
+            }
+
+            csv += header + rowDelim;
+
+            for (var i = 0; i < maxLength; i++) {
+
+                for (var j = 0; j < communityNumbers.length; j++) {
+                    var genes = communities[communityNumbers[j]].epi.concat(communities[communityNumbers[j]].stroma);
+
+                    if (i < genes.length) {
+                        csv += genes[i];
+                    }
+
+                    csv += colDelim;
+                }
+
+                csv += rowDelim;
+            }
+
+            var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+            downloadFile(fileName, csvData);
+        }
+
+        /**
+         * @summary Creates an anchor element and triggers a
+         * download of the specified fileName with the given data.
+         *
+         * @param {String} fileName A name for the file to be downloaded.
+         * @param {String} fileData A String of URI encoded data
+         * for the file that will be downloaded.
+         */
         function downloadFile(fileName, fileData) {
             var link = document.createElement("a");
             link.setAttribute("href", fileData);

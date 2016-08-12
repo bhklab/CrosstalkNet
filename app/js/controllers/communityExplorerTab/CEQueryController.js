@@ -67,12 +67,6 @@
         function getCommunities(filterType) {
             var file = JSON.parse(vm.communityFile);
             $rootScope.state = $rootScope.states.loadingGraph;
-            if (vm.sdWithinTab.cy != null) {
-                angular.element("#cyCommunityExplorer").remove();
-                // var parent = angular.element("#community-explorer-graph-view");
-                // var newGraphContainer = angular.element('<div class="graph-container" id="cyCommunityExplorer"></div>');
-                // parent.prepend(newGraphContainer);
-            }
 
             GraphConfigService.destroyGraph(vm);
             CESharedData.resetWTM(vm);
@@ -85,12 +79,9 @@
 
                 $rootScope.state = $rootScope.states.loadingConfig;
 
-                var container = angular.element("#cyCommunityExplorer"); 
-                if (container.length != null && container.length != 0) {
-                    vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
-                }
+                vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
 
-                $rootScope.state = $rootScope.states.showingConfig;
+                $rootScope.state = $rootScope.states.showingGraph;
 
                 vm.sdWithinTab.communities = result.communities;
                 vm.sdWithinTab.communityNumbers = Object.keys(vm.sdWithinTab.communities);
@@ -98,12 +89,24 @@
             });
         }
 
+        /**
+         * @summary Loads the list of available communities files 
+         * from the server.
+         *
+         * @memberOf controllers.CEQueryController
+         */
         function loadFileList() {
             QueryService.getCommunityFileList().then(function(result) {
                 vm.fileList = result.fileList;
             });
         }
 
+        /**
+         * @summary Uploads a communitiy file to the server. The file
+         * should be attached to vm.communityUpload. 
+         *
+         * @memberOf controllers.CEQueryController
+         */
         function uploadFile() {
             $rootScope.state = $rootScope.states.uploadingFile;
             FileUploadService.uploadCommunityFile(vm.communityUpload).then(function() {
@@ -171,12 +174,13 @@
          * @memberOf controllers.CEQueryController
          */
         $scope.$watch(function() {
-            return vm.sharedData.clearAllData;
+            return vm.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 GraphConfigService.destroyGraph(vm);
                 CESharedData.resetWTM(vm);
                 initializeVariables();
+                vm.clearAllData = false;
             }
         });
 

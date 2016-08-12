@@ -5,7 +5,7 @@
  */
 (function() {
     angular.module('myApp.controllers').controller('CommunityExplorerController', ['GlobalControls',
-        'ExportService', 'GlobalSharedData', 'TableService', 'CESharedData', '$filter',
+        'ExportService', 'GlobalSharedData', 'TableService', 'CESharedData', '$filter', '$window',
         CommunityExplorerController
     ]);
 
@@ -17,7 +17,7 @@
      * @memberOf controllers
      */
     function CommunityExplorerController(GlobalControls, ExportService, GlobalSharedData, TableService,
-        CESharedData, $filter) {
+        CESharedData, $filter, $window) {
         var vm = this;
 
         vm.initializeController = initializeController;
@@ -34,6 +34,8 @@
 
 
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
+        vm.exportSingleCommunityToCSV = ExportService.exportSingleCommunityToCSV;
+        vm.exportAllCommunitiesToCSV = ExportService.exportAllCommunitiesToCSV;
         GlobalControls.setMethodsWholeTab(vm);
 
         /**
@@ -49,6 +51,10 @@
             vm.sdWithinTab.display = vm.displayModes.graph;
         }
 
+        /**
+         * @summary Selects a community to display in the table view
+         * by filtering the communities.
+         */
         function selectCommunity() {
             search("epi");
             search("stroma");
@@ -124,7 +130,7 @@
          * @summary Filters the specified array of genes to limit them
          * based on the page number that the user is currently on.
          *
-         * @param {Array} genes An array of gene objects.
+         * @param {Array} genes An array of Strings representing gene names.
          * @param {Number} page The page that the user is currently on. This
          * is used in combination with the limit to determine which subset 
          * of genes to return.
