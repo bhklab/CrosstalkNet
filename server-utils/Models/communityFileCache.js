@@ -100,8 +100,6 @@ class CommunityFileCache {
                 result.fake = clone(this._fake);
             }
         } else if (user.accessLevel == 'admin') {
-            console.log("Filtering for admin");
-
             if (this._real) {
                 result.real = clone(this._real);
             }
@@ -137,17 +135,11 @@ class CommunityFileCache {
      * the user doesn't exist or is trying to access a file they shouldn't be, null is returned.
      */
     matchFile(file, user) {
-        console.log("file: " + file);
-
         var accessibleFiles = this.filterCacheByUser(user);
 
         if (file == null || file.name == null || file.type == null) {
             return null;
         }
-
-        
-
-        console.log("accessibleFiles" + accessibleFiles);
 
         if (accessibleFiles[file.type] != null) {
             if (file.type == TYPES.personal) {

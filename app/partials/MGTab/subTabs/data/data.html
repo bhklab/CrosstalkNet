@@ -1,10 +1,10 @@
 <md-content>
     <div class="md-padding">
         <div class="md-subhead bottom-margin">Network Type:</div>
-        <md-radio-group ng-model="vm.selectedNetworkType">
-            <md-radio-button value="normal" class="md-primary">Normal</md-radio-button>
-            <md-radio-button value="tumor" class="md-primary">Tumor</md-radio-button>
-            <md-radio-button value="delta" class="md-primary">Delta</md-radio-button>
+        <md-radio-group ng-disabled="state.id == states.gettingGeneList.id" ng-model="vm.selectedNetworkType">
+            <md-radio-button ng-disabled="state.id == states.gettingGeneList.id" value="normal" class="md-primary">Normal</md-radio-button>
+            <md-radio-button ng-disabled="state.id == states.gettingGeneList.id" value="tumor" class="md-primary">Tumor</md-radio-button>
+            <md-radio-button ng-disabled="state.id == states.gettingGeneList.id" value="delta" class="md-primary">Delta</md-radio-button>
         </md-radio-group>
     </div>
     <div class="bottom-margin md-padding no-padding-top no-padding-bottom">

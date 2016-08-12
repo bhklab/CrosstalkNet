@@ -14,7 +14,6 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 	
 	if (getGeneSuffix(source) == getGeneSuffix(target)) {
 		for (i in names(corMatrices)) {
-			write(paste("getting neighbours from", i, sep=" "), stderr())
             neighbours[[i]] = getNeighbours(corMatrices[[i]], source, c())
         }
 
