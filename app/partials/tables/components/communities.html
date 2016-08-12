@@ -1,14 +1,21 @@
 <md-card ng-if="vm.sdWithinTab.communities != null">
     <md-card-title>
         <md-card-title-text>
-            <md-input-container class="select bottom-margin-25">
-                <label>Choose A Community</label>
-                <md-select ng-model="vm.sdWithinTab.selectedCom" ng-change="vm.selectCommunity()">
-                    <md-option ng-repeat="communityNumber in ::vm.sdWithinTab.communityNumbers" value="{{communityNumber}}" ng-selected="0">
-                        {{communityNumber}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+            <div layout="row">
+                <div flex>
+                    <md-input-container class="select bottom-margin-25">
+                        <label>Choose A Community</label>
+                        <md-select ng-model="vm.sdWithinTab.selectedCom" ng-change="vm.selectCommunity()">
+                            <md-option ng-repeat="communityNumber in ::vm.sdWithinTab.communityNumbers" value="{{communityNumber}}" ng-selected="0">
+                                {{communityNumber}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div flex style="position: relative;">
+                    <md-button class="md-raised md-primary right-aligned" ng-click="vm.exportAllCommunitiesToCSV(vm, false)">Download All Communities As CSV</md-button>
+                </div>
+            </div>
             <div layout="row">
                 <div flex>
                     <span class="md-headline">Communitiy: {{vm.sdWithinTab.selectedCom}}</span>
@@ -67,6 +74,6 @@
             </div>
         </div>
         <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.filtered.stroma.total}}" md-on-paginate="vm.paginateStroma" md-page-select="true" md-boundary-links="true"></md-table-pagination>
-        <md-button class="md-raised md-primary" ng-click="vm.exportTopGenesToCSV(vm)">Download As CSV</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.exportSingleCommunityToCSV(vm)">Download Selected Community As CSV</md-button>
     </md-card-content>
 </md-card>
