@@ -52,6 +52,13 @@ This starts the server on port 5000. To use the app, simply naviagate to http://
 └── server.js
 ```
 
+### Code Description
+To see how the app works, click one of the following links:
+* [Server](docs/server.md)
+* [Client](docs/client.md)
+* [R](docs/r.md)
+
+
    [data.table]: <https://cran.r-project.org/web/packages/data.table/index.html>
    [jsonlite]: <https://cran.r-project.org/web/packages/jsonlite/index.html>
    [Matrix]: <https://cran.r-project.org/web/packages/Matrix/index.html>
