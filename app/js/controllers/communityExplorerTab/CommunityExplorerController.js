@@ -32,6 +32,8 @@
         vm.selectCommunity = selectCommunity;
         vm.goToGeneCard = goToGeneCard;
 
+        vm.goToTable = goToTable;
+
 
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
         vm.exportSingleCommunityToCSV = ExportService.exportSingleCommunityToCSV;
@@ -49,6 +51,10 @@
             vm.ctrl = ctrl;
             vm.sdWithinTab = CESharedData.data;
             vm.sdWithinTab.display = vm.displayModes.graph;
+        }
+
+        function goToTable() {
+            alert("Go to table");
         }
 
         /**

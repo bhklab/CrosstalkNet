@@ -97,23 +97,29 @@ function createNodes(genes, parent, degrees, neighbourLevel) {
  * from these pseudo-nodes will be used to create the cytoscape.js nodes.
  * @return {Array} An array of cytoscape.js nodes based on pseudo-nodes returned from R.
  */
-function createNodesFromRNodes(rNodes, parent) {
+function createNodesFromRNodes(rNodes, specifiedParent, useSpecifiedParent) {
     var resultNodes = [];
 
-
-
     for (var i = 0; i < rNodes.length; i++) {
-        var parentFromNode = rNodes[i].name.endsWith('-E') ? "epi" : "stroma";
+        var nodeType = rNodes[i].name.endsWith('-E') ? "epi" : "stroma";
+        var parent;
+
+        if (useSpecifiedParent == true) {
+            parent = specifiedParent;
+        } else {
+            parent = specifiedParent + rNodes[i].level;
+        }
+
         resultNodes.push({
             data: {
                 id: rNodes[i].name,
                 degree: rNodes[i].degree,
-                parent: parent + rNodes[i].level,
+                parent: parent,
                 neighbourLevel: rNodes[i].level,
                 isSource: rNodes[i].isSource,
-                type: parentFromNode
+                type: nodeType
             },
-            classes: parentFromNode + " " + createAllClasses(parentFromNode)
+            classes: nodeType + " " + createAllClasses(nodeType)
         });
     }
 
@@ -150,18 +156,54 @@ function createParentNodesIE(selectedGenes, nodes) {
 /**
  * @summary Creates parent nodes for the main graph .
  *
- * @param {Number} number The number of parent nodes to create.
+ * @param {String} prefix The prefix of each parent node ID.
+ * @param {Array} sourceNodes An array of arrays of cytoscape.js nodes. Used to determine
+ * if there are any source nodes and whether or not a parent should be created for
+ * source nodes.
+ * @param {Array} firstNeighbours An array of arrays of cytoscape.js nodes. Used to determine
+ * if there are any first neighbours and whether or not a parent should be created for
+ * first neighbours.
+ * @param {Array} secondNeighbours An array of arrays of cytoscape.js nodes. Used to determine
+ * if there are any second neighbours and whether or not a parent should be created for
+ * second neighbours.
  * @return {Array} An array of cytoscape.js parent nodes.
  */
-function createParentNodesMG(prefix, number) {
+function createParentNodesMG(prefix, sourceNodes, firstNeighbours, secondNeighbours) {
     var parentNodes = [];
+    var count = 0;
 
-    for (var i = 0; i < number; i++) {
+    if (isNodesArrayFull(sourceNodes)) {
+        count++;
+    }
+
+    if (isNodesArrayFull(firstNeighbours)) {
+        count++;
+    }
+
+    if (isNodesArrayFull(secondNeighbours)) {
+        count++;
+    }
+
+    for (var i = 0; i < count; i++) {
         parentNodes.push({
             data: {
                 id: prefix + i
             }
         });
+    }
+
+    return parentNodes;
+}
+
+function createParentNodesCommunities(communityNumbers) {
+    var parentNodes = [];
+
+    for (var i = 0; i < communityNumbers.length; i++) {
+        parentNodes.push({
+            data: {
+                id: communityNumbers[i]
+            }
+        })
     }
 
     return parentNodes;
@@ -222,16 +264,16 @@ function positionNodesBipartiteGrid(nodes) {
  * any nodes.
  *
  * @param {Array} An array of arrays of cytoscape.js nodes.
- * @return {Number} 1 if there is a nodes, 0 otherwise.
+ * @return {Boolean} True if there is a nodes, false otherwise.
  */
 function isNodesArrayFull(nodes) {
     for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].length > 0) {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 /**
@@ -317,5 +359,5 @@ module.exports = {
     positionNodesBipartiteGrid: positionNodesBipartiteGrid,
     positionNodesClustered: positionNodesClustered,
     getMinRadius: getMinRadius,
-    isNodesArrayFull: isNodesArrayFull,
+    createParentNodesCommunities: createParentNodesCommunities
 };

@@ -298,7 +298,7 @@ app.post('/interaction-explorer', function(req, res) {
             }
 
             for (var i = 0; i < parsedNodes.length; i++) {
-                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], "par"));
+                nodes.push(nodeUtils.createNodesFromRNodes(parsedNodes[i], "par", false));
             }
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
@@ -462,11 +462,11 @@ app.post('/main-graph', function(req, res) {
             }
 
             for (var i = 0; i < parsedNodesFirst.length; i++) {
-                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], "par");
+                firstNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesFirst[i], "par", false);
             }
 
             for (var i = 0; i < parsedNodesSecond.length; i++) {
-                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], "par");
+                secondNodes[i] = nodeUtils.createNodesFromRNodes(parsedNodesSecond[i], "par", false);
             }
 
             for (var i = 0; i < parsedEdgesFirst.length; i++) {
@@ -505,8 +505,7 @@ app.post('/main-graph', function(req, res) {
                 config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
                 config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
 
-                parentNodes = nodeUtils.createParentNodesMG("par", nodeUtils.isNodesArrayFull(sourceNodes) +
-                    nodeUtils.isNodesArrayFull(firstNodes) + nodeUtils.isNodesArrayFull(secondNodes));
+                parentNodes = nodeUtils.createParentNodesMG("par", sourceNodes, firstNodes, secondNodes);
                 allNodes.push(parentNodes);
                 allNodes = parseUtils.flatten(allNodes);
             } else if (requestedLayout == 'clustered') {
@@ -827,7 +826,7 @@ app.post('/community-explorer', function(req, res) {
         var layout;
 
         for (var i = 0; i < parsedNodes.length; i++) {
-            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], "c");
+            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], communityNumbers[i], true);
 
             var colorClass = communityNumbers[i];
             var randomColor = styleUtils.createRandomColor(generatedColors);
@@ -852,6 +851,9 @@ app.post('/community-explorer', function(req, res) {
 
         layout = layoutUtils.createPresetLayout();
         //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
+
+        //nodes = nodes.concat(nodeUtils.createParentNodesCommunities(communityNumbers));
+
         conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
         conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
         conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
