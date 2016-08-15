@@ -25,11 +25,11 @@ var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
 
+var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';
+
 app.get('', function(req, res) {
     res.redirect('/app');
 });
-
-var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';
 
 app.use('/app', express.static(__dirname + '/app'));
 app.set('secretKey', SECRET_KEY_ENC);
@@ -68,7 +68,7 @@ app.use(function(req, res, next) {
         }
     } else if (req.body.token == 'guest') {
         next();
-    } else {
+    } else if (req.body.token != null) {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
             if (err || authenticationUtils.getUserFromToken(req.body.token) == null) {
                 console.log(err);
@@ -77,6 +77,9 @@ app.use(function(req, res, next) {
                 next();
             }
         });
+    } else {
+        console.log("Null token sent");
+        return res.json({ success: false, message: 'Failed to authenticate token.' });
     }
 });
 
