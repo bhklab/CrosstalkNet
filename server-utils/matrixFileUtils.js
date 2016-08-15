@@ -17,8 +17,8 @@ var FileGroup = require('./Models/fileGroup').FileGroup;
 var File = require('./Models/fileModel').File;
 var availableMatrixCache = null;
 
-const TYPES = require('./Models/MatrixFileCache').TYPES;
-const SUB_TYPES = require('./Models/MatrixFileCache').SUB_TYPES;
+const TYPES = require('./Models/matrixFileCache').TYPES;
+const SUB_TYPES = require('./Models/matrixFileCache').SUB_TYPES;
 
 var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Uploaded_Matrices/';
 var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Proprietary_Matrices/';

@@ -16,7 +16,7 @@ function positionCommunitiesRandom(nodes, nodeSize) {
         totalNodes += nodes[i].length;
     }
 
-    var totalArea = totalNodes * (nodeSize * nodeSize) * Math.PI * 8;
+    var totalArea = totalNodes * (nodeSize * nodeSize) * Math.PI * 10;
     var containerRadius = Math.sqrt(totalArea / Math.PI);
 
     for (var i = nodes.length - 1; i >= 0; i--) {
@@ -47,7 +47,7 @@ function positionCommunitiesRandom(nodes, nodeSize) {
         var placedCircle = clone(circleModel);
         placedCircle.x = centerPoint.x;
         placedCircle.y = centerPoint.y;
-        placedCircle.radius = withinClusterMaxRadius + 100;
+        placedCircle.radius = withinClusterMaxRadius + 120;
 
         placedCircles.push(placedCircle);
 
@@ -95,6 +95,8 @@ function avoidOverlap(centerPoint, clusterRadius, containerRadius, placedCircles
 
         avoidOverlapIterations++;
     }
+
+    console.log("avoidOverlapIterations: " + avoidOverlapIterations);
 
     return centerPoint;
 

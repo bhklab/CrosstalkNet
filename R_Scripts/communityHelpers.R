@@ -44,9 +44,6 @@ createCommunitiesNodes <- function(communityInteractions) {
     	nodes$level = rep(i, length(genesInCommunity))
     	nodes$isSource = rep(FALSE, length(genesInCommunity))
 
-    	# nodes[1, "level"] = 0
-    	nodes[1, "isSource"] = TRUE
-
     	result[[i]] = nodes
 
         exclusion <- c(exclusion, genesInCommunity)
