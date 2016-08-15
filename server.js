@@ -6,20 +6,19 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser')
 var app = express();
-var nodeUtils = require('./server-utils/nodeUtils');
-var communityUtils = require('./server-utils/communityUtils');
-var configUtils = require('./server-utils/configUtils');
-var edgeUtils = require('./server-utils/edgeUtils');
-var styleUtils = require('./server-utils/styleUtils');
+var nodeUtils = require('./server-utils/cytoscape/nodeUtils');
+var communityUtils = require('./server-utils/cytoscape/communityUtils');
+var configUtils = require('./server-utils/cytoscape/configUtils');
+var edgeUtils = require('./server-utils/cytoscape/edgeUtils');
+var styleUtils = require('./server-utils/cytoscape/styleUtils');
 var geneUtils = require('./server-utils/geneUtils');
-var layoutUtils = require('./server-utils/layoutUtils');
+var layoutUtils = require('./server-utils/cytoscape/layoutUtils');
 var authenticationUtils = require('./server-utils/authenticationUtils');
 var validationUtils = require('./server-utils/validationUtils');
 var clientTableUtils = require('./server-utils/clientTableUtils');
 var parseUtils = require('./server-utils/parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-var databaseConfigUtils = require('./server-utils/databaseConfigUtils');
 var communityFileUtils = require('./server-utils/communityFileUtils');
 var matrixFileUtils = require('./server-utils/matrixFileUtils');
 var bcrypt = require('bcrypt');
@@ -30,8 +29,10 @@ app.get('', function(req, res) {
     res.redirect('/app');
 });
 
+var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';
+
 app.use('/app', express.static(__dirname + '/app'));
-app.set('secretKey', databaseConfigUtils.secret);
+app.set('secretKey', SECRET_KEY_ENC);
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
