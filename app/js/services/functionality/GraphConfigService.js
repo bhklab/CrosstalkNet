@@ -207,7 +207,7 @@
             config.container = document.getElementById(containerID);
             cy = cytoscape(config);
 
-            vm.sdWithinTab.config = config;
+            //vm.sdWithinTab.config = config;
 
             cy.fit(cy.$("*"), 10);
 
@@ -216,63 +216,27 @@
                 var id = node.id();
                 var edges = cy.edges("[source='" + id + "'], [target='" + id + "']");
 
-                cy.batch(function() {
-                    for (var i = edges.length - 1; i >= 0; i--) {
-                        edges[i].addClass('highlighted-edge');
-                        edges[i].removeClass('faded-edge');
-                    }
-                });
+                // cy.batch(function() {
+                //     for (var i = edges.length - 1; i >= 0; i--) {
+                //         edges[i].addClass('highlighted-edge');
+                //         edges[i].removeClass('faded-edge');
+                //     }
+                // });
 
-                edges = cy.edges().not("[source='" + id + "'], [target='" + id + "']");
+                // edges = cy.edges().not("[source='" + id + "'], [target='" + id + "']");
 
-                cy.batch(function() {
-                    for (var i = edges.length - 1; i >= 0; i--) {
-                        edges[i].addClass('faded-edge');
-                        edges[i].removeClass('highlighted-edge');
-                    }
-                });
+                // cy.batch(function() {
+                //     for (var i = edges.length - 1; i >= 0; i--) {
+                //         edges[i].addClass('faded-edge');
+                //         edges[i].removeClass('highlighted-edge');
+                //     }
+                // });
 
-                cy.forceRender();
+                // cy.forceRender();
 
-                service.selectedItem = null;
-            });
+                // service.selectedItem = null;
 
-            cy.on("unselect", 'node', function(evt) {
-                var node = evt.cyTarget;
-                var id = node.id();
-
-                resetEdges(vm);
-            });
-
-            cy.nodes().not(':parent').forEach(function(n) {
-                var g = n.data('id').slice(0, -2);
-                n.qtip({
-                    content: [{
-                        name: 'Inspector',
-                        url: g
-                    }, {
-                        name: 'GeneCard',
-                        url: 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + g
-                    }].map(function(link) {
-                        if (link.name != "Inspector") {
-                            // return '<a target="_blank" href="' + link.url + '">' + link.name + '</a>';
-                            return '<div ng-click="vm.goToTable()">Go to table</div>';
-                        } else {
-                            return '<div>' + link.url + '</div>'
-                        }
-                    }).join('<br />\n'),
-                    position: {
-                        my: 'top center',
-                        at: 'bottom center'
-                    },
-                    style: {
-                        classes: 'qtip-bootstrap',
-                        tip: {
-                            width: 16,
-                            height: 8
-                        }
-                    }
-                });
+                vm.goToTable(node.data());
             });
 
             return cy;

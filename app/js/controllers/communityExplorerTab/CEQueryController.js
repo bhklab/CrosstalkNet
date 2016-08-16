@@ -34,6 +34,15 @@
         vm.resize = GraphConfigService.resetZoom;
         vm.needsRedraw = false;
 
+        vm.goToTable = goToTable;
+
+        function goToTable(com) {
+            //alert("Go to table");
+            console.log(com);
+            vm.sdWithinTab.display = vm.displayModes.table;
+            vm.sdWithinTab.selectedCom = com;
+        }
+
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
          * tab model based on the ctrl property.
