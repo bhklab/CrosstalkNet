@@ -38,6 +38,32 @@ function createEdgesFromREdges(REdges, neighbourLevel) {
     return edges;
 }
 
+function createCommunityEdgesFromREdges(REdges) {
+    var edges = [];
+
+    for (var i = 0; i < REdges.length; i++) {
+        var source = REdges[i].source;
+        var target = REdges[i].target;
+        var weight = REdges[i].weight;
+        var epiCommunity = REdges[i].epiCommunity;
+        var stromaCommunity = REdges[i].stromaCommunity;
+
+        edges.push({
+            data: {
+                id: source + target,
+                source: source,
+                target: target,
+                weight: weight,
+                epiCommunity: epiCommunity,
+                stromaCommunity: stromaCommunity
+            }
+        });
+    }
+
+    return edges;
+}
+
 module.exports = {
-    createEdgesFromREdges: createEdgesFromREdges
+    createEdgesFromREdges: createEdgesFromREdges,
+    createCommunityEdgesFromREdges: createCommunityEdgesFromREdges
 };

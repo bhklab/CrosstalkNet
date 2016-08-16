@@ -173,15 +173,18 @@ var communityEdge = {
     selector: 'edge',
     style: {
         width: '1px',
-        'line-color': 'black',
+        'line-color': 'grey',
         'events': 'no'
     }
 };
 
 var communityNode = {
-    selector: 'node',
+    selector: "node[top]",
     style: {
-        'events': 'no'
+        'label': 'data(par)',
+        'font-size': '100px',
+        'color': 'black',
+        'text-events': 'yes'
     }
 };
 
