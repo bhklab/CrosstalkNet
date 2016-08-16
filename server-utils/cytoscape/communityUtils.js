@@ -5,18 +5,14 @@ var clone = require('clone');
 function positionCommunitiesRandom(nodes, nodeSize) {
     nodes = clone(nodes);
     var totalNodes = 0;
-    var circleModel = {
-        x: 0,
-        y: 0,
-        radius: 0
-    }
+    
     var placedCircles = [];
 
     for (var i = 0; i < nodes.length; i++) {
         totalNodes += nodes[i].length;
     }
 
-    var totalArea = totalNodes * (nodeSize * nodeSize) * Math.PI * 10;
+    var totalArea = totalNodes * (nodeSize * nodeSize) * Math.PI * 14;
     var containerRadius = Math.sqrt(totalArea / Math.PI);
 
     for (var i = nodes.length - 1; i >= 0; i--) {
@@ -44,13 +40,10 @@ function positionCommunitiesRandom(nodes, nodeSize) {
             };
         }
 
-        var placedCircle = clone(circleModel);
-        placedCircle.x = centerPoint.x;
-        placedCircle.y = centerPoint.y;
-        placedCircle.radius = withinClusterMaxRadius + 120;
+        var highestNodeIndex = getHighestNodeIndex(nodes[i]);
+        nodes[i][highestNodeIndex] = labelCommunity(nodes[i][highestNodeIndex]);
 
-        placedCircles.push(placedCircle);
-
+        placedCircles.push(createPlacedCircle(centerPoint, withinClusterMaxRadius + 200));
     }
 
     return nodes;
@@ -96,10 +89,37 @@ function avoidOverlap(centerPoint, clusterRadius, containerRadius, placedCircles
         avoidOverlapIterations++;
     }
 
-    console.log("avoidOverlapIterations: " + avoidOverlapIterations);
-
     return centerPoint;
+}
 
+function getHighestNodeIndex(nodes) {
+    var highestNodeIndex = 0;
+
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[highestNodeIndex].position.y > nodes[i].position.y) {
+            highestNodeIndex = i;
+        }
+    }
+
+    return highestNodeIndex;
+}
+
+function labelCommunity(node) {
+    node = clone(node);
+
+    node.data["top"] = true;
+
+    return node;
+}
+
+function createPlacedCircle(centerPoint, radius) {
+    var placedCircle = {
+        x: centerPoint.x,
+        y: centerPoint.y,
+        radius: radius
+    };
+
+    return placedCircle;
 }
 
 module.exports = {

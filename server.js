@@ -16,6 +16,7 @@ var layoutUtils = require('./server-utils/cytoscape/layoutUtils');
 var authenticationUtils = require('./server-utils/authenticationUtils');
 var validationUtils = require('./server-utils/validationUtils');
 var clientTableUtils = require('./server-utils/clientTableUtils');
+var userCreationUtils = require('./server-utils/userCreationUtils');
 var parseUtils = require('./server-utils/parseUtils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
@@ -792,6 +793,8 @@ app.post('/community-explorer', function(req, res) {
     var file;
     var user = authenticationUtils.getUserFromToken(req.body.token);
 
+    console.log(req.body.token);
+
     file = communityFileUtils.getRequestedFile(req.body.selectedFile, user);
 
     if (file == null || file.path == null || file.name == null) {
@@ -844,7 +847,7 @@ app.post('/community-explorer', function(req, res) {
             return a.length - b.length;
         });
 
-        edges = edgeUtils.createEdgesFromREdges(parsedEdges, 1);
+        edges = edgeUtils.createCommunityEdgesFromREdges(parsedEdges);
 
         // Position nodes randomly in clusters
         nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
@@ -856,6 +859,7 @@ app.post('/community-explorer', function(req, res) {
         config = configUtils.addStyleToConfig(config, styleUtils.noLabel);
         config = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
         config = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
+        config = configUtils.addStyleToConfig(config, styleUtils.communityNode);
 
         nodes = parseUtils.flatten(nodes);
         edges = parseUtils.flatten(edges);
@@ -896,17 +900,19 @@ app.post('/upload-community-file', function(req, res) {
         file.data = file.data.replace(/^data:;base64,/, "");
         communityFileUtils.createDirectory(communityFileUtils.BASE_UPLOAD_DIRECTORY, user.name, callback);
         communityFileUtils.writeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY, file, user.name, callback);
+    }, function(callback) {
+        verifyFile("R_Scripts/communityFileChecker.R", communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file.name, callback);
     }], function(result) {
-        if (result != null) {
+        if (result[0] != null) {
             res.send({ error: result });
             return;
-        } else {
+        } else if (result[1] != null) {
             console.log("Wrote file: " + file.name + " to disk");
         }
     });
 
     async.series([function(callback) {
-        verifyFile("R_Scripts/communityFileChecker.R", communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file.name, callback);
+
     }], function(result) {
         if (result != null) {
             communityFileUtils.removeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file, null);
@@ -955,23 +961,30 @@ app.post('/delete-community-file', function(req, res) {
     }
 });
 
-function createSampleUser() {
-    var salt = bcrypt.genSaltSync(3);
-    var password = bcrypt.hashSync('', salt);
-    var nick = new User({
-        name: '',
-        password: password,
-        admin: true
-    });
+app.post('/create-new-users', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+    var newUsers = req.body.newUsers;
 
-    // save the sample user
-    nick.save(function(err) {
-        if (err) throw err;
+    if (user.accessLevel != 'admin') {
+        res.send({ error: "Not authorized to create users" });
+        return;
+    }
 
-        console.log('User saved successfully');
-        // res.json({ success: true });
+    async.series([function(callback) {
+        userCreationUtils.createNewUsers(newUsers, callback);
+    }], function(err, results) {
+        if (err) {
+            console.log(err);
+        }
+
+        if (results[0] != null && results[0].error != null) {
+            res.send({ error: results[0].error });
+            return;
+        } else {
+            res.send({ success: "Added new users to the app." });
+        }
     });
-}
+});
 
 function verifyFile(script, filePath, fileName, callback) {
     var args = {};

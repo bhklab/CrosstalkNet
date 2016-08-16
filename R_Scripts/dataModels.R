@@ -24,6 +24,10 @@ createEmptyDifferentialEdges <- function(amount) {
 	edges
 }
 
+createEmptyCommunityEdges <- function(amount) {
+	edges <- data.frame(source = character(amount), target = character(amount), weight = numeric(amount), epiCommunity = character(amount), stromaCommunity = character(amount), stringsAsFactors = FALSE)
+}
+
 createPaths <- function(amount) {
 	# Creates a data frame representing paths between genes.
 	#

@@ -214,30 +214,57 @@
             cy.on('select', 'node', function(evt) {
                 var node = evt.cyTarget;
                 var id = node.id();
-                var edges = cy.edges("[source='" + id + "'], [target='" + id + "']");
+                var edges = null;
+                var setOfNodes;
+                var community = node.data("par");
 
-                // cy.batch(function() {
-                //     for (var i = edges.length - 1; i >= 0; i--) {
-                //         edges[i].addClass('highlighted-edge');
-                //         edges[i].removeClass('faded-edge');
+                var communityNodes = cy.nodes("[par='" + node.data("par") + "']").map(function(node) {
+                    return node.id();
+                });
+
+                edges = cy.edges("[epiCommunity='" + community + "'], [stromaCommunity='" + community + "']");
+
+
+                // setOfNodes = new Set(communityNodes);
+
+                // setOfNodes.forEach(function(id) {
+                //     if (edges == null) {
+                //         edges = cy.edges("[source='" + id + "'], [target='" + node.id + "']");
+                //     } else {
+                //         edges = edges.add(cy.edges("[source='" + id + "'], [target='" + id + "']"));
                 //     }
                 // });
 
-                // edges = cy.edges().not("[source='" + id + "'], [target='" + id + "']");
+                cy.batch(function() {
+                    for (var i = edges.length - 1; i >= 0; i--) {
+                        edges[i].addClass('highlighted-edge');
+                        edges[i].removeClass('faded-edge');
+                    }
+                });
 
-                // cy.batch(function() {
-                //     for (var i = edges.length - 1; i >= 0; i--) {
-                //         edges[i].addClass('faded-edge');
-                //         edges[i].removeClass('highlighted-edge');
-                //     }
-                // });
+                edges = cy.edges("[epiCommunity!='" + community + "'][stromaCommunity!='" + community + "']");
 
-                // cy.forceRender();
+                console.log(edges.length);
 
-                // service.selectedItem = null;
+                cy.batch(function() {
+                    for (var i = edges.length - 1; i >= 0; i--) {
+                        edges[i].addClass('faded-edge');
+                        edges[i].removeClass('highlighted-edge');
+                    }
+                });
 
-                vm.goToTable(node.data());
+                cy.forceRender();
+
+                // vm.goToTable(node.data());
             });
+
+            cy.on("unselect", 'node', function(evt) {
+                var node = evt.cyTarget;
+                var id = node.id();
+
+                resetEdges(vm);
+            });
+
 
             return cy;
         }

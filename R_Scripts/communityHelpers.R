@@ -19,6 +19,8 @@ createDFEdgesCommunities <- function(communityInteractions) {
 	edges$source = communityInteractions$epi
 	edges$target = communityInteractions$stroma
 	edges$weight = communityInteractions$interaction
+    edges$epiCommunity = paste("C", communityInteractions$epiCommunity, sep = "")
+    edges$stromaCommunity = paste("C", communityInteractions$stromaCommunity, sep = "")
 
 	edges
 }

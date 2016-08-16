@@ -110,7 +110,7 @@ function createNodesFromRNodes(rNodes, specifiedParent, useSpecifiedParent) {
             parent = specifiedParent + rNodes[i].level;
         }
 
-        resultNodes.push({
+        var node = {
             data: {
                 id: rNodes[i].name,
                 degree: rNodes[i].degree,
@@ -120,7 +120,13 @@ function createNodesFromRNodes(rNodes, specifiedParent, useSpecifiedParent) {
                 type: nodeType
             },
             classes: nodeType + " " + createAllClasses(nodeType)
-        });
+        };
+
+        if (useSpecifiedParent == true) {
+            node.data["par"] = parent;
+        }
+
+        resultNodes.push(node);
     }
 
     return resultNodes;
