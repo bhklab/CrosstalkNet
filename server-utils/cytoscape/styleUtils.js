@@ -176,7 +176,14 @@ var communityEdge = {
         'line-color': 'black',
         'events': 'no'
     }
-}
+};
+
+var communityNode = {
+    selector: 'node',
+    style: {
+        'events': 'no'
+    }
+};
 
 var allRandomFormats = [nodeSize.medium, randomStyles.stripedSourceEpi, randomStyles.stripedSourceStroma, randomStyles.labelBackground, bipartiteStyles.epi.nodeColor,
     bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement
@@ -327,6 +334,7 @@ module.exports = {
     noLabel: noLabel,
     invisibleParent: invisibleParent,
     communityEdge: communityEdge,
+    communityNode: communityNode,
     createRandomColor: createRandomColor,
     createCommunityStyle: createCommunityStyle
 };

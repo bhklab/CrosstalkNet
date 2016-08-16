@@ -850,13 +850,12 @@ app.post('/community-explorer', function(req, res) {
         nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
 
         layout = layoutUtils.createPresetLayout();
-        //config = configUtils.addStylesToConfig(config, styleUtils.allConcentricFormats);
 
         //nodes = nodes.concat(nodeUtils.createParentNodesCommunities(communityNumbers));
 
-        conig = configUtils.addStyleToConfig(config, styleUtils.noLabel);
-        conig = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
-        conig = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
+        config = configUtils.addStyleToConfig(config, styleUtils.noLabel);
+        config = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
+        config = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
 
         nodes = parseUtils.flatten(nodes);
         edges = parseUtils.flatten(edges);
