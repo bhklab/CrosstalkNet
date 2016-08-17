@@ -25,10 +25,6 @@
         service.deleteMatrixFile = deleteMatrixFile;
         service.getUserPermission = getUserPermission;
         service.getTopGenes = getTopGenes;
-        service.getCommunities = getCommunities;
-        service.getCommunityFileList = getCommunityFileList;
-        service.uploadCommunityFile = uploadCommunityFile;
-        service.deleteCommunityFile = deleteCommunityFile;
         service.createUsers = createUsers;
         service.deleteUsers = deleteUsers;
         service.getAllUsersNames = getAllUsersNames;
@@ -328,90 +324,6 @@
                 });
 
             return deferred.promise;
-        }
-
-        /**
-         * @summaryt Gets the communities for a file specified on the view model
-         * from the server.
-         *
-         * @param {Object} vm The view model for the CEQueryController. This has
-         * a selected file in its sdWithinTab.
-         * @return {Promise} A promise that will be resolved when the request has
-         * been completed.
-         */
-        function getCommunities(file) {
-            var deferred = $q.defer();
-
-            RESTService.post('community-explorer', {
-                    selectedFile: file
-                })
-                .then(function(data) {
-                    if (!ValidationService.checkServerResponse(data)) {
-                        deferred.resolve({ communities: null });
-                    }
-
-                    deferred.resolve({ communities: data.communities, config: data.config });
-                }, function(response) {
-                    console.log(response);
-                });
-
-            return deferred.promise;
-
-        }
-
-        /**
-         * @summary Gets the list of community files available to the user.
-         *
-         * @return {Promise} A promise that will be resolved when the request has
-         * been completed.
-         */
-        function getCommunityFileList() {
-            var deferred = $q.defer();
-
-            RESTService.post("community-file-list", {}).then(function(data) {
-                if (!ValidationService.checkServerResponse(data)) {
-                    deferred.resolve({ fileList: null });
-                }
-
-                deferred.resolve({ fileList: data.fileList });
-            }, function(response) {
-                console.log(response);
-            });
-
-            return deferred.promise;
-        }
-
-        function uploadCommunityFile(file) {
-            var deferred = $q.defer();
-
-            RESTService.post("upload-community-file", { file: file }).then(function(data) {
-                GlobalSharedData.data.reloadCommunityFileList = true;
-
-                ValidationService.checkServerResponse(data);
-                deferred.resolve({ result: null });
-            });
-
-            return deferred.promise;
-        }
-
-        /**
-         * @summary Deletes the specified file from the server.
-         *
-         * @param {Obeject} file The file to be deleted from the server.
-         * @return {Promise} A promise that will be resolved when the request has
-         * been completed.
-         */
-        function deleteCommunityFile(file) {
-            RESTService.post('delete-community-file', { file: file })
-                .then(function(data) {
-                    GlobalSharedData.data.reloadCommunityFileList = true;
-
-                    if (!ValidationService.checkServerResponse(data)) {
-                        return;
-                    }
-                }, function(response) {
-                    console.log(response);
-                });
         }
 
         function createUsers(newUsers) {
