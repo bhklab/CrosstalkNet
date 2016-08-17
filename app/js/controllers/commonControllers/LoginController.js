@@ -39,6 +39,7 @@
          * @memberOf controllers.LoginController
          */
         function guestLogin() {
+            vm.user = { name: null, password: null, token: null };
             vm.loggedIn = true;
             $rootScope.tokenSet = true;
             vm.sharedData.guest = true;
@@ -114,7 +115,8 @@
                 templateUrl: '/app/partials/dialogs/loginDialog.html',
                 parent: angular.element(document.body),
                 clickOutsideToClose: false,
-                fullscreen: false,
+                fullscreen: true,
+                escapeToClose: false,
                 targetEvent: ev
             });
         }
