@@ -789,179 +789,179 @@ app.post('/upload-matrix', function(req, res) {
     });
 });
 
-app.post('/community-explorer', function(req, res) {
-    var args = { filePath: null };
-    var argsString = "";
-    var file;
-    var user = authenticationUtils.getUserFromToken(req.body.token);
+// app.post('/community-explorer', function(req, res) {
+//     var args = { filePath: null };
+//     var argsString = "";
+//     var file;
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
 
-    console.log(req.body.token);
+//     console.log(req.body.token);
 
-    file = communityFileUtils.getRequestedFile(req.body.selectedFile, user);
+//     file = communityFileUtils.getRequestedFile(req.body.selectedFile, user);
 
-    if (file == null || file.path == null || file.name == null) {
-        res.send({ error: "Please specify a file name" });
-        return;
-    }
+//     if (file == null || file.path == null || file.name == null) {
+//         res.send({ error: "Please specify a file name" });
+//         return;
+//     }
 
-    args.filePath = file.path + file.name;
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
+//     args.filePath = file.path + file.name;
+//     argsString = JSON.stringify(args);
+//     argsString = argsString.replace(/"/g, '\\"');
 
-    var child = exec("Rscript R_Scripts/getCommunities.R --args \"" + argsString + "\"", {
-        maxBuffer: 1024 *
-            50000
-    }, function(error, stdout, stderr) {
-        console.log('stderr: ' + stderr);
+//     var child = exec("Rscript R_Scripts/getCommunities.R --args \"" + argsString + "\"", {
+//         maxBuffer: 1024 *
+//             50000
+//     }, function(error, stdout, stderr) {
+//         console.log('stderr: ' + stderr);
 
-        if (error != null) {
-            console.log('error: ' + error);
-        }
+//         if (error != null) {
+//             console.log('error: ' + error);
+//         }
 
-        var parsedValue = JSON.parse(stdout);
-        var parsedNodes = parsedValue.nodes;
-        var parsedEdges = parsedValue.edges;
-        var communities = parsedValue.communities;
-        var communityNumbers = parsedValue.communityNumbers;
+//         var parsedValue = JSON.parse(stdout);
+//         var parsedNodes = parsedValue.nodes;
+//         var parsedEdges = parsedValue.edges;
+//         var communities = parsedValue.communities;
+//         var communityNumbers = parsedValue.communityNumbers;
 
-        var nodes = [];
-        var edges = [];
-        var generatedColors = [];
-        var config = configUtils.createConfig();
-        var layout;
+//         var nodes = [];
+//         var edges = [];
+//         var generatedColors = [];
+//         var config = configUtils.createConfig();
+//         var layout;
 
-        for (var i = 0; i < parsedNodes.length; i++) {
-            nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], communityNumbers[i], true);
+//         for (var i = 0; i < parsedNodes.length; i++) {
+//             nodes[i] = nodeUtils.createNodesFromRNodes(parsedNodes[i], communityNumbers[i], true);
 
-            var colorClass = communityNumbers[i];
-            var randomColor = styleUtils.createRandomColor(generatedColors);
-            generatedColors.push(randomColor);
+//             var colorClass = communityNumbers[i];
+//             var randomColor = styleUtils.createRandomColor(generatedColors);
+//             generatedColors.push(randomColor);
 
-            var epiStyle = styleUtils.createCommunityStyle("epi", colorClass, randomColor, 'circle');
-            var stromaStyle = styleUtils.createCommunityStyle("stroma", colorClass, randomColor, 'triangle');
+//             var epiStyle = styleUtils.createCommunityStyle("epi", colorClass, randomColor, 'circle');
+//             var stromaStyle = styleUtils.createCommunityStyle("stroma", colorClass, randomColor, 'triangle');
 
-            config = configUtils.addStyleToConfig(config, epiStyle);
-            config = configUtils.addStyleToConfig(config, stromaStyle);
-            nodes[i] = nodeUtils.addClassToNodes(nodes[i], colorClass);
-        }
+//             config = configUtils.addStyleToConfig(config, epiStyle);
+//             config = configUtils.addStyleToConfig(config, stromaStyle);
+//             nodes[i] = nodeUtils.addClassToNodes(nodes[i], colorClass);
+//         }
 
-        nodes = nodes.sort(function(a, b) {
-            return a.length - b.length;
-        });
+//         nodes = nodes.sort(function(a, b) {
+//             return a.length - b.length;
+//         });
 
-        edges = edgeUtils.createCommunityEdgesFromREdges(parsedEdges);
+//         edges = edgeUtils.createCommunityEdgesFromREdges(parsedEdges);
 
-        // Position nodes randomly in clusters
-        nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
+//         // Position nodes randomly in clusters
+//         nodes = communityUtils.positionCommunitiesRandom(nodes, styleUtils.nodeSizes.medium / 2);
 
-        layout = layoutUtils.createPresetLayout();
+//         layout = layoutUtils.createPresetLayout();
 
-        //nodes = nodes.concat(nodeUtils.createParentNodesCommunities(communityNumbers));
+//         //nodes = nodes.concat(nodeUtils.createParentNodesCommunities(communityNumbers));
 
-        config = configUtils.addStyleToConfig(config, styleUtils.noLabel);
-        config = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
-        config = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
-        config = configUtils.addStyleToConfig(config, styleUtils.communityNode);
+//         config = configUtils.addStyleToConfig(config, styleUtils.noLabel);
+//         config = configUtils.addStyleToConfig(config, styleUtils.invisibleParent);
+//         config = configUtils.addStyleToConfig(config, styleUtils.communityEdge);
+//         config = configUtils.addStyleToConfig(config, styleUtils.communityNode);
 
-        nodes = parseUtils.flatten(nodes);
-        edges = parseUtils.flatten(edges);
+//         nodes = parseUtils.flatten(nodes);
+//         edges = parseUtils.flatten(edges);
 
-        config = configUtils.setConfigLayout(config, layout);
-        config = configUtils.setConfigElements(config, nodes.concat(edges));
+//         config = configUtils.setConfigLayout(config, layout);
+//         config = configUtils.setConfigElements(config, nodes.concat(edges));
 
-        res.json({
-            config: config,
-            communities: communities,
-            communityNumbers: communityNumbers
-        });
-    });
-});
+//         res.json({
+//             config: config,
+//             communities: communities,
+//             communityNumbers: communityNumbers
+//         });
+//     });
+// });
 
-app.post('/community-file-list', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleFiles = communityFileUtils.getAccessibleFilesForUser(user);
+// app.post('/community-file-list', function(req, res) {
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
+//     var accessibleFiles = communityFileUtils.getAccessibleFilesForUser(user);
 
-    res.send({ fileList: accessibleFiles });
-});
+//     res.send({ fileList: accessibleFiles });
+// });
 
-app.post('/upload-community-file', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var file = req.body.file;
+// app.post('/upload-community-file', function(req, res) {
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
+//     var file = req.body.file;
 
-    if (user == null) {
-        res.send({ error: "Upload failed. Failed to authenticate user." })
-        return;
-    }
+//     if (user == null) {
+//         res.send({ error: "Upload failed. Failed to authenticate user." })
+//         return;
+//     }
 
-    if (file == null || file.name == null || file.data == null) {
-        res.send({ error: "Upload failed. File name or data missing." })
-        return;
-    }
+//     if (file == null || file.name == null || file.data == null) {
+//         res.send({ error: "Upload failed. File name or data missing." })
+//         return;
+//     }
 
-    async.series([function(callback) {
-        file.data = file.data.replace(/^data:;base64,/, "");
-        communityFileUtils.createDirectory(communityFileUtils.BASE_UPLOAD_DIRECTORY, user.name, callback);
-        communityFileUtils.writeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY, file, user.name, callback);
-    }, function(callback) {
-        verifyFile("R_Scripts/communityFileChecker.R", communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file.name, callback);
-    }], function(result) {
-        if (result[0] != null) {
-            res.send({ error: result });
-            return;
-        } else if (result[1] != null) {
-            console.log("Wrote file: " + file.name + " to disk");
-        }
-    });
+//     async.series([function(callback) {
+//         file.data = file.data.replace(/^data:;base64,/, "");
+//         communityFileUtils.createDirectory(communityFileUtils.BASE_UPLOAD_DIRECTORY, user.name, callback);
+//         communityFileUtils.writeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY, file, user.name, callback);
+//     }, function(callback) {
+//         verifyFile("R_Scripts/communityFileChecker.R", communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file.name, callback);
+//     }], function(result) {
+//         if (result[0] != null) {
+//             res.send({ error: result });
+//             return;
+//         } else if (result[1] != null) {
+//             console.log("Wrote file: " + file.name + " to disk");
+//         }
+//     });
 
-    async.series([function(callback) {
+//     async.series([function(callback) {
 
-    }], function(result) {
-        if (result != null) {
-            communityFileUtils.removeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file, null);
-            console.log("Failed file verification.");
-            res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
-        } else {
-            console.log("File verification successful.");
-            res.send({ fileStatus: "Successfully uploaded file. Please check the dropdown to select new file(s). " })
-        }
+//     }], function(result) {
+//         if (result != null) {
+//             communityFileUtils.removeFile(communityFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/", file, null);
+//             console.log("Failed file verification.");
+//             res.send({ fileStatus: "Failed to upload file(s). " + result.message, errorStatus: result.status })
+//         } else {
+//             console.log("File verification successful.");
+//             res.send({ fileStatus: "Successfully uploaded file. Please check the dropdown to select new file(s). " })
+//         }
 
-        communityFileUtils.updateAvailableCommunitiesCache();
-    });
-});
+//         communityFileUtils.updateAvailableCommunitiesCache();
+//     });
+// });
 
-app.post('/delete-community-file', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var file;
-    console.log("delete file: %j", req.body.file);
-    console.log("req.body: %j", req.body);
+// app.post('/delete-community-file', function(req, res) {
+//     var user = authenticationUtils.getUserFromToken(req.body.token);
+//     var file;
+//     console.log("delete file: %j", req.body.file);
+//     console.log("req.body: %j", req.body);
 
-    file = communityFileUtils.getRequestedFile(req.body.file, user)
+//     file = communityFileUtils.getRequestedFile(req.body.file, user)
 
-    if (file == null) {
-        res.send({ fileStatus: "Failed to delete file" })
-        return;
-    }
+//     if (file == null) {
+//         res.send({ fileStatus: "Failed to delete file" })
+//         return;
+//     }
 
-    if (file) {
-        async.series([
-                function(callback) {
-                    communityFileUtils.removeFile(file.path, file, callback);
-                }
-            ],
-            // optional callback
-            function(err, results) {
-                console.log("results in server.js: %j", results);
-                console.log("err: %j", err);
-                communityFileUtils.updateAvailableCommunitiesCache();
+//     if (file) {
+//         async.series([
+//                 function(callback) {
+//                     communityFileUtils.removeFile(file.path, file, callback);
+//                 }
+//             ],
+//             // optional callback
+//             function(err, results) {
+//                 console.log("results in server.js: %j", results);
+//                 console.log("err: %j", err);
+//                 communityFileUtils.updateAvailableCommunitiesCache();
 
-                if (results != null && results.length > 0 && results[0] != null) {
-                    res.send({ fileStatus: "Failed to delete file: " + file.name });
-                } else {
-                    res.send({ fileStatus: "Successfully deleted file" });
-                }
-            });
-    }
-});
+//                 if (results != null && results.length > 0 && results[0] != null) {
+//                     res.send({ fileStatus: "Failed to delete file: " + file.name });
+//                 } else {
+//                     res.send({ fileStatus: "Successfully deleted file" });
+//                 }
+//             });
+//     }
+// });
 
 app.post('/create-new-users', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
