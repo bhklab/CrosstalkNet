@@ -18,7 +18,7 @@ var user = require('../server-utils/Models/user');
 var existingUsersFile = './server-utils/Models/users.json';
 var newUsersFile = './user_creation/newUsers.json';
 
-var NAME_ERROR = "File contains user with null or non-string name. " +
+var CREATION_NAME_ERROR = "Request contains user with null or non-string name. " +
     "Please ensure every user has a 'name' propery and that its value is a string. ";
 
 var PASSWORD_ERROR = "File contains user with null or non-string password. " +
@@ -29,6 +29,11 @@ var ALREAD_EXISTS_ERROR = "There is already a user named: ${temp.name} ." +
 
 var FORBIDDEN_NAME_ERROR = "Having a user named: ${temp.name} is not permitted. " +
     "Please choose a different user name";
+
+var NO_USERS_ERROR = "No users specified";
+
+var DELETION_NAME_ERROR = "Request contians user with null or non-string name. " + 
+    "Please ensure all user names specified for deletion are strings";
 /**
  * @summary Reads the JSON file specified and creates a cache of
  * users from its contents.
@@ -40,7 +45,7 @@ function loadExistingUsers(file, callback) {
     jsonfile.readFile(file, function(err, obj) {
         var existingUsers = {};
 
-        if (err != null) {
+        if (err !== null) {
             console.log(err);
         }
 
@@ -59,25 +64,25 @@ function loadExistingUsers(file, callback) {
 function addNewUsers(existingUsers, newUsers) {
     var allUsers = clone(existingUsers);
 
-    if (newUsers == null || newUsers.users == null || !Array.isArray(newUsers.users)) {
-        console.log("No users specified");
-        return { error: "No users specified" };
+    if (newUsers === null || !Array.isArray(newUsers) || newUsers.length === 0) {
+        console.log(NO_USERS_ERROR);
+        return { error: NO_USERS_ERROR };
     }
 
-    for (var i = 0; i < newUsers.users.length; i++) {
-        var temp = new user.User(newUsers.users[i].name, newUsers.users[i].password, "1", null);
+    for (var i = 0; i < newUsers.length; i++) {
+        var temp = new user.User(newUsers[i].name, newUsers[i].password, "1", null);
 
-        if (temp.name == null || typeof temp.name != "string" || temp.name.length == 0) {
-            console.log(NAME_ERROR);
-            return { error: NAME_ERROR };
+        if (temp.name === null || temp.name === undefined || typeof temp.name !== "string" || temp.name.length === 0) {
+            console.log(CREATION_NAME_ERROR);
+            return { error: CREATION_NAME_ERROR };
 
-        } else if (temp.password == null || typeof temp.password != "string" || temp.password.length == 0) {
+        } else if (temp.password === null || temp.password === undefined || typeof temp.password !== "string" || temp.password.length === 0) {
             console.log(PASSWORD_ERROR);
             return { error: PASSWORD_ERROR };
-        } else if (existingUsers[temp.name] != null || allUsers[temp.name] != null) {
+        } else if (allUsers[temp.name] !== undefined) {
             console.log(ALREAD_EXISTS_ERROR);
             return { error: ALREAD_EXISTS_ERROR };
-        } else if (temp.name == "error") {
+        } else if (temp.name === "error") {
             console.log(FORBIDDEN_NAME_ERROR);
             return { error: FORBIDDEN_NAME_ERROR };
         } else {
@@ -89,16 +94,39 @@ function addNewUsers(existingUsers, newUsers) {
         }
     }
 
-    
-
     return allUsers;
+}
+
+function removeSpecifiedUsers(existingUsers, specifiedUsers) {
+    var trimmedUsers = clone(existingUsers);
+
+    if (specifiedUsers === null || !Array.isArray(specifiedUsers) || specifiedUsers.length === 0) {
+        console.log(NO_USERS_ERROR);
+        return { error: NO_USERS_ERROR };
+    }
+
+    for (var i = 0; i < specifiedUsers.length; i++) {
+        var name = specifiedUsers[i];
+
+        if (name === null || typeof name !== 'string' || name.length === 0) {
+            console.log(DELETION_NAME_ERROR);
+            return { error: DELETION_NAME_ERROR };
+        } else if (trimmedUsers[name] === undefined) {
+            console.log("Could not find user: " + name);
+            return { error: "Could not find user: " + name };
+        } else {
+            delete trimmedUsers[name];
+        }
+    }
+
+    return trimmedUsers;
 }
 
 function saveAllUsers(file, users, callback) {
     jsonfile.writeFile(existingUsersFile, { users: users }, function(err) {
         if (err) {
             console.log(err);
-        } 
+        }
 
         callback(err, null);
 
@@ -118,10 +146,10 @@ function createNewUsers(newUsers, mainCB) {
 
                 if (allUsers.error) {
                     callback(allUsers.error, allUsers);
-                } else if (allUsers.Alex == null) {
+                } else if (allUsers.Alex === null) {
                     callback("No users loaded", allUsers);
                 } else {
-                    callback(null, allUsers);    
+                    callback(null, allUsers);
                 }
             },
             function(allUsers, callback) {
@@ -132,14 +160,47 @@ function createNewUsers(newUsers, mainCB) {
         function(err, results) {
             if (err) {
                 //console.log(err);
-                mainCB({ error: err }, null);
+                mainCB(err, null);
             } else {
                 console.log("Successfully added new users");
-                mainCB(null, {success: "Successfully added new users"});
+                mainCB(null, "Successfully added new users");
+            }
+        });
+}
+
+function deleteUsers(users, mainCB) {
+    async.waterfall([
+            function(callback) {
+                loadExistingUsers(existingUsersFile, callback);
+            },
+            function(existingUsers, callback) {
+                // console.log(existingUsers);
+                var trimmedUsers = removeSpecifiedUsers(existingUsers, users);
+
+
+                if (trimmedUsers.error) {
+                    callback(trimmedUsers.error, trimmedUsers);
+                } else {
+                    callback(null, trimmedUsers);
+                }
+            },
+            function(trimmedUsers, callback) {
+                saveAllUsers(existingUsersFile, trimmedUsers, callback);
+            }
+        ],
+        // optional callback
+        function(err, results) {
+            if (err) {
+                //console.log(err);
+                mainCB(err, null);
+            } else {
+                console.log("Successfully deleted users");
+                mainCB(null, "Successfully deleted users");
             }
         });
 }
 
 module.exports = {
-    createNewUsers: createNewUsers
+    createNewUsers: createNewUsers,
+    deleteUsers: deleteUsers
 }

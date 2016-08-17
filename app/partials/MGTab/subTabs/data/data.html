@@ -24,15 +24,17 @@
             </md-tooltip>
         </md-button>
     </div>
-    <md-divider></md-divider>
-    <div ng-if="vm.sharedData.permission > 0" class="md-padding">
-        <div class="md-subhead bottom-margin">Optional File Upload</div>
-        <form>
-            <div ng-repeat="(key, value) in vm.matrixUpload" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="bottom-margin">
-                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload[key]" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose {{key | capitalize}} File</md-button>
-                <div>Normal File: {{vm.matrixUpload[key].name ? vm.matrixUpload[key].name : "No file selected"}}</div>
-            </div>
-            <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised top-margin-10">Upload Files</md-button>
-        </form>
+    <div ng-if="vm.sharedData.permission != 0">
+        <md-divider></md-divider>
+        <div class="md-padding">
+            <div class="md-subhead bottom-margin">Optional File Upload</div>
+            <form>
+                <div ng-repeat="(key, value) in vm.matrixUpload" ng-if="vm.selectedNetworkType == key || vm.selectedNetworkType == 'delta'" class="bottom-margin">
+                    <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.matrixUpload[key]" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose {{key | capitalize}} File</md-button>
+                    <div>Normal File: {{vm.matrixUpload[key].name ? vm.matrixUpload[key].name : "No file selected"}}</div>
+                </div>
+                <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised top-margin-10">Upload Files</md-button>
+            </form>
+        </div>
     </div>
 </md-content>
