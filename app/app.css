@@ -36,7 +36,7 @@
     display: none !important;
 }
 
-md-dialog md-dialog-actions.login {
+md-dialog md-dialog-actions.stacked-buttons {
     display: block;
     justify-content: inherit;
     padding-right: 16px;
@@ -46,15 +46,27 @@ md-dialog md-dialog-actions .md-button {
     margin-right: 8px;
 }
 
-md-select-value { 
+.md-select-menu-container { 
     max-width: 300px;
 }
 
-.login-controls-container {
+.dialog-controls-container {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.create-users-dialog {
+    /*width: 50%;*/
+}
+
+.delete-users-dialog {
+    max-width: 300px;
+}
+
+.full-width {
+    width: 1--%;
 }
 
 .graph-container {

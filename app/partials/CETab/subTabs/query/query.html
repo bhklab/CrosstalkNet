@@ -1,7 +1,6 @@
 <md-content>
     <div class="md-padding">
         <h2 class="md-subhead">Get Communities</h2>
-        <md-button class="md-raised md-primary" ng-click="vm.getCommunities()">Get Communities</md-button>
         <md-input-container class="select">
             <label>Select Community File</label>
             <md-select class="file-select" ng-model="vm.communityFile">
@@ -10,16 +9,19 @@
                 </md-option>
             </md-select>
         </md-input-container>
+        <md-button class="md-raised md-primary" ng-click="vm.getCommunities()">Get Communities</md-button>
     </div>
-    <md-divider></md-divider>
-    <div ng-if="vm.sharedData.permission > 0" class="md-padding">
-        <div class="md-subhead bottom-margin">Optional File Upload</div>
-        <form>
-            <div class="bottom-margin">
-                <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.communityUpload" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose Community File</md-button>
-                <div>File: {{vm.communityUpload.name ? vm.communityUpload.name : "No file selected"}}</div>
-            </div>
-            <md-button ng-click="vm.uploadFile()" class="md-primary md-raised top-margin-10">Upload File</md-button>
-        </form>
+    <div ng-if="vm.sharedData.permission != 0">
+        <md-divider></md-divider>
+        <div class="md-padding">
+            <div class="md-subhead bottom-margin">Optional File Upload</div>
+            <form>
+                <div class="bottom-margin">
+                    <md-button class="md-primary md-raised" type="file" ngf-select ng-model="vm.communityUpload" ngf-max-height="1000" ngf-max-size="20MB" accept=".Rdata,.RData" ngf-pattern=".Rdata,.RData">Choose Community File</md-button>
+                    <div>File: {{vm.communityUpload.name ? vm.communityUpload.name : "No file selected"}}</div>
+                </div>
+                <md-button ng-click="vm.uploadFile()" class="md-primary md-raised top-margin-10">Upload File</md-button>
+            </form>
+        </div>
     </div>
 </md-content>

@@ -1,14 +1,14 @@
-<md-dialog aria-label="Login Dialog">
+<md-dialog class="create-users-dialog" aria-label="Create Users Dialog">
     <form ng-cloak>
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2>Login</h2>
+                <h2>Create Users</h2>
             </div>
         </md-toolbar>
         <md-dialog-content>
             <div class="md-dialog-content">
                 <md-input-container style="margin-top: 5px;">
-                    <label>User</label>
+                    <label>Name</label>
                     <input ng-model="ctrl.vm.user.name">
                 </md-input-container>
                 <br>
@@ -19,13 +19,11 @@
             </div>
         </md-dialog-content>
         <md-dialog-actions class="stacked-buttons">
-            <div>
-                <div class="dialog-controls-container">
-                    <md-button class="md-raised md-primary" ng-click="ctrl.vm.login()">Login</md-button>
-                </div>
-                <div class="dialog-controls-container">
-                    <md-button md-no-ink class="md-primary" ng-click="ctrl.vm.guestLogin()">Sign in as Guest</md-button>
-                </div>
+            <div class="dialog-controls-container">
+                <md-button class="md-raised md-primary" ng-click="ctrl.vm.createUsers()">Create User</md-button>
+            </div>
+            <div class="dialog-controls-container">
+                <md-button md-no-ink class="md-raised md-primary" ng-click="ctrl.vm.closeDialog()">Close</md-button>
             </div>
         </md-dialog-actions>
     </form>

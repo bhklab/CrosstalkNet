@@ -29,6 +29,9 @@
         service.getCommunityFileList = getCommunityFileList;
         service.uploadCommunityFile = uploadCommunityFile;
         service.deleteCommunityFile = deleteCommunityFile;
+        service.createUsers = createUsers;
+        service.deleteUsers = deleteUsers;
+        service.getAllUsersNames = getAllUsersNames;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -409,6 +412,48 @@
                 }, function(response) {
                     console.log(response);
                 });
+        }
+
+        function createUsers(newUsers) {
+            var deferred = $q.defer();
+
+            RESTService.post('create-new-users', { newUsers: newUsers }).then(function(data) {
+                ValidationService.checkServerResponse(data);
+
+                if (data.result) {
+                    deferred.resolve({ result: data.result });
+                }
+            });
+
+            return deferred.promise;
+        }
+
+        function deleteUsers(users) {
+            var deferred = $q.defer();
+
+            RESTService.post('delete-users', { users: users }).then(function(data) {
+                ValidationService.checkServerResponse(data);
+
+                if (data.result) {
+                    deferred.resolve({ result: data.result });
+                }
+            });
+
+            return deferred.promise;
+        }
+
+        function getAllUsersNames() {
+            var deferred = $q.defer();
+
+            RESTService.post('get-all-user-names', {}).then(function(data) {
+                ValidationService.checkServerResponse(data);
+
+                if (data.users) {
+                    deferred.resolve({ users: data.users });
+                }
+            });
+
+            return deferred.promise;
         }
 
         return service;

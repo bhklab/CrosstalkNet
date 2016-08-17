@@ -26,6 +26,11 @@
 
         vm.guestLogin = guestLogin;
         vm.login = login;
+        vm.logout = logout;
+
+        vm.loggedIn = false;
+
+        vm.showLoginDialog = showLoginDialog;
 
         /**
          * @summary Signs in the user as a guest giving them access to only
@@ -34,11 +39,19 @@
          * @memberOf controllers.LoginController
          */
         function guestLogin() {
+            vm.loggedIn = true;
             $rootScope.tokenSet = true;
             vm.sharedData.guest = true;
             vm.sharedData.reloadMatrixFileList = true;
             vm.sharedData.reloadCommunityFileList = true;
             $mdDialog.hide('');
+        }
+
+        function logout() {
+            vm.loggedIn = false;
+            vm.sharedData.guest = false;
+            $rootScope.tokenSet = false;
+            $cookies.remove('token');
         }
 
         /**
@@ -52,6 +65,7 @@
                 .then(function(data) {
                     vm.user = { name: null, password: null, token: null };
                     if (!ValidationService.checkServerResponse(data)) {
+                        vm.loggedIn = false;
                         return;
                     } else {
                         var now = new Date();
@@ -62,6 +76,8 @@
                             $cookies.put('token', data.token, { expires: exp });
                         }
 
+                        vm.loggedIn = true;
+                        vm.sharedData.guest = false;
                         vm.sharedData.reloadMatrixFileList = true;
                         vm.sharedData.reloadCommunityFileList = true;
                         $mdDialog.hide('');
@@ -91,6 +107,7 @@
          * @memberOf controllers.LoginController
          */
         function showLoginDialog(ev) {
+            vm.sharedData.guest = false;
             $mdDialog.show({
                 controller: function() { this.vm = vm },
                 controllerAs: 'ctrl',

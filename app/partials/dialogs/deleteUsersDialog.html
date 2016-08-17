@@ -1,0 +1,27 @@
+<md-dialog class="delete-users-dialog" aria-label="Delete Users Dialog">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Delete Users</h2>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-input-container class="full-width">
+                    <label>Select Users</label>
+                    <md-select class="users-select" ng-model="ctrl.vm.usersToDelete" multiple="true">
+                        <md-option ng-value="name" ng-repeat="name in ctrl.vm.allUserNames">{{ name }}</md-option>
+                    </md-select>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions class="stacked-buttons">
+            <div class="dialog-controls-container">
+                <md-button class="md-raised md-primary" ng-click="ctrl.vm.deleteConfirm()">Delete Users</md-button>
+            </div>
+            <div class="dialog-controls-container">
+                <md-button md-no-ink class="md-raised md-primary" ng-click="ctrl.vm.closeDialog()">Close</md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

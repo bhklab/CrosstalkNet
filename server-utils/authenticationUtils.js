@@ -13,7 +13,7 @@
 
 var jsonfile = require('jsonfile');
 var user = require('./Models/user');
-var file = './server-utils/Models/users.json';
+var EXISTING_USERS_FILE = './server-utils/Models/users.json';
 var users = {};
 
 /**
@@ -24,6 +24,8 @@ var users = {};
  * @param {string} file The path to a JSON file containing users.
  */
 function loadUsers(file) {
+    users = {};
+
     jsonfile.readFile(file, function(err, obj) {
         //console.log(obj);
         obj = obj.users;
@@ -53,7 +55,7 @@ function addTokenToUser(user, token) {
 
     if (users[user.name] != null) {
         users[user.name].token = token;
-        jsonfile.writeFile(file, { users: users }, function(err) {
+        jsonfile.writeFile(EXISTING_USERS_FILE, { users: users }, function(err) {
             console.log(err);
         });
     }
@@ -99,10 +101,25 @@ function getUser(name, callback) {
     callback(user);
 }
 
-loadUsers(file);
+function getAllUserNames() {
+    var names = [];
+
+    for (var name in users) {
+        if (users[name].accessLevel != "admin") {
+            names.push(users[name].name);
+        }
+    }
+
+    return names;
+}
+
+loadUsers(EXISTING_USERS_FILE);
 
 module.exports = {
+    loadUsers: loadUsers,
     getUser: getUser,
     addTokenToUser: addTokenToUser,
-    getUserFromToken: getUserFromToken
+    getUserFromToken: getUserFromToken,
+    getAllUserNames: getAllUserNames,
+    EXISTING_USERS_FILE: EXISTING_USERS_FILE
 };

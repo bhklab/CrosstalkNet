@@ -33,6 +33,7 @@ app.get('', function(req, res) {
 });
 
 app.use('/app', express.static(__dirname + '/app'));
+
 app.set('secretKey', SECRET_KEY_ENC);
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -89,7 +90,8 @@ app.post('/get-user-permission', function(req, res) {
     if (user == null) {
         res.send({ permission: 0 });
     } else {
-        res.send({ permission: 1 });
+        var permission = user.accessLevel;
+        res.send({ permission: permission });
     }
 });
 
@@ -965,6 +967,8 @@ app.post('/create-new-users', function(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var newUsers = req.body.newUsers;
 
+    console.log("%j", req.body);
+
     if (user.accessLevel != 'admin') {
         res.send({ error: "Not authorized to create users" });
         return;
@@ -973,15 +977,57 @@ app.post('/create-new-users', function(req, res) {
     async.series([function(callback) {
         userCreationUtils.createNewUsers(newUsers, callback);
     }], function(err, results) {
+        authenticationUtils.loadUsers(authenticationUtils.EXISTING_USERS_FILE);
+
         if (err) {
             console.log(err);
+            res.send({ error: err });
+            return;
         }
 
-        if (results[0] != null && results[0].error != null) {
-            res.send({ error: results[0].error });
+        if (results[0] != null) {
+            res.send({ result: results[0] });
             return;
-        } else {
-            res.send({ success: "Added new users to the app." });
+        }
+    });
+});
+
+app.post('/get-all-user-names', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+
+    if (user.accessLevel != 'admin') {
+        res.send({ error: "Not authorized to view users" });
+        return;
+    }
+
+    var users = authenticationUtils.getAllUserNames();
+
+    res.send({ users: users });
+
+});
+
+app.post('/delete-users', function(req, res) {
+    var user = authenticationUtils.getUserFromToken(req.body.token);
+
+    if (user.accessLevel != 'admin') {
+        res.send({ error: "Not authorized to delete users" });
+        return;
+    }
+
+    async.series([function(callback) {
+        userCreationUtils.deleteUsers(req.body.users, callback);
+    }], function(err, results) {
+        authenticationUtils.loadUsers(authenticationUtils.EXISTING_USERS_FILE);
+
+        if (err) {
+            console.log(err);
+            res.send({ error: err });
+            return;
+        }
+
+        if (results[0] != null) {
+            res.send({ result: results[0] });
+            return;
         }
     });
 });
