@@ -52,16 +52,24 @@ function getAccessibleFilesForUser(user) {
 function createAvailableCommunitiesCache() {
     var result = new CommunityFileCache();
 
-    
+
     result.real = getFilesInDirectory(BASE_PROPRIETARY_DIRECTORY, TYPES.real);
     result.fake = getFilesInDirectory(BASE_FAKE_DIRECTORY, TYPES.fake);
 
 
     var personalDirectories = fs.readdirSync(BASE_UPLOAD_DIRECTORY);
+    personalDirectories = personalDirectories.filter(function(directory) {
+        if (directory == ".gitkeep") {
+            return false;
+        } else {
+            return true;
+        }
+    })
+    console.log(personalDirectories);
 
     for (var i = 0; i < personalDirectories.length; i++) {
         result.personal[personalDirectories[i]] = [];
-            
+
         try {
             fs.accessSync(BASE_UPLOAD_DIRECTORY + personalDirectories[i], fs.R_OK);
             result.personal[personalDirectories[i]] = getFilesInDirectory(BASE_UPLOAD_DIRECTORY + personalDirectories[i], TYPES.personal);
@@ -69,7 +77,7 @@ function createAvailableCommunitiesCache() {
             console.log(err);
             createDirectory(BASE_UPLOAD_DIRECTORY, personalDirectories[i], null);
         }
-    
+
     }
 
     return result;
@@ -89,7 +97,7 @@ function getRequestedFile(selectedFile, user) {
 
     if (selectedFile != null) {
         file = matchSelectedFile(selectedFile, availableCommunitiesCache, user);
-    } 
+    }
 
     return file;
 }
@@ -216,17 +224,23 @@ function writeFile(baseDirectory, file, userName, callback) {
  * @param {string} subType The sub type of the directory.
  */
 function createDirectory(baseDirectory, userName, callback) {
-    mkdirp.sync(baseDirectory + userName, function(err) {
-        if (err) {
-            if (callback) {
-                callback("Failed");
-            }
+    try {
+        mkdirp.sync(baseDirectory + userName, function(err) {
+            if (err) {
+                if (callback) {
+                    callback("Failed");
+                }
 
-            console.error(err)
-        } else if (callback) {
+                console.error(err)
+            } else if (callback) {
+                callback();
+            }
+        });
+    } catch(e) {
+        if (callback) {
             callback();
         }
-    });
+    }
 }
 
 module.exports = {
