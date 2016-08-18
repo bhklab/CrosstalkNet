@@ -29,7 +29,7 @@ var mkdirp = require('mkdirp');
 var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';
 
 app.get('', function(req, res) {
-    res.redirect('/app');
+    res.redirect('/app/#/documentation');
 });
 
 app.use('/app', express.static(__dirname + '/app'));
