@@ -1,3 +1,4 @@
+global.APP_BASE_DIRECTORY = __dirname + "/";
 const fs = require('fs');
 var exec = require('child_process').exec;
 var child_process = require('child_process');
@@ -22,9 +23,11 @@ var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
 var communityFileUtils = require('./server-utils/communityFileUtils');
 var matrixFileUtils = require('./server-utils/matrixFileUtils');
+var handlerUtils = require("./server-utils/handler_utils");
 var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
 var mkdirp = require('mkdirp');
+
 
 var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';
 
@@ -102,124 +105,9 @@ app.post('/login', function(req, res) {
     });
 });
 
-app.post('/gene-list', function(req, res) {
-    var args = { fileName: null };
-    var argsString = "";
-    var file;
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    //console.log(req.body);
+app.post('/gene-list', handlerUtils.geneList);
 
-    file = matrixFileUtils.getRequestedFile(req.body.selectedFile, user);
-
-    if (file == null || file.path == null || file.name == null) {
-        res.send({ error: "Please specify a file name" });
-        return;
-    }
-
-    var geneList = [];
-
-    args.fileName = matrixFileUtils.getCorrespondingDegreesFileName(file);
-    args.path = file.path;
-
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-
-    var child = exec("Rscript R_Scripts/getGeneList.R --args \"" + argsString + "\"", {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);
-            }
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var parsedValue = JSON.parse(stdout);
-            var message = parsedValue.message;
-
-            if (message) {
-                res.json({ error: message });
-                return;
-            }
-
-            var allGenes = [];
-
-            var epiDegrees = parsedValue.epiDegrees;
-            var stromaDegrees = parsedValue.stromaDegrees;
-
-            var epiGeneNames = parsedValue.epiGeneNames;
-            var stromaGeneNames = parsedValue.stromaGeneNames;
-
-            var maxDegree = parsedValue.maxDegree;
-
-            allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
-            allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
-
-            res.send({ geneList: allGenes, maxDegree: maxDegree });
-        });
-});
-
-app.post('/min-degree-genes', function(req, res) {
-    var args = {};
-    var argsString = "";
-    var file;
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-
-    file = matrixFileUtils.getRequestedFile(req.body.selectedFile, user);
-
-    if (file == null || file.path == null || file.name == null) {
-        res.send({ error: "Please specify a file name" });
-        return;
-    }
-
-    args.fileName = matrixFileUtils.getCorrespondingDegreesFileName(file);
-    args.path = file.path;
-    args.filterAmount = req.body.filterAmount;
-    args.filterType = req.body.filterType;
-
-    argsString = JSON.stringify(args);
-    argsString = argsString.replace(/"/g, '\\"');
-
-    var child = exec("Rscript R_Scripts/getMinDegreeGenes.R --args \"" + argsString + "\"", {
-            maxBuffer: 1024 *
-                50000
-        },
-        function(error, stdout, stderr) {
-            if (stderr != null && stderr != "") {
-                console.log('stderr: ' + stderr);
-            }
-
-            if (error != null) {
-                console.log('error: ' + error);
-            }
-
-            var parsedValue = JSON.parse(stdout);
-            var message = parsedValue.message;
-
-            if (message) {
-                res.json({ error: message });
-                return;
-            }
-
-            var epiGenes = [];
-            var stromaGenes = [];
-
-            var epiDegrees = parsedValue.epiDegrees;
-            var stromaDegrees = parsedValue.stromaDegrees;
-
-            var epiGeneNames = parsedValue.epiGeneNames;
-            var stromaGeneNames = parsedValue.stromaGeneNames;
-
-
-            epiGenes = geneUtils.createGeneList(epiGeneNames, epiDegrees);
-            stromaGenes = geneUtils.createGeneList(stromaGeneNames, stromaDegrees);
-
-            res.send({ topGenes: { epi: epiGenes, stroma: stromaGenes } });
-        });
-});
+app.post('/min-degree-genes', handlerUtils.minDegreeGenes);
 
 app.post('/interaction-explorer', function(req, res) {
     var args = {};
