@@ -5,7 +5,7 @@
  * 
  * @summary Functions for creating cytoscape.js nodes.
  */
-var styleUtils = require('./styleUtils');
+var styleUtils = require('./style_utils');
 var clone = require('clone');
 
 var classes = [];

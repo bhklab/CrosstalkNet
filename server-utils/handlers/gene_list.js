@@ -1,6 +1,6 @@
-var authenticationUtils = require(APP_BASE_DIRECTORY + 'server-utils/authenticationUtils');
-var matrixFileUtils = require(APP_BASE_DIRECTORY + '/server-utils/matrixFileUtils');
-var geneUtils = require(APP_BASE_DIRECTORY + '/server-utils/geneUtils');
+var authenticationUtils = require(APP_BASE_DIRECTORY + 'server-utils/authentication_utils');
+var matrixFileUtils = require(APP_BASE_DIRECTORY + '/server-utils/matrix_file_utils');
+var geneUtils = require(APP_BASE_DIRECTORY + '/server-utils/gene_utils');
 var exec = require('child_process').exec;
 
 function handler(req, res) {
@@ -29,7 +29,7 @@ function handler(req, res) {
 }
 
 function callRScript(argsString, res) {
-    exec("Rscript R_Scripts/getGeneList.R --args \"" + argsString + "\"", {
+    exec("Rscript r_scripts/get_gene_list.R --args \"" + argsString + "\"", {
             maxBuffer: 1024 *
                 50000
         },

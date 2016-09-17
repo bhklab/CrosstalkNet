@@ -41,7 +41,7 @@
             var cy = null;
             config.container = document.getElementById(containerID);
 
-            if (config.layout.position == "grid") {
+            if (config.layout != null && config.layout.position == "grid") {
                 config.layout.position = function(node) {
                     return { row: node.data('row'), col: node.data('col') };
                 };

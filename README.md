@@ -16,8 +16,6 @@ EpiStroma-webapp requires [node.js](https://nodejs.org/) v4+ to run.
 
 EpiStroma-webapp requires [bower](https://bower.io) to install and update javascript dependencies.
 
-Download and extract the [latest pre-built release](https://github.com/joemccann/dillinger/releases).
-
 Install the dependencies:
 
 ```sh
