@@ -3,7 +3,7 @@ library(methods)
 library(jsonlite)
 library(data.table)
 
-source('R_Scripts/helpers.R')
+source('r_scripts/helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
 

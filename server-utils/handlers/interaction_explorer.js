@@ -1,3 +1,15 @@
+var authenticationUtils = require(APP_BASE_DIRECTORY + 'server-utils/authentication_utils');
+var matrixFileUtils = require(APP_BASE_DIRECTORY + 'server-utils/matrix_file_utils');
+var styleUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/style_utils');
+var parseUtils = require(APP_BASE_DIRECTORY + 'server-utils/parse_utils');
+var validationUtils = require(APP_BASE_DIRECTORY + 'server-utils/validation_utils');
+var configUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/config_utils');
+var nodeUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/node_utils');
+var edgeUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/edge_utils');
+var layoutUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/layout_utils');
+var clientTableUtils = require(APP_BASE_DIRECTORY + 'server-utils/client_table_utils');
+var exec = require('child_process').exec;
+
 function handler(req, res) {
     var args = {};
     var argsString = "";
@@ -30,10 +42,12 @@ function handler(req, res) {
     args.fileNameDegrees = files.degree;
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');
+
+    callRScript(argsString, res, selectedGenes, requestedLayout);
 }
 
-function callRScript(argsString, res) {
-    exec("Rscript R_Scripts/interactionExplorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
+function callRScript(argsString, res, selectedGenes, requestedLayout) {
+    exec("Rscript r_scripts/interaction_explorer.R --args \"" + argsString + "\"", { maxBuffer: 1024 * 50000 },
         function(error, stdout, stderr) {
             if (stderr != null && stderr != "") {
                 console.log('stderr: ' + stderr);
@@ -42,8 +56,6 @@ function callRScript(argsString, res) {
             if (error != null) {
                 console.log('error: ' + error);
             }
-
-            var initialColor = selectedGenes[0].value.endsWith("-E") ? "red" : "blue";
 
             var parsedValue = JSON.parse(stdout);
             var message = parsedValue.message;
@@ -56,14 +68,10 @@ function callRScript(argsString, res) {
             var RNodes = parsedValue.nodes
             var REdges = parsedValue.edges;
 
-            var allNodes = [];
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
-            var parentNodes = [];
             var edges = [];
-            var elements = [];
-            var layout = null;
             var edgeDictionary = {};
             var edgeStyleNegative = JSON.parse(JSON.stringify(styleUtils.edgeWeights.negative));
             var edgeStylePositive = JSON.parse(JSON.stringify(styleUtils.edgeWeights.positive));
@@ -78,51 +86,13 @@ function callRScript(argsString, res) {
             nodes = parseNodes(RNodes);
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
-                var maxRows = 1;
-                var maxCols = 1;
-
-                maxCols = allNodes.length + 1;
-                allNodes = nodeUtils.positionNodesBipartiteGrid(allNodes);
-
-                for (var j = 0; j < allNodes.length; j++) {
-                    if (allNodes[j].length > maxRows) {
-                        maxRows = allNodes[j].length;
-                    }
-                }
-
-                layout = layoutUtils.createGridLayout(maxRows, maxCols);
-
-                config = configUtils.addStylesToConfig(config, styleUtils.getAllBipartiteStyles());
-                config = configUtils.addStyleToConfig(config, styleUtils.nodeSize.medium);
-                config = configUtils.setConfigLayout(config, layout);
-
-                parentNodes = nodeUtils.createParentNodesIE(selectedGenes, nodes);
-                elements = elements.concat(parentNodes);
+                config = createBipartiteLayout(nodes, sourceNodes, edges, selectedGenes);
             } else {
-                for (var i = 0; i < nodes.length; i++) {
-                    for (var j = 0; j < nodes[i].length; j++) {
-                        if (nodes[i][j].data.isSource) {
-                            nodes[i][j] = nodeUtils.addClassToNodes(nodes[i][j], "sourceNode");
-                        }
-                    }
-                }
-
-                config = configUtils.createConfig();
-                layout = layoutUtils.createRandomLayout([].concat.apply([], nodes).length, styleUtils.nodeSizes.medium);
-
-                sourceNodes = nodeUtils.addClassToNodes(sourceNodes[0], "sourceNode");
-                config = configUtils.addStylesToConfig(config, styleUtils.allRandomFormats);
-                config = configUtils.setConfigLayout(config, layout);
+                config = createRandomLayout(nodes, sourceNodes, edges);
             }
-
-            allNodes = nodes.concat(sourceNodes);
-
-            elements = elements.concat([].concat.apply([], allNodes));
-            elements = elements.concat(edges);
 
             config = configUtils.addStyleToConfig(config, edgeStyleNegative);
             config = configUtils.addStyleToConfig(config, edgeStylePositive);
-            config = configUtils.setConfigElements(config, elements);
 
             selfLoops = clientTableUtils.getSelfLoops(edges);
             edgeDictionary = clientTableUtils.createEdgeDictionaryFromREdges([].concat.apply([], REdges));
@@ -155,7 +125,7 @@ function parseNodes(RNodes) {
     return nodes;
 }
 
-function createBipartiteLayout(nodes, sourceNodes, edges) {
+function createBipartiteLayout(nodes, sourceNodes, edges, selectedGenes) {
     var maxRows = 1;
     var maxCols = 1;
     var config = configUtils.createConfig();
@@ -185,8 +155,6 @@ function createBipartiteLayout(nodes, sourceNodes, edges) {
     elements = elements.concat([].concat.apply([], allNodes));
     elements = elements.concat(edges);
 
-    config = configUtils.addStyleToConfig(config, edgeStyleNegative);
-    config = configUtils.addStyleToConfig(config, edgeStylePositive);
     config = configUtils.setConfigElements(config, elements);
 
     return config;
@@ -195,6 +163,7 @@ function createBipartiteLayout(nodes, sourceNodes, edges) {
 function createRandomLayout(nodes, sourceNodes, edges) {
     var allNodes;
     var config = configUtils.createConfig();
+    var elements = [];
     var layout;
 
     for (var i = 0; i < nodes.length; i++) {
@@ -217,9 +186,11 @@ function createRandomLayout(nodes, sourceNodes, edges) {
     elements = elements.concat([].concat.apply([], allNodes));
     elements = elements.concat(edges);
 
-    config = configUtils.addStyleToConfig(config, edgeStyleNegative);
-    config = configUtils.addStyleToConfig(config, edgeStylePositive);
     config = configUtils.setConfigElements(config, elements);
 
     return config;
 }
+
+module.exports = {
+    handler: handler
+};

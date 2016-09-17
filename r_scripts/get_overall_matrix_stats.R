@@ -1,7 +1,7 @@
 library(jsonlite)
 library(Matrix)
 
-source('R_Scripts/helpers.R')
+source('r_scripts/helpers.R')
 
 args <- commandArgs(trailingOnly = TRUE)
 settings <- fromJSON(args[2])

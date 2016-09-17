@@ -4,9 +4,9 @@
  * 
  * @summary Functions for creating cytoscape.js layouts.
  */
-var configUtils = require('./configUtils');
-var nodeUtils = require('./nodeUtils');
-var styleUtils = require('./styleUtils');
+var configUtils = require('./config_utils');
+var nodeUtils = require('./node_utils');
+var styleUtils = require('./style_utils');
 var clone = require('clone');
 
 /**

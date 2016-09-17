@@ -1,7 +1,7 @@
 options(warn = -1)
 library(methods)
 library(Matrix)
-source('R_Scripts/dataModels.R')
+source('r_scripts/data_models.R')
 
 readMatricesFromFiles <- function(normalFile, tumorFile, deltaFile) {
     # Creates a list of matrices by reading in specified files

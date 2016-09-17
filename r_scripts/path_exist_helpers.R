@@ -1,5 +1,5 @@
-source('R_Scripts/helpers.R')
-source('R_Scripts/dataModels.R')
+source('r_scripts/helpers.R')
+source('r_scripts/data_models.R')
 
 findAllPaths <- function(source, target, corMatrices, networkType) {
 	# Creates a data frame representing all of the paths that exist

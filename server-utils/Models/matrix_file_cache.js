@@ -1,5 +1,5 @@
 'use strict'
-var FileGroup = require('./fileGroup').FileGroup;
+var FileGroup = require('./file_group').FileGroup;
 var clone = require('clone');
 
 const TYPES = { real: "real", fake: "fake", personal: "personal" };

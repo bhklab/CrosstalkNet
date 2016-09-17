@@ -1,5 +1,5 @@
-source('R_Scripts/dataModels.R')
-source('R_Scripts/helpers.R')
+source('r_scripts/data_models.R')
+source('r_scripts/helpers.R')
 
 createDFEdgesCommunities <- function(communityInteractions) {
 	# Creates a data frame of cytoscape edges representing the interactions

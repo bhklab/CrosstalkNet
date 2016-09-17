@@ -2,8 +2,8 @@ options(warn = -1)
 library(methods)
 library(jsonlite)
 
-source('R_Scripts/helpers.R')
-source('R_Scripts/communityHelpers.R')
+source('r_scripts/helpers.R')
+source('r_scripts/community_helpers.R')
 args <- commandArgs(trailingOnly = TRUE)
 
 settings <- fromJSON(args[2])

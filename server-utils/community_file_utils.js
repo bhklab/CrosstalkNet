@@ -11,16 +11,16 @@ const DEGREES_FILE_PREFIX = "degrees";
 const fs = require('fs');
 var async = require('async');
 var mkdirp = require('mkdirp');
-var CommunityFileCache = require('./Models/communityFileCache').CommunityFileCache;
-var FileGroup = require('./Models/fileGroup').FileGroup;
-var File = require('./Models/fileModel').File;
+var CommunityFileCache = require('./Models/community_file_cache').CommunityFileCache;
+var FileGroup = require('./Models/file_group').FileGroup;
+var File = require('./Models/file_model').File;
 var availableCommunitiesCache = null;
 
-const TYPES = require('./Models/communityFileCache').TYPES;
+const TYPES = require('./Models/community_file_cache').TYPES;
 
-var BASE_UPLOAD_DIRECTORY = 'R_Scripts/Communities/Uploaded/';
-var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/Communities/Proprietary/';
-var BASE_FAKE_DIRECTORY = 'R_Scripts/Communities/Fake/'
+var BASE_UPLOAD_DIRECTORY = 'r_scripts/communities/uploaded/';
+var BASE_PROPRIETARY_DIRECTORY = 'r_scripts/communities/proprietary/';
+var BASE_FAKE_DIRECTORY = 'r_scripts/communities/fake/'
 
 /**
  * @summary Updates the in-memory cache of avaialble files.
