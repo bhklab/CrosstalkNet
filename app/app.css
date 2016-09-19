@@ -38,6 +38,33 @@
     text-align: center;
 }
 
+.documentation-content-padding {
+    padding: 20px 20px 20px 20px;
+}
+
+.dna-background {
+    background-image: url("res/images/dna.svg");
+    height: 115px;
+    width: 97px;
+    background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: cover;
+}
+
+.microscope-background {
+    background-image: url("res/images/microscope.svg");
+    height: 130px;
+    width: 130px;
+    background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: cover;
+}
+
+.full-height {
+    height: 100%;
+}
 
 .documentation-font {
     color: white;
