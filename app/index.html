@@ -41,6 +41,7 @@
     <script src="js/controllers/communityExplorerTab/CEQueryController.js"></script>
     <script src="js/controllers/communityExplorerTab/CommunityExplorerController.js"></script>
     <script src="js/controllers/commonControllers/LoginController.js"></script>
+    <script src="js/controllers/commonControllers/RouteController.js"></script>
     <script src="js/controllers/commonControllers/UserManagementController.js"></script>
     <script src="js/services/controls/GlobalControls.js"></script>
     <script src="js/services/controls/MainGraphControls.js"></script>
@@ -78,11 +79,18 @@
                 Status: {{state.text}}
                 <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id" md-mode="indeterminate"></md-progress-circular>
             </div>
-            <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="33">
+            <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="34">
                 <div class="title-font">BHK Lab</div>
             </div>
             <div class="flex-toolbar align-flex-right" flex="33">
-                <md-button class="">Documentation</md-button>
+                <div ng-controller="RouteController as vm">
+                    <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.showDocumentation">
+                        <a class="unstyled-link" href="#/app">App</a>
+                    </md-button>
+                    <md-button ng-click="vm.changeRoute('documentation')" ng-if="vm.showDocumentation">
+                        <a class="unstyled-link" href="#/documentation">Documentation</a>                     
+                    </md-button>
+                </div>
                 <div ng-controller="UserManagementController as vm" ng-init="vm.initializeController('userManagement')">
                     <div ng-if="vm.sharedData.permission === 'admin'">
                         <md-button ng-click="vm.showCreateUsersDialog()" class="">Create Users</md-button>
@@ -94,11 +102,7 @@
             </div>
         </div>
     </md-toolbar>
-    <a href="#/documentation">Documentation</a>
-    <br/>
-    <a href="#/app">App</a>
-    <br/>
-    <div ng-view></div>
+    <div ng-view style="height: 100%;"></div>
 </body>
 
 </html>

@@ -1,5 +1,55 @@
 /* app css stylesheet */
 
+.documentation-background {
+    height: 100%;
+    background-image: url("res/images/beam.svg");
+    background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: cover;
+}
+
+.documentation-intro-background {
+    height: 50%;
+    background-color: rgb(0, 96, 154);
+}
+
+.documentation-h1 {
+    /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 36px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 26.4px;
+    color: white;
+    text-align: center;
+}
+
+.documentation-h2 {
+    /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 26px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 26.4px;
+    color: white;
+    text-align: center;
+}
+
+
+.documentation-font {
+    color: white;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 18px;
+}
+
+.unstyled-link {
+    color: inherit;
+    text-decoration: inherit;
+}
+
 .community-select-width {
     width: 100px;
 }
@@ -46,7 +96,7 @@ md-dialog md-dialog-actions .md-button {
     margin-right: 8px;
 }
 
-.md-select-menu-container { 
+.md-select-menu-container {
     max-width: 300px;
 }
 
@@ -149,7 +199,7 @@ md-sidenav {
 
 .bottom-margin-25 {
     margin-bottom: 25px;
-} 
+}
 
 .top-margin-10 {
     margin-top: 10px;

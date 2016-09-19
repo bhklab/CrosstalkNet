@@ -78,15 +78,7 @@ app.use(function(req, res, next) {
     }
 });
 
-app.post('/get-user-permission', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    if (user == null) {
-        res.send({ permission: 0 });
-    } else {
-        var permission = user.accessLevel;
-        res.send({ permission: permission });
-    }
-});
+app.post('/get-user-permission', handlerUtils.getUserPermission);
 
 app.post('/login', function(req, res) {
     res.json({
@@ -105,13 +97,7 @@ app.post('/main-graph', handlerUtils.mainGraph);
 
 app.post('/get-all-paths', handlerUtils.getAllPaths);
 
-app.post('/available-matrices', function(req, res) {
-    var subTypes = req.body.types;
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleMatrices = matrixFileUtils.getAccessibleFilesForUser(user);
-
-    res.send({ fileList: accessibleMatrices });
-});
+app.post('/available-matrices', handlerUtils.availableMatrices);
 
 app.post('/overall-matrix-stats', handlerUtils.overallMatrixStats);
 
@@ -119,87 +105,19 @@ app.post('/delete-matrix-file', handlerUtils.deleteMatrixFile);
 
 app.post('/upload-matrices', handlerUtils.uploadMatrices);
 
-app.post('/community-explorer', handlerUtils.communityExplorer);
+// app.post('/community-explorer', handlerUtils.communityExplorer);
 
-app.post('/community-file-list', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var accessibleFiles = communityFileUtils.getAccessibleFilesForUser(user);
+// app.post('/community-file-list', handlerUtils.communityFileList);
 
-    res.send({ fileList: accessibleFiles });
-});
+// app.post('/upload-community-file', handlerUtils.uploadCommunityFile);
 
-app.post('/upload-community-file', handlerUtils.uploadCommunityFile);
+// app.post('/delete-community-file', handlerUtils.deleteCommunityFile);
 
-app.post('/delete-community-file', handlerUtils.deleteCommunityFile);
+app.post('/create-new-users', handlerUtils.createNewUsers);
 
-app.post('/create-new-users', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-    var newUsers = req.body.newUsers;
+app.post('/get-all-user-names', handlerUtils.getAllUserNames);
 
-    console.log("%j", req.body);
-
-    if (user.accessLevel != 'admin') {
-        res.send({ error: "Not authorized to create users" });
-        return;
-    }
-
-    async.series([function(callback) {
-        userCreationUtils.createNewUsers(newUsers, callback);
-    }], function(err, results) {
-        authenticationUtils.loadUsers(authenticationUtils.EXISTING_USERS_FILE);
-
-        if (err) {
-            console.log(err);
-            res.send({ error: err });
-            return;
-        }
-
-        if (results[0] != null) {
-            res.send({ result: results[0] });
-            return;
-        }
-    });
-});
-
-app.post('/get-all-user-names', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-
-    if (user.accessLevel != 'admin') {
-        res.send({ error: "Not authorized to view users" });
-        return;
-    }
-
-    var users = authenticationUtils.getAllUserNames();
-
-    res.send({ users: users });
-
-});
-
-app.post('/delete-users', function(req, res) {
-    var user = authenticationUtils.getUserFromToken(req.body.token);
-
-    if (user.accessLevel != 'admin') {
-        res.send({ error: "Not authorized to delete users" });
-        return;
-    }
-
-    async.series([function(callback) {
-        userCreationUtils.deleteUsers(req.body.users, callback);
-    }], function(err, results) {
-        authenticationUtils.loadUsers(authenticationUtils.EXISTING_USERS_FILE);
-
-        if (err) {
-            console.log(err);
-            res.send({ error: err });
-            return;
-        }
-
-        if (results[0] != null) {
-            res.send({ result: results[0] });
-            return;
-        }
-    });
-});
+app.post('/delete-users', handlerUtils.deleteUsers);
 
 var server = app.listen(5000, function() {
     console.log("Listening on port 5000");
