@@ -62,21 +62,6 @@
                     </section>
                 </md-content>
             </md-tab>
-            <md-tab label="Community Explorer">
-                <md-content ng-controller="CommunityExplorerController as vm" ng-init="vm.initializeController('community')">
-                    <section layout="row">
-                        <div static-include="partials/CETab/sideBar.html">
-                        </div>
-                        <md-content flex>
-                            <div id="community-explorer-graph-view" ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
-                                <div class="graph-container" id="cyCommunityExplorer"></div>
-                                <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
-                            </div>
-                            <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/CETab/tableView.html"></div>
-                        </md-content>
-                    </section>
-                </md-content>
-            </md-tab>
         </md-tabs>
     </md-content>
 </div>
