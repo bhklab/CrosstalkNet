@@ -1,31 +1,43 @@
 /* app css stylesheet */
 
-.separator { 
-    display:block;
-    border:none;
-    color:white;
-    height:1px;
-    background:black;
+.doc-app-button {
+    border-radius: 0px;
+    border-color: #FF9800;
+    border-style: solid;
+    border-width: 2px;
+    color: #FF9800;
+    font-size: 16px;
+    float: right;
+    margin-right: 20px;
+}
+
+.separator {
+    display: block;
+    border: none;
+    color: white;
+    height: 1px;
+    background: black;
     background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 350, from(#00609A), to(#fff));
     margin-bottom: 30px;
     margin-top: 30px;
 }
-/*
+
 .choosing-data::after {
     display: block;
-position: absolute;
-content: '';
-width: 100px;
-height: 100px;
-bottom: -50px;
-left: 50%;
-margin-left: -50px;
-background-color: #dddddd;
--ms-transform: rotate(45deg);
--webkit-transform: rotate(45deg);
-transform: rotate(45deg);
-z-index: 1;
-}*/
+    position: absolute;
+    content: '';
+    width: 100px;
+    height: 100px;
+    bottom: -50px;
+    left: 50%;
+    margin-left: -50px;
+    background-color: #dddddd;
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    z-index: -1;
+    background-color: #f44336;
+}
 
 .doc-intro-background-blue {
     background-color: rgb(0, 96, 154);
@@ -111,6 +123,10 @@ z-index: 1;
     min-width: 60px;
     height: 60%;
     width: 60%;
+}
+
+.relative-position {
+    position: relative;
 }
 
 .unstyled-link {
@@ -269,8 +285,20 @@ md-sidenav {
     margin-bottom: 25px;
 }
 
+.bottom-margin-75 {
+    margin-bottom: 75px;
+}
+
 .top-margin-10 {
     margin-top: 10px;
+}
+
+.top-margin-25 {
+    margin-top: 25px;
+}
+
+.top-margin-75 {
+    margin-top: 75px;
 }
 
 .left-margin {

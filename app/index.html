@@ -73,35 +73,39 @@
 </head>
 
 <body md-no-ink>
-    <md-toolbar ng-controller="LoginController as vm" class="md-primary md-hue-3">
-        <div class="toolbar-height" layout="row">
-            <div class="flex-toolbar align-flex-vertical left-padded" flex="33">
-                Status: {{state.text}}
-                <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id" md-mode="indeterminate"></md-progress-circular>
-            </div>
-            <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="34">
-                <div class="title-font">BHK Lab</div>
-            </div>
-            <div class="flex-toolbar align-flex-right" flex="33">
-                <div ng-controller="RouteController as vm">
-                    <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.showDocumentation">
-                        <a class="unstyled-link" href="#/app">App</a>
-                    </md-button>
-                    <md-button ng-click="vm.changeRoute('documentation')" ng-if="vm.showDocumentation">
-                        <a class="unstyled-link" href="#/documentation">Documentation</a>                     
-                    </md-button>
+    <div ng-controller="RouteController as vm">
+        <md-toolbar class="md-primary md-hue-3" ng-if="vm.showDocumentation">
+            <div class="toolbar-height" layout="row">
+                <div class="flex-toolbar align-flex-vertical left-padded" flex="33">
+                    Status: {{state.text}}
+                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id" md-mode="indeterminate"></md-progress-circular>
                 </div>
-                <div ng-controller="UserManagementController as vm" ng-init="vm.initializeController('userManagement')">
-                    <div ng-if="vm.sharedData.permission === 'admin'">
-                        <md-button ng-click="vm.showCreateUsersDialog()" class="">Create Users</md-button>
-                        <md-button ng-click="vm.showDeleteUsersDialog()" class="">Delete Users</md-button>
+                <div class="flex-toolbar align-flex-vertical align-flex-horizontal" flex="34">
+                    <div class="title-font">BHK Lab</div>
+                </div>
+                <div class="flex-toolbar align-flex-right" flex="33">
+                    <div>
+                        <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.showDocumentation">
+                            <a class="unstyled-link" href="#/app">App</a>
+                        </md-button>
+                        <md-button ng-click="vm.changeRoute('documentation')" ng-if="vm.showDocumentation">
+                            <a class="unstyled-link" href="#/documentation">Documentation</a>
+                        </md-button>
+                    </div>
+                    <div ng-controller="UserManagementController as vm" ng-init="vm.initializeController('userManagement')">
+                        <div ng-if="vm.sharedData.permission === 'admin'">
+                            <md-button ng-click="vm.showCreateUsersDialog()" class="">Create Users</md-button>
+                            <md-button ng-click="vm.showDeleteUsersDialog()" class="">Delete Users</md-button>
+                        </div>
+                    </div>
+                    <div ng-controller="LoginController as vm">
+                        <md-button ng-if="(vm.loggedIn == false && vm.sharedData.guest == false) || vm.sharedData.guest == true" ng-click="vm.showLoginDialog()">Login</md-button>
+                        <md-button ng-if="vm.loggedIn == true && vm.sharedData.guest == false" ng-click="vm.logout()">Logout</md-button>
                     </div>
                 </div>
-                <md-button ng-if="(vm.loggedIn == false && vm.sharedData.guest == false) || vm.sharedData.guest == true" ng-click="vm.showLoginDialog()">Login</md-button>
-                <md-button ng-if="vm.loggedIn == true && vm.sharedData.guest == false" ng-click="vm.logout()">Logout</md-button>
             </div>
-        </div>
-    </md-toolbar>
+        </md-toolbar>
+    </div>
     <div ng-view style="height: 100%;"></div>
 </body>
 

@@ -1,6 +1,14 @@
-<div layout="column">
+<div style="min-width: 900px;" layout="column">
     <div class="doc-intro-background-blue" flex>
-        <h1 class="doc-h1 doc-white-font">Introducing CrosstalkNet</h1>
+    	<div class="top-margin-25" layout="row" layout-align="none center">
+    		<div flex="30"></div>
+    		<div class="doc-h1 doc-white-font" flex="40">Introducing CrosstalkNet</div>
+    		<div flex="30">
+    			<md-button href="#/app" class="doc-app-button">App</md-button>
+    			<a class="unstyled-link">App</a>
+    		</div>
+    	</div>
+        <!-- <h1 class="doc-h1 doc-white-font">Introducing CrosstalkNet</h1> -->
         <div class="full-height" layout="row">
             <div class="doc-content-padding" flex>
                 <div class="full-height" layout="column">
@@ -32,11 +40,32 @@
             </div>
         </div>
     </div>
-    <div class="choosing-data" flex>
-        <div>
+    <div class="choosing-data relative-position" flex>
+        <div class="bottom-margin-75">
             <h1 class="doc-h1 doc-blue-font">Choosing Data</h1>
             <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
                 In order to begin exploring interactions, a network type must be selected via the radio buttons. Once a network type is selected, the corresponding file(s) need to be selected as well.
+            </div>
+            <div layout="row">
+                <div flex="10"></div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/networkType.PNG"></div>
+                <div flex layout="row" layout-align="center center">
+                    <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
+                </div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/chooseFile.PNG"></div>
+                <div flex layout="row" layout-align="center center">
+                    <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
+                </div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/getGenes.PNG"></div>
+                <div flex="10"></div>
+            </div>
+        </div>
+    </div>
+    <div class="doc-intro-background-red" flex>
+        <div>
+            <h1 class="doc-h1 doc-white-font">Uploading Data</h1>
+            <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
+                If a user wants to use their own data, they are able to upload it in the Data sub-tab of the Main Graph tab. A user needs to be logged in for this feature to be enabled.
             </div>
             <div style="min-width: 900px;" layout="row">
                 <div flex="10"></div>
@@ -52,26 +81,5 @@
                 <div flex="10"></div>
             </div>
         </div>
-    </div>
-    <div class="doc-intro-" flex>
-        <h1 class="doc-h1 doc-blue-font">Uploading Data</h1>
-        <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
-            If a user wants to use their own data, they are able to upload it in the Data sub-tab of the Main Graph tab. A user needs to be logged in for this feature to be enabled.
-        </div>
-        <div style="min-width: 900px;" layout="row">
-            <div flex="10"></div>
-            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/networkType.PNG"></div>
-            <div flex layout="row" layout-align="center center">
-                <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
-            </div>
-            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/chooseFile.PNG"></div>
-            <div flex layout="row" layout-align="center center">
-                <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
-            </div>
-            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/getGenes.PNG"></div>
-            <div flex="10"></div>
-        </div>
-        <div>If a user wants to use their own data instead of the test data, they can upload their own file(s). In order to be able to upload file(s), the user needs to be logged in.</div>
-        <div>Following these steps will automatically take you to the query subtab when the genes are finished loading. </div>
     </div>
 </div>
