@@ -1,20 +1,41 @@
 /* app css stylesheet */
 
-.documentation-background {
-    height: 100%;
-    background-image: url("res/images/beam.svg");
-    background-size: 100% 100%;
-    -o-background-size: 100% 100%;
-    -webkit-background-size: 100% 100%;
-    background-size: cover;
+.separator { 
+    display:block;
+    border:none;
+    color:white;
+    height:1px;
+    background:black;
+    background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 350, from(#00609A), to(#fff));
+    margin-bottom: 30px;
+    margin-top: 30px;
 }
+/*
+.choosing-data::after {
+    display: block;
+position: absolute;
+content: '';
+width: 100px;
+height: 100px;
+bottom: -50px;
+left: 50%;
+margin-left: -50px;
+background-color: #dddddd;
+-ms-transform: rotate(45deg);
+-webkit-transform: rotate(45deg);
+transform: rotate(45deg);
+z-index: 1;
+}*/
 
-.documentation-intro-background {
-    height: 50%;
+.doc-intro-background-blue {
     background-color: rgb(0, 96, 154);
 }
 
-.documentation-h1 {
+.doc-intro-background-red {
+    background-color: #f44336;
+}
+
+.doc-h1 {
     /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
     font-family: Roboto, "Helvetica Neue", sans-serif;
     font-size: 36px;
@@ -22,11 +43,10 @@
     font-variant: normal;
     font-weight: 500;
     line-height: 26.4px;
-    color: white;
     text-align: center;
 }
 
-.documentation-h2 {
+.doc-h2 {
     /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
     font-family: Roboto, "Helvetica Neue", sans-serif;
     font-size: 26px;
@@ -35,21 +55,27 @@
     font-weight: 500;
     line-height: 26.4px;
     color: white;
-    text-align: center;
 }
 
-.documentation-content-padding {
+.doc-content-padding {
     padding: 20px 20px 20px 20px;
 }
 
-.dna-background {
-    background-image: url("res/images/dna.svg");
-    height: 115px;
-    width: 97px;
-    background-size: 100% 100%;
-    -o-background-size: 100% 100%;
-    -webkit-background-size: 100% 100%;
-    background-size: cover;
+.doc-blue-font {
+    color: rgb(0, 96, 154);
+}
+
+.doc-white-font {
+    color: white;
+}
+
+.doc-blue-fill {
+    fill: rgb(0, 96, 154);
+}
+
+.dna-pic {
+    height: 173px;
+    width: 146px;
 }
 
 .microscope-background {
@@ -66,10 +92,25 @@
     height: 100%;
 }
 
-.documentation-font {
-    color: white;
+.doc-content-font {
     font-family: Roboto, "Helvetica Neue", sans-serif;
     font-size: 18px;
+}
+
+.doc-get-genes-size {
+    min-height: 200px;
+    min-width: 180px;
+    max-height: 390px;
+    max-width: 350px;
+    height: 100%;
+    width: 100%;
+}
+
+.doc-arrow-size {
+    min-height: 20px;
+    min-width: 60px;
+    height: 60%;
+    width: 60%;
 }
 
 .unstyled-link {

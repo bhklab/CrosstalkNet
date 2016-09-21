@@ -1,58 +1,77 @@
-<div class="documentation-intro-background" style="display: flex; flex-direction: column;">
-    <h1 class="documentation-h1">Introducing CrosstalkNet</h1>
-    <div class="full-height" layout="row">
-        <div class="documentation-content-padding" flex>
-            <div class="full-height" layout="column">
-                <div flex="50">
-                    <h2 class="documentation-h2">App Description</h2>
-                    <p class="left-padded documentation-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
-                </div>
-                <div flex="noshrink" layout="row" layout-align="center center">
-                    <div class="microscope-background">
+<div layout="column">
+    <div class="doc-intro-background-blue" flex>
+        <h1 class="doc-h1 doc-white-font">Introducing CrosstalkNet</h1>
+        <div class="full-height" layout="row">
+            <div class="doc-content-padding" flex>
+                <div class="full-height" layout="column">
+                    <div class="bottom-margin-25" flex="50">
+                        <h2 class="doc-h2 center-text">App Description</h2>
+                        <p class="left-padded doc-content-font doc-white-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
+                    </div>
+                    <div flex="noshrink" layout="row" layout-align="center center">
+                        <object data="res/images/microscope.svg" style="width: 130px; height: 130px;"></object>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="documentation-content-padding" flex>
-            <div class="full-height" layout="column">
-                <div flex="noshrink" layout="row" layout-align="center center">
-                    <div class="dna-background">
+            <div class="doc-content-padding" flex>
+                <div class="full-height" layout="column">
+                    <div flex="noshrink" layout="row" layout-align="center center">
+                        <object data="res/images/dna.svg" class="dna-pic"></object>
                     </div>
-                </div>
-                <div flex="50">
-                    <h2 class="documentation-h2">Requirements</h2>
-                    <p class="left-padded documentation-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
+                    <div layout="row" layout-align="center center" flex="50">
+                        <div>
+                            <h2 class="doc-h2">Requirements</h2>
+                            <ul class="doc-content-font doc-white-font">
+                                <li>Google Chrome</li>
+                                <li>An account to upload files</li>
+                                <li>Nothing else!</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="documentation-intro-background" style="display: flex; flex-direction: column; background-color: red;">
-    <h1 class="documentation-h1">Introducing CrosstalkNet</h1>
-    <div class="full-height" layout="row">
-        <div class="documentation-content-padding" flex>
-            <div class="full-height" layout="column">
-                <div flex="50">
-                    <h2 class="documentation-h2">App Description</h2>
-                    <p class="left-padded documentation-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
+    <div class="choosing-data" flex>
+        <div>
+            <h1 class="doc-h1 doc-blue-font">Choosing Data</h1>
+            <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
+                In order to begin exploring interactions, a network type must be selected via the radio buttons. Once a network type is selected, the corresponding file(s) need to be selected as well.
+            </div>
+            <div style="min-width: 900px;" layout="row">
+                <div flex="10"></div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/networkType.PNG"></div>
+                <div flex layout="row" layout-align="center center">
+                    <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
                 </div>
-                <div flex="noshrink" layout="row" layout-align="center center">
-                    <div class="microscope-background">
-                    </div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/chooseFile.PNG"></div>
+                <div flex layout="row" layout-align="center center">
+                    <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
                 </div>
+                <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/getGenes.PNG"></div>
+                <div flex="10"></div>
             </div>
         </div>
-        <div class="documentation-content-padding" flex>
-            <div class="full-height" layout="column">
-                <div flex="noshrink" layout="row" layout-align="center center">
-                    <div class="dna-background">
-                    </div>
-                </div>
-                <div flex="50">
-                    <h2 class="documentation-h2">Requirements</h2>
-                    <p class="left-padded documentation-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
-                </div>
-            </div>
+    </div>
+    <div class="doc-intro-" flex>
+        <h1 class="doc-h1 doc-blue-font">Uploading Data</h1>
+        <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
+            If a user wants to use their own data, they are able to upload it in the Data sub-tab of the Main Graph tab. A user needs to be logged in for this feature to be enabled.
         </div>
+        <div style="min-width: 900px;" layout="row">
+            <div flex="10"></div>
+            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/networkType.PNG"></div>
+            <div flex layout="row" layout-align="center center">
+                <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
+            </div>
+            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/chooseFile.PNG"></div>
+            <div flex layout="row" layout-align="center center">
+                <object class="doc-blue-fill doc-arrow-size" data="res/images/right-arrow.svg"></object>
+            </div>
+            <div flex="20"><img class="doc-get-genes-size" src="res/images/tutorial/getGenes.PNG"></div>
+            <div flex="10"></div>
+        </div>
+        <div>If a user wants to use their own data instead of the test data, they can upload their own file(s). In order to be able to upload file(s), the user needs to be logged in.</div>
+        <div>Following these steps will automatically take you to the query subtab when the genes are finished loading. </div>
     </div>
 </div>
