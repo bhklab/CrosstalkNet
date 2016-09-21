@@ -19,7 +19,12 @@ angular.module('myApp', [
             'hue-2': '600', // use shade 600 for the <code>md-hue-2</code> class
             'hue-3': 'A700' // use shade A100 for the <code>md-hue-3</code> class
         })
-        .accentPalette('orange');
+        .accentPalette('orange', {
+          'default': '500',
+          'hue-1': '600',
+          'hue-2': '700',
+          'hue-3': '800'
+        });
 });
 
 angular.module('myApp').config(['$routeProvider',
