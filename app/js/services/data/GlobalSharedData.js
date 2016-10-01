@@ -57,6 +57,8 @@
         $rootScope.states = angular.copy(service.states);
         $rootScope.state = service.states.initial;
 
+        service.showDocumentation = false;
+
         service.resetCorrelationFiles = resetCorrelationFiles;
         service.resetMatrixSummary = resetMatrixSummary;
         service.resetGeneList = resetGeneList;

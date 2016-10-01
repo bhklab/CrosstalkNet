@@ -7,7 +7,7 @@
  */
 
 var clone = require('clone');
-var classSuffixes = { nodeColor: 'node-color', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
+var classSuffixes = { nodeColor: 'node-color', nodeShape: 'shape', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
 var nodeSizes = { small: 12, medium: 18, large: 20, source: 40 };
 var fontSizes = { source: 24 };
 var epiColor = 'red';
@@ -31,6 +31,12 @@ var bipartiteStyles = {
                 'color': 'white',
                 'font-family': 'Verdana'
             }
+        },
+        nodeShape: {
+            'selector': '.epi-' + classSuffixes.nodeShape,
+            'style': {
+                'shape': 'circle'
+            }
         }
     },
     stroma: {
@@ -49,6 +55,12 @@ var bipartiteStyles = {
                 'text-outline-width': 1,
                 'color': 'white',
                 'font-family': 'Verdana'
+            }
+        },
+        nodeShape: {
+            'selector': '.stroma-' + classSuffixes.nodeShape,
+            'style': {
+                'shape': 'triangle'
             }
         }
     }
@@ -189,11 +201,12 @@ var communityNode = {
 };
 
 var allRandomFormats = [nodeSize.medium, randomStyles.stripedSourceEpi, randomStyles.stripedSourceStroma, randomStyles.labelBackground, bipartiteStyles.epi.nodeColor,
-    bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement
+    bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement, bipartiteStyles.epi.nodeShape, bipartiteStyles.stroma.nodeShape
 ];
 
 var allConcentricFormats = [nodeSize.medium, nodeSize.source, bipartiteStyles.epi.nodeColor,
-    bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement, fontSize.source
+    bipartiteStyles.epi.labelPlacement, bipartiteStyles.stroma.nodeColor, bipartiteStyles.stroma.labelPlacement, 
+    bipartiteStyles.epi.nodeShape, bipartiteStyles.stroma.nodeShape, fontSize.source
 ];
 
 /**
@@ -255,7 +268,7 @@ function getDynamicColor(property, min, max) {
             return '#ff9900';
         }
 
-        return 'mapData(' + property + ',' + min + ',' + max + ',' + "#ff9900" + "," + "#ffd699" + ")";
+        return 'mapData(' + property + ',' + min + ',' + max + ',' + "#ffb3ff" + "," + "#e600e6" + ")";
     } else {
         if (Number(min) == Number(max)) {
             return 'black';

@@ -40,6 +40,7 @@
     <script src="js/controllers/degreeExplorerTab/DegreeExplorerController.js"></script>
     <script src="js/controllers/communityExplorerTab/CEQueryController.js"></script>
     <script src="js/controllers/communityExplorerTab/CommunityExplorerController.js"></script>
+    <script src="js/controllers/documentation/DocumentationController.js"></script>
     <script src="js/controllers/commonControllers/LoginController.js"></script>
     <script src="js/controllers/commonControllers/RouteController.js"></script>
     <script src="js/controllers/commonControllers/UserManagementController.js"></script>
@@ -74,7 +75,7 @@
 
 <body md-no-ink>
     <div ng-controller="RouteController as vm">
-        <md-toolbar class="md-primary md-hue-3" ng-if="vm.showDocumentation">
+        <md-toolbar class="md-primary md-hue-3" ng-if="vm.sharedData.showDocumentation">
             <div class="toolbar-height" layout="row">
                 <div class="flex-toolbar align-flex-vertical left-padded" flex="33">
                     Status: {{state.text}}
@@ -85,10 +86,10 @@
                 </div>
                 <div class="flex-toolbar align-flex-right" flex="33">
                     <div>
-                        <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.showDocumentation">
+                        <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.sharedData.showDocumentation">
                             <a class="unstyled-link" href="#/app">App</a>
                         </md-button>
-                        <md-button ng-click="vm.changeRoute('documentation')" ng-if="vm.showDocumentation">
+                        <md-button ng-click="vm.changeRoute('documentation')" ng-if="vm.sharedData.showDocumentation">
                             <a class="unstyled-link" href="#/documentation">Documentation</a>
                         </md-button>
                     </div>
