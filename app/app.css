@@ -9,6 +9,11 @@
     font-size: 16px;
     float: right;
     margin-right: 20px;
+    display: flex;
+}
+
+.doc-app-button span {
+    margin: auto;
 }
 
 .separator {
@@ -35,7 +40,6 @@
     -ms-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
-    z-index: -1;
     background-color: #f44336;
 }
 
@@ -56,6 +60,8 @@
     font-weight: 500;
     line-height: 26.4px;
     text-align: center;
+    z-index: 50;
+    position: relative;
 }
 
 .doc-h2 {
@@ -86,14 +92,14 @@
 }
 
 .dna-pic {
-    height: 173px;
-    width: 146px;
+    height: 219px;
+    width: 175px;
 }
 
 .microscope-background {
     background-image: url("res/images/microscope.svg");
-    height: 130px;
-    width: 130px;
+    height: 200px;
+    width: 200px;
     background-size: 100% 100%;
     -o-background-size: 100% 100%;
     -webkit-background-size: 100% 100%;

@@ -2,7 +2,7 @@
 
 (function() {
     angular.module('myApp.controllers').controller('RouteController', [
-        '$location',
+        '$location', '$scope', 'GlobalSharedData',
         RouteController
     ]);
 
@@ -11,12 +11,14 @@
      * @desc Controller for changing routes.
      * @memberOf controllers
      */
-    function RouteController($location) {
+    function RouteController($location, $scope, GlobalSharedData) {
         var vm = this;
         vm.ctrl = "route";
 
+        vm.sharedData = GlobalSharedData.data;
+
         vm.changeRoute = changeRoute;
-        vm.showDocumentation = $location.path().endsWith('app');
+        vm.sharedData.showDocumentation = $location.path().endsWith('app');
 
         /**
          * @summary Changes the route link name in the toolbar
@@ -27,11 +29,11 @@
          */
         function changeRoute(route) {
             if (route == 'app') {
-                vm.showDocumentation = true;
+                vm.sharedData.showDocumentation = true;
                 $location.path('/app');
                 $location.replace();
             } else if (route == 'documentation') {
-                vm.showDocumentation = false;
+                vm.sharedData.showDocumentation = false;
                 $location.path('/documentation');
                 $location.replace();
             }
