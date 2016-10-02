@@ -4,8 +4,8 @@
             <div flex="30"></div>
             <div class="doc-h1 doc-white-font" flex="40">Introducing CrosstalkNet</div>
             <div flex="30">
-                <a href="res/docs/crosstalknetdocumentation.pdf" target="_blank">Download</a>
-                <md-button ng-click="vm.changeRoute()" href="#/app" class="doc-app-button">App</md-button>
+                <md-button ng-click="vm.changeRoute()" href="#/app" t class="doc-app-button">App</md-button>
+                <md-button href="res/docs/crosstalknetdocumentation.pdf" target="_blank" class="doc-app-button">Documentation</md-button>
             </div>
         </div>
         <!-- <h1 class="doc-h1 doc-white-font">Introducing CrosstalkNet</h1> -->
@@ -17,7 +17,7 @@
                         <p class="left-padded doc-content-font doc-white-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
                     </div>
                     <div flex="noshrink" layout="row" layout-align="center center">
-                        <object data="res/images/microscope1.svg" style="width: 200px; height: 200px;"></object>
+                        <object data="res/images/microscope1.svg" class="microscope-pic"></object>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
         </div>
     </div>
     <div class="doc-intro-background-red" flex>
-        <div>
+        <div class="bottom-margin-25">
             <h1 class="doc-h1 doc-white-font">Uploading Data</h1>
             <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
                 If a user wants to use their own data, they are able to upload it in the Data sub-tab of the Main Graph tab. A user needs to be logged in for this feature to be enabled.
@@ -82,8 +82,8 @@
             </div>
         </div>
     </div>
-    <div class="doc-intro-background-blue" flex>
-        <div>
+    <div class="doc-zig-background" flex>
+        <div class="bottom-margin-25">
             <h1 class="doc-h1 doc-white-font">Main Graph</h1>
             <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
                 Here is a video guide showing the basic usage of the Main Graph tab.
@@ -99,5 +99,27 @@
             </div>
         </div>
     </div>
+    <div class="" flex>
+        <div class="bottom-margin-25">
+            <h1 class="doc-h1 doc-blue-font">Interaction Explorer</h1>
+            <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
+                Here is a video guide showing the basic usage of the Interaction Explorer tab.
+            </div>
+            <div style="min-width: 900px;" layout="row">
+                <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div>
+                <div flex layout="row" layout-align="center center">
+                    <video width="400" controls>
+                        <source src="res/videos/tutorial/interaction_explorer.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div>
+            </div>
+        </div>
+    </div>
     <div>DNA by Viktor Minuvi from the Noun Project</div>
+    <div>direction by Pham Thi Dieu Linh from the Noun Project</div>
 </div>
