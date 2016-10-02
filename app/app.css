@@ -5,6 +5,20 @@ background-color: #00609A;
 background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2MScgaGVpZ2h0PScxMjInIHZpZXdCb3g9JzAgMCA1IDEwJz4KCTxwYXRoIGQ9J00wLDBsNSw1bC01LDVtLTEsLTZsMSwxbC0xLDFNNCwtMWw2LDZsLTYsNicgZmlsbC1vcGFjaXR5PScwJyBzdHJva2U9JyMwMDkxRUEnIHN0cm9rZS13aWR0aD0nMicvPgo8L3N2Zz4=);
 }
 
+.doc-honeycomb-background {
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NiIgaGVpZ2h0PSIxMDAiPgo8cmVjdCB3aWR0aD0iNTYiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA2MDlBIj48L3JlY3Q+CjxwYXRoIGZpbGw9IiMwMDYwOUEiIGQ9Ik0yOCA2NkwwIDUwTDAgMTZMMjggMEw1NiAxNkw1NiA1MEwyOCA2NkwyOCAxMDAiIHN0cm9rZT0iIzAwOTdBNyIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CjxwYXRoIGQ9Ik0yOCAwTDI4IDM0TDAgNTBMMCA4NEwyOCAxMDBMNTYgODRMNTYgNTBMMjggMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAyODhEMSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+Cjwvc3ZnPg==");
+}
+
+#trianglePath1 {
+    fill: #3498db;
+    stroke: #3498db;
+}
+
+#trianglePath2 {
+    fill: #2072a7;
+    stroke: #2072a7;
+}
+
 .doc-app-button {
     border-radius: 0px;
     border-color: #FF9800;
@@ -48,11 +62,15 @@ background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53M
     background-color: #f44336;
 }
 
-.doc-intro-background-blue {
+.doc-background-blue {
     background-color: #00609A;
 }
 
-.doc-intro-background-red {
+.doc-background-light-blue {
+    background-color: #0091EA;
+}
+
+.doc-background-red {
     background-color: #f44336;
 }
 
