@@ -1,5 +1,5 @@
 <div ng-controller="DocumentationController as vm" style="min-width: 900px;" layout="column">
-    <div class="doc-intro-background-blue" flex>
+    <div class="doc-background-blue" flex>
         <div class="top-margin-25" layout="row" layout-align="none center">
             <div flex="30"></div>
             <div class="doc-h1 doc-white-font" flex="40">Introducing CrosstalkNet</div>
@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <div class="doc-intro-background-red" flex>
+    <div class="doc-background-red" flex>
         <div class="bottom-margin-25">
             <h1 class="doc-h1 doc-white-font">Uploading Data</h1>
             <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
@@ -82,7 +82,7 @@
             </div>
         </div>
     </div>
-    <div class="doc-zig-background" flex>
+    <div class="doc-background-light-blue" flex>
         <div class="bottom-margin-25">
             <h1 class="doc-h1 doc-white-font">Main Graph</h1>
             <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
@@ -99,10 +99,11 @@
             </div>
         </div>
     </div>
-    <div class="" flex>
+    <object data="res/images/curved_divider.svg" class="doc-background-blue"></object>
+    <div class="doc-background-blue" flex>
         <div class="bottom-margin-25">
-            <h1 class="doc-h1 doc-blue-font">Interaction Explorer</h1>
-            <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
+            <h1 class="doc-h1 doc-white-font">Interaction Explorer</h1>
+            <div class="full-height doc-content-font doc-white-font center-text bottom-margin-25">
                 Here is a video guide showing the basic usage of the Interaction Explorer tab.
             </div>
             <div style="min-width: 900px;" layout="row">
@@ -112,6 +113,27 @@
                 <div flex layout="row" layout-align="center center">
                     <video width="400" controls>
                         <source src="res/videos/tutorial/interaction_explorer.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="" flex>
+        <div class="bottom-margin-25">
+            <h1 class="doc-h1 doc-blue-font">Path Existence Checker</h1>
+            <div class="full-height doc-content-font doc-blue-font center-text bottom-margin-25">
+                Here is a video guide showing the basic usage of the Path Existence Checker tab.
+            </div>
+            <div style="min-width: 900px;" layout="row">
+                <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div>
+                <div flex layout="row" layout-align="center center">
+                    <video width="400" controls>
+                        <source src="res/videos/tutorial/path_existence_checker.mp4" type="video/mp4">
                     </video>
                 </div>
                 <div flex layout="row" layout-align="center center">
