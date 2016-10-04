@@ -31,10 +31,12 @@ angular.module('myApp').config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
         when('/documentation', {
-            templateUrl: 'partials/documentation.html'
+            templateUrl: 'partials/documentation.html',
+            css: 'app.css'
         }).
         when('/app', {
-            templateUrl: 'partials/app.html'
+            templateUrl: 'partials/app.html',
+            css: 'app.css'
         }).
         otherwise({
             redirectTo: '/documentation'
