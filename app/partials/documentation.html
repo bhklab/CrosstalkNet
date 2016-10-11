@@ -13,11 +13,12 @@
             <div class="doc-content-padding" flex>
                 <div class="full-height" layout="column">
                     <div class="bottom-margin-25" flex="50">
-                        <h2 class="doc-h2 center-text">App Description</h2>
+                        <h2 class="doc-h2 center-text doc-white-font">App Description</h2>
                         <p class="left-padded doc-content-font doc-white-font"> Crosstalk Net is a data mining app focused on examining the interactions between tumor epithelial and stromal cells. It has multiple utilities that allow for exploring different levels of neighbours, determining if there are paths between two genes of interest, and finding out what genes are highly connected.</p>
                     </div>
                     <div flex="noshrink" layout="row" layout-align="center center">
-                        <object data="res/images/microscope1.svg" class="microscope-pic"></object>
+                        <!-- <object data="res/images/microscope1.svg" class="microscope-pic"></object> -->
+                        <object data="res/images/network.svg" class="network-pic"></object>
                     </div>
                 </div>
             </div>
@@ -28,7 +29,7 @@
                     </div>
                     <div layout="row" layout-align="center center" flex="50">
                         <div>
-                            <h2 class="doc-h2">Requirements</h2>
+                            <h2 class="doc-h2 doc-white-font">Requirements</h2>
                             <ul class="doc-content-font doc-white-font">
                                 <li>Google Chrome</li>
                                 <li>An account to upload files</li>
@@ -106,13 +107,31 @@
                 Here is a video guide showing the basic usage of the Main Graph tab.
             </div>
             <div style="min-width: 900px;" layout="row">
-                <div flex></div>
-                <div flex layout="row" layout-align="center center">
+                <div flex="10">
+                </div>
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-white-font">Features</h2>
+                    <ul class="doc-content-font doc-white-font">
+                        <li>Investigate multiple genes at once</li>
+                        <li>View first neighbours</li>
+                        <li>View second neighbours</li>
+                        <li>Filter interactions</li>
+                        <li>Locate genes in graph</li>
+                        <li>Download interactions</li>
+                    </ul>
+                </div>
+                <div flex="40" layout="row" layout-align="center center">
                     <video width="400" controls>
                         <source src="res/videos/tutorial/main_graph.mp4" type="video/mp4">
                     </video>
                 </div>
-                <div flex></div>
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-white-font">Usage</h2>
+                    <div class="doc-content-font doc-white-font">
+                        Intended to view clusters of first and second neighbours for multiple genes of interest. Can show if genes have interactors in common and provides a focused subnetwork of the overall network that has possibly millions of interactions.
+                    </div>
+                </div>
+                <div flex="10"></div>
             </div>
         </div>
     </div>
@@ -124,17 +143,29 @@
                 Here is a video guide showing the basic usage of the Interaction Explorer tab.
             </div>
             <div style="min-width: 900px;" layout="row">
-                <div flex layout="row" layout-align="center center">
-                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                <div flex="10">
                 </div>
-                <div flex layout="row" layout-align="center center">
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-white-font">Features</h2>
+                    <ul class="doc-content-font doc-white-font">
+                        <li>Focus on one gene of interest</li>
+                        <li>View infinite levels of neighbours</li>
+                        <li>Locate genes in graph</li>
+                        <li>Download interactions</li>
+                    </ul>
+                </div>
+                <div flex="40" layout="row" layout-align="center center">
                     <video width="400" controls>
                         <source src="res/videos/tutorial/interaction_explorer.mp4" type="video/mp4">
                     </video>
                 </div>
-                <div flex layout="row" layout-align="center center">
-                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-white-font">Usage</h2>
+                    <div class="doc-content-font doc-white-font">
+                        Intended to explore potential pathways from a single gene of interest through its neighbours. At each level of neighbours, a different gene is selected and its corresponding neighbours will be added to the chain of neighbours.
+                    </div>
                 </div>
+                <div flex="10"></div>
             </div>
         </div>
     </div>
@@ -145,17 +176,34 @@
                 Here is a video guide showing the basic usage of the Path Existence Checker tab.
             </div>
             <div style="min-width: 900px;" layout="row">
-                <div flex layout="row" layout-align="center center">
-                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                <div flex="10">
                 </div>
-                <div flex layout="row" layout-align="center center">
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-light-blue-font">Features</h2>
+                    <ul class="doc-content-font doc-light-blue-font">
+                        <li>Find all paths between 2 genes</li>
+                        <li>Sort by various columns</li>
+                        <li>Download list of paths</li>
+                    </ul>
+                </div>
+                <!--                 <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div> -->
+                <div flex="40" layout="row" layout-align="center center">
                     <video width="400" controls>
                         <source src="res/videos/tutorial/path_existence_checker.mp4" type="video/mp4">
                     </video>
                 </div>
-                <div flex layout="row" layout-align="center center">
-                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-light-blue-font">Usage</h2>
+                    <div class="doc-content-font doc-light-blue-font">
+                        Retrieves the path between an epi and stroma gene if one exists. Retrieves all paths between two stroma genes, or two epi genes.
+                    </div>
                 </div>
+                <div flex="10"></div>
+                <!--                 <div flex layout="row" layout-align="center center">
+                    <object data="res/images/path1.svg" style="width: 200px; height: 200px;"></object>
+                </div> -->
             </div>
         </div>
     </div>
@@ -166,6 +214,16 @@
                 Here is a video guide showing the basic usage of the Degree Explorer tab.
             </div>
             <div style="min-width: 900px;" layout="row">
+                <div flex="10">
+                </div>
+                <div flex="20" layout="column" layout-align="center center">
+                    <h2 class="doc-h2 doc-white-font">Features</h2>
+                    <ul class="doc-content-font doc-white-font">
+                        <li>View top genes ordered by degree</li>
+                        <li>View genes having specified degree or higher</li>
+                        <li>Download list of paths</li>
+                    </ul>
+                </div>
                 <div flex layout="row" layout-align="center center">
                 </div>
                 <div flex layout="row" layout-align="center center">
@@ -180,4 +238,5 @@
     </div>
     <div>DNA by Viktor Minuvi from the Noun Project</div>
     <div>direction by Pham Thi Dieu Linh from the Noun Project</div>
+    <div>Brain Network by Bob Holzer from the Noun Project</div>
 </div>

@@ -106,8 +106,8 @@
 }
 
 .doc-h1 {
-    /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    /*font-family: Roboto, "Helvetica Neue", sans-serif;*/
     font-size: 36px;
     font-style: normal;
     font-variant: normal;
@@ -118,6 +118,15 @@
     position: relative;
 }
 
+.network-background {
+    display: block;
+  text-indent: -9999px;
+  width: 500%;
+  height: 500%;
+  background: url(res/images/network.svg);
+  background-size: 500% 500%;
+}
+
 .doc-h2 {
     /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
     font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -126,7 +135,6 @@
     font-variant: normal;
     font-weight: 500;
     line-height: 26.4px;
-    color: white;
 }
 
 .doc-content-padding {
@@ -153,6 +161,11 @@
 .microscope-pic {
     height: 200px;
     width: 200px;
+}
+
+.network-pic {
+    height: 300px;
+    width: 300px;
 }
 
 .microscope-background {
