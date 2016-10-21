@@ -90,8 +90,8 @@
          * @memberOf controllers.MGQueryController
          */
         function refreshGraph(filter) {
-            GraphConfigService.destroyGraph(vm);
             vm.clearLocatedGene();
+            GraphConfigService.destroyGraph(vm);
             MGSharedData.resetWTM(vm);
             getConfigForGraph(filter);
         }

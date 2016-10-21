@@ -265,7 +265,7 @@ function getDynamicWidth(property, min, max) {
 function getDynamicColor(property, min, max) {
     if (min < 0) {
         if (Number(min) == Number(max)) {
-            return '#ff9900';
+            return '#e600e6';
         }
 
         return 'mapData(' + property + ',' + min + ',' + max + ',' + "#ffb3ff" + "," + "#e600e6" + ")";
