@@ -43,7 +43,8 @@
          * to specify along with the request.
          */
         function post(url, data) {
-            GlobalSharedData.data.guest ? data.token = 'guest' : data.token = $cookies.get('token');
+            // GlobalSharedData.data.guest ? data.token = 'guest' : data.token = $cookies.get('token');
+            data.token = $cookies.get('token');
             return $http.post(SERVER_URL + url, data).then(function(result) {
                 return result.data;
             });

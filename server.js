@@ -32,9 +32,10 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(function(req, res, next) {
-    if (req.body.token == null) {
+    console.log(req.body.token);    
+    if (req.body.token == null && req.body.token != 'guest') {
         if (req.body.user == null) {
-            res.send({ error: "Failed to authenticate." });
+            res.send({ error: "Failed to authenticate. Please try logging in again." });
         } else {
             authenticationUtils.getUser(req.body.user.name,
                 function(user) {
@@ -44,9 +45,7 @@ app.use(function(req, res, next) {
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
                             res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-                            var token = jwt.sign({ user: Date.now() }, app.get('secretKey'), {
-                                expiresIn: '168h' // expires in 7 days
-                            });
+                            var token = jwt.sign({ user: Date.now() }, app.get('secretKey'));
 
                             authenticationUtils.addTokenToUser(user, token);
 
@@ -56,9 +55,7 @@ app.use(function(req, res, next) {
                                 token: token
                             });
                         }
-
                     }
-
                 });
         }
     } else if (req.body.token == 'guest') {
@@ -67,14 +64,14 @@ app.use(function(req, res, next) {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
             if (err || authenticationUtils.getUserFromToken(req.body.token) == null) {
                 console.log(err);
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                return res.json({ success: false, message: 'Failed to authenticate token. Please try logging in again.' });
             } else {
                 next();
             }
         });
     } else {
         console.log("Null token sent");
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
+        return res.json({ success: false, message: 'Failed to authenticate token. Please try logging in again.' });
     }
 });
 

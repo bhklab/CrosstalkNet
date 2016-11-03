@@ -6,7 +6,7 @@
         RouteController
     ]);
 
-        /**
+    /**
      * @namespace RouteController
      * @desc Controller for changing routes.
      * @memberOf controllers
@@ -38,5 +38,12 @@
                 $location.replace();
             }
         }
+
+        $scope.$on("$locationChangeStart", function(event, next, current) {
+            console.info("location changing to:" + next);
+            if (next.endsWith('documentation')) {
+                vm.sharedData.showDocumentation = false;
+            }
+        });
     }
 })();

@@ -17,7 +17,7 @@ communityInteractions <- c()
 tryCatch(communityInteractions <- readRDS(paste(filePath, fileName, sep="")),
            error = function(cond) {printMessageAndQuit("Failed to read the uploaded file. Please make sure that it is an RData file containing a data table.")}) 
 
-# Checks to see if the read object is a dgCMatrix
+# Checks to see if the read object is a data frame
 if (class(communityInteractions) != 'data.frame') {
 	printMessageAndQuit("The specified file is not a data.frame.")
 }

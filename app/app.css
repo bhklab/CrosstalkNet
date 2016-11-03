@@ -1,5 +1,19 @@
 /* app css stylesheet */
 
+.doc-link:hover {
+    color: #FF9800;
+}
+
+.doc-link {
+    text-decoration: none;
+}
+
+.doc-sleek-divider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 145, 234, 0.75), rgba(0, 0, 0, 0));
+}
+
 .doc-castle-divider {
     position: relative;
 }
@@ -105,6 +119,10 @@
     background-color: #f44336;
 }
 
+.doc-font-family {
+    font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
+}
+
 .doc-h1 {
     font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
     /*font-family: Roboto, "Helvetica Neue", sans-serif;*/
@@ -129,7 +147,7 @@
 
 .doc-h2 {
     /*font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;*/
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
     font-size: 26px;
     font-style: normal;
     font-variant: normal;
@@ -183,7 +201,7 @@
 }
 
 .doc-content-font {
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
     font-size: 18px;
 }
 

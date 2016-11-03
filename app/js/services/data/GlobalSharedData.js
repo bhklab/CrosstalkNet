@@ -96,6 +96,12 @@
             resetCorrelationFiles();
             resetMatrixSummary();
             resetGeneList();
+
+            for (var prop in globalDataModel) {
+                if (prop != 'clearAllData') {
+                    service.data[prop] = globalDataModel[prop];    
+                }
+            }
         }
 
         return service;
