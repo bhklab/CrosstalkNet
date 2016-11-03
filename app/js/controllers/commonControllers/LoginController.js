@@ -9,7 +9,7 @@
         LoginController
     ]);
 
-        /**
+    /**
      * @namespace LoginController
      * @desc Controller for the login dialog.
      * @memberOf controllers
@@ -19,7 +19,10 @@
         var vm = this;
         vm.ctrl = "login";
 
-        $rootScope.tokenSet = false;
+        if ($rootScope.tokenSet != true) {
+            $rootScope.tokenSet = false;    
+        }
+        
         vm.user = { name: null, password: null, token: null };
 
         vm.sharedData = GlobalSharedData.data;
@@ -39,20 +42,28 @@
          * @memberOf controllers.LoginController
          */
         function guestLogin() {
+            // vm.user = { name: null, password: null, token: null };
+            // vm.loggedIn = true;
+            // $rootScope.tokenSet = true;
+            // vm.sharedData.guest = true;
+            // vm.sharedData.reloadMatrixFileList = true;
+            // vm.sharedData.reloadCommunityFileList = true;
+            // $mdDialog.hide('');
+
+            $cookies.put('token', 'guest');
             vm.user = { name: null, password: null, token: null };
-            vm.loggedIn = true;
-            $rootScope.tokenSet = true;
+            login(vm.user);
+            
             vm.sharedData.guest = true;
-            vm.sharedData.reloadMatrixFileList = true;
-            vm.sharedData.reloadCommunityFileList = true;
             $mdDialog.hide('');
         }
 
         function logout() {
             vm.loggedIn = false;
             vm.sharedData.guest = false;
-            $rootScope.tokenSet = false;
+            // $rootScope.tokenSet = false;
             $cookies.remove('token');
+            GlobalSharedData.resetGlobalData();
         }
 
         /**
@@ -61,12 +72,15 @@
          *
          * @memberOf controllers.LoginController
          */
-        function login() {
-            RESTService.post('login', { user: vm.user })
+        function login(user) {
+            RESTService.post('login', { user: user})
                 .then(function(data) {
                     vm.user = { name: null, password: null, token: null };
+                    $mdDialog.hide('');
+
                     if (!ValidationService.checkServerResponse(data)) {
-                        vm.loggedIn = false;
+                        logout();
+                        showLoginDialog();
                         return;
                     } else {
                         var now = new Date();
@@ -81,7 +95,7 @@
                         vm.sharedData.guest = false;
                         vm.sharedData.reloadMatrixFileList = true;
                         vm.sharedData.reloadCommunityFileList = true;
-                        $mdDialog.hide('');
+                        
                     }
                 });
         }
@@ -94,10 +108,11 @@
          * @memberOf controllers.LoginController
          */
         function checkToken() {
-            if ($cookies.get('token') != null && $cookies.get('token') != 'null') {
-                $rootScope.tokenSet = true;
-                login();
+            if ($cookies.get('token') != null && $cookies.get('token') != 'null' && $cookies.get('token') != 'guest') {
+                // $rootScope.tokenSet = true;
+                login({ name: null, password: null, token: null });
             } else {
+                console.log("-----checkToken triggered-------");
                 showLoginDialog();
             }
         }
@@ -109,6 +124,7 @@
          */
         function showLoginDialog(ev) {
             vm.sharedData.guest = false;
+            $mdDialog.hide('');
             $mdDialog.show({
                 controller: function() { this.vm = vm },
                 controllerAs: 'ctrl',
@@ -128,12 +144,28 @@
          * @memberOf controllers.LoginController
          */
         $rootScope.$watch('tokenSet', function(newValue, oldValue) {
-            if (newValue == false && oldValue == true) {
-                $cookies.remove('token');
-                showLoginDialog();
+            if (newValue == false && oldValue == true && vm.sharedData.permission != 0) {
+                // $cookies.remove('token');
+                // showLoginDialog();
+                // console.log("------Tokenset Watch Triggered------");
+                // logout();
+                // showLoginDialog();
             }
         });
 
-        checkToken();
+        $scope.$on("$locationChangeStart", function(event, next, current) {
+            console.info("location changing to:" + next);
+            $mdDialog.hide('');
+            if (next.endsWith('documentation')) {
+                $mdDialog.hide('');
+            } else if ($cookies.get('token') == 'guest' || $cookies.get('token') == null) {
+                logout();
+                showLoginDialog();
+                // $rootScope.tokenSet = false;
+            } else {
+                // logout();
+                checkToken();
+            }
+        });
     }
 })();

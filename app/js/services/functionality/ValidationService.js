@@ -18,6 +18,7 @@
         var service = {};
         service.checkServerResponse = checkServerResponse;
 
+
         /**
          * @summary Checks to see if a server response has
          * an error message attatched to it. If so, it prints
@@ -32,8 +33,12 @@
                 alert(data.error);
                 return false;
             } else if (data.success == false) {
-                alert(data.message);
-                $rootScope.tokenSet = false;
+                alert(data.message);    
+                
+                if ($rootScope.tokenSet == true) {
+                    $rootScope.tokenSet = false;    
+                }
+                
             } else if (data.fileStatus) {
                 alert(data.fileStatus);
             } else {

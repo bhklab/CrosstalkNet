@@ -253,9 +253,11 @@
         }, function(newValue, oldValue) {
             if (newValue == true) {
                 QueryService.getFileList(['tumor', 'normal', 'delta']).then(function(result) {
-                    vm.fileList.normal = result.fileList.normal;
-                    vm.fileList.tumor = result.fileList.tumor;
-                    vm.fileList.delta = result.fileList.delta;
+                    if (result.fileList != null) {
+                        vm.fileList.normal = result.fileList.normal;
+                        vm.fileList.tumor = result.fileList.tumor;
+                        vm.fileList.delta = result.fileList.delta;
+                    }
                 });
 
                 QueryService.getUserPermission().then(function(result) {
