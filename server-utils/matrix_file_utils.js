@@ -20,9 +20,9 @@ var availableMatrixCache = null;
 const TYPES = require('./Models/matrix_file_cache').TYPES;
 const SUB_TYPES = require('./Models/matrix_file_cache').SUB_TYPES;
 
-var BASE_UPLOAD_DIRECTORY = 'R_Scripts/uploaded_matrices/';
-var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/proprietary_matrices/';
-var BASE_FAKE_DIRECTORY = 'R_Scripts/fake_matrices/'
+var BASE_UPLOAD_DIRECTORY = 'r_scripts/uploaded_matrices/';
+var BASE_PROPRIETARY_DIRECTORY = 'r_scripts/proprietary_matrices/';
+var BASE_FAKE_DIRECTORY = 'r_scripts/fake_matrices/'
 
 /**
  * @summary Updates the in-memory cache of avaialble files.

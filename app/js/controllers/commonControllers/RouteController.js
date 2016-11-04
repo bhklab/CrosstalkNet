@@ -44,7 +44,7 @@
             if (next.endsWith('documentation')) {
                 vm.sharedData.showDocumentation = false;
             } else if (current.endsWith('app')) {
-                vm.showDocumentation.showDocumentation = true;
+                vm.sharedData.showDocumentation = true;
             }
         });
     }
