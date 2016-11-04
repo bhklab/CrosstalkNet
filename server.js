@@ -32,7 +32,6 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(function(req, res, next) {
-    console.log(req.body.token);    
     if (req.body.token == null && req.body.token != 'guest') {
         if (req.body.user == null) {
             res.send({ error: "Failed to authenticate. Please try logging in again." });
@@ -40,17 +39,19 @@ app.use(function(req, res, next) {
             authenticationUtils.getUser(req.body.user.name,
                 function(user) {
                     if (!user) {
-                        res.json({ success: false, message: 'Authentication failed. User not found.' });
+                        res.json({ login: false, message: 'Authentication failed. User not found.' });
                     } else if (user) {
                         if (!bcrypt.compareSync(req.body.user.password, user.password)) {
-                            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+                            res.json({ login: false, message: 'Authentication failed. Wrong password.' });
                         } else {
-                            var token = jwt.sign({ user: Date.now() }, app.get('secretKey'));
+                            var token = jwt.sign({ user: Date.now() }, app.get('secretKey'), {
+                                expiresIn: '168h'
+                            });
 
                             authenticationUtils.addTokenToUser(user, token);
 
                             res.json({
-                                success: true,
+                                login: true,
                                 message: 'Enjoy your token!',
                                 token: token
                             });
@@ -63,15 +64,23 @@ app.use(function(req, res, next) {
     } else if (req.body.token != null) {
         jwt.verify(req.body.token, app.get('secretKey'), function(err, decoded) {
             if (err || authenticationUtils.getUserFromToken(req.body.token) == null) {
+                var message = '';
+
                 console.log(err);
-                return res.json({ success: false, message: 'Failed to authenticate token. Please try logging in again.' });
+                if (err.expiredAt != null) {
+                    message = 'Failed to authenticate token. Expired: ' + err.expiredAt + '. Please try logging in again.';
+                } else {
+                    message = 'Failed to authenticate token. Please try logging in again.';
+                }
+
+                return res.json({ login: false, message: message });
             } else {
                 next();
             }
         });
     } else {
         console.log("Null token sent");
-        return res.json({ success: false, message: 'Failed to authenticate token. Please try logging in again.' });
+        return res.json({ login: false, message: 'Failed to authenticate token. Please try logging in again.' });
     }
 });
 
@@ -79,7 +88,7 @@ app.post('/get-user-permission', handlerUtils.getUserPermission);
 
 app.post('/login', function(req, res) {
     res.json({
-        success: true,
+        login: true,
         message: 'Token Validated!'
     });
 });
