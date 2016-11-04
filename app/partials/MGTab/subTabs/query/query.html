@@ -2,7 +2,7 @@
     <div class="md-padding">
         <div>
             <div layout="row">
-                <div class="flex-toolbar align-flex-vertical" flex="75">
+                <div class="display-flex align-flex-vertical" flex="75">
                     <md-autocomplete ng-class="[vm.ctrl, vm.ctrl + 'gene-input', 'no-margin-bottom', 'full-width']" md-no-cache='true' md-selected-item="vm.selectedGOI" md-search-text="vm.searchGOI" md-selected-item-change="vm.addGeneOfInterest(item)" md-items="item in vm.querySearch(vm.searchGOI, 'geneList') | degreeFilter : vm.minDegree.first" md-item-text="item.display" md-min-length="2" placeholder="Choose Genes" ng-disabled="vm.GOIState != vm.GOIStates.initial">
                         <md-item-template>
                             <span md-highlight-text="vm.searchTextFirst" md-highlight-flags="^i">{{item.display}}</span>
@@ -15,7 +15,7 @@
                         Click Reset To Add More Genes
                     </md-tooltip>
                 </div>
-                <div class="flex-toolbar align-flex-vertical align-flex-right" flex="25">
+                <div class="display-flex align-flex-vertical align-flex-right" flex="25">
                     <md-button class="md-raised md-primary small-button" ng-click="vm.resetGeneSelection()" ng-disabled="vm.GOIState == vm.GOIStates.initial || state == states.loadingGraph || state == states.loadingConfig">Reset</md-button>
                 </div>
             </div>

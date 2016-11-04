@@ -148,8 +148,8 @@
                 // $cookies.remove('token');
                 // showLoginDialog();
                 // console.log("------Tokenset Watch Triggered------");
-                // logout();
-                // showLoginDialog();
+                logout();
+                showLoginDialog();
             }
         });
 

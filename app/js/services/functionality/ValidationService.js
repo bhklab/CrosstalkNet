@@ -9,14 +9,17 @@
 (function() {
     angular.module("myApp.services").factory('ValidationService', ValidationService);
 
-        /**
+    /**
      * @namespace ValidationService
      * @desc Factory for checking for errors in server responses.
      * @memberOf services
      */
-    function ValidationService($rootScope) {
+    function ValidationService($rootScope, $cookies, $interval) {
         var service = {};
+        var reset = 3;
         service.checkServerResponse = checkServerResponse;
+
+
 
 
         /**
@@ -30,15 +33,24 @@
          */
         function checkServerResponse(data) {
             if (data.error) {
-                alert(data.error);
-                return false;
-            } else if (data.success == false) {
-                alert(data.message);    
-                
-                if ($rootScope.tokenSet == true) {
-                    $rootScope.tokenSet = false;    
+                if (reset == 3) {
+                    alert(data.error);
+                    console.log("ERROR");
+                    $interval(function() { reset++; }, 1000, 3);
                 }
+
                 
+                return false;
+            } else if (data.login == false) {
+                if (reset == 3) {
+                    alert(data.message);
+                    reset = 0;
+                    $interval(function() { reset++; }, 1000, 3);
+
+                    if ($rootScope.tokenSet == true) {
+                        $rootScope.tokenSet = false;
+                    }
+                }
             } else if (data.fileStatus) {
                 alert(data.fileStatus);
             } else {
