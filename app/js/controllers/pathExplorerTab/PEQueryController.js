@@ -1,23 +1,23 @@
 'use strict';
 /**
- * Controller for the QUERY sub-tab PATH EXISTENCE CHECKER tab.
+ * Controller for the QUERY sub-tab PATH EXPLORER tab.
  * @namespace controllers
  */
 (function() {
     angular.module('myApp.controllers').controller('PEQueryController', [
         '$scope',
         '$rootScope',
-        'GlobalControls', 'GlobalSharedData', 'QueryService', 'PathExistenceControls',
+        'GlobalControls', 'GlobalSharedData', 'QueryService', 'PathExplorerControls',
         'PESharedData',
         PEQueryController
     ]);
 
     /**
      * @namespace PEQueryController
-     * @desc Controller for the QUERY sub-tab in the PATH EXISTENCE CHECKER tab.
+     * @desc Controller for the QUERY sub-tab in the PATH EXPLORER tab.
      * @memberOf controllers
      */
-    function PEQueryController($scope, $rootScope, GlobalControls, GlobalSharedData, QueryService, PathExistenceControls,
+    function PEQueryController($scope, $rootScope, GlobalControls, GlobalSharedData, QueryService, PathExplorerControls,
         PESharedData) {
         var vm = this;
         vm.scope = $scope;
@@ -27,7 +27,7 @@
         vm.setPathExplorerGene = setPathExplorerGene;
 
         vm.sharedData = GlobalSharedData.data;
-        PathExistenceControls.setMethods(vm);
+        PathExplorerControls.setMethods(vm);
         GlobalControls.setMethodsSideBar(vm);
 
         /**
@@ -80,7 +80,7 @@
         }
 
         /**
-         * @summary Resets the data shown within the PATH EXISTENCE CHECKER
+         * @summary Resets the data shown within the PATH EXPLORER
          * tab and obtains all paths between the currently selected genes from
          * the server.
          *

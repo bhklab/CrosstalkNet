@@ -1,22 +1,22 @@
 'use strict';
 /**
- * Controller for the PATH EXISTENCE CHECKER tab.
+ * Controller for the PATH EXPLORER tab.
  * @namespace controllers
  */
 (function() {
-    angular.module('myApp.controllers').controller('PathExistenceController', [
+    angular.module('myApp.controllers').controller('PathExplorerController', [
         'GlobalControls', 'GlobalSharedData', 'PESharedData', 'ExportService',
-        PathExistenceController
+        PathExplorerController
     ]);
 
     /**
-     * @namespace PathExistenceController
-     * @desc Controller for the PATH EXISTENCE CHECKER tab. Its main
+     * @namespace PathExplorerController
+     * @desc Controller for the PATH EXPLORER tab. Its main
      * purpose is to allow the sharing of data throughout the different 
      * controls and tables in the tab.
      * @memberOf controllers
      */
-    function PathExistenceController(GlobalControls, GlobalSharedData, PESharedData, ExportService) {
+    function PathExplorerController(GlobalControls, GlobalSharedData, PESharedData, ExportService) {
         var vm = this;
 
         vm.exportAllPathsToCSV = ExportService.exportAllPathsToCSV;
@@ -30,7 +30,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
-         * @memberOf controllers.PathExistenceController
+         * @memberOf controllers.PathExplorerController
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
@@ -42,7 +42,7 @@
          * @summary Exports the HTML table with the specified ID to a csv file.
          *
          * @param {String} tableID The ID of the table to export to csv.
-         * @memberOf controllers.PathExistenceController
+         * @memberOf controllers.PathExplorerController
          */
         function exportTableToCSV(tableID) {
             $("." + tableID).tableToCSV();

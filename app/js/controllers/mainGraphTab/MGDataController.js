@@ -141,6 +141,13 @@
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
                 QueryService.deleteMatrixFile(toDelete);
+
+                if (vm.sharedData.correlationFileActual.normal.name == file.name ||
+                    vm.sharedData.correlationFileActual.tumor.name == file.name ||
+                    vm.sharedData.correlationFileActual.delta.name == file.name) {
+                    GlobalControls.resetInputFieldsGlobal();
+                    GlobalSharedData.resetGlobalData();
+                }
             }, function() {});
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");

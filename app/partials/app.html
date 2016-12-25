@@ -40,8 +40,8 @@
                     </section>
                 </md-content>
             </md-tab>
-            <md-tab ng-if="dataLoaded" label="Path Existence Viewer">
-                <md-content ng-controller="PathExistenceController as vm" ng-init="vm.initializeController('pathExistence')">
+            <md-tab ng-if="dataLoaded" label="Path Explorer">
+                <md-content ng-controller="PathExplorerController as vm" ng-init="vm.initializeController('pathExplorer')">
                     <section layout="row">
                         <div static-include="partials/PETab/sideBar.html">
                         </div>

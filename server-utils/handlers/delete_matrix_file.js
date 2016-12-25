@@ -8,6 +8,7 @@ function handler(req, res) {
     console.log("delete file: %j", req.body.file);
 
     file = matrixFileUtils.getRequestedFile({ arbitrary: req.body.file }, user)
+    
     if (file == null) {
         res.send({ fileStatus: "!!!!Failed to delete file: " })
         return;

@@ -20,9 +20,9 @@
         vm.ctrl = "login";
 
         if ($rootScope.tokenSet != true) {
-            $rootScope.tokenSet = false;    
+            $rootScope.tokenSet = false;
         }
-        
+
         vm.user = { name: null, password: null, token: null };
 
         vm.sharedData = GlobalSharedData.data;
@@ -53,7 +53,7 @@
             $cookies.put('token', 'guest');
             vm.user = { name: null, password: null, token: null };
             login(vm.user);
-            
+
             vm.sharedData.guest = true;
             $mdDialog.hide('');
         }
@@ -64,6 +64,11 @@
             // $rootScope.tokenSet = false;
             $cookies.remove('token');
             GlobalSharedData.resetGlobalData();
+            GlobalSharedData.resetPermission();
+
+            QueryService.getUserPermission().then(function(result) {
+                vm.sharedData.permission = result.permission;
+            });
         }
 
         /**
@@ -73,7 +78,7 @@
          * @memberOf controllers.LoginController
          */
         function login(user) {
-            RESTService.post('login', { user: user})
+            RESTService.post('login', { user: user })
                 .then(function(data) {
                     vm.user = { name: null, password: null, token: null };
                     $mdDialog.hide('');
@@ -95,7 +100,7 @@
                         vm.sharedData.guest = false;
                         vm.sharedData.reloadMatrixFileList = true;
                         vm.sharedData.reloadCommunityFileList = true;
-                        
+
                     }
                 });
         }
