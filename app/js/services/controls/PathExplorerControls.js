@@ -1,18 +1,18 @@
 'use strict';
 /**
- * Path existence checker factory. Contains functions that are used for 
+ * Path explorer factory. Contains functions that are used for 
  * maniupulating and resetting data within the PEQueryController.
  * @namespace services
  */
 (function() {
-    angular.module('myApp.services').factory('PathExistenceControls', PathExistenceControls);
+    angular.module('myApp.services').factory('PathExplorerControls', PathExplorerControls);
 
     /**
-     * @namespace PathExistenceControls
+     * @namespace PathExplorerControls
      * @desc Factory for maniupulating and resetting data in the PEQueryController;
      * @memberOf services
      */
-    function PathExistenceControls() {
+    function PathExplorerControls() {
         var service = {};
 
         service.setMethods = setMethods;
@@ -25,7 +25,7 @@
          */
         function setMethods(vm) {
             /**
-             * @summary Sets either the path existence checker source
+             * @summary Sets either the path explorer checker source
              * or target gene depending on which autocomplete control
              * the request came from.
              *

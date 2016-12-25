@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Shared data factory for PATH EXISTENCE CHEKCER tab. Allows for sharing of data
+ * Shared data factory for PATH EXPLORER tab. Allows for sharing of data
  * between controllers within the tab.
  * @namespace services
  */
@@ -44,7 +44,7 @@
         tumor.query.order = "-firstEdge.tumor"; 
 
         /** Object representing variables to be available between the various controllers within
-         * the PATH EXISTENCE CHEKCER tab.
+         * the PATH EXPLORER tab.
          */
         var withinTabModel = {
             pathSourceCached: null,

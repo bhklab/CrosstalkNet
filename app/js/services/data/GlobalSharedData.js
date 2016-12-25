@@ -63,6 +63,7 @@
         service.resetMatrixSummary = resetMatrixSummary;
         service.resetGeneList = resetGeneList;
         service.resetGlobalData = resetGlobalData;
+        service.resetPermission = resetPermission;
 
         /**
          * @summary Resets the global variable representing the currently selected
@@ -98,10 +99,17 @@
             resetGeneList();
 
             for (var prop in globalDataModel) {
-                if (prop != 'clearAllData') {
+                if (prop != 'clearAllData' && prop != 'permission') {
                     service.data[prop] = globalDataModel[prop];    
                 }
             }
+        }
+
+        /**
+         * @summary Resets the permission of the user.
+         */
+        function resetPermission() {
+            service.data.permission = 0;
         }
 
         return service;

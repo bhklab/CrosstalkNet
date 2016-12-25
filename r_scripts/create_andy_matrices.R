@@ -2,11 +2,13 @@ library(psych)
 library(methods)
 library(Matrix)
 
-setwd('/mnt/work1/users/home2/aadam/R_Scripts')
+# setwd('/mnt/work1/users/home2/aadam/R_Scripts')
 
 load('Andy-ScaledDataSets.RData')
 
 ProbeGeneMap <- read.csv("028004_D_AA_20140813.txt",stringsAsFactors = F, sep = "\t")
+
+saveRDS(ProbeGeneMap, "genemap.RData")
 
 CorMatrix.Normal <- cor(t(allmat.by.ctype.by.ES$No$Epi),t(allmat.by.ctype.by.ES$No$Str))
 CorMatrix.BrP <- cor(t(allmat.by.ctype.by.ES$BrP$Epi),t(allmat.by.ctype.by.ES$BrP$Str))
@@ -41,6 +43,16 @@ CorMatrix.Delta.Positive.FDRadj.05 <- CorMatrix.Delta.Positive
 
 CorMatrix.Delta.Negative.FDRadj.05 <- CorMatrix.Delta.Negative
 
+saveRDS(CorMatrix.Normal.FDRadj.05, file='normal.correlation.RData')
+
+saveRDS(CorMatrix.BrP.FDRadj.05, file='breastPositive.correlation.RData')
+
+saveRDS(CorMatrix.BrN.FDRadj.05, file='breastNegative.correlation.RData')
+
+saveRDS(CorMatrix.Delta.Positive.FDRadj.05, file='deltaPositive.correlation.RData')
+
+saveRDS(CorMatrix.Delta.Negative.FDRadj.05, file='deltaNegative.correlation.RData')
+
 
 timeDif <- proc.time() - ptm 
 write("Significance Test Took: ", stderr())
@@ -48,34 +60,30 @@ write(timeDif, stderr())
 
 ptm <- proc.time()
 
-CorMatrix.Normal.FDRadj.05[NormalES.padj.FDR > 0.05] <- 0
-CorMatrix.Normal.FDRadj.05 <- as(CorMatrix.Normal.FDRadj.05, "sparseMatrix")
+# CorMatrix.Normal.FDRadj.05[NormalES.padj.FDR > 0.05] <- 0
+# CorMatrix.Normal.FDRadj.05 <- as(CorMatrix.Normal.FDRadj.05, "sparseMatrix")
 
-CorMatrix.BrP.FDRadj.05[BrPES.padj.FDR > 0.05] <- 0
-CorMatrix.BrP.FDRadj.05 <- as(CorMatrix.BrP.FDRadj.05, "sparseMatrix")
+# CorMatrix.BrP.FDRadj.05[BrPES.padj.FDR > 0.05] <- 0
+# CorMatrix.BrP.FDRadj.05 <- as(CorMatrix.BrP.FDRadj.05, "sparseMatrix")
 
-CorMatrix.BrN.FDRadj.05[BrNES.padj.FDR > 0.05] <- 0
-CorMatrix.BrN.FDRadj.05 <- as(CorMatrix.BrN.FDRadj.05, "sparseMatrix")
+# CorMatrix.BrN.FDRadj.05[BrNES.padj.FDR > 0.05] <- 0
+# CorMatrix.BrN.FDRadj.05 <- as(CorMatrix.BrN.FDRadj.05, "sparseMatrix")
 
-CorMatrix.Delta.Positive.FDRadj.05[Delta.Positive.padj.FDR > 0.05] <- 0
-CorMatrix.Delta.Positive.FDRadj.05 <- as(CorMatrix.Delta.Positive.FDRadj.05, "sparseMatrix")
+# CorMatrix.Delta.Positive.FDRadj.05[Delta.Positive.padj.FDR > 0.05] <- 0
+# CorMatrix.Delta.Positive.FDRadj.05 <- as(CorMatrix.Delta.Positive.FDRadj.05, "sparseMatrix")
 
-CorMatrix.Delta.Negative.FDRadj.05[Delta.Negative.padj.FDR > 0.05] <- 0
-CorMatrix.Delta.Negative.FDRadj.05 <- as(CorMatrix.Delta.Negative.FDRadj.05, "sparseMatrix")
+# CorMatrix.Delta.Negative.FDRadj.05[Delta.Negative.padj.FDR > 0.05] <- 0
+# CorMatrix.Delta.Negative.FDRadj.05 <- as(CorMatrix.Delta.Negative.FDRadj.05, "sparseMatrix")
 
 
-timeDif <- proc.time() - ptm 
-write("Overwriting Matrices With Zeros Took: ", stderr())
-write(timeDif, stderr())
+# timeDif <- proc.time() - ptm 
+# write("Overwriting Matrices With Zeros Took: ", stderr())
+# write(timeDif, stderr())
 
-ptm <- proc.time()
+# ptm <- proc.time()
 
-saveRDS(CorMatrix.Normal.FDRadj.05, file='normal.correlation.05.RData')
-
-saveRDS(CorMatrix.BrP.FDRadj.05, file='breastPositive.correlation.05.RData')
-
-saveRDS(CorMatrix.BrN.FDRadj.05, file='breastNegative.correlation.05.RData')
-
-saveRDS(CorMatrix.Delta.Positive.FDRadj.05, file='deltaPositive.correlation.05.RData')
-
-saveRDS(CorMatrix.Delta.Negative.FDRadj.05, file='deltaNegative.correlation.05.RData')
+saveRDS(NormalES.padj.FDR, file="normal_indices.RData")
+saveRDS(BrPES.padj.FDR, file="br_positive_indices.RData")
+saveRDS(BrNES.padj.FDR, file="br_negative_indices.RData")
+saveRDS(Delta.Positive.padj.FDR, file="delta_positive_indices.RData")
+saveRDS(Delta.Negative.padj.FDR, file="delta_negative_indices.RData")

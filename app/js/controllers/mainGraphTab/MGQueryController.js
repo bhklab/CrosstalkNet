@@ -28,6 +28,7 @@
         vm.refreshGraph = refreshGraph;
         vm.removeGene = removeGene;
         vm.removeAllGenes = removeAllGenes;
+        vm.backToFirstNeighbours = backToFirstNeighbours;
 
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
@@ -103,6 +104,10 @@
          * @memberOf controllers.MGQueryController
          */
         function getConfigForGraph(filter) {
+            if (!vm.validateFilterInput()) {
+                return;
+            }
+
             QueryService.getMainGraph(vm, filter).then(function(result) {
                 if (result.data == null) {
                     return;
@@ -127,6 +132,12 @@
 
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
             });
+        }
+
+
+        function backToFirstNeighbours() {
+            vm.returnToFirstNeighboursFilter();
+            refreshGraph(true);
         }
 
         /**
