@@ -148,12 +148,16 @@
             $mdDialog.show(confirm).then(function() {
                 QueryService.deleteMatrixFile(toDelete);
 
-                if (vm.sharedData.correlationFileActual.normal.name == file.name ||
-                    vm.sharedData.correlationFileActual.tumor.name == file.name ||
-                    vm.sharedData.correlationFileActual.delta.name == file.name) {
+                if ((vm.sharedData.correlationFileActual.normal != null &&
+                        vm.sharedData.correlationFileActual.normal == file.name) ||
+                    (vm.sharedData.correlationFileActual.tumor != null &&
+                        vm.sharedData.correlationFileActual.tumor.name == file.name) ||
+                    (vm.sharedData.correlationFileActual.delta != null &&
+                        vm.sharedData.correlationFileActual.delta.name == file.name)) {
                     GlobalControls.resetInputFieldsGlobal();
                     GlobalSharedData.resetGlobalData();
                 }
+
             }, function() {});
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
@@ -245,8 +249,7 @@
                 GlobalControls.resetInputFieldsGlobal();
                 GlobalSharedData.resetGlobalData();
                 initializeVariables();
-                vm.sdWithinTab.selectedTab = 0;
-                $rootScope.dataLoaded = false;
+                vm.sharedData.reloadMatrixFileList = true;
             });
         }
 
