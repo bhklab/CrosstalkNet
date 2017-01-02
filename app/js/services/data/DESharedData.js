@@ -9,7 +9,9 @@
 
     /**
      * @namespace DESharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function DESharedData() {
@@ -55,6 +57,8 @@
          *
          * @param {Object} vm A view model whose within-tab shared data will
          * be reset to the initial state.
+         *
+         * @memberOf services.DESharedData
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {

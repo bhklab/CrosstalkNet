@@ -9,7 +9,9 @@
 
     /**
      * @namespace PathExplorerControls
+     *
      * @desc Factory for maniupulating and resetting data in the PEQueryController;
+     *
      * @memberOf services
      */
     function PathExplorerControls() {
@@ -22,6 +24,8 @@
          * view model. This helps keep controllers slim.
          *
          * @param {Object} vm A view model from a controller.
+         *
+         * @memberOf services.PathExplorerControls
          */
         function setMethods(vm) {
             /**

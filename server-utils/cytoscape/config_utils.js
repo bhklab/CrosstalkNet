@@ -29,7 +29,7 @@ function createConfig() {
             selector: 'node',
             style: {
                 'content': 'data(id)',
-                'font-size': '10px',
+                'font-size': '11px',
                 'color': '#7B1FA2'
             }
         }, {

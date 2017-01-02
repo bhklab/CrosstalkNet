@@ -11,7 +11,9 @@
 
     /**
      * @namespace IELayoutController
+     *
      * @desc Controller for the LAYOUT sub-tab.
+     *
      * @memberOf controllers
      */
     function IELayoutController(IESharedData, GlobalControls, GraphConfigService) {
@@ -24,6 +26,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.IELayoutController
          */
         function initializeController(ctrl) {

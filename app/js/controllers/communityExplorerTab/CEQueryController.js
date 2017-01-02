@@ -14,7 +14,9 @@
 
     /**
      * @namespace CEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the COMMUNITY EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService,
@@ -48,6 +50,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.CEQueryController
          */
         function initializeController(ctrl) {
@@ -131,6 +134,7 @@
          * @param {Event} ev The event associated with the click. This is used to prevent
          * propogation.
          * @param {Object} file The file that is to be deleted.
+         *
          * @memberOf controllers.CEQueryController
          */
         function deleteConfirm(ev, file) {
@@ -197,7 +201,7 @@
          * @summary Watches the display variable and redraws the graph when switching
          * from the Tables view to the Graph view.
          *
-         * @memberOf controllers.IEQueryController
+         * @memberOf controllers.CEQueryController
          */
         $scope.$watch(function() {
             if (vm.sdWithinTab) {

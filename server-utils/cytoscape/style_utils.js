@@ -27,7 +27,7 @@ var bipartiteStyles = {
                 'text-halign': 'center',
                 'text-valign': 'center',
                 'text-outline-color': epiColor,
-                'text-outline-width': 1,
+                'text-outline-width': 1.1,
                 'color': 'white',
                 'font-family': 'Verdana'
             }
@@ -52,7 +52,7 @@ var bipartiteStyles = {
                 'text-halign': 'center',
                 'text-valign': 'center',
                 'text-outline-color': stromaColor,
-                'text-outline-width': 1,
+                'text-outline-width': 1.1,
                 'color': 'white',
                 'font-family': 'Verdana'
             }
@@ -274,7 +274,7 @@ function getDynamicColor(property, min, max) {
             return 'black';
         }
 
-        return 'mapData(' + property + ',' + min + ',' + max + ',' + "#f2f2f2" + "," + "black" + ")";
+        return 'mapData(' + property + ',' + min + ',' + max + ',' + "#a6a6a6" + "," + "black" + ")";
     }
 }
 

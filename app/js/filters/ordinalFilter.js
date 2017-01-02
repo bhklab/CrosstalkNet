@@ -8,6 +8,7 @@
 
     /**
      * @desc Ordinal number filter.
+     *
      * @memberOf filters
      */
     function ordinal() {

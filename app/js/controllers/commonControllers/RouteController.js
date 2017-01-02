@@ -8,7 +8,9 @@
 
     /**
      * @namespace RouteController
+     *
      * @desc Controller for changing routes.
+     *
      * @memberOf controllers
      */
     function RouteController($location, $scope, GlobalSharedData) {
@@ -26,6 +28,8 @@
          * active.
          *
          * @param {String} route The route that is now active
+         *
+         * @memberOf controllers.RouteController
          */
         function changeRoute(route) {
             if (route == 'app') {
@@ -39,6 +43,12 @@
             }
         }
 
+        /**
+         * @summary Watches for changes in the address and changes the visibility of 
+         * the main toolbar accordingly.
+         *
+         * @memberOf controllers.RouteController
+         */
         $scope.$on("$locationChangeStart", function(event, next, current) {
             console.info("location changing to:" + next);
             if (next.endsWith('documentation')) {

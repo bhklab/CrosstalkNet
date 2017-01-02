@@ -11,7 +11,9 @@
 
     /**
      * @namespace GlobalControls
+     *
      * @desc Factory for manipulating controls.
+     *
      * @memberOf services
      */
     function GlobalControls($http, $rootScope, $timeout, GraphConfigService) {
@@ -42,13 +44,14 @@
         service.clickElement = clickElement;
 
         service.setMethodsSideBar = setMethodsSideBar;
-        service.setMethodsWholeTab = setMethodsWholeTab;
 
         /**
          * @summary Attaches a group of functions to the given
          * view model. This helps keep controllers slim.
          *
          * @param {Object} vm A view model from a controller.
+         *
+         * @memberOf services.GlobalControls
          */
         function setMethodsSideBar(vm) {
             vm.querySearch = querySearch;
@@ -135,6 +138,7 @@
          * @return {Array} An array of cytoscape.js nodes that
          * are not parent nodes.
          *
+         * @memberOf services.GlobalControls
          */
         function getAllVisibleGenes(cy) {
             var result = [];
@@ -149,6 +153,8 @@
 
         /**
          * @summary Resets all autocomplete controls throughout the app.
+         *
+         * @memberOf services.GlobalControls
          */
         function resetInputFieldsGlobal() {
             angular.forEach(angular.element("md-autocomplete" + " input"), function(value, key) {
@@ -170,6 +176,8 @@
          *
          * @param {String} tabName The name of a tab. This is used to only 
          * clear the autocomplete controls within that tab.
+         *
+         * @memberOf services.GlobalControls
          */
         function resetInputFieldsLocal(tabName, extraClass) {
             angular.forEach(angular.element("md-autocomplete." + tabName + extraClass + " input"), function(value, key) {
@@ -201,6 +209,8 @@
          *
          * @param {String} selector A valid CSS selector used
          * to locate an element.
+         *
+         * @memberOf services.GlobalControls
          */
         function focusElement(selector) {
             $timeout(function() {
@@ -215,6 +225,8 @@
          *
          * @param {String} selector A valid CSS selector used
          * to locate an element.
+         *
+         * @memberOf services.GlobalControls
          */
         function clickElement(selector) {
             $timeout(function() {
@@ -223,20 +235,33 @@
             }, 40);
         }
 
+        /**
+         * @summary Closes the edge inspector.
+         *
+         * @param {Object} vm The view model of the controller from which this
+         * method is being called.
+         *
+         * @memberOf services.GlobalControls
+         */
         function closeEdgeInspector(vm) {
             vm.sdWithinTab.selectedEdge = {};
         }
 
+        /**
+         * @summary Switches between showing the graph and table view for the tabs which
+         * contain graphs.
+         *
+         * @param {Object} vm The view model of the controller from which this
+         * method is being called.
+         *
+         * @memberOf services.GlobalControls
+         */
         function changeDisplay(vm) {
             if (vm.sdWithinTab.display == vm.displayModes.graph) {
                 vm.sdWithinTab.display = vm.displayModes.table;
             } else {
                 vm.sdWithinTab.display = vm.displayModes.graph;
             }
-        }
-
-        function setMethodsWholeTab(vm) {
-
         }
 
         return service;

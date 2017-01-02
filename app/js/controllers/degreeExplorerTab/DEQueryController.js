@@ -13,7 +13,9 @@
 
     /**
      * @namespace DEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the DEGREE EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function DEQueryController($scope, $rootScope, GlobalSharedData, QueryService, DESharedData) {
@@ -46,6 +48,15 @@
             vm.minDegreeSlider = 0;
         }
 
+        /**
+         * @summary Retrievies a list of the top genes for epi and stroma from the server
+         * based on the specified query.
+         *
+         * @param {String} filterType The type of query to perform. This is a choice between top 
+         * and min.
+         *
+         * @memberOf controllers.DEQueryController
+         */
         function getTopGenes(filterType) {
             $rootScope.state = $rootScope.states.loadingDegreeExplorer;
             DESharedData.resetWTM(vm);

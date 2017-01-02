@@ -12,7 +12,9 @@
 
     /**
      * @namespace TableService
+     *
      * @desc Factory for getting interactions to be displayed in tables.
+     *
      * @memberOf services
      */
     function TableService() {
@@ -33,6 +35,8 @@
          * @param {String} matType The type of network to get the interaction for.
          * This is required especially for delta networks in order to determine
          * which of the network types to show the interaction strength for.
+         *
+         * @memberOf services.TableService
          */
         function getInteractionViaDictionary(vm, source, target, matType) {
             if (vm.sdWithinTab.edgeDictionary == null) {
@@ -58,6 +62,8 @@
          * @return {Array} An array of objects. These objects have 2 properties, epi
          * and stroma, whose values are both arrays containing the gene names
          * for a certain neighbour level of neighbours.
+         *
+         * @memberOf services.TableService
          */
         function getNeighboursGeneral(vm, highestLevel) {
             var neighbours = [];
@@ -83,6 +89,8 @@
          * genes and one for stroma genes. These arrays contain strings
          * which are the gene names of nodes relevant to a certain level
          * of neighbours.
+         *
+         * @memberOf services.TableService
          */
         function getNeighboursFromEdges(vm, level) {
             var neighbours = { epi: new Set(), stroma: new Set() };

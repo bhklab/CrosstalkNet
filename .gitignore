@@ -6,3 +6,5 @@ node_modules/*
 R_Scripts/028004_D_AA_20140813.txt
 *.swo
 *.swp
+r_scripts/uploaded_matrices/
+r_scripts/apply_p_value_adjustment.R

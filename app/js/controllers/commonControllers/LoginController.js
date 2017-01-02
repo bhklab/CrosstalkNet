@@ -5,17 +5,19 @@
         '$scope',
         '$rootScope', 'RESTService',
         'ValidationService', 'GlobalSharedData', '$q', '$timeout', '$cookies',
-        '$mdDialog',
+        '$mdDialog', 'QueryService',
         LoginController
     ]);
 
     /**
      * @namespace LoginController
+     *
      * @desc Controller for the login dialog.
+     *
      * @memberOf controllers
      */
     function LoginController($scope, $rootScope, RESTService, ValidationService, GlobalSharedData,
-        $q, $timeout, $cookies, $mdDialog) {
+        $q, $timeout, $cookies, $mdDialog, QueryService) {
         var vm = this;
         vm.ctrl = "login";
 
@@ -42,14 +44,6 @@
          * @memberOf controllers.LoginController
          */
         function guestLogin() {
-            // vm.user = { name: null, password: null, token: null };
-            // vm.loggedIn = true;
-            // $rootScope.tokenSet = true;
-            // vm.sharedData.guest = true;
-            // vm.sharedData.reloadMatrixFileList = true;
-            // vm.sharedData.reloadCommunityFileList = true;
-            // $mdDialog.hide('');
-
             $cookies.put('token', 'guest');
             vm.user = { name: null, password: null, token: null };
             login(vm.user);
@@ -58,6 +52,11 @@
             $mdDialog.hide('');
         }
 
+        /**
+         * @summary Clears variables on the client side thereby logging out the user.
+         *
+         * @memberOf controllers.LoginController
+         */
         function logout() {
             vm.loggedIn = false;
             vm.sharedData.guest = false;
@@ -65,10 +64,6 @@
             $cookies.remove('token');
             GlobalSharedData.resetGlobalData();
             GlobalSharedData.resetPermission();
-
-            QueryService.getUserPermission().then(function(result) {
-                vm.sharedData.permission = result.permission;
-            });
         }
 
         /**
@@ -125,6 +120,8 @@
         /**
          * @summary Displays the login dialog.
          *
+         * @param {Object} ev The click event to be associated with the creation of the dialog.
+         *
          * @memberOf controllers.LoginController
          */
         function showLoginDialog(ev) {
@@ -158,6 +155,12 @@
             }
         });
 
+        /**
+         * @summary Watches for changes in address of the webapp in order to determine 
+         * whether or not to show the login dialog.
+         *
+         * @memberOf controllers.LoginController
+         */
         $scope.$on("$locationChangeStart", function(event, next, current) {
             console.info("location changing to:" + next);
             $mdDialog.hide('');
@@ -166,9 +169,7 @@
             } else if ($cookies.get('token') == 'guest' || $cookies.get('token') == null) {
                 logout();
                 showLoginDialog();
-                // $rootScope.tokenSet = false;
             } else {
-                // logout();
                 checkToken();
             }
         });

@@ -8,6 +8,7 @@
 
     /**
      * @desc Filter for pagination filter.
+     *
      * @memberOf filters
      */
     function startFrom() {

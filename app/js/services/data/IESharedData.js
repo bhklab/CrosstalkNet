@@ -9,12 +9,14 @@
 
     /**
      * @namespace IESharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function IESharedData() {
         var service = {};
-        
+
         /** Object representing variables to be available between the various controllers within
          * the INTERACTION EXPLORER tab.
          */
@@ -35,15 +37,17 @@
         };
 
         service.data = angular.copy(withinTabModel);
-        
+
         service.resetWTM = resetWTM;
-        
+
 
         /**
          * @summary Resets the within tab variables for a given view model. 
          *
          * @param {Object} vm A view model whose within-tab shared data will
          * be reset to the initial state.
+         *
+         * @memberOf services.IESharedData
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {

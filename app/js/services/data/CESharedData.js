@@ -9,7 +9,9 @@
 
     /**
      * @namespace CESharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function CESharedData() {
@@ -43,8 +45,8 @@
             communities: null,
             communityNumbers: null,
             pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) },
-            filtered: { epi : {genes: null, total: 0}, stroma: {genes: null, total: 0} },
-            search: {epi: "", stroma: ""},
+            filtered: { epi: { genes: null, total: 0 }, stroma: { genes: null, total: 0 } },
+            search: { epi: "", stroma: "" },
             selectedCom: null
         };
 
@@ -57,6 +59,8 @@
          *
          * @param {Object} vm A view model whose within-tab shared data will
          * be reset to the initial state.
+         *
+         * @memberOf services.CESharedData
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {

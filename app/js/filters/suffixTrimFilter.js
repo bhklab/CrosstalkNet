@@ -9,6 +9,7 @@
 
     /**
      * @desc Suffix trimming filter.
+     *
      * @memberOf filters
      */
     function suffixTrim() {

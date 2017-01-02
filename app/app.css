@@ -74,10 +74,6 @@ md-dialog md-dialog-actions .md-button {
     align-items: center;
 }
 
-.create-users-dialog {
-    /*width: 50%;*/
-}
-
 .delete-users-dialog {
     max-width: 300px;
 }

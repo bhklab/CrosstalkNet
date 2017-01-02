@@ -11,7 +11,9 @@
 
     /**
      * @namespace ValidationService
+     *
      * @desc Factory for checking for errors in server responses.
+     *
      * @memberOf services
      */
     function ValidationService($rootScope, $cookies, $interval) {
@@ -27,6 +29,7 @@
          * @param {Object} data The data associated with the reponse
          * to a REST call.
          *
+         * @memberOf services.ValidationService
          */
         function checkServerResponse(data) {
             if (data.error) {
@@ -37,7 +40,7 @@
                     $interval(function() { reset++; }, 1000, 2);
                 }
 
-                
+
                 return false;
             } else if (data.login == false) {
                 if (reset == 2) {

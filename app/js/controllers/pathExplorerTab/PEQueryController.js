@@ -14,7 +14,9 @@
 
     /**
      * @namespace PEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the PATH EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function PEQueryController($scope, $rootScope, GlobalControls, GlobalSharedData, QueryService, PathExplorerControls,
@@ -35,6 +37,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.PEQueryController
          */
         function initializeController(ctrl) {
@@ -67,6 +70,7 @@
          * @param {String} which An indicator variable used to determine which autocomplete
          * control the selection came from. This in turn is used to decide between assigning
          * either the source or target gene.
+         *
          * @memberOf controllers.PEQueryController
          */
         function setPathExplorerGene(gene, which) {
