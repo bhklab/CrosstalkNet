@@ -9,7 +9,9 @@
 
     /**
      * @namespace InteractionExplorerControls
+     *
      * @desc Factory for maniupulating and resetting data in the IEQueryController;
+     *
      * @memberOf services
      */
     function InteractionExplorerControls(GraphConfigService, IESharedData, GlobalControls) {
@@ -23,6 +25,8 @@
          * view model. This helps keep controllers slim.
          *
          * @param {Object} vm A view model from a controller.
+         *
+         * @memberOf services.InteractionExplorerControls
          */
         function setMethods(vm) {
             vm.addGeneOfInterest = addGeneOfInterest;
@@ -31,8 +35,6 @@
 
             /**
              * @summary Initializes variables used within the tab for binding to the controls.
-             *
-             * @memberOf controllers.IEQueryController
              */
             function initializeVariables() {
                 vm.zoomGene = null;
@@ -101,5 +103,4 @@
 
         return service;
     }
-
 })();

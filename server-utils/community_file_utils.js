@@ -11,12 +11,12 @@ const DEGREES_FILE_PREFIX = "degrees";
 const fs = require('fs');
 var async = require('async');
 var mkdirp = require('mkdirp');
-var CommunityFileCache = require('./Models/community_file_cache').CommunityFileCache;
-var FileGroup = require('./Models/file_group').FileGroup;
-var File = require('./Models/file_model').File;
+var CommunityFileCache = require('./models/community_file_cache').CommunityFileCache;
+var FileGroup = require('./models/file_group').FileGroup;
+var File = require('./models/file_model').File;
 var availableCommunitiesCache = null;
 
-const TYPES = require('./Models/community_file_cache').TYPES;
+const TYPES = require('./models/community_file_cache').TYPES;
 
 var BASE_UPLOAD_DIRECTORY = 'r_scripts/communities/uploaded/';
 var BASE_PROPRIETARY_DIRECTORY = 'r_scripts/communities/proprietary/';

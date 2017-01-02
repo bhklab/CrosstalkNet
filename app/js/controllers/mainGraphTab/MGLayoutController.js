@@ -11,7 +11,9 @@
 
     /**
      * @namespace MGLayoutController
+     *
      * @desc Controller for the LAYOUT sub-tab.
+     *
      * @memberOf controllers
      */
     function MGLayoutController(GraphConfigService, GlobalControls, MGSharedData) {
@@ -24,6 +26,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.MGLayoutController
          */
         function initializeController(ctrl) {

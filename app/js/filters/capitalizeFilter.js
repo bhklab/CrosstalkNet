@@ -9,6 +9,7 @@
 
     /**
      * @desc Capitalization filter.
+     *
      * @memberOf filters
      */
     function capitalize() {

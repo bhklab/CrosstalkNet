@@ -9,7 +9,9 @@
 
     /**
      * @namespace PESharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function PESharedData() {
@@ -65,6 +67,8 @@
          *
          * @param {Object} vm A view model whose within-tab shared data will
          * be reset to the initial state.
+         *
+         * @memberOf services.PESharedData
          */
         function resetWTM(vm) {
             for (var prop in withinTabModel) {

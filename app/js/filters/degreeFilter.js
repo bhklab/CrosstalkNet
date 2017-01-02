@@ -8,6 +8,7 @@
 
     /**
      * @desc Minimum degree filter.
+     *
      * @memberOf filters
      */
     function degreeFilter() {

@@ -14,8 +14,8 @@ var clone = require("clone");
 var async = require("async");
 var bcrypt = require('bcrypt');
 var jsonfile = require('jsonfile');
-var user = require('../server-utils/Models/user');
-var existingUsersFile = './server-utils/Models/users.json';
+var user = require('../server-utils/models/user');
+var existingUsersFile = './server-utils/models/users.json';
 var newUsersFile = './user_creation/newUsers.json';
 
 var CREATION_NAME_ERROR = "Request contains user with null or non-string name. " +

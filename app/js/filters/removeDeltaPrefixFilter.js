@@ -10,6 +10,7 @@
 
     /**
      * @desc File name trimming filter.
+     *
      * @memberOf filters
      */
     function removeDeltaPrefix() {

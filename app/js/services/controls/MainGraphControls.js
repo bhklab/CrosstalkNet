@@ -10,10 +10,12 @@
 
     /**
      * @namespace MainGraphControls
-     * @desc Factory for maniupulating and resetting data in the MGQueryController;
+     *
+     * @desc Factory for maniupulating and resetting data in the MGQueryController
+     *
      * @memberOf services
      */
-    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls) {
+    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls, $rootScope) {
         var service = {};
 
         service.layouts = [{ display: "Bipartite", value: "preset" }, {
@@ -28,6 +30,8 @@
          * view model. This helps keep controllers slim.
          *
          * @param {Object} vm A view model from a controller.
+         *
+         * @memberOf services.MainGraphControls
          */
         function setMethods(vm) {
             vm.addGeneOfInterest = addGeneOfInterest;
@@ -41,8 +45,6 @@
 
             /**
              * @summary Initializes variables used within the tab for binding to the controls.
-             *
-             * @memberOf controllers.MGQueryController
              */
             function initializeVariables() {
                 vm.selectedItemFirst = null;
@@ -167,6 +169,11 @@
                 vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
             }
 
+            /**
+             * @summmary Checks to see if the inputs to the filters in the main graph
+             * are valid numbers and are in the apporpriate range. Triggers an error if 
+             * an input is invalid.
+             */
             function validateFilterInput() {
                 if (vm.correlationFilterFirst.negativeFilter !== undefined && vm.correlationFilterFirst.positiveFilter !== undefined &&
                     vm.correlationFilterSecond.negativeFilter !== undefined && vm.correlationFilterSecond.positiveFilter !== undefined) {
@@ -206,5 +213,4 @@
 
         return service;
     }
-
 })();

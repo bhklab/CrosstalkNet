@@ -15,7 +15,9 @@
 
     /**
      * @namespace IEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function IEQueryController($scope, $rootScope, GraphConfigService, InteractionExplorerControls, GlobalControls, GlobalSharedData, TableService,
@@ -42,6 +44,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.IEQueryController
          */
         function initializeController(ctrl) {
@@ -56,6 +59,8 @@
          * refreshes the graph otherwise.
          *
          * @param {Object} gene The gene to remove.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function removeGene(gene) {
             vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
@@ -72,6 +77,8 @@
         /**
          * @summary Empties the genes of interest and
          * resets data within the tab.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function removeAllGenes() {
             vm.allowAdditionalGenes = true;
@@ -82,6 +89,8 @@
 
         /**
          * @summary Resets the data within the tab.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function resetDisplayedData() {
             vm.allVisibleGenes = [];
@@ -198,5 +207,4 @@
             }
         });
     }
-
 })();

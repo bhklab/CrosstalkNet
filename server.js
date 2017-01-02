@@ -135,7 +135,6 @@ var server = app.listen(5000, function() {
 
     matrixFileUtils.updateAvailableMatrixCache();
     communityFileUtils.updateAvailableCommunitiesCache();
-    //createSampleUser();
 });
 
 server.timeout = 300000;
