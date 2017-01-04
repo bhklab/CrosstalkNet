@@ -53,11 +53,12 @@
             gettingGeneList: { id: 8, text: "Getting gene list..." },
             gettingAllPaths: { id: 9, text: "Getting all paths between source and target genes..." },
             uploadingFile: { id: 10, text: "Uploading file to server..." },
-            loadingDegreeExplorer: { id: 11, text: "Getting top genes from the server..." }
+            loadingDegreeExplorer: { id: 11, text: "Getting top genes from the server..." },
+            waitingForInputFiles: { id: 12, text: "Please choose input file(s) and click 'Get Genes'..." }
         };
 
         $rootScope.states = angular.copy(service.states);
-        $rootScope.state = service.states.initial;
+        $rootScope.state = service.states.waitingForInputFiles;
 
         service.showDocumentation = false;
 

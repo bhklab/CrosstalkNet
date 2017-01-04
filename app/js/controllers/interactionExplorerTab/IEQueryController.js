@@ -121,6 +121,7 @@
         function getConfigForGraph() {
             QueryService.getInteractionExplorerConfig(vm).then(function(result) {
                 if (result.data == null) {
+                    $rootScope.state = $rootScope.states.initial;
                     return;
                 }
 

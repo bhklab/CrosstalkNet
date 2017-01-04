@@ -23,7 +23,6 @@
     <script type="text/javascript" src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script type="text/javascript" src="bower_components/angular-animate/angular-animate.js"></script>
     <script type="text/javascript" src="bower_components/angular-material/angular-material.js"></script>
-    <script type="text/javascript" src="bower_components/angular-material/angular-route.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-material-data-table/dist/md-data-table.js"></script>
     <script type="text/javascript" src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
@@ -80,7 +79,7 @@
             <div class="toolbar-height" layout="row">
                 <div class="display-flex align-flex-vertical left-padded" flex="33">
                     Status: {{state.text}}
-                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id" md-mode="indeterminate"></md-progress-circular>
+                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id && state.id != states.waitingForInputFiles.id" md-mode="indeterminate"></md-progress-circular>
                 </div>
                 <div class="display-flex align-flex-vertical align-flex-horizontal" flex="34">
                     <div class="title-font">BHK Lab</div>
