@@ -413,6 +413,15 @@ table.md-table th.md-column {
     bottom: 0px;
 }
 
+.disabled {
+    opacity: 0.5;
+    color: grey;
+}
+
+.remove-border:focus {
+    outline: none;
+}
+
 
 /* Disable animations*/
 

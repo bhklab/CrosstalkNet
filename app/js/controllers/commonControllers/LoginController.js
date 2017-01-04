@@ -112,7 +112,7 @@
                 // $rootScope.tokenSet = true;
                 login({ name: null, password: null, token: null });
             } else {
-                console.log("-----checkToken triggered-------");
+                // console.log("-----checkToken triggered-------");
                 showLoginDialog();
             }
         }
@@ -162,7 +162,7 @@
          * @memberOf controllers.LoginController
          */
         $scope.$on("$locationChangeStart", function(event, next, current) {
-            console.info("location changing to:" + next);
+            // console.info("location changing to:" + next);
             $mdDialog.hide('');
             if (next.endsWith('documentation')) {
                 $mdDialog.hide('');

@@ -119,6 +119,7 @@
 
             QueryService.getMainGraph(vm, filter).then(function(result) {
                 if (result.data == null) {
+                    $rootScope.state = $rootScope.states.initial;
                     return;
                 }
 

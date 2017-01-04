@@ -180,7 +180,7 @@
          * @memberOf controllers.UserManagementController
          */
         function deleteUsers() {
-            console.log(vm.usersToDelete);
+            // console.log(vm.usersToDelete);
 
             QueryService.deleteUsers(vm.usersToDelete).then(function(result) {
                 if (!result.result) {

@@ -50,7 +50,7 @@
          * @memberOf controllers.RouteController
          */
         $scope.$on("$locationChangeStart", function(event, next, current) {
-            console.info("location changing to:" + next);
+            // console.info("location changing to:" + next);
             if (next.endsWith('documentation')) {
                 vm.sharedData.showDocumentation = false;
             } else if (current.endsWith('app')) {

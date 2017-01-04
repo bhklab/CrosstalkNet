@@ -156,6 +156,7 @@
                         vm.sharedData.correlationFileActual.delta.name == file.name)) {
                     GlobalControls.resetInputFieldsGlobal();
                     GlobalSharedData.resetGlobalData();
+                    $rootScope.state = $rootScope.states.waitingForInputFiles;
                 }
 
             }, function() {});
@@ -186,6 +187,8 @@
             vm.sharedData.correlationFileActual.tumor = JSON.parse(vm.correlationFileDisplayed.tumor);
             vm.sharedData.correlationFileActual.delta = JSON.parse(vm.correlationFileDisplayed.delta);
             GlobalControls.resetInputFieldsGlobal();
+
+            $rootScope.state = $rootScope.states.initial;
 
             getGeneList();
             getMatrixSummary();
@@ -244,7 +247,7 @@
 
             $rootScope.state = $rootScope.states.uploadingFile;
             FileUploadService.uploadMatrixFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
-                $rootScope.state = $rootScope.states.initial;
+                $rootScope.state = $rootScope.states.waitingForInputFiles;
                 vm.matrixUpload = { normal: null, tumor: null, delta: null };
                 GlobalControls.resetInputFieldsGlobal();
                 GlobalSharedData.resetGlobalData();
@@ -267,6 +270,7 @@
                     GlobalControls.resetInputFieldsGlobal();
                     GlobalSharedData.resetGlobalData();
                     initializeVariables();
+                    $rootScope.state = $rootScope.states.waitingForInputFiles;
                 }
             });
 
