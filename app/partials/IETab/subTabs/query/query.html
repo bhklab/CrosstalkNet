@@ -16,12 +16,12 @@
         Selected Path
         <md-list class="selected-genes-list">
             <md-list-item ng-repeat="gene in vm.genesOfInterest">
-                <span ng-if="$last" ng-click="state.id == states.loadingGraph.id || vm.removeGene(gene)" class="right-margin red-text remove-border" ng-class="{'highlight': state.id != states.loadingGraph.id, 'disabled': state.id == states.loadingGraph.id}">X</span>
+                <span ng-if="$last" ng-click="state.id == states.loadingGraph.id  || state.id == states.loadingConfig.id || vm.removeGene(gene)" class="right-margin red-text remove-border" ng-class="{'highlight': state.id != states.loadingGraph.id && state.id != states.loadingConfig.id, 'disabled': state.id == states.loadingGraph.id || state.id == states.loadingConfig.id}">X</span>
                 <span>{{gene.value}}</span>
             </md-list-item>
         </md-list>
         <md-button class="md-raised md-primary" ng-click="vm.refreshGraph()" ng-disabled="vm.genesOfInterest.length == 0">Get Data</md-button>
-        <md-button class="md-raised md-primary" ng-click="vm.removeAllGenes()" ng-disabled="state.id == states.loadingGraph.id || vm.genesOfInterest.length == 0">Remove All</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.removeAllGenes()" ng-disabled="state.id == states.loadingGraph.id || state.id == states.loadingConfig.id || vm.genesOfInterest.length == 0">Remove All</md-button>
     </div>
     <md-divider></md-divider>
     <div class="md-padding">
