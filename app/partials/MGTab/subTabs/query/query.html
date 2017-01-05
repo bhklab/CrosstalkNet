@@ -24,7 +24,7 @@
             <legend class="fieldset-legend">Selected Genes:</legend>
             <md-list class="selected-genes-list">
                 <md-list-item ng-repeat="gene in vm.genesOfInterest">
-                    <span ng-click="state.id == states.loadingGraph.id || vm.removeGene(gene)" class="right-margin red-text remove-border" ng-class="{'highlight': state.id != states.loadingGraph.id, 'disabled': state.id == states.loadingGraph.id}">X</span>
+                    <span ng-click="state.id == states.loadingGraph.id || vm.removeGene(gene)" class="right-margin red-text remove-border" ng-class="{'highlight': state.id != states.loadingGraph.id && state.id != states.loadingConfig.id, 'disabled': state.id == states.loadingGraph.id || state.id == states.loadingConfig.id}">X</span>
                     <span>{{gene.value}}</span>
                 </md-list-item>
             </md-list>
