@@ -334,20 +334,19 @@
         }
 
         /**
-         * @summary Destroys the graph found in the specified view model.
+         * @summary Destroys the graph found in the specified service.
          *
-         * @param {Object} vm A view model for the controller
-         * that is calling this method. The within-tab shared for this
-         * view model should have a cytoscape object set.
+         * @param {Object} sv A Service object containing the 
+         * a cytoscape object as a data member.
          *
          * @memberOf services.GraphConfigService
          */
-        function destroyGraph(vm) {
-            if (vm.sdWithinTab.cy) {
-                vm.sdWithinTab.cy.destroy();
+        function destroyGraph(sv) {
+            if (sv.data.cy) {
+                sv.data.cy.destroy();
             }
 
-            vm.sdWithinTab.cy = null;
+            sv.data.cy = null;
         }
 
         return service;

@@ -89,8 +89,8 @@
          */
         function resetAllData() {
             vm.initializeVariables();
-            GraphConfigService.destroyGraph(vm);
-            MGSharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(MGSharedData);
+            MGSharedData.resetWTM();
         }
 
         /**
@@ -101,8 +101,8 @@
          */
         function refreshGraph(filter) {
             vm.clearLocatedGene();
-            GraphConfigService.destroyGraph(vm);
-            MGSharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(MGSharedData);
+            MGSharedData.resetWTM();
             getConfigForGraph(filter);
         }
 
@@ -202,7 +202,7 @@
             if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
-                        GraphConfigService.destroyGraph(vm);
+                        GraphConfigService.destroyGraph(MGSharedData);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain");
                     }

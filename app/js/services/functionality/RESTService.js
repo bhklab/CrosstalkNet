@@ -16,8 +16,8 @@
      * @memberOf services
      */
     function RESTService($http, $cookies, GlobalSharedData) {
-        // var SERVER_URL = "http://localhost:5000/";
-        var SERVER_URL = "http://epistroma.pmgenomics.ca/";
+        var SERVER_URL = "http://localhost:5000/";
+        // var SERVER_URL = "http://epistroma.pmgenomics.ca/";
 
         var service = {};
 

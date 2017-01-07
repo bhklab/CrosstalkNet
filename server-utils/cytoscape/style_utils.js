@@ -27,7 +27,7 @@ var bipartiteStyles = {
                 'text-halign': 'center',
                 'text-valign': 'center',
                 'text-outline-color': epiColor,
-                'text-outline-width': 1.1,
+                'text-outline-width': 2,
                 'color': 'white',
                 'font-family': 'Verdana'
             }
@@ -51,8 +51,10 @@ var bipartiteStyles = {
             'style': {
                 'text-halign': 'center',
                 'text-valign': 'center',
+                // 'text-background-color' : 'black',
+                // 'text-background-opacity': 0.6,
                 'text-outline-color': stromaColor,
-                'text-outline-width': 1.1,
+                'text-outline-width': 2,
                 'color': 'white',
                 'font-family': 'Verdana'
             }

@@ -67,7 +67,7 @@ app.use(function(req, res, next) {
                 var message = '';
 
                 console.log(err);
-                if (err.expiredAt != null) {
+                if (err && err.expiredAt != null) {
                     message = 'Failed to authenticate token. Expired: ' + err.expiredAt + '. Please try logging in again.';
                 } else {
                     message = 'Failed to authenticate token. Please try logging in again.';
