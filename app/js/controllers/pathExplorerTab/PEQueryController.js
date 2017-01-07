@@ -96,7 +96,7 @@
                 return;
             }
 
-            PESharedData.resetWTM(vm);
+            PESharedData.resetWTM();
             vm.sdWithinTab.pathTargetCached = vm.pathExplorerTarget.value;
             vm.sdWithinTab.pathSourceCached = vm.pathExplorerSource.value;
             getPathsFromServer();
@@ -130,7 +130,7 @@
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 initializeVariables();
-                PESharedData.resetWTM(vm);
+                PESharedData.resetWTM();
             }
         });
     }

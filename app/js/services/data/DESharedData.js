@@ -55,19 +55,16 @@
          * @summary Resets the within tab variables for a given view model.
          * This is used for the DEGREE EXPLORER tab.
          *
-         * @param {Object} vm A view model whose within-tab shared data will
-         * be reset to the initial state.
-         *
          * @memberOf services.DESharedData
          */
-        function resetWTM(vm) {
+        function resetWTM() {
             for (var prop in withinTabModel) {
                 if (prop == "pagination") {
-                    vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
-                    vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
+                    service.data[prop].epi = angular.copy(paginationModel);
+                    service.data[prop].stroma = angular.copy(paginationModel);
                 }
                 
-                vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
+                service.data[prop] = angular.copy(withinTabModel[prop]);
             }
         }
 

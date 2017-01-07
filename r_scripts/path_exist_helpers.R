@@ -62,6 +62,7 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 			}
 		}
 	} else {
+		write(names(corMatrices), stderr())
 		for (i in names(corMatrices)) {
             neighbours[[i]] = getNeighbours(corMatrices[[i]], source, c())
         }
@@ -72,6 +73,11 @@ findAllPaths <- function(source, target, corMatrices, networkType) {
 
 		if (target %in% names(neighbours[[networkType]])) {
 			paths[1, "firstEdge.weight"] <- neighbours[[networkType]][target]
+
+			if (networkType == 'delta') {
+				paths[1, "firstEdge.normal"] <- neighbours$normal[target]
+				paths[1, "firstEdge.tumor"] <- neighbours$tumor[target]
+			}
 		}
 	}
 

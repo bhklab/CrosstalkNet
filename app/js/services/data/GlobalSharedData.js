@@ -17,7 +17,7 @@
      *
      * @memberOf services
      */
-    function GlobalSharedData($rootScope) {
+    function GlobalSharedData($rootScope, MGSharedData, IESharedData, PESharedData, DESharedData, GraphConfigService) {
         var service = {};
         var networkTypes = { normal: 'normal', tumor: 'tumor', delta: 'delta' };
         var correlationFileModel = { normal: null, tumor: null, delta: null };
@@ -67,6 +67,8 @@
         service.resetGeneList = resetGeneList;
         service.resetGlobalData = resetGlobalData;
         service.resetPermission = resetPermission;
+        service.resetWTModels = resetWTModels;
+        service.resetGraphs = resetGraphs;
 
         /**
          * @summary Resets the global variable representing the currently selected
@@ -123,6 +125,18 @@
          */
         function resetPermission() {
             service.data.permission = 0;
+        }
+
+        function resetWTModels() {
+            MGSharedData.resetWTM();
+            IESharedData.resetWTM();
+            PESharedData.resetWTM();
+            DESharedData.resetWTM();
+        }
+
+        function resetGraphs() {
+            GraphConfigService.destroyGraph(MGSharedData);
+            GraphConfigService.destroyGraph(IESharedData);
         }
 
         return service;

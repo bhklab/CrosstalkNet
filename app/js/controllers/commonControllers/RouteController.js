@@ -56,6 +56,11 @@
             } else if (current.endsWith('app')) {
                 vm.sharedData.showDocumentation = true;
             }
+
+            if (next.endsWith('app')) {
+                GlobalSharedData.resetWTModels();
+                GlobalSharedData.resetGlobalData();
+            }
         });
     }
 })();

@@ -59,7 +59,7 @@
          */
         function getTopGenes(filterType) {
             $rootScope.state = $rootScope.states.loadingDegreeExplorer;
-            DESharedData.resetWTM(vm);
+            DESharedData.resetWTM();
             vm.sdWithinTab.filterType = filterType;
             if (filterType == "top") {
                 vm.sdWithinTab.filterAmount = vm.topXSlider;
@@ -88,7 +88,7 @@
             return vm.sharedData.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                DESharedData.resetWTM(vm);
+                DESharedData.resetWTM();
                 initializeVariables();
             }
         });

@@ -267,8 +267,10 @@
             },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
+                    GlobalSharedData.resetGraphs();
                     GlobalControls.resetInputFieldsGlobal();
                     GlobalSharedData.resetGlobalData();
+                    GlobalSharedData.resetWTModels();
                     initializeVariables();
                     $rootScope.state = $rootScope.states.waitingForInputFiles;
                 }
