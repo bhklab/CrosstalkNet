@@ -25,11 +25,13 @@ var bipartiteStyles = {
             'selector': '.epi-' + classSuffixes.labelPlacement,
             'style': {
                 'text-halign': 'center',
-                'text-valign': 'center',
-                'text-outline-color': epiColor,
-                'text-outline-width': 2,
-                'color': 'white',
-                'font-family': 'Verdana'
+                'text-valign': 'top',
+                // 'text-outline-color': epiColor,
+                // 'text-background-color' : 'black',
+                // 'text-background-opacity': 0.6,
+                // 'text-outline-width': 2,
+                'color': 'red',
+                'font-family': 'Arial Black'
             }
         },
         nodeShape: {
@@ -50,13 +52,13 @@ var bipartiteStyles = {
             'selector': '.stroma-' + classSuffixes.labelPlacement,
             'style': {
                 'text-halign': 'center',
-                'text-valign': 'center',
+                'text-valign': 'top',
                 // 'text-background-color' : 'black',
                 // 'text-background-opacity': 0.6,
-                'text-outline-color': stromaColor,
-                'text-outline-width': 2,
-                'color': 'white',
-                'font-family': 'Verdana'
+                // 'text-outline-color': stromaColor,
+                // 'text-outline-width': 0,
+                'color': 'blue',
+                'font-family': 'Arial Black'
             }
         },
         nodeShape: {

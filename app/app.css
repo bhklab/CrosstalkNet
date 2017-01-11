@@ -306,6 +306,11 @@ md-menu-content {
     bottom: 75% !important;
 }
 
+/* Custom fix for the labels in the filter input boxes so that they maintain position if the user removes all the contents in the input box*/
+md-input-container:not(.md-input-focused) label:not(.md-no-float):not(.md-container-ignore) {
+    transform: translate3d(0, 6px, 0) scale(0.75) !important;
+}
+
 td,
 th {
     padding: 5px;
