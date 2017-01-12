@@ -1,17 +1,26 @@
 <md-content class="md-padding">
-    <div layout="row">
-        <div flex>
-            <md-input-container class="select">
-                <label>Layout</label>
-                <md-select ng-model="vm.sdWithinTab.selectedLayout">
-                    <md-option ng-repeat="layout in ::vm.layouts" value="{{layout.value}}" ng-selected="layout.value == vm.startingLayout.value">
-                        {{layout.display}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+    <div layout="column">
+        <div flex="50" layout="row">
+            <div flex="50">
+                <md-input-container class="select">
+                    <label>Layout</label>
+                    <md-select ng-model="vm.sdWithinTab.selectedLayout">
+                        <md-option ng-repeat="layout in ::vm.layouts" value="{{layout.value}}" ng-selected="layout.value == vm.startingLayout.value">
+                            {{layout.display}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+            </div>
+            <div flex="50">
+                <md-button class=" md-raised md-primary" ng-click="vm.resetZoom(vm)">Reset Zoom</md-button>
+            </div>
         </div>
-        <div flex style="position: relative;">
-            <md-button class="no-margin float-bottom md-raised md-primary" ng-click="vm.resize(vm)">Resize</md-button>
+        <div flex="50" layout="row">
+            <div flex="50">
+            </div>
+            <div flex="50">
+                <md-button class=" md-raised md-primary" ng-click="vm.resetGraph(vm)">Reset Graph</md-button>
+            </div>
         </div>
     </div>
 </md-content>
