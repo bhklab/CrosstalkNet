@@ -8,7 +8,7 @@
 
 var clone = require('clone');
 var classSuffixes = { nodeColor: 'node-color', nodeShape: 'shape', nodeSize: 'node-size', labelPlacement: 'label-placement', labelBackground: 'label-background' };
-var nodeSizes = { small: 12, medium: 18, large: 20, source: 40 };
+var nodeSizes = { small: 12, medium: 24, large: 30, source: 40 };
 var fontSizes = { source: 24 };
 var epiColor = 'red';
 var stromaColor = 'blue';
@@ -30,7 +30,7 @@ var bipartiteStyles = {
                 // 'text-background-color' : 'black',
                 // 'text-background-opacity': 0.6,
                 // 'text-outline-width': 2,
-                'color': 'red',
+                'color': '#607D8B',
                 'font-family': 'Arial Black'
             }
         },
@@ -57,7 +57,7 @@ var bipartiteStyles = {
                 // 'text-background-opacity': 0.6,
                 // 'text-outline-color': stromaColor,
                 // 'text-outline-width': 0,
-                'color': 'blue',
+                'color': '#607D8B',
                 'font-family': 'Arial Black'
             }
         },

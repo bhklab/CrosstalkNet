@@ -54,7 +54,7 @@
 
             cy = cytoscape(config);
 
-            vm.sdWithinTab.config = config;
+            vm.sdWithinTab.config = angular.copy(config);
 
             cy.fit(cy.$("*"), 10);
 
