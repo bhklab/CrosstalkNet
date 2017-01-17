@@ -273,6 +273,7 @@
                     GlobalSharedData.resetWTModels();
                     initializeVariables();
                     $rootScope.state = $rootScope.states.waitingForInputFiles;
+                    vm.showTooltip.button = false;
                 }
             });
 

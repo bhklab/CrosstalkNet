@@ -35,7 +35,8 @@
                 limit: 50,
                 page: 1
             },
-            limitOptions: [50, 100, 200]
+            limitOptions: [50, 100, 200],
+            label: 'Results per page'
         };
 
         var withinTabModel = {

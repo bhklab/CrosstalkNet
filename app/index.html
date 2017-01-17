@@ -77,14 +77,14 @@
     <div ng-controller="RouteController as vm">
         <md-toolbar class="md-primary md-hue-3" ng-if="vm.sharedData.showDocumentation">
             <div class="toolbar-height" layout="row">
-                <div class="display-flex align-flex-vertical left-padded" flex="33">
+                <div class="display-flex align-flex-vertical left-padded min-width-500" flex="33">
                     Status: {{state.text}}
                     <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id && state.id != states.waitingForInputFiles.id" md-mode="indeterminate"></md-progress-circular>
                 </div>
-                <div class="display-flex align-flex-vertical align-flex-horizontal" flex="34">
-                    <div class="title-font">BHK Lab</div>
+                <div class="display-flex align-flex-vertical align-flex-horizontal min-width-250" flex="34">
+                    <div class="title-font">CrosstalkNet</div>
                 </div>
-                <div class="display-flex align-flex-right" flex="33">
+                <div ng-class="{'min-width-250': vm.sharedData.permission !== 'admin', 'min-width-500': vm.sharedData.permission === 'admin'}" class="display-flex align-flex-right" flex="33">
                     <div>
                         <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.sharedData.showDocumentation">
                             <a class="unstyled-link" href="#/app">App</a>
