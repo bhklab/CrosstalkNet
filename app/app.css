@@ -1,5 +1,25 @@
 /* app css stylesheet */
 
+.min-width-1250 {
+    min-width: 1250px;
+}
+
+.min-width-1000 {
+    min-width: 1000px;
+}
+
+.min-width-500 {
+    min-width: 500px;
+}
+
+.min-width-250 {
+    min-width: 250px;
+}
+
+.min-width-125 {
+    min-width: 125px;
+}
+
 .example-download-button {
     display: inline-flex;
 }
@@ -307,7 +327,7 @@ md-menu-content {
 }
 
 /* Custom fix for the labels in the filter input boxes so that they maintain position if the user removes all the contents in the input box*/
-md-input-container:not(.md-input-focused) label:not(.md-no-float):not(.md-container-ignore) {
+.filter-label-fix label {
     transform: translate3d(0, 6px, 0) scale(0.75) !important;
 }
 
