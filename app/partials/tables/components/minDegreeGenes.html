@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.filtered.epi.total}}" md-on-paginate="vm.paginateEpi" md-page-select="true" md-boundary-links="true" md-label="vm.sdWithinTab.pagination.epi.label"></md-table-pagination>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.filtered.epi.total}}" md-on-paginate="vm.paginateEpi" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.epi.label}}"></md-table-pagination>
         <div class="bottom-margin-25">
             <div class="top-padded-10" layout="row">
                 <div flex>
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.filtered.stroma.total}}" md-on-paginate="vm.paginateStroma" md-page-select="true" md-boundary-links="true" md-label="vm.sdWithinTab.pagination.stroma.label"></md-table-pagination>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.filtered.stroma.total}}" md-on-paginate="vm.paginateStroma" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.stroma.label}}"></md-table-pagination>
         <md-button class="md-raised md-primary" ng-click="vm.exportTopGenesToCSV(vm)">Download As CSV</md-button>
     </md-card-content>
 </md-card>

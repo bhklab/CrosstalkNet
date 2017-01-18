@@ -36,7 +36,7 @@
                 page: 1
             },
             limitOptions: [50, 100, 200],
-            label: 'Results per page'
+            label: {page: 'Page:', of: 'of', rowsPerPage: 'Results per page:'}
         };
 
         var withinTabModel = {
