@@ -11,7 +11,7 @@ var userCreationUtils = require('./server-utils/user_creation_utils');
 var parseUtils = require('./server-utils/parse_utils');
 var multiparty = require('connect-multiparty');
 var jwt = require('jsonwebtoken');
-var communityFileUtils = require('./server-utils/community_file_utils');
+// var communityFileUtils = require('./server-utils/community_file_utils');
 var matrixFileUtils = require('./server-utils/matrix_file_utils');
 var handlerUtils = require("./server-utils/handler_utils");
 var bcrypt = require('bcrypt');
@@ -134,7 +134,7 @@ var server = app.listen(5000, function() {
     // console.log("password: " + password);
 
     matrixFileUtils.updateAvailableMatrixCache();
-    communityFileUtils.updateAvailableCommunitiesCache();
+    // communityFileUtils.updateAvailableCommunitiesCache();
 });
 
 server.timeout = 300000;
