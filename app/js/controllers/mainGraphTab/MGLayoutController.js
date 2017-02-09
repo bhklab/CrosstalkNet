@@ -4,7 +4,7 @@
  * @namespace controllers
  */
 (function() {
-    angular.module('myApp.controllers').controller('MGLayoutController', ['GraphConfigService', 'GlobalControls',
+    angular.module('myApp.controllers').controller('MGLayoutController', ['$scope', 'GraphConfigService', 'GlobalControls',
         'MGSharedData',
         MGLayoutController
     ]);
@@ -16,11 +16,12 @@
      *
      * @memberOf controllers
      */
-    function MGLayoutController(GraphConfigService, GlobalControls, MGSharedData) {
+    function MGLayoutController($scope, GraphConfigService, GlobalControls, MGSharedData) {
         var vm = this;
         vm.resetZoom = GraphConfigService.resetZoom;
         vm.initializeController = initializeController;
         vm.resetGraph = resetGraph;
+        vm.scope = $scope;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
