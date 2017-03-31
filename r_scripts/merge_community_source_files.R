@@ -1,0 +1,14 @@
+unifyCommunities <- function(communities, interactions) {
+    result = interactions
+    
+    epiColumn = communities[match(interactions$epi, communities$gene), "community"]
+    stromaColumn = communities[match(interactions$stroma, communities$gene), "community"]
+    
+    result = cbind(result, epiColumn, stromaColumn)
+    colnames(result)[4] = "epiCommunity"
+    colnames(result)[5] = "stromaCommunity"
+    
+    result <- result[which(!is.na(result$epiCommunity)),]
+    
+    result
+}

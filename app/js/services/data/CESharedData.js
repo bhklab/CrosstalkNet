@@ -62,14 +62,14 @@
          *
          * @memberOf services.CESharedData
          */
-        function resetWTM(vm) {
+        function resetWTM() {
             for (var prop in withinTabModel) {
                 if (prop == "pagination") {
-                    vm.sdWithinTab[prop].epi = angular.copy(paginationModel);
-                    vm.sdWithinTab[prop].stroma = angular.copy(paginationModel);
+                    service.data[prop].epi = angular.copy(paginationModel);
+                    service.data[prop].stroma = angular.copy(paginationModel);
                 }
 
-                vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
+                service.data[prop] = angular.copy(withinTabModel[prop]);
             }
         }
 

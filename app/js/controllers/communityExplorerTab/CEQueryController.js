@@ -67,7 +67,6 @@
         function initializeVariables() {
             vm.communityFile = null;
             vm.communityUpload = null;
-            loadFileList();
         }
 
         /**
@@ -80,8 +79,8 @@
             var file = JSON.parse(vm.communityFile);
             $rootScope.state = $rootScope.states.loadingGraph;
 
-            GraphConfigService.destroyGraph(vm);
-            CESharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(CESharedData);
+            CESharedData.resetWTM();
             QueryService.getCommunities(file).then(function(result) {
                 $rootScope.state = $rootScope.states.finishedGettingCommunities;
 
@@ -124,6 +123,7 @@
             FileUploadService.uploadCommunityFile(vm.communityUpload).then(function() {
                 $rootScope.state = $rootScope.states.initial;
                 vm.clearAllData = true;
+                loadFileList();
             });
         }
 
@@ -159,6 +159,13 @@
                 .ok('Yes')
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
+                console.log(JSON.parse(vm.communityFile));
+                console.log(toDelete.name);
+                if (vm.communityFile != null && JSON.parse(vm.communityFile).name == toDelete.name) {
+                    GraphConfigService.destroyGraph(CESharedData);
+                    CESharedData.resetWTM();
+                }
+
                 QueryService.deleteCommunityFile(toDelete);
             }, function() {});
 
@@ -190,7 +197,7 @@
             return vm.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                GraphConfigService.destroyGraph(vm);
+                GraphConfigService.destroyGraph(CESharedData);
                 CESharedData.resetWTM(vm);
                 initializeVariables();
                 vm.clearAllData = false;

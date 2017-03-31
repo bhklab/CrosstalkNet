@@ -37,7 +37,7 @@
         vm.exportGraphToPNG = ExportService.exportGraphToPNG;
         vm.exportSingleCommunityToCSV = ExportService.exportSingleCommunityToCSV;
         vm.exportAllCommunitiesToCSV = ExportService.exportAllCommunitiesToCSV;
-        GlobalControls.setMethodsWholeTab(vm);
+        // GlobalControls.setMethodsWholeTab(vm);
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
