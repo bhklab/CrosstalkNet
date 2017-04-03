@@ -14,13 +14,17 @@
 
     /**
      * @namespace MGDataController
+     *
      * @desc Controller for getting, uploading, and deleting files.
+     *
      * @memberOf controllers
      */
     function MGDataController($scope, $mdDialog, $mdSelect, $rootScope, GlobalControls, GlobalSharedData, QueryService, FileUploadService,
         $timeout, MGSharedData) {
         var vm = this;
         vm.scope = $scope;
+
+        $rootScope.dataLoaded = false;
 
         vm.sharedData = GlobalSharedData.data;
         vm.fileList = { normal: null, tumor: null, delta: null };
@@ -32,8 +36,6 @@
         vm.getOverallMatrixStats = QueryService.getOverallMatrixStats;
         vm.showTooltip = { button: false };
 
-        $rootScope.dataLoaded = false;
-
         vm.deleteConfirm = deleteConfirm;
         vm.getGenes = getGenes;
         vm.initializeController = initializeController;
@@ -43,7 +45,7 @@
          * @summary Initializes variables used within the tab for referring to selected
          * files.
          *
-         * @memberOf controllers.FileController
+         * @memberOf controllers.MGDataController
          */
         function initializeVariables() {
             vm.correlationFileDisplayed = { normal: null, tumor: null, delta: null };
@@ -55,7 +57,8 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function initializeController(ctrl) {
             vm.ctrl = ctrl;
@@ -68,7 +71,8 @@
          * in order to retrieve data for the selected network type.
          *
          * @return {Boolean} true if all the necessary files have been specified, false otherwise.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function checkFilesSelected() {
             if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta &&
@@ -91,7 +95,8 @@
          * in order to upload the data to the server.
          *
          * @return {Boolean} true if all of the necessary files have been specified, false otherwise.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function checkFilesToUpload() {
             if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta &&
@@ -116,7 +121,8 @@
          * @param {Event} ev The event associated with the click. This is used to prevent
          * propogation.
          * @param {Object} file The file that is to be deleted.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function deleteConfirm(ev, file) {
             var toDelete = {};
@@ -141,6 +147,18 @@
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
                 QueryService.deleteMatrixFile(toDelete);
+
+                if ((vm.sharedData.correlationFileActual.normal != null &&
+                        vm.sharedData.correlationFileActual.normal == file.name) ||
+                    (vm.sharedData.correlationFileActual.tumor != null &&
+                        vm.sharedData.correlationFileActual.tumor.name == file.name) ||
+                    (vm.sharedData.correlationFileActual.delta != null &&
+                        vm.sharedData.correlationFileActual.delta.name == file.name)) {
+                    GlobalControls.resetInputFieldsGlobal();
+                    GlobalSharedData.resetGlobalData();
+                    $rootScope.state = $rootScope.states.waitingForInputFiles;
+                }
+
             }, function() {});
 
             GlobalControls.focusElement("md-dialog button.ng-enter-active");
@@ -148,7 +166,8 @@
 
         /**
          * @summary Obtains necessary information for the selected files and network type.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function getGenes() {
             if (!checkFilesSelected()) {
@@ -169,6 +188,8 @@
             vm.sharedData.correlationFileActual.delta = JSON.parse(vm.correlationFileDisplayed.delta);
             GlobalControls.resetInputFieldsGlobal();
 
+            $rootScope.state = $rootScope.states.initial;
+
             getGeneList();
             getMatrixSummary();
         }
@@ -176,7 +197,8 @@
         /**
          * @summary Sends a request to the server to obtain the gene list for the selected files
          * and network type.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function getGeneList() {
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
@@ -191,7 +213,8 @@
         /**
          * @summary Sends a request to the server to obtain the matrix summary for the selected files
          * and network type.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function getMatrixSummary() {
             QueryService.getMatrixSummary(vm.sharedData.correlationFileActual).then(function(result) {
@@ -202,7 +225,8 @@
 
         /**
          * @summary Shows a tooltip from the GET GENES button.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function showTooltip() {
             stopTutorial();
@@ -213,7 +237,8 @@
 
         /**
          * @summary Uploads the specified files to the server.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         function uploadFiles() {
             if (!checkFilesToUpload()) {
@@ -222,31 +247,41 @@
 
             $rootScope.state = $rootScope.states.uploadingFile;
             FileUploadService.uploadMatrixFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
-                $rootScope.state = $rootScope.states.initial;
+                $rootScope.state = $rootScope.states.waitingForInputFiles;
                 vm.matrixUpload = { normal: null, tumor: null, delta: null };
+                GlobalControls.resetInputFieldsGlobal();
+                GlobalSharedData.resetGlobalData();
+                initializeVariables();
+                vm.sharedData.reloadMatrixFileList = true;
             });
         }
 
         /**
          * @summary Watched for changes in the network type and resets data in all tabs in the case
          * of a change.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         $scope.$watch(function() {
                 return vm.selectedNetworkType;
             },
             function(newValue, oldValue) {
                 if (newValue != oldValue && newValue != null) {
+                    GlobalSharedData.resetGraphs();
                     GlobalControls.resetInputFieldsGlobal();
                     GlobalSharedData.resetGlobalData();
+                    GlobalSharedData.resetWTModels();
                     initializeVariables();
+                    $rootScope.state = $rootScope.states.waitingForInputFiles;
+                    vm.showTooltip.button = false;
                 }
             });
 
         /**
          * @summary Wacthes for changes in the reloadMatrixFileList variable and reloads the available
          * file dropdowns as well as the user permission level when reloadMatrixFileList becomes true.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         $scope.$watch(function() {
             return vm.sharedData.reloadMatrixFileList;
@@ -270,7 +305,8 @@
         /**
          * @summary Watches for changes in the correlationFileDisplayed variable and shows a tooltip
          * once the appropriate files are selected.
-         * @memberOf controllers.FileController
+         *
+         * @memberOf controllers.MGDataController
          */
         var stopTutorial = $scope.$watch(function() {
             return vm.correlationFileDisplayed;

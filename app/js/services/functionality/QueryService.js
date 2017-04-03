@@ -9,7 +9,9 @@
 
     /**
      * @namespace QueryService
+     *
      * @desc Factory for querying the server for data.
+     *
      * @memberOf services
      */
     function QueryService($q, $rootScope, RESTService, ValidationService, GlobalSharedData) {
@@ -25,9 +27,13 @@
         service.deleteMatrixFile = deleteMatrixFile;
         service.getUserPermission = getUserPermission;
         service.getTopGenes = getTopGenes;
-        service.createUsers = createUsers;
+        service.createUser = createUser;
         service.deleteUsers = deleteUsers;
         service.getAllUsersNames = getAllUsersNames;
+        service.getCommunities = getCommunities;
+        service.getCommunityFileList = getCommunityFileList;
+        service.uploadCommunityFile = uploadCommunityFile;
+        service.deleteCommunityFile = deleteCommunityFile;
 
         /**
          * @summary Gets a list of genes from the server associated with the
@@ -37,6 +43,8 @@
          * has specified.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getGeneList(files) {
             $rootScope.state = $rootScope.states.gettingGeneList;
@@ -62,6 +70,8 @@
          * (normal, tumor, or delta) should be returned.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getFileList(types) {
             var deferred = $q.defer();
@@ -85,6 +95,8 @@
          * has specified.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getMatrixSummary(files) {
             var deferred = $q.defer();
@@ -110,6 +122,8 @@
          * should be filtered by correlation.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getMainGraph(vm, filter) {
             var deferred = $q.defer();
@@ -176,6 +190,8 @@
          * the selected genes for which to obtain the config.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getInteractionExplorerConfig(vm) {
             var deferred = $q.defer();
@@ -205,6 +221,8 @@
          * the source and target genes for which to obtain the paths.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getAllPaths(vm) {
             var deferred = $q.defer();
@@ -236,6 +254,8 @@
          * normal, tumor, or delta.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function uploadFiles(files, type) {
             var deferred = $q.defer();
@@ -260,6 +280,8 @@
          * @param {Obeject} file The file to be deleted from the server.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function deleteMatrixFile(file) {
             RESTService.post('delete-matrix-file', { file: file })
@@ -279,6 +301,8 @@
          *
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getUserPermission() {
             var deferred = $q.defer();
@@ -304,6 +328,8 @@
          * filter amount and filter type to be used by the server.
          * @return {Promise} A promise that will be resolved when the request has
          * been completed.
+         *
+         * @memberOf services.QueryService
          */
         function getTopGenes(vm) {
             var deferred = $q.defer();
@@ -326,7 +352,15 @@
             return deferred.promise;
         }
 
-        function createUsers(newUsers) {
+        /**
+         * @summary Sends details to the server that will be used to create new user(s)
+         *
+         * @param {Array} newUsers An array of objects each of which specify a new user
+         * to be created.
+         *
+         * @memberOf services.QueryService
+         */
+        function createUser(newUsers) {
             var deferred = $q.defer();
 
             RESTService.post('create-new-users', { newUsers: newUsers }).then(function(data) {
@@ -340,6 +374,14 @@
             return deferred.promise;
         }
 
+        /**
+         * @summary Deletes a specified list of users from the server.
+         *
+         * @param {Array} users An array of strings specifying the names of users to be
+         * deleted.
+         *
+         * @memberOf services.QueryService
+         */
         function deleteUsers(users) {
             var deferred = $q.defer();
 
@@ -354,6 +396,11 @@
             return deferred.promise;
         }
 
+        /**
+         * @summary Retrieves a list of all user names from the server.
+         *
+         * @memberOf services.QueryService
+         */
         function getAllUsersNames() {
             var deferred = $q.defer();
 
@@ -368,7 +415,89 @@
             return deferred.promise;
         }
 
+        /**
+         * @summary Gets the communities for a file specified on the view model
+         * from the server.
+         *
+         * @param {Object} vm The view model for the CEQueryController. This has
+         * a selected file in its sdWithinTab.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function getCommunities(file) {
+            var deferred = $q.defer();
+
+            RESTService.post('community-explorer', {
+                    selectedFile: file
+                })
+                .then(function(data) {
+                    if (!ValidationService.checkServerResponse(data)) {
+                        deferred.resolve({ communities: null });
+                    }
+
+                    deferred.resolve({ communities: data.communities, config: data.config });
+                }, function(response) {
+                    console.log(response);
+                });
+
+            return deferred.promise;
+        }
+
+        /**
+         * @summary Gets the list of community files available to the user.
+         *
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function getCommunityFileList() {
+            var deferred = $q.defer();
+
+            RESTService.post("community-file-list", {}).then(function(data) {
+                if (!ValidationService.checkServerResponse(data)) {
+                    deferred.resolve({ fileList: null });
+                }
+
+                deferred.resolve({ fileList: data.fileList });
+            }, function(response) {
+                console.log(response);
+            });
+
+            return deferred.promise;
+        }
+
+        function uploadCommunityFile(file) {
+            var deferred = $q.defer();
+
+            RESTService.post("upload-community-file", { file: file }).then(function(data) {
+                GlobalSharedData.data.reloadCommunityFileList = true;
+
+                ValidationService.checkServerResponse(data);
+                deferred.resolve({ result: null });
+            });
+
+            return deferred.promise;
+        }
+
+        /**
+         * @summary Deletes the specified file from the server.
+         *
+         * @param {Obeject} file The file to be deleted from the server.
+         * @return {Promise} A promise that will be resolved when the request has
+         * been completed.
+         */
+        function deleteCommunityFile(file) {
+            RESTService.post('delete-community-file', { file: file })
+                .then(function(data) {
+                    GlobalSharedData.data.reloadCommunityFileList = true;
+
+                    if (!ValidationService.checkServerResponse(data)) {
+                        return;
+                    }
+                }, function(response) {
+                    console.log(response);
+                });
+        }
+
         return service;
     }
-
 })();

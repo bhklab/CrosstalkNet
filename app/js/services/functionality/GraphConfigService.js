@@ -9,7 +9,9 @@
 
     /**
      * @namespace GraphConfigService
+     *
      * @desc Factory for interacting with cytoscape.js graphs and resetting their state.
+     *
      * @memberOf services
      */
     function GraphConfigService() {
@@ -36,6 +38,8 @@
          * @param {String} containerID An HTML element ID for an empty container that
          * can host a cytoscape.js graph.
          * @return {Object} A cytoscape.js object representing a graph.
+         *
+         * @memberOf services.GraphConfigService
          */
         function applyConfig(vm, config, containerID) {
             var cy = null;
@@ -50,7 +54,7 @@
 
             cy = cytoscape(config);
 
-            vm.sdWithinTab.config = config;
+            vm.sdWithinTab.config = angular.copy(config);
 
             cy.fit(cy.$("*"), 10);
 
@@ -141,6 +145,8 @@
          * that is calling this method. The within-tab shared for this
          * view model should have a cytoscape object set.
          * @param {Object} gene The gene to be located.
+         *
+         * @memberOf services.GraphConfigService
          */
         function locateGene(vm, gene) {
             if (gene == '' || gene == null) {
@@ -201,6 +207,8 @@
          * @param {String} containerID An HTML element ID for an empty container that
          * can host a cytoscape.js graph.
          * @return {Object} A cytoscape.js object representing a graph.
+         *
+         * @memberOf services.GraphConfigService
          */
         function applyConfigCommunities(vm, config, containerID) {
             var cy = null;
@@ -276,6 +284,8 @@
          * @param {Object} vm A view model for the controller
          * that is calling this method. The within-tab shared for this
          * view model should have a currentlyZoomed gene set.
+         *
+         * @memberOf services.GraphConfigService
          */
         function clearLocatedGene(vm) {
             if (vm.currentlyZoomed != null) {
@@ -293,6 +303,7 @@
          * that is calling this method. The within-tab shared for this
          * view model should have a cytoscape object set.
          *
+         * @memberOf services.GraphConfigService
          */
         function resetEdges(vm) {
             var edges = vm.sdWithinTab.cy.edges();
@@ -312,6 +323,8 @@
          * @param {Object} vm A view model for the controller
          * that is calling this method. The within-tab shared for this
          * view model should have a cytoscape object set.
+         *
+         * @memberOf services.GraphConfigService
          */
         function resetZoom(vm) {
             if (vm.sdWithinTab.cy != null) {
@@ -321,19 +334,19 @@
         }
 
         /**
-         * @summary Destroys the graph found in the specified view model.
+         * @summary Destroys the graph found in the specified service.
          *
-         * @param {Object} vm A view model for the controller
-         * that is calling this method. The within-tab shared for this
-         * view model should have a cytoscape object set.
+         * @param {Object} sv A Service object containing the 
+         * a cytoscape object as a data member.
          *
+         * @memberOf services.GraphConfigService
          */
-        function destroyGraph(vm) {
-            if (vm.sdWithinTab.cy) {
-                vm.sdWithinTab.cy.destroy();
+        function destroyGraph(sv) {
+            if (sv.data.cy) {
+                sv.data.cy.destroy();
             }
 
-            vm.sdWithinTab.cy = null;
+            sv.data.cy = null;
         }
 
         return service;

@@ -9,6 +9,7 @@
 
     /**
      * @desc Filter for hiding files based on selected network type.
+     *
      * @memberOf filters
      */
     function showDeltaFiles() {

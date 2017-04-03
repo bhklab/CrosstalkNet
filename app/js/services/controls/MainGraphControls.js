@@ -10,10 +10,12 @@
 
     /**
      * @namespace MainGraphControls
-     * @desc Factory for maniupulating and resetting data in the MGQueryController;
+     *
+     * @desc Factory for maniupulating and resetting data in the MGQueryController
+     *
      * @memberOf services
      */
-    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls) {
+    function MainGraphControls(GraphConfigService, MGSharedData, GlobalControls, $rootScope) {
         var service = {};
 
         service.layouts = [{ display: "Bipartite", value: "preset" }, {
@@ -28,6 +30,8 @@
          * view model. This helps keep controllers slim.
          *
          * @param {Object} vm A view model from a controller.
+         *
+         * @memberOf services.MainGraphControls
          */
         function setMethods(vm) {
             vm.addGeneOfInterest = addGeneOfInterest;
@@ -37,11 +41,10 @@
             vm.returnToFirstNeighboursFilter = returnToFirstNeighboursFilter;
             vm.setFilterMinMax = setFilterMinMax;
             vm.initializeVariables = initializeVariables;
+            vm.validateFilterInput = validateFilterInput;
 
             /**
              * @summary Initializes variables used within the tab for binding to the controls.
-             *
-             * @memberOf controllers.MGQueryController
              */
             function initializeVariables() {
                 vm.selectedItemFirst = null;
@@ -165,9 +168,49 @@
                 vm.GOIState = vm.GOIStates.filterFirst;
                 vm.correlationFilterSecond = angular.copy(vm.correlationFilterModel);
             }
+
+            /**
+             * @summmary Checks to see if the inputs to the filters in the main graph
+             * are valid numbers and are in the apporpriate range. Triggers an error if 
+             * an input is invalid.
+             */
+            function validateFilterInput() {
+                if (vm.correlationFilterFirst.negativeFilter !== undefined && vm.correlationFilterFirst.positiveFilter !== undefined &&
+                    vm.correlationFilterSecond.negativeFilter !== undefined && vm.correlationFilterSecond.positiveFilter !== undefined) {
+                    if (isNaN(vm.correlationFilterFirst.negativeFilter) || isNaN(vm.correlationFilterFirst.positiveFilter) ||
+                        isNaN(vm.correlationFilterSecond.negativeFilter) || isNaN(vm.correlationFilterSecond.positiveFilter)) {
+                        alert("One of the filter values is not a number. Please enter a proper decimal value.");
+                        return false;
+                    }
+                }
+
+                if (vm.correlationFilterFirst.negativeFilter === undefined) {
+                    alert("First neighbours negative filter has a value outside of legal range. Please adjust this value so that it is between " + vm.correlationFilterFirst.min + " and 0");
+                    return false;
+                } else if (vm.correlationFilterFirst.positiveFilter === undefined) {
+                    alert("First neighbours positive filter has a value outside of legal range. Please adjust this value so that it is between 0 and " + vm.correlationFilterFirst.max);
+                    return false;
+                } else if (vm.correlationFilterSecond.negativeFilter === undefined) {
+                    alert("Second neighbours negative filter has a value outside of legal range. Please adjust this value so that it is between " + vm.correlationFilterSecond.min + " and 0");
+                    return false;
+                } else if (vm.correlationFilterSecond.positiveFilter === undefined) {
+                    alert("Second neighbours positive filter has a value outside of legal range. Please adjust this value so that it is between 0 and " + vm.correlationFilterSecond.max);
+                    return false;
+                }
+
+                if (vm.correlationFilterFirst.negativeFilter < vm.correlationFilterFirst.min || vm.correlationFilterFirst.negativeFilter > 0 ||
+                    vm.correlationFilterFirst.positiveFilter > vm.correlationFilterFirst.max || vm.correlationFilterFirst.positiveFilter < 0 ||
+                    vm.correlationFilterSecond.negativeFilter < vm.correlationFilterSecond.min || vm.correlationFilterSecond.negativeFilter > 0 ||
+                    vm.correlationFilterSecond.positiveFilter > vm.correlationFilterSecond.max || vm.correlationFilterSecond.positiveFilter < 0) {
+                    alert("Filter values must be in appropriate range. Ensure negative filter values are negative and don't go below the minumum. \
+                        Ensure that positive filter values are positive and don't go above the maximum.");
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         return service;
     }
-
 })();

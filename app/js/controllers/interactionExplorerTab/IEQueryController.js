@@ -15,7 +15,9 @@
 
     /**
      * @namespace IEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the INTERACTION EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function IEQueryController($scope, $rootScope, GraphConfigService, InteractionExplorerControls, GlobalControls, GlobalSharedData, TableService,
@@ -42,6 +44,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.IEQueryController
          */
         function initializeController(ctrl) {
@@ -56,11 +59,13 @@
          * refreshes the graph otherwise.
          *
          * @param {Object} gene The gene to remove.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function removeGene(gene) {
             vm.genesOfInterest.splice(vm.genesOfInterest.indexOf(gene), 1);
             if (vm.genesOfInterest.length == 0) {
-                GraphConfigService.destroyGraph(vm);
+                GraphConfigService.destroyGraph(IESharedData);
             } else {
                 vm.refreshGraph();
             }
@@ -72,23 +77,27 @@
         /**
          * @summary Empties the genes of interest and
          * resets data within the tab.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function removeAllGenes() {
             vm.allowAdditionalGenes = true;
             vm.genesOfInterest = [];
-            GraphConfigService.destroyGraph(vm);
+            GraphConfigService.destroyGraph(IESharedData);
             resetDisplayedData();
         }
 
         /**
          * @summary Resets the data within the tab.
+         *
+         * @memberOf controllers.IEQueryController
          */
         function resetDisplayedData() {
             vm.allVisibleGenes = [];
             vm.explorerGenes = [];
             GlobalControls.resetInputFieldsLocal(vm.ctrl, '');
             vm.clearLocatedGene();
-            IESharedData.resetWTM(vm);
+            IESharedData.resetWTM();
         }
 
         /**
@@ -99,7 +108,7 @@
          */
         function refreshGraph() {
             resetDisplayedData();
-            IESharedData.resetWTM(vm);
+            IESharedData.resetWTM();
             getConfigForGraph();
         }
 
@@ -112,6 +121,7 @@
         function getConfigForGraph() {
             QueryService.getInteractionExplorerConfig(vm).then(function(result) {
                 if (result.data == null) {
+                    $rootScope.state = $rootScope.states.initial;
                     return;
                 }
 
@@ -147,7 +157,7 @@
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
                 vm.genesOfInterest = [];
-                GraphConfigService.destroyGraph(vm);
+                GraphConfigService.destroyGraph(IESharedData);
                 resetDisplayedData();
             }
         });
@@ -184,7 +194,7 @@
             if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
-                        GraphConfigService.destroyGraph(vm);
+                        GraphConfigService.destroyGraph(IESharedData);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyInteractionExplorer");
                     }
@@ -198,5 +208,4 @@
             }
         });
     }
-
 })();

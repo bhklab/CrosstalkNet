@@ -5,24 +5,26 @@
         '$scope',
         '$rootScope', 'RESTService',
         'ValidationService', 'GlobalSharedData', '$q', '$timeout', '$cookies',
-        '$mdDialog',
+        '$mdDialog', 'QueryService',
         LoginController
     ]);
 
     /**
      * @namespace LoginController
+     *
      * @desc Controller for the login dialog.
+     *
      * @memberOf controllers
      */
     function LoginController($scope, $rootScope, RESTService, ValidationService, GlobalSharedData,
-        $q, $timeout, $cookies, $mdDialog) {
+        $q, $timeout, $cookies, $mdDialog, QueryService) {
         var vm = this;
         vm.ctrl = "login";
 
         if ($rootScope.tokenSet != true) {
-            $rootScope.tokenSet = false;    
+            $rootScope.tokenSet = false;
         }
-        
+
         vm.user = { name: null, password: null, token: null };
 
         vm.sharedData = GlobalSharedData.data;
@@ -42,28 +44,26 @@
          * @memberOf controllers.LoginController
          */
         function guestLogin() {
-            // vm.user = { name: null, password: null, token: null };
-            // vm.loggedIn = true;
-            // $rootScope.tokenSet = true;
-            // vm.sharedData.guest = true;
-            // vm.sharedData.reloadMatrixFileList = true;
-            // vm.sharedData.reloadCommunityFileList = true;
-            // $mdDialog.hide('');
-
             $cookies.put('token', 'guest');
             vm.user = { name: null, password: null, token: null };
             login(vm.user);
-            
+
             vm.sharedData.guest = true;
             $mdDialog.hide('');
         }
 
+        /**
+         * @summary Clears variables on the client side thereby logging out the user.
+         *
+         * @memberOf controllers.LoginController
+         */
         function logout() {
             vm.loggedIn = false;
             vm.sharedData.guest = false;
             // $rootScope.tokenSet = false;
             $cookies.remove('token');
             GlobalSharedData.resetGlobalData();
+            GlobalSharedData.resetPermission();
         }
 
         /**
@@ -73,7 +73,7 @@
          * @memberOf controllers.LoginController
          */
         function login(user) {
-            RESTService.post('login', { user: user})
+            RESTService.post('login', { user: user })
                 .then(function(data) {
                     vm.user = { name: null, password: null, token: null };
                     $mdDialog.hide('');
@@ -95,7 +95,7 @@
                         vm.sharedData.guest = false;
                         vm.sharedData.reloadMatrixFileList = true;
                         vm.sharedData.reloadCommunityFileList = true;
-                        
+
                     }
                 });
         }
@@ -112,13 +112,15 @@
                 // $rootScope.tokenSet = true;
                 login({ name: null, password: null, token: null });
             } else {
-                console.log("-----checkToken triggered-------");
+                // console.log("-----checkToken triggered-------");
                 showLoginDialog();
             }
         }
 
         /**
          * @summary Displays the login dialog.
+         *
+         * @param {Object} ev The click event to be associated with the creation of the dialog.
          *
          * @memberOf controllers.LoginController
          */
@@ -153,17 +155,21 @@
             }
         });
 
+        /**
+         * @summary Watches for changes in address of the webapp in order to determine 
+         * whether or not to show the login dialog.
+         *
+         * @memberOf controllers.LoginController
+         */
         $scope.$on("$locationChangeStart", function(event, next, current) {
-            console.info("location changing to:" + next);
+            // console.info("location changing to:" + next);
             $mdDialog.hide('');
             if (next.endsWith('documentation')) {
                 $mdDialog.hide('');
             } else if ($cookies.get('token') == 'guest' || $cookies.get('token') == null) {
                 logout();
                 showLoginDialog();
-                // $rootScope.tokenSet = false;
             } else {
-                // logout();
                 checkToken();
             }
         });

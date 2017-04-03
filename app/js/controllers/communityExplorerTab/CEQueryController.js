@@ -14,7 +14,9 @@
 
     /**
      * @namespace CEQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the COMMUNITY EXPLORER tab.
+     *
      * @memberOf controllers
      */
     function CEQueryController($scope, $rootScope, GlobalSharedData, QueryService, CESharedData, GraphConfigService,
@@ -48,6 +50,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.CEQueryController
          */
         function initializeController(ctrl) {
@@ -64,7 +67,6 @@
         function initializeVariables() {
             vm.communityFile = null;
             vm.communityUpload = null;
-            loadFileList();
         }
 
         /**
@@ -77,8 +79,8 @@
             var file = JSON.parse(vm.communityFile);
             $rootScope.state = $rootScope.states.loadingGraph;
 
-            GraphConfigService.destroyGraph(vm);
-            CESharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(CESharedData);
+            CESharedData.resetWTM();
             QueryService.getCommunities(file).then(function(result) {
                 $rootScope.state = $rootScope.states.finishedGettingCommunities;
 
@@ -121,6 +123,7 @@
             FileUploadService.uploadCommunityFile(vm.communityUpload).then(function() {
                 $rootScope.state = $rootScope.states.initial;
                 vm.clearAllData = true;
+                loadFileList();
             });
         }
 
@@ -131,6 +134,7 @@
          * @param {Event} ev The event associated with the click. This is used to prevent
          * propogation.
          * @param {Object} file The file that is to be deleted.
+         *
          * @memberOf controllers.CEQueryController
          */
         function deleteConfirm(ev, file) {
@@ -155,6 +159,13 @@
                 .ok('Yes')
                 .cancel('No');
             $mdDialog.show(confirm).then(function() {
+                console.log(JSON.parse(vm.communityFile));
+                console.log(toDelete.name);
+                if (vm.communityFile != null && JSON.parse(vm.communityFile).name == toDelete.name) {
+                    GraphConfigService.destroyGraph(CESharedData);
+                    CESharedData.resetWTM();
+                }
+
                 QueryService.deleteCommunityFile(toDelete);
             }, function() {});
 
@@ -186,7 +197,7 @@
             return vm.clearAllData;
         }, function(newValue, oldValue) {
             if (newValue == true && newValue != oldValue) {
-                GraphConfigService.destroyGraph(vm);
+                GraphConfigService.destroyGraph(CESharedData);
                 CESharedData.resetWTM(vm);
                 initializeVariables();
                 vm.clearAllData = false;
@@ -197,7 +208,7 @@
          * @summary Watches the display variable and redraws the graph when switching
          * from the Tables view to the Graph view.
          *
-         * @memberOf controllers.IEQueryController
+         * @memberOf controllers.CEQueryController
          */
         $scope.$watch(function() {
             if (vm.sdWithinTab) {

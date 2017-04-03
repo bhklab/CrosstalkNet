@@ -9,7 +9,9 @@
 
     /**
      * @namespace FileUploadService
+     *
      * @desc Factory for uploading files to the server.
+     *
      * @memberOf services
      */
     function FileUploadService($q, GlobalSharedData, QueryService) {
@@ -26,6 +28,8 @@
          * @param {String} type The type of network that the user wants to upload.
          * @return {Promise} A promise to be resolved when the request to the server is 
          * complete.
+         *
+         * @memberOf services.FileUploadService
          */
         function uploadMatrixFiles(files, type) {
             var deferred = $q.defer();
@@ -76,6 +80,8 @@
          * @param {Object} file A file selected by the user.
          * @return {Promise} A promise to be resolved when the request to the server is
          * complete.
+         *
+         * @memberOf services.FileUploadService
          */
         function uploadCommunityFile(file) {
             var deferred = $q.defer();
@@ -109,6 +115,8 @@
          * be read.
          * @return {Promise} A promise to be resolved when the contents of
          * the file are finished being read by the browser.
+         *
+         * @memberOf services.FileUploadService
          */
         function readHelper(file) {
             var deferred = $q.defer();

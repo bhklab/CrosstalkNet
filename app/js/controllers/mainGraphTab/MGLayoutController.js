@@ -4,26 +4,31 @@
  * @namespace controllers
  */
 (function() {
-    angular.module('myApp.controllers').controller('MGLayoutController', ['GraphConfigService', 'GlobalControls',
+    angular.module('myApp.controllers').controller('MGLayoutController', ['$scope', 'GraphConfigService', 'GlobalControls',
         'MGSharedData',
         MGLayoutController
     ]);
 
     /**
      * @namespace MGLayoutController
+     *
      * @desc Controller for the LAYOUT sub-tab.
+     *
      * @memberOf controllers
      */
-    function MGLayoutController(GraphConfigService, GlobalControls, MGSharedData) {
+    function MGLayoutController($scope, GraphConfigService, GlobalControls, MGSharedData) {
         var vm = this;
-        vm.resize = GraphConfigService.resetZoom;
+        vm.resetZoom = GraphConfigService.resetZoom;
         vm.initializeController = initializeController;
+        vm.resetGraph = resetGraph;
+        vm.scope = $scope;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.MGLayoutController
          */
         function initializeController(ctrl) {
@@ -32,6 +37,15 @@
             vm.layouts = angular.copy(GlobalControls.layouts[vm.ctrl]);
             vm.startingLayout = angular.copy(GlobalControls.startingLayouts[vm.ctrl]);
             vm.sdWithinTab.selectedLayout = vm.layouts[0].value;
+        }
+
+        function resetGraph() {
+            GraphConfigService.destroyGraph(MGSharedData);
+
+            if (vm.sdWithinTab.config) {
+                vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain");    
+            }
+            
         }
     }
 })();

@@ -23,7 +23,6 @@
     <script type="text/javascript" src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script type="text/javascript" src="bower_components/angular-animate/angular-animate.js"></script>
     <script type="text/javascript" src="bower_components/angular-material/angular-material.js"></script>
-    <script type="text/javascript" src="bower_components/angular-material/angular-route.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-material-data-table/dist/md-data-table.js"></script>
     <script type="text/javascript" src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
@@ -35,8 +34,8 @@
     <script src="js/controllers/interactionExplorerTab/IEQueryController.js"></script>
     <script src="js/controllers/interactionExplorerTab/IELayoutController.js"></script>
     <script src="js/controllers/interactionExplorerTab/InteractionExplorerController.js"></script>
-    <script src="js/controllers/pathExistenceTab/PEQueryController.js"></script>
-    <script src="js/controllers/pathExistenceTab/PathExistenceController.js"></script>
+    <script src="js/controllers/pathExplorerTab/PEQueryController.js"></script>
+    <script src="js/controllers/pathExplorerTab/PathExplorerController.js"></script>
     <script src="js/controllers/degreeExplorerTab/DEQueryController.js"></script>
     <script src="js/controllers/degreeExplorerTab/DegreeExplorerController.js"></script>
     <script src="js/controllers/communityExplorerTab/CEQueryController.js"></script>
@@ -48,7 +47,7 @@
     <script src="js/services/controls/GlobalControls.js"></script>
     <script src="js/services/controls/MainGraphControls.js"></script>
     <script src="js/services/controls/InteractionExplorerControls.js"></script>
-    <script src="js/services/controls/PathExistenceControls.js"></script>
+    <script src="js/services/controls/PathExplorerControls.js"></script>
     <script src="js/services/functionality/ExportService.js"></script>
     <script src="js/services/functionality/GraphConfigService.js"></script>
     <script src="js/services/functionality/RESTService.js"></script>
@@ -78,14 +77,14 @@
     <div ng-controller="RouteController as vm">
         <md-toolbar class="md-primary md-hue-3" ng-if="vm.sharedData.showDocumentation">
             <div class="toolbar-height" layout="row">
-                <div class="display-flex align-flex-vertical left-padded" flex="33">
+                <div class="display-flex align-flex-vertical left-padded min-width-500" flex="33">
                     Status: {{state.text}}
-                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id" md-mode="indeterminate"></md-progress-circular>
+                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id && state.id != states.waitingForInputFiles.id" md-mode="indeterminate"></md-progress-circular>
                 </div>
-                <div class="display-flex align-flex-vertical align-flex-horizontal" flex="34">
-                    <div class="title-font">BHK Lab</div>
+                <div class="display-flex align-flex-vertical align-flex-horizontal min-width-250" flex="34">
+                    <div class="title-font">CrosstalkNet</div>
                 </div>
-                <div class="display-flex align-flex-right" flex="33">
+                <div ng-class="{'min-width-250': vm.sharedData.permission !== 'admin', 'min-width-500': vm.sharedData.permission === 'admin'}" class="display-flex align-flex-right" flex="33">
                     <div>
                         <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.sharedData.showDocumentation">
                             <a class="unstyled-link" href="#/app">App</a>
@@ -96,7 +95,7 @@
                     </div>
                     <div ng-controller="UserManagementController as vm" ng-init="vm.initializeController('userManagement')">
                         <div ng-if="vm.sharedData.permission === 'admin'">
-                            <md-button ng-click="vm.showCreateUsersDialog()" class="">Create Users</md-button>
+                            <md-button ng-click="vm.showCreateUserDialog()" class="">Create User</md-button>
                             <md-button ng-click="vm.showDeleteUsersDialog()" class="">Delete Users</md-button>
                         </div>
                     </div>
@@ -110,5 +109,4 @@
     </div>
     <div ng-view style="height: 100%;"></div>
 </body>
-
 </html>

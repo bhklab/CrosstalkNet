@@ -9,7 +9,9 @@
 
     /**
      * @namespace ExportService
+     *
      * @desc Factory for exporting data to files.
+     *
      * @memberOf services
      */
     function ExportService($filter) {
@@ -30,6 +32,8 @@
          * @param {Number} index The level of neighbours that are desired.
          * @param {String} networkType A string indicating whether the network type is
          * weight, normal, or tumor. 
+         *
+         * @memberOf services.ExportService
          */
         function exportNeighboursToCSV(vm, index, networkType) {
             var fileName = $filter("ordinal")(index + 1) + "neighbours" + Date.now() + ".csv";
@@ -64,6 +68,8 @@
          *
          * @param {Object} vm A view model for the current controller
          * that has a cytoscape object in its within-tab shared data.
+         *
+         * @memberOf services.ExportService
          */
         function exportGraphToPNG(vm) {
             if (vm.sdWithinTab.cy == null) {
@@ -94,6 +100,8 @@
          *
          * @param {Object} vm A view model for the DegreeExplorerController
          * that has an object of top genes attached to it.
+         *
+         * @memberOf services.ExportService
          */
         function exportTopGenesToCSV(vm) {
             var epiGenes = vm.sdWithinTab.topGenes.epi;
@@ -135,6 +143,8 @@
          *
          * @param {Object} vm A view model for the PathExistenceController
          * that has an array of all paths attached to it.
+         *
+         * @memberOf services.ExportService
          */
         function exportAllPathsToCSV(vm, matType) {
             var source = vm.sdWithinTab.pathSourceCached;
@@ -177,6 +187,8 @@
          * as a csv file.
          *
          * @param {Object} vm A view model for the CommunityExplorerController
+         *
+         * @memberOf services.ExportService
          */
         function exportSingleCommunityToCSV(vm) {
             var communities = vm.sdWithinTab.communities;
@@ -224,6 +236,9 @@
             downloadFile(fileName, csvData);
         }
 
+        /**
+         * @summary Not yet ready for production.
+         */
         function exportAllCommunitiesToCSV(vm) {
             var communities = vm.sdWithinTab.communities;
             var fileName = "communities" + Date.now() + ".csv";
@@ -274,6 +289,8 @@
          * @param {String} fileName A name for the file to be downloaded.
          * @param {String} fileData A String of URI encoded data
          * for the file that will be downloaded.
+         *
+         * @memberOf services.ExportService
          */
         function downloadFile(fileName, fileData) {
             var link = document.createElement("a");

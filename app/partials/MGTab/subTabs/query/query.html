@@ -24,7 +24,7 @@
             <legend class="fieldset-legend">Selected Genes:</legend>
             <md-list class="selected-genes-list">
                 <md-list-item ng-repeat="gene in vm.genesOfInterest">
-                    <span ng-click="vm.removeGene(gene)" class="highlight right-margin red-text">X</span>
+                    <span ng-click="state.id == states.loadingGraph.id || vm.removeGene(gene)" class="right-margin red-text remove-border" ng-class="{'highlight': state.id != states.loadingGraph.id && state.id != states.loadingConfig.id, 'disabled': state.id == states.loadingGraph.id || state.id == states.loadingConfig.id}">X</span>
                     <span>{{gene.value}}</span>
                 </md-list-item>
             </md-list>
@@ -36,7 +36,7 @@
             </div>
             <div flex="60">
                 <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.refreshGraph(false)" ng-show="vm.GOIState < vm.GOIStates.getSecondNeighbours" ng-disabled="vm.GOIState >= vm.GOIStates.getSecondNeighbours || vm.genesOfInterest.length == 0">Get {{vm.GOIState == vm.GOIStates.initial ? "First" : "Second"}} Neighbours</md-button>
-                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.returnToFirstNeighboursFilter()" ng-show="vm.GOIState >= vm.GOIStates.getSecondNeighbours">Back to
+                <md-button class="md-raised md-primary" style="float: right;" ng-click="vm.backToFirstNeighbours()" ng-show="vm.GOIState >= vm.GOIStates.getSecondNeighbours">Back to
                     <br>First Neighbours
                 </md-button>
             </div>
@@ -45,18 +45,18 @@
             <legend class="fieldset-legend">First Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
                 <div flex="50">
-                    <md-input-container class="md-icon-float md-icon-right md-block md-input-has-value">
-                        <label class="label-position">Min Negative Correlation | Lowest: {{vm.correlationFilterFirst.min}}</label>
-                        <input ng-model="vm.correlationFilterFirst.negativeFilter" min="{{vm.correlationFilterFirst.min}}" max="0" type="number" step="0.001" autocomplete="off">
+                    <md-input-container class="md-icon-float md-icon-right md-block filter-label-fix">
+                        <label class="label-position">Min Negative Strength | Lowest: {{vm.correlationFilterFirst.min}}</label>
+                        <input ng-model="vm.correlationFilterFirst.negativeFilter" min="{{vm.correlationFilterFirst.min}}" max="0" type="number" step="0.001" required autocomplete="off">
                     </md-input-container>
                     <md-checkbox ng-disabled="vm.GOIState != vm.GOIStates.filterFirst" ng-model="vm.correlationFilterFirst.negativeEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
                 <div flex="50">
-                    <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Positive Correlation | Highest: {{vm.correlationFilterFirst.max}}</label>
-                        <input ng-model="vm.correlationFilterFirst.positiveFilter" min="0" max="{{vm.correlationFilterFirst.max}}" type="number" step="0.001" autocomplete="off">
+                    <md-input-container class="md-icon-float md-icon-right md-block filter-label-fix">
+                        <label class="label-position">Min Positive Strength | Highest: {{vm.correlationFilterFirst.max}}</label>
+                        <input ng-model="vm.correlationFilterFirst.positiveFilter" min="0" max="{{vm.correlationFilterFirst.max}}" type="number" step="0.001" required autocomplete="off">
                     </md-input-container>
                     <md-checkbox ng-disabled="vm.GOIState != vm.GOIStates.filterFirst" ng-model="vm.correlationFilterFirst.positiveEnabled" aria-label="Checkbox 1">
                         Enable
@@ -68,18 +68,18 @@
             <legend class="fieldset-legend">Second Neighbour Filters</legend>
             <div style="margin-top: 10px;" layout="row">
                 <div flex="50">
-                    <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Negative Correlation | Lowest: {{vm.correlationFilterSecond.min}}</label>
-                        <input ng-model="vm.correlationFilterSecond.negativeFilter" min="{{vm.correlationFilterSecond.min}}" max="0" type="number" step="0.001">
+                    <md-input-container class="md-icon-float md-icon-right md-block filter-label-fix">
+                        <label class="label-position">Min Negative Strength | Lowest: {{vm.correlationFilterSecond.min}}</label>
+                        <input ng-model="vm.correlationFilterSecond.negativeFilter" min="{{vm.correlationFilterSecond.min}}" max="0" type="number" step="0.001" required autocomplete="off">
                     </md-input-container>
                     <md-checkbox ng-model="vm.correlationFilterSecond.negativeEnabled" aria-label="Checkbox 1">
                         Enable
                     </md-checkbox>
                 </div>
                 <div flex="50">
-                    <md-input-container class="md-icon-float md-icon-right md-block">
-                        <label class="label-position">Min Positive Correlation | Highest: {{vm.correlationFilterSecond.max}}</label>
-                        <input ng-model="vm.correlationFilterSecond.positiveFilter" min="0" max="{{vm.correlationFilterSecond.max}}" type="number" step="0.001">
+                    <md-input-container class="md-icon-float md-icon-right md-block filter-label-fix">
+                        <label class="label-position">Min Positive Strength | Highest: {{vm.correlationFilterSecond.max}}</label>
+                        <input ng-model="vm.correlationFilterSecond.positiveFilter" min="0" max="{{vm.correlationFilterSecond.max}}" type="number" step="0.001" required autocomplete="off">
                     </md-input-container>
                     <md-checkbox ng-model="vm.correlationFilterSecond.positiveEnabled" aria-label="Checkbox 1">
                         Enable

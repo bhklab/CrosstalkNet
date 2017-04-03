@@ -13,9 +13,11 @@
 
     /**
      * @namespace MainGraphController
+     *
      * @desc Controller for the MAIN GRAPH tab. Its main
      * purpose is to allow the sharing of data throughout the different 
      * controls and tables in the tab.
+     *
      * @memberOf controllers
      */
     function MainGraphController($scope, $rootScope, GlobalControls, ExportService, GlobalSharedData, TableService,
@@ -40,6 +42,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.MainGraphController
          */
         function initializeController(ctrl) {

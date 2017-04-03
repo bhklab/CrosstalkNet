@@ -8,6 +8,7 @@
 
     /**
      * @desc Range creating filter.
+     *
      * @memberOf filters
      */
     function range() {

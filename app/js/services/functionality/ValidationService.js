@@ -11,16 +11,15 @@
 
     /**
      * @namespace ValidationService
+     *
      * @desc Factory for checking for errors in server responses.
+     *
      * @memberOf services
      */
     function ValidationService($rootScope, $cookies, $interval) {
         var service = {};
-        var reset = 3;
+        var reset = 2;
         service.checkServerResponse = checkServerResponse;
-
-
-
 
         /**
          * @summary Checks to see if a server response has
@@ -30,22 +29,24 @@
          * @param {Object} data The data associated with the reponse
          * to a REST call.
          *
+         * @memberOf services.ValidationService
          */
         function checkServerResponse(data) {
             if (data.error) {
-                if (reset == 3) {
+                if (reset == 2) {
                     alert(data.error);
                     console.log("ERROR");
-                    $interval(function() { reset++; }, 1000, 3);
+                    reset = 0;
+                    $interval(function() { reset++; }, 1000, 2);
                 }
 
-                
+
                 return false;
             } else if (data.login == false) {
-                if (reset == 3) {
+                if (reset == 2) {
                     alert(data.message);
                     reset = 0;
-                    $interval(function() { reset++; }, 1000, 3);
+                    $interval(function() { reset++; }, 1000, 2);
 
                     if ($rootScope.tokenSet == true) {
                         $rootScope.tokenSet = false;

@@ -67,7 +67,7 @@ app.use(function(req, res, next) {
                 var message = '';
 
                 console.log(err);
-                if (err.expiredAt != null) {
+                if (err && err.expiredAt != null) {
                     message = 'Failed to authenticate token. Expired: ' + err.expiredAt + '. Please try logging in again.';
                 } else {
                     message = 'Failed to authenticate token. Please try logging in again.';
@@ -111,13 +111,13 @@ app.post('/delete-matrix-file', handlerUtils.deleteMatrixFile);
 
 app.post('/upload-matrices', handlerUtils.uploadMatrices);
 
-// app.post('/community-explorer', handlerUtils.communityExplorer);
+app.post('/community-explorer', handlerUtils.communityExplorer);
 
-// app.post('/community-file-list', handlerUtils.communityFileList);
+app.post('/community-file-list', handlerUtils.communityFileList);
 
-// app.post('/upload-community-file', handlerUtils.uploadCommunityFile);
+app.post('/upload-community-file', handlerUtils.uploadCommunityFile);
 
-// app.post('/delete-community-file', handlerUtils.deleteCommunityFile);
+app.post('/delete-community-file', handlerUtils.deleteCommunityFile);
 
 app.post('/create-new-users', handlerUtils.createNewUsers);
 
@@ -135,7 +135,6 @@ var server = app.listen(5000, function() {
 
     matrixFileUtils.updateAvailableMatrixCache();
     communityFileUtils.updateAvailableCommunitiesCache();
-    //createSampleUser();
 });
 
 server.timeout = 300000;

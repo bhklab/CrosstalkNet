@@ -1,6 +1,6 @@
 <md-content>
     <div class="md-padding">
-        <h2 class="md-subhead">Path Existence Checker</h2>
+        <h2 class="md-subhead">Path Explorer</h2>
         <md-autocomplete ng-class="[vm.ctrl]" md-no-cache='true' md-selected-item="vm.pathExplorerSource" md-search-text="vm.pathExplorerTextSource" md-selected-item-change="vm.setPathExplorerGene(item, 'source')" md-items="item in vm.querySearch(vm.pathExplorerTextSource, 'geneList')" md-item-text="item.display" md-min-length="2" md-match-case-insensitive="true" placeholder="Choose Source Gene">
             <md-item-template>
                 <span md-highlight-text="vm.pathExplorerTextSource" md-highlight-flags="^i">{{item.display}}</span>

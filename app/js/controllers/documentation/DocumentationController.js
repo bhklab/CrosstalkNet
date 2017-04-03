@@ -6,9 +6,11 @@
         DocumentationController
     ]);
 
-        /**
+    /**
      * @namespace DocumentationController
+     *
      * @desc Controller for changing routes.
+     *
      * @memberOf controllers
      */
     function DocumentationController($location, $scope, GlobalSharedData) {
@@ -26,6 +28,8 @@
          * active.
          *
          * @param {String} route The route that is now active
+         *
+         * @memberOf controllers.DocumentationController
          */
         function changeRoute() {
             vm.sharedData.showDocumentation = true;

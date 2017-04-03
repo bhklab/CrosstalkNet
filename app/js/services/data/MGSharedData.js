@@ -9,7 +9,9 @@
 
     /**
      * @namespace MGSharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function MGSharedData() {
@@ -35,20 +37,19 @@
         };
 
         service.data = angular.copy(withinTabModel);
-        
+
         service.resetWTM = resetWTM;
-        
+
 
         /**
          * @summary Resets the within tab variables for a given view model. 
          *
-         * @param {Object} vm A view model whose within-tab shared data will
-         * be reset to the initial state.
+         * @memberOf services.MGSharedData
          */
-        function resetWTM(vm) {
+        function resetWTM() {
             for (var prop in withinTabModel) {
                 if (prop != "display" && prop != "selectedTab" && prop != "selectedLayout") {
-                    vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
+                    service.data[prop] = angular.copy(withinTabModel[prop]);
                 }
             }
         }

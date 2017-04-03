@@ -14,7 +14,9 @@
 
     /**
      * @namespace MGQueryController
+     *
      * @desc Controller for the QUERY sub-tab in the MAIN GRAPH tab.
+     *
      * @memberOf controllers
      */
     function MGQueryController($scope, $rootScope, GraphConfigService, GlobalControls, MainGraphControls, GlobalSharedData, QueryService, TableService,
@@ -28,6 +30,7 @@
         vm.refreshGraph = refreshGraph;
         vm.removeGene = removeGene;
         vm.removeAllGenes = removeAllGenes;
+        vm.backToFirstNeighbours = backToFirstNeighbours;
 
         vm.resize = GraphConfigService.resetZoom;
         vm.locateGene = GraphConfigService.locateGene;
@@ -40,6 +43,7 @@
          * tab model based on the ctrl property.
          *
          * @param {String} ctrl A name to associate this controller with.
+         *
          * @memberOf controllers.MGQueryController
          */
         function initializeController(ctrl) {
@@ -54,6 +58,8 @@
          * refreshes the graph otherwise.
          *
          * @param {Object} gene The gene to remove.
+         *
+         * @memberOf controllers.MGQueryController
          */
         function removeGene(gene) {
             if (vm.genesOfInterest.length == 1) {
@@ -68,6 +74,8 @@
         /**
          * @summary Removes all genes of interest and resets all data within the
          * tab.
+         *
+         * @memberOf controllers.MGQueryController
          */
         function removeAllGenes() {
             resetAllData();
@@ -76,11 +84,13 @@
         /**
          * @summary Resets all data within the tab to the initial state
          * as if no queries have been made.
+         *
+         * @memberOf controllers.MGQueryController
          */
         function resetAllData() {
             vm.initializeVariables();
-            GraphConfigService.destroyGraph(vm);
-            MGSharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(MGSharedData);
+            MGSharedData.resetWTM();
         }
 
         /**
@@ -91,8 +101,8 @@
          */
         function refreshGraph(filter) {
             vm.clearLocatedGene();
-            GraphConfigService.destroyGraph(vm);
-            MGSharedData.resetWTM(vm);
+            GraphConfigService.destroyGraph(MGSharedData);
+            MGSharedData.resetWTM();
             getConfigForGraph(filter);
         }
 
@@ -103,8 +113,13 @@
          * @memberOf controllers.MGQueryController
          */
         function getConfigForGraph(filter) {
+            if (!vm.validateFilterInput()) {
+                return;
+            }
+
             QueryService.getMainGraph(vm, filter).then(function(result) {
                 if (result.data == null) {
+                    $rootScope.state = $rootScope.states.initial;
                     return;
                 }
 
@@ -127,6 +142,17 @@
 
                 vm.sdWithinTab.neighbours = TableService.getNeighboursGeneral(vm, result.depth, false);
             });
+        }
+
+        /**
+         * @summary Changes the state of the filters and controls so that only first neighbours 
+         * are the focus. Also refreshes the graph so that only first neighbours are shown.
+         *
+         * @memberOf controllers.MGQueryController
+         */
+        function backToFirstNeighbours() {
+            vm.returnToFirstNeighboursFilter();
+            refreshGraph(true);
         }
 
         /**
@@ -176,7 +202,7 @@
             if (newValue == vm.displayModes.graph && newValue != oldValue && vm.needsRedraw) {
                 $timeout(function() {
                     if (vm.sdWithinTab.config != null && vm.sdWithinTab.cy != null) {
-                        GraphConfigService.destroyGraph(vm);
+                        GraphConfigService.destroyGraph(MGSharedData);
                         vm.needsRedraw = false;
                         vm.sdWithinTab.cy = GraphConfigService.applyConfig(vm, vm.sdWithinTab.config, "cyMain");
                     }

@@ -12,17 +12,17 @@ const fs = require('fs');
 var accessLevelDirectories = { '0': ['fake'], '1': ['real', 'personal'], 'admin': ['real', 'personal'] };
 var async = require('async');
 var mkdirp = require('mkdirp');
-var MatrixFileCache = require('./Models/matrix_file_cache').MatrixFileCache;
-var FileGroup = require('./Models/file_group').FileGroup;
-var File = require('./Models/file_model').File;
+var MatrixFileCache = require('./models/matrix_file_cache').MatrixFileCache;
+var FileGroup = require('./models/file_group').FileGroup;
+var File = require('./models/file_model').File;
 var availableMatrixCache = null;
 
-const TYPES = require('./Models/matrix_file_cache').TYPES;
-const SUB_TYPES = require('./Models/matrix_file_cache').SUB_TYPES;
+const TYPES = require('./models/matrix_file_cache').TYPES;
+const SUB_TYPES = require('./models/matrix_file_cache').SUB_TYPES;
 
-var BASE_UPLOAD_DIRECTORY = 'R_Scripts/uploaded_matrices/';
-var BASE_PROPRIETARY_DIRECTORY = 'R_Scripts/proprietary_matrices/';
-var BASE_FAKE_DIRECTORY = 'R_Scripts/fake_matrices/'
+var BASE_UPLOAD_DIRECTORY = 'r_scripts/uploaded_matrices/';
+var BASE_PROPRIETARY_DIRECTORY = 'r_scripts/proprietary_matrices/';
+var BASE_FAKE_DIRECTORY = 'r_scripts/fake_matrices/'
 
 /**
  * @summary Updates the in-memory cache of avaialble files.

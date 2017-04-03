@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Shared data factory for PATH EXISTENCE CHEKCER tab. Allows for sharing of data
+ * Shared data factory for PATH EXPLORER tab. Allows for sharing of data
  * between controllers within the tab.
  * @namespace services
  */
@@ -9,7 +9,9 @@
 
     /**
      * @namespace PESharedData
+     *
      * @desc Factory for facilitating the sharing of data between controllers.
+     *
      * @memberOf services
      */
     function PESharedData() {
@@ -44,7 +46,7 @@
         tumor.query.order = "-firstEdge.tumor"; 
 
         /** Object representing variables to be available between the various controllers within
-         * the PATH EXISTENCE CHEKCER tab.
+         * the PATH EXPLORER tab.
          */
         var withinTabModel = {
             pathSourceCached: null,
@@ -63,13 +65,12 @@
         /**
          * @summary Resets the within tab variables for a given view model. 
          *
-         * @param {Object} vm A view model whose within-tab shared data will
-         * be reset to the initial state.
+         * @memberOf services.PESharedData
          */
-        function resetWTM(vm) {
+        function resetWTM() {
             for (var prop in withinTabModel) {
                 if (prop != "display") {
-                    vm.sdWithinTab[prop] = angular.copy(withinTabModel[prop]);
+                    service.data[prop] = angular.copy(withinTabModel[prop]);
                 }
             }
         }

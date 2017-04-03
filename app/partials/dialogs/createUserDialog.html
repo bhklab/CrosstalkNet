@@ -1,0 +1,30 @@
+<md-dialog aria-label="Create User Dialog">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Create User</h2>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-input-container style="margin-top: 5px;">
+                    <label>Name</label>
+                    <input ng-model="ctrl.vm.user.name">
+                </md-input-container>
+                <br>
+                <md-input-container style="margin-top: 5px;">
+                    <label>Password</label>
+                    <input type="password" ng-model="ctrl.vm.user.password">
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions class="stacked-buttons">
+            <div class="dialog-controls-container">
+                <md-button class="md-raised md-primary" ng-click="ctrl.vm.createUser()">Create User</md-button>
+            </div>
+            <div class="dialog-controls-container">
+                <md-button md-no-ink class="md-raised md-primary" ng-click="ctrl.vm.closeDialog()">Close</md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
