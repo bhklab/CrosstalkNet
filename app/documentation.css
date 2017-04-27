@@ -97,6 +97,22 @@
     background-color: #f44336;
 }
 
+.degree-explorer::after {
+    display: block;
+    position: absolute;
+    content: '';
+    width: 100px;
+    height: 100px;
+    bottom: -50px;
+    left: 50%;
+    margin-left: -50px;
+    background-color: #dddddd;
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    background-color: #f44336;
+}
+
 .doc-background-black {
     background-color: #212121;
 }
@@ -118,7 +134,7 @@
 }
 
 .doc-font-family {
-    font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
+    font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
 }
 
 .doc-h1 {
@@ -136,11 +152,11 @@
 
 .network-background {
     display: block;
-  text-indent: -9999px;
-  width: 500%;
-  height: 500%;
-  background: url(res/images/network.svg);
-  background-size: 500% 500%;
+    text-indent: -9999px;
+    width: 500%;
+    height: 500%;
+    background: url(res/images/network.svg);
+    background-size: 500% 500%;
 }
 
 .doc-h2 {
@@ -194,7 +210,7 @@
 }
 
 .doc-content-font {
-    font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
+    font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
     font-size: 18px;
 }
 

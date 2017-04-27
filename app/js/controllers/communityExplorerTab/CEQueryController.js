@@ -91,6 +91,7 @@
                 $rootScope.state = $rootScope.states.loadingConfig;
 
                 vm.sdWithinTab.cy = GraphConfigService.applyConfigCommunities(vm, result.config, "cyCommunityExplorer");
+                vm.sdWithinTab.config = result.config;
 
                 $rootScope.state = $rootScope.states.showingGraph;
 
@@ -203,6 +204,7 @@
                 vm.clearAllData = false;
             }
         });
+
 
         /** 
          * @summary Watches the display variable and redraws the graph when switching
