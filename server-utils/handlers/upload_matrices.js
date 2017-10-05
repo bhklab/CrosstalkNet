@@ -6,6 +6,7 @@ var async = require('async');
 function handler(req, res) {
     var user = authenticationUtils.getUserFromToken(req.body.token);
     var files = req.body.files;
+    var postFixes = req.body.postFixes;
     var uploadType = req.body.type;
 
     if (user == null) {
@@ -51,7 +52,7 @@ function handler(req, res) {
     }
 
     writeFiles(nonEmptyFiles, files, user);
-    checkFiles(nonEmptyFiles, files, user, res);
+    checkFiles(nonEmptyFiles, files, user, postFixes, res);
 }
 
 function writeFiles(nonEmptyFiles, files, user) {
@@ -66,10 +67,10 @@ function writeFiles(nonEmptyFiles, files, user) {
     });
 }
 
-function checkFiles(nonEmptyFiles, files, user, res) {
+function checkFiles(nonEmptyFiles, files, user, postFixes, res) {
     async.eachSeries(nonEmptyFiles, function iterate(type, callback) {
         console.log("type:" + type);
-        verifyFile("r_scripts/matrix_file_checker.R", matrixFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, callback);
+        verifyFile("r_scripts/matrix_file_checker.R", matrixFileUtils.BASE_UPLOAD_DIRECTORY + user.name + "/" + type + "/", files[type].name, postFixes, callback);
     }, function done(result) {
         if (result != null) {
             for (var i = 0; i < nonEmptyFiles.length; i++) {
@@ -87,12 +88,14 @@ function checkFiles(nonEmptyFiles, files, user, res) {
     });
 }
 
-function verifyFile(script, filePath, fileName, callback) {
+function verifyFile(script, filePath, fileName, postFixes, callback) {
     var args = {};
     var argsString = "";
 
     args.filePath = filePath;
     args.fileName = fileName;
+    args.colPost = postFixes.colPost;
+    args.rowPost = postFixes.rowPost;
 
     argsString = JSON.stringify(args);
     argsString = argsString.replace(/"/g, '\\"');

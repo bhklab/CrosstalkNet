@@ -43,6 +43,20 @@ function createGeneList(geneNames, degrees) {
     return result;
 }
 
+/**
+ * @summary Gets the suffix of the gene name.
+ *
+ * @param {String} geneName A gene name returned from an R script.
+ *
+ * @return {String} The suffix of the given gene name.
+ */
+function getGeneSuffix(geneName) {
+    var splitted = geneName.split("-");
+
+    return splitted[splitted.length - 1];
+}
+
 module.exports = {
-    createGeneList: createGeneList
+    createGeneList: createGeneList,
+    getGeneSuffix: getGeneSuffix
 };

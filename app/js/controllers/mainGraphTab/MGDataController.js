@@ -30,6 +30,7 @@
         vm.fileList = { normal: null, tumor: null, delta: null };
 
         vm.selectedNetworkType = vm.sharedData.selectedNetworkType;
+        vm.postFixes = {colPost: "S", rowPost: "E"};
 
         vm.getFileList = QueryService.getFileList;
         vm.getGeneList = QueryService.getGeneList;
@@ -246,7 +247,7 @@
             }
 
             $rootScope.state = $rootScope.states.uploadingFile;
-            FileUploadService.uploadMatrixFiles(vm.matrixUpload, vm.selectedNetworkType).then(function(result) {
+            FileUploadService.uploadMatrixFiles(vm.matrixUpload, vm.selectedNetworkType, vm.postFixes).then(function(result) {
                 $rootScope.state = $rootScope.states.waitingForInputFiles;
                 vm.matrixUpload = { normal: null, tumor: null, delta: null };
                 GlobalControls.resetInputFieldsGlobal();

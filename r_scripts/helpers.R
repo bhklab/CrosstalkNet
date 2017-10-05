@@ -69,8 +69,16 @@ createDegrees <- function(corMatrix) {
     # }
     # #dim(deg.col) <- length(deg.col)
     # names(deg.col) <- colnames(corMatrix)
+
+    rowPost <- getGeneSuffix(rownames(corMatrix)[1])
+    colPost <- getGeneSuffix(colnames(corMatrix)[1])
+
+    result <- list()
+
+    result[[rowPost]] <- deg.row
+    result[[colPost]] <- deg.col
     
-    result <- list(epiDegree = deg.row, stromaDegree = deg.col)
+    return(result)
 }
 
 appendSideToMatrixNames <- function(corMatrix, side, rowOrCol) {
@@ -113,7 +121,7 @@ getNeighbourNames <- function(corMatrix, gene, exclusions) {
         return(character())
     }
 
-    if (getGeneSuffix(gene) == '-e') {
+    if (getGeneSuffix(gene) == getGeneSuffix(rownames(corMatrix)[1])) {
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 
     } else {
         neighboursNames <- names(which(corMatrix[, gene] != 0))
@@ -138,10 +146,10 @@ getDegreesForGenes <- function(degrees, genes) {
         return(integer())
     }
 
-    if (getGeneSuffix(first) == '-e') {
-        resultDegrees <- degrees$epiDegree[na.omit(genes)]
+    if (getGeneSuffix(first) == getGeneSuffix(names(degrees[[1]][1]))) {
+        resultDegrees <- degrees[[1]][na.omit(genes)]
     } else {
-        resultDegrees <- degrees$stromaDegree[na.omit(genes)]
+        resultDegrees <- degrees[[2]][na.omit(genes)]
     }
 
     resultDegrees
@@ -169,7 +177,7 @@ createEdgesDFDelta <- function(corMatrices, gene, exclusion, limit, networkType)
     edges <- createEmptyDifferentialEdges(0)
     neighbours <- list(normal = NULL, tumor = NULL, delta = NULL)
 
-    if (getGeneSuffix(gene) == '-e') {
+    if (getGeneSuffix(gene) == getGeneSuffix(rownames(corMatrices[[networkType]])[1])) {
         checkGeneInGeneNames(gene, rownames(corMatrices[[networkType]]))
 
         neighboursNames <- names(which(corMatrices[[networkType]][gene, ] != 0)) 
@@ -272,7 +280,10 @@ getGeneSuffix <- function(gene) {
         printMessageAndQuit("Could not find gene in matrix")
     }
 
-    tolower(substr(gene, nchar(gene)-1, nchar(gene)))
+    splitted <- strsplit(gene, "-")
+    suffix <- splitted[[1]][length(splitted[[1]])]
+
+    return(suffix)
 }
 
 filterEdgesByWeight <- function(edges, minNegativeWeight, minPositiveWeight) {
@@ -358,7 +369,7 @@ getNeighbours <- function(corMatrix, gene, exclusions) {
         return(c())
     }
 
-    if (getGeneSuffix(gene) == '-e') {
+    if (getGeneSuffix(gene) == getGeneSuffix(rownames(corMatrix)[1])) {
         checkGeneInGeneNames(gene, rownames(corMatrix))
 
         neighboursNames <- names(which(corMatrix[gene, ] != 0)) 

@@ -257,10 +257,10 @@
          *
          * @memberOf services.QueryService
          */
-        function uploadFiles(files, type) {
+        function uploadFiles(files, type, postFixes) {
             var deferred = $q.defer();
 
-            RESTService.post('upload-matrices', { files: files, type: type })
+            RESTService.post('upload-matrices', { files: files, type: type, postFixes: postFixes })
                 .then(function(data) {
                     GlobalSharedData.data.reloadMatrixFileList = true;
 

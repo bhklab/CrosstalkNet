@@ -113,6 +113,10 @@ minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
 neighboursNodes <- list(first = firstNeighboursNodes, second = secondNeighboursNodes)
 edges <- list(first = edgesFirst, second = edgesSecond)
 
-output <- list(neighboursNodes = neighboursNodes, edges = edges, minMaxWeightDepth = minMaxWeightDepth, minMaxWeightOverall = minMaxWeightOverall)
+rowPost <- getGeneSuffix(rownames(corMatrices[[selectedNetworkType]])[1])
+colPost <- getGeneSuffix(colnames(corMatrices[[selectedNetworkType]])[1])
+
+output <- list(neighboursNodes = neighboursNodes, edges = edges, minMaxWeightDepth = minMaxWeightDepth, 
+				minMaxWeightOverall = minMaxWeightOverall, rowPost = rowPost, colPost = colPost)
 
 cat(format(toJSON(output, auto_unbox = TRUE)))

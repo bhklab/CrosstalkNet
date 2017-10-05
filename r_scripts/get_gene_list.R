@@ -11,12 +11,12 @@ fileName <- settings$fileName
 path <- settings$path
 
 degrees <- readFileWithValidation(paste(path, fileName, sep=""))	
-if (degrees$epiDegree[1] > degrees$stromaDegree[1])  {
-	maxDegree <- degrees$epiDegree[1]
+if (degrees[[1]][1] > degrees[[2]][1])  {
+	maxDegree <- degrees[[1]][1]
 } else {
-	maxDegree <- degrees$stromaDegree[1]
+	maxDegree <- degrees[[2]][1]
 }
 
-output <- list(epiDegrees = degrees$epiDegree, epiGeneNames = names(degrees$epiDegree), stromaDegrees = degrees$stromaDegree, stromaGeneNames = names(degrees$stromaDegree),
+output <- list(rowDegrees = degrees[[1]], rowNames = names(degrees[[1]]), colDegrees = degrees[[2]], colNames = names(degrees[[2]]),
 			maxDegree = maxDegree)
 cat(format(toJSON(output, auto_unbox = TRUE)))

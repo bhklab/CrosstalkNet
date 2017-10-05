@@ -52,16 +52,16 @@ function callRScript(argsString, res) {
 
             var allGenes = [];
 
-            var epiDegrees = parsedValue.epiDegrees;
-            var stromaDegrees = parsedValue.stromaDegrees;
+            var rowDegrees = parsedValue.rowDegrees;
+            var colDegrees = parsedValue.colDegrees;
 
-            var epiGeneNames = parsedValue.epiGeneNames;
-            var stromaGeneNames = parsedValue.stromaGeneNames;
+            var rowNames = parsedValue.rowNames;
+            var colNames = parsedValue.colNames;
 
             var maxDegree = parsedValue.maxDegree;
 
-            allGenes = allGenes.concat(geneUtils.createGeneList(epiGeneNames, epiDegrees));
-            allGenes = allGenes.concat(geneUtils.createGeneList(stromaGeneNames, stromaDegrees));
+            allGenes = allGenes.concat(geneUtils.createGeneList(rowNames, rowDegrees));
+            allGenes = allGenes.concat(geneUtils.createGeneList(colNames, colDegrees));
 
             res.send({ geneList: allGenes, maxDegree: maxDegree });
         });

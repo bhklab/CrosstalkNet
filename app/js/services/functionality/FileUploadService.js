@@ -31,7 +31,7 @@
          *
          * @memberOf services.FileUploadService
          */
-        function uploadMatrixFiles(files, type) {
+        function uploadMatrixFiles(files, type, postFixes) {
             var deferred = $q.defer();
             var filesToUpload = { normal: null, tumor: null, delta: null };
 
@@ -49,7 +49,7 @@
                         readHelper(files.tumor).then(function(result) {
                             filesToUpload.tumor = result.file;
 
-                            QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                            QueryService.uploadFiles(filesToUpload, type, postFixes).then(function(result) {
                                 deferred.resolve({ result: null });
                             });
                         });
@@ -64,7 +64,7 @@
                     }
 
                     filesToUpload[type] = result.file;
-                    QueryService.uploadFiles(filesToUpload, type).then(function(result) {
+                    QueryService.uploadFiles(filesToUpload, type, postFixes).then(function(result) {
                         deferred.resolve({ result: null });
                     });
                 });

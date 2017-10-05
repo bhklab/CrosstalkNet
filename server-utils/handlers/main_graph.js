@@ -8,6 +8,7 @@ var nodeUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/node_utils'
 var edgeUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/edge_utils');
 var layoutUtils = require(APP_BASE_DIRECTORY + 'server-utils/cytoscape/layout_utils');
 var clientTableUtils = require(APP_BASE_DIRECTORY + 'server-utils/client_table_utils');
+var geneUtils = require(APP_BASE_DIRECTORY + 'server-utils/gene_utils');
 var exec = require('child_process').exec;
 
 function handler(req, res) {
@@ -84,6 +85,9 @@ function callRScript(argsString, res, selectedGenes, requestedLayout) {
             var parsedNodesFirst = parsedValue.neighboursNodes.first;
             var parsedNodesSecond = parsedValue.neighboursNodes.second;
 
+            var rowPost = parsedValue.rowPost;
+            var colPost = parsedValue.colPost;
+
             var parsedEdgesFirst = parsedValue.edges.first;
             var parsedEdgesSecond = parsedValue.edges.second;
             var parsedEdgesAll = parsedEdgesFirst.concat(parsedEdgesSecond);
@@ -111,9 +115,9 @@ function callRScript(argsString, res, selectedGenes, requestedLayout) {
             edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
             edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
-            sourceNodes = createSourceNodes(selectedGenes);
-            firstNodes = parseNodes(parsedNodesFirst);
-            secondNodes = parseNodes(parsedNodesSecond);
+            sourceNodes = createSourceNodes(selectedGenes, rowPost);
+            firstNodes = parseNodes(parsedNodesFirst, rowPost);
+            secondNodes = parseNodes(parsedNodesSecond, rowPost);
 
             firstNeighbourInteractions = parseEdges(parsedEdgesFirst, 1);
             secondNeighbourInteractions = parseEdges(parsedEdgesSecond, 2);
@@ -150,21 +154,21 @@ function callRScript(argsString, res, selectedGenes, requestedLayout) {
         });
 }
 
-function createSourceNodes(selectedGenes) {
+function createSourceNodes(selectedGenes, rowPost) {
     var sourceNodes = [];
 
     for (var i = 0; i < selectedGenes.length; i++) {
-        sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, selectedGenes[i].object.degree, -1));
+        sourceNodes.push(nodeUtils.createNodes([selectedGenes[i].object.name], 'par' + 0, selectedGenes[i].object.degree, -1, rowPost));
     }
 
     return sourceNodes;
 }
 
-function parseNodes(RNodes) {
+function parseNodes(RNodes, rowPost) {
     var nodes = [];
 
     for (var i = 0; i < RNodes.length; i++) {
-        nodes.push(nodeUtils.createNodesFromRNodes(RNodes[i], "par", false));
+        nodes.push(nodeUtils.createNodesFromRNodes(RNodes[i], "par", false, rowPost));
     }
 
     return nodes;

@@ -5,6 +5,7 @@
  * 
  * @summary Functions for creating cytoscape.js nodes.
  */
+var geneUtils = require('../gene_utils');
 var styleUtils = require('./style_utils');
 var clone = require('clone');
 
@@ -70,11 +71,11 @@ function addClassToNodes(nodes, newClass) {
  * be added to each node. This is set to -1 for source nodes.
  * @return {Array} An array of cytoscape.js nodes.
  */
-function createNodes(genes, parent, degrees, neighbourLevel) {
+function createNodes(genes, parent, degrees, neighbourLevel, rowPost) {
     var resultNodes = [];
 
     for (var i = 0; i < genes.length; i++) {
-        var parentFromNode = genes[i].endsWith('-E') ? "epi" : "stroma";
+        var parentFromNode = geneUtils.getGeneSuffix(genes[i]) == rowPost ? "epi" : "stroma";
         resultNodes.push({
             data: {
                 id: genes[i],
@@ -97,11 +98,11 @@ function createNodes(genes, parent, degrees, neighbourLevel) {
  * from these pseudo-nodes will be used to create the cytoscape.js nodes.
  * @return {Array} An array of cytoscape.js nodes based on pseudo-nodes returned from R.
  */
-function createNodesFromRNodes(rNodes, specifiedParent, useSpecifiedParent) {
+function createNodesFromRNodes(rNodes, specifiedParent, useSpecifiedParent, rowPost) {
     var resultNodes = [];
 
     for (var i = 0; i < rNodes.length; i++) {
-        var nodeType = rNodes[i].name.endsWith('-E') ? "epi" : "stroma";
+        var nodeType = geneUtils.getGeneSuffix(rNodes[i].name) == rowPost ? "epi" : "stroma";
         var parent;
 
         if (useSpecifiedParent == true) {

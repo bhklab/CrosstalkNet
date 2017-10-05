@@ -36,6 +36,16 @@
                 <md-button ng-click="vm.uploadFiles()" class="md-primary md-raised top-margin-10">Upload Files</md-button>
             </form>
         </div>
+        <div class="md-padding">
+            <md-input-container>
+                <label>Row Suffix</label>
+                <input ng-maxlength="2" ng-model="vm.postFixes.rowPost">
+            </md-input-container>
+            <md-input-container>
+                <label>Column Suffix</label>
+                <input ng-maxlength="2" ng-model="vm.postFixes.colPost">
+            </md-input-container>
+        </div>
     </div>
     <md-divider></md-divider>
     <div class="md-padding">

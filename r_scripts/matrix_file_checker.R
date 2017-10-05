@@ -7,6 +7,8 @@ args <- commandArgs(trailingOnly = TRUE)
 settings <- fromJSON(args[2])
 fileName <- settings$fileName
 filePath <- settings$filePath
+colPost <- settings$colPost
+rowPost <- settings$rowPost
 
 write('fileName:', stderr())
 write(fileName, stderr())
@@ -33,8 +35,8 @@ if (anyNA(corMatrix)) {
 	# Prints an error if there exist any NA's in the dgCMatrix
 	printMessageAndQuit("The uploaded file contains NA's. Please remove them and try again")
 } else if (!anyNA(rowNames) && !anyNA(colNames) && all(rowNames == colNames)) {		
-	corMatrix <- appendSideToMatrixNames(corMatrix, 'E', 'row')
-	corMatrix <- appendSideToMatrixNames(corMatrix, 'S', 'col')
+	corMatrix <- appendSideToMatrixNames(corMatrix, rowPost, 'row')
+	corMatrix <- appendSideToMatrixNames(corMatrix, colPost, 'col')
 	ptm <- proc.time()
 	degrees <- createDegrees(corMatrix)
 
