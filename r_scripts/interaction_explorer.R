@@ -37,7 +37,10 @@ for (i in 1:length(selectedGenes)) {
     edgeTest <- c(edgeTest, edges[[i]]$weight)
 }
 
+rowPost <- getGeneSuffix(rownames(corMatrices[[selectedNetworkType]])[1])
+colPost <- getGeneSuffix(colnames(corMatrices[[selectedNetworkType]])[1])
+
 # Get the max and minimum weights to be used for gradient styling by server
 minMaxWeightOverall <- getMinMaxWeightValues(edgeTest)
-result <- list(nodes = nodes, edges = edges, minMaxWeightOverall = minMaxWeightOverall)
+result <- list(nodes = nodes, edges = edges, minMaxWeightOverall = minMaxWeightOverall, rowPost = rowPost, colPost = colPost)
 cat(format(toJSON(result)))

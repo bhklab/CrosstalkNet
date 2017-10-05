@@ -68,6 +68,9 @@ function callRScript(argsString, res, selectedGenes, requestedLayout) {
             var RNodes = parsedValue.nodes
             var REdges = parsedValue.edges;
 
+            var colPost = parsedValue.colPost;
+            var rowPost = parsedValue.rowPost;
+
             var interactionsTableList = [];
             var sourceNodes = [];
             var nodes = [];
@@ -80,10 +83,10 @@ function callRScript(argsString, res, selectedGenes, requestedLayout) {
             edgeStyleNegative = styleUtils.setDynamicEdgeStyles(edgeStyleNegative, { min: overallWeights.minNegative, max: overallWeights.maxNegative });
             edgeStylePositive = styleUtils.setDynamicEdgeStyles(edgeStylePositive, { min: overallWeights.minPositive, max: overallWeights.maxPositive });
 
-            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, selectedGenes[0].object.degree, -1));
+            sourceNodes.push(nodeUtils.createNodes([selectedGenes[0].value], 'par' + 0, selectedGenes[0].object.degree, -1, rowPost));
 
             edges = parseEdges(REdges);
-            nodes = parseNodes(RNodes);
+            nodes = parseNodes(RNodes, rowPost);
 
             if (requestedLayout == 'bipartite' || requestedLayout == 'preset') {
                 config = createBipartiteLayout(nodes, sourceNodes, edges, selectedGenes);
@@ -115,11 +118,11 @@ function parseEdges(REdges) {
     return edges;
 }
 
-function parseNodes(RNodes) {
+function parseNodes(RNodes, rowPost) {
     var nodes = [];
 
     for (var i = 0; i < RNodes.length; i++) {
-        nodes.push(nodeUtils.createNodesFromRNodes(RNodes[i], "par", false));
+        nodes.push(nodeUtils.createNodesFromRNodes(RNodes[i], "par", false, rowPost));
     }
 
     return nodes;
