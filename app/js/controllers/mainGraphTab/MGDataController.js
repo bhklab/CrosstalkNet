@@ -100,6 +100,23 @@
          * @memberOf controllers.MGDataController
          */
         function checkFilesToUpload() {
+            if (vm.postFixes.colPost == vm.postFixes.rowPost) {
+                alert("Row and column suffices must be different.")
+                return false;
+            }
+
+            if (vm.postFixes.colPost.indexOf("-") >= 0 || vm.postFixes.rowPost.indexOf("-") >= 0) {
+                alert("Row and column sufficies must not contain dashes (-).")
+                return false;
+            }
+
+            if (vm.postFixes.colPost.length == 0 || vm.postFixes.colPost.length > 2 || vm.postFixes.rowPost.length == 0 
+                || vm.postFixes.rowPost.length > 2) {
+                alert("Row and column suffices must be 1 to 2 characters in length.")
+                return false;
+            }
+
+
             if (vm.selectedNetworkType == vm.sharedData.networkTypes.delta &&
                 (!vm.matrixUpload.normal || !vm.matrixUpload.tumor || !vm.matrixUpload.delta)) {
                 alert("Please choose all 3 Rdata files to upload delta network");

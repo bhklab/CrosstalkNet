@@ -100,11 +100,38 @@ function validateSelectedGenes(selectedGenes) {
     return selectedGeneNames;
 }
 
+/**
+ * @summary Checks to see if the submitted row and column suffices are valid.
+ *
+ * @param {Object} postFixes An object containing row and column suffices as its properties.
+ */
+ function validateSuffices(postFixes) {
+    if (postFixes == null || postFixes.colPost == null || postFixes.rowPost == null) {
+        return {error: "Row and column suffices missing. Please enter them."};
+    }
+
+    if (postFixes.colPost == postFixes.rowPost) {
+        return {error: "Row and column suffices must be different."};
+    }
+
+    if (postFixes.colPost.indexOf("-") >= 0 || postFixes.rowPost.indexOf("-") >= 0) {
+        return {error: "Row and column sufficies must not contain dashes (-)."};
+    }
+
+    if (postFixes.colPost.length == 0 || postFixes.colPost.length > 2 || postFixes.rowPost.length == 0 
+        || postFixes.rowPost.length > 2) {
+        return {error: "Row and column suffices must be 1 to 2 characters in length."};
+    }
+
+    return {};
+ }
+
 module.exports = {
     isNegative: isNegative,
     isPositive: isPositive,
     isNumeric: isNumeric,
     validateFilters: validateFilters,
     validateFiles: validateFiles,
-    validateSelectedGenes: validateSelectedGenes
+    validateSelectedGenes: validateSelectedGenes,
+    validateSuffices: validateSuffices
 };

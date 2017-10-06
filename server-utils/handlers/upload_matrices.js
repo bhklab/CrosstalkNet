@@ -1,5 +1,6 @@
 var authenticationUtils = require(APP_BASE_DIRECTORY + 'server-utils/authentication_utils');
 var matrixFileUtils = require(APP_BASE_DIRECTORY + 'server-utils/matrix_file_utils');
+var validationUtils = require(APP_BASE_DIRECTORY + 'server-utils/validation_utils')
 var exec = require('child_process').exec;
 var async = require('async');
 
@@ -12,6 +13,12 @@ function handler(req, res) {
     if (user == null) {
         console.log("Unable to find user for token: " + req.body.token);
         res.send({ error: "Unable to find user for specified token" });
+        return;
+    }
+
+    var postFixValidation = validationUtils.validateSuffices(postFixes);
+    if (postFixValidation.error) {
+        res.send(postFixValidation);
         return;
     }
 
