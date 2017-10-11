@@ -51,6 +51,8 @@ function callRScript(argsString, res) {
             }
 
             var allGenes = [];
+            var rowPost = parsedValue.rowPost;
+            var colPost = parsedValue.colPost;
 
             var rowDegrees = parsedValue.rowDegrees;
             var colDegrees = parsedValue.colDegrees;
@@ -63,7 +65,7 @@ function callRScript(argsString, res) {
             allGenes = allGenes.concat(geneUtils.createGeneList(rowNames, rowDegrees));
             allGenes = allGenes.concat(geneUtils.createGeneList(colNames, colDegrees));
 
-            res.send({ geneList: allGenes, maxDegree: maxDegree });
+            res.send({ geneList: allGenes, maxDegree: maxDegree, rowPost: rowPost, colPost: colPost });
         });
 }
 

@@ -17,6 +17,9 @@ if (degrees[[1]][1] > degrees[[2]][1])  {
 	maxDegree <- degrees[[2]][1]
 }
 
+rowPost <- getGeneSuffix(names(degrees[[1]])[1])
+colPost <- getGeneSuffix(names(degrees[[2]])[1])
+
 output <- list(rowDegrees = degrees[[1]], rowNames = names(degrees[[1]]), colDegrees = degrees[[2]], colNames = names(degrees[[2]]),
-			maxDegree = maxDegree)
+			maxDegree = maxDegree, rowPost = rowPost, colPost = colPost)
 cat(format(toJSON(output, auto_unbox = TRUE)))

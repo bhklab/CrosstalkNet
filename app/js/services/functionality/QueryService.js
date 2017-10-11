@@ -57,7 +57,8 @@
                     }
 
                     $rootScope.state = $rootScope.states.initial;
-                    deferred.resolve({ geneList: data.geneList, maxDegree: data.maxDegree });
+                    deferred.resolve({ geneList: data.geneList, maxDegree: data.maxDegree, rowPost: data.rowPost, 
+                        colPost: data.colPost });
                 });
             return deferred.promise;
         }

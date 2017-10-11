@@ -33,7 +33,9 @@
             clearAllData: false,
             networkTypes: networkTypes,
             guest: false,
-            permission: 0
+            permission: 0,
+            rowPost: "E",
+            colPost: "S"
         };
 
         service.data = angular.copy(globalDataModel);

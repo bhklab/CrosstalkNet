@@ -222,6 +222,8 @@
             QueryService.getGeneList(vm.sharedData.correlationFileActual).then(function(result) {
                 vm.sharedData.geneList = result.geneList;
                 vm.sharedData.maxDegree = result.maxDegree;
+                vm.sharedData.rowPost = result.rowPost;
+                vm.sharedData.colPost = result.colPost;
                 $rootScope.dataLoaded = true;
                 vm.sdWithinTab.selectedTab = 1;
                 stopTutorial();
