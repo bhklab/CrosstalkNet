@@ -14,6 +14,9 @@
             <md-tab label="Query" class="md-padding">
                 <div ng-controller="CEQueryController as vm" ng-init="vm.initializeController('communityExplorer')" static-include="partials/CETab/subTabs/query/query.html"></div>
             </md-tab>
+            <md-tab label="Style" class="md-padding">
+                <div ng-controller="CELayoutController as vm" ng-init="vm.initializeController('communityExplorer')" static-include="partials/CETab/subTabs/layout/layout.html"></div>
+            </md-tab>
         </md-tabs>
     </md-content>
 </md-sidenav>
