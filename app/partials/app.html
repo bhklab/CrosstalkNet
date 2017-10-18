@@ -4,7 +4,9 @@
             <md-tab label="Main Graph">
                 <md-content ng-controller="MainGraphController as vm" ng-init="vm.initializeController('main')">
                     <section layout="row">
-                        <div class="md-whiteframe-1dp" static-include="partials/MGTab/sideBar.html">
+                        <div>
+                            <div class="md-whiteframe-1dp" static-include="partials/MGTab/sideBar.html"></div>
+                            <md-button ng-if="vm.sdWithinTab.config" style="float: right;" class="md-primary md-raised export-button" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                         </div>
                         <md-content flex>
                             <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
@@ -14,7 +16,6 @@
                                 <!--                                    <div class="card-side-by-side" static-include="'partials/legend.html'"></div>-->
                                 <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                 <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
-                                <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                             </div>
                             <div ng-show="vm.sdWithinTab.display == vm.displayModes.table && selectedTab == 0" static-include="partials/MGTab/tableView.html"></div>
                             <!--<div>{{genes}}</div>-->
@@ -25,7 +26,9 @@
             <md-tab ng-if="dataLoaded" label="Interaction Explorer">
                 <md-content ng-controller="InteractionExplorerController as vm" ng-init="vm.initializeController('interactionExplorer')">
                     <section layout="row">
-                        <div static-include="partials/IETab/sideBar.html">
+                        <div>
+                            <div static-include="partials/IETab/sideBar.html"></div>
+                            <md-button ng-if="vm.sdWithinTab.config" style="float: right;" class="md-primary md-raised export-button" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                         </div>
                         <md-content flex>
                             <div ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
@@ -33,7 +36,6 @@
                                 <div class="card-side-by-side" static-include="partials/tiles/graphSummary.html"></div>
                                 <div class="card-side-by-side" static-include="partials/tiles/edgeInspectorTile.html"></div>
                                 <div class="card-side-by-side" static-include="partials/tiles/legend.html"></div>
-                                <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                             </div>
                             <div ng-show="vm.sdWithinTab.display == vm.displayModes.table && selectedTab == 1" static-include="partials/IETab/tableView.html"></div>
                         </md-content>
@@ -65,12 +67,13 @@
             <md-tab label="Community Explorer">
                 <md-content ng-controller="CommunityExplorerController as vm" ng-init="vm.initializeController('community')">
                     <section layout="row">
-                        <div static-include="partials/CETab/sideBar.html">
+                        <div>
+                            <div static-include="partials/CETab/sideBar.html"></div>
+                            <md-button ng-if="vm.sdWithinTab.config" style="float: right;" class="md-primary md-raised export-button" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                         </div>
                         <md-content flex>
                             <div id="community-explorer-graph-view" ng-show="vm.sdWithinTab.display == vm.displayModes.graph">
                                 <div class="graph-container" id="cyCommunityExplorer"></div>
-                                <md-button style="float: right;" class="md-primary md-raised" ng-click="vm.exportGraphToPNG(vm)">Export Graph</md-button>
                             </div>
                             <div ng-show="vm.sdWithinTab.display == vm.displayModes.table" static-include="partials/CETab/tableView.html"></div>
                         </md-content>

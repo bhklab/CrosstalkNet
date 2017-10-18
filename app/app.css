@@ -447,6 +447,12 @@ table.md-table th.md-column {
     outline: none;
 }
 
+.export-button {
+    height: 50px;
+    width: 175px;
+    font-size: 18px;
+}
+
 
 /* Disable animations*/
 
