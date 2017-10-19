@@ -17,12 +17,12 @@ CorMatrix.BrN <- cor(t(allmat.by.ctype.by.ES$BrN$Epi),t(allmat.by.ctype.by.ES$Br
 CorMatrix.Delta.Positive <- CorMatrix.BrP - CorMatrix.Normal
 CorMatrix.Delta.Negative <- CorMatrix.BrN - CorMatrix.Normal
 
-Signif.Normal <- r.test(22, CorMatrix.Normal)
-Signif.BrP <- r.test(54, CorMatrix.BrP)
-Signif.BrN <- r.test(28, CorMatrix.BrN)
+Signif.Normal <- r.test(ncol(allmat.by.ctype.by.ES$No$Epi), CorMatrix.Normal)
+Signif.BrP <- r.test(ncol(allmat.by.ctype.by.ES$BrP$Epi), CorMatrix.BrP)
+Signif.BrN <- r.test(ncol(allmat.by.ctype.by.ES$BrN$Epi), CorMatrix.BrN)
 
-Signif.Delta.Positive <- r.test(22, CorMatrix.Normal, CorMatrix.BrP, n2=54)
-Signif.Delta.Negative <- r.test(22, CorMatrix.Normal, CorMatrix.BrN, n2=28)
+Signif.Delta.Positive <- r.test(ncol(allmat.by.ctype.by.ES$No$Epi), CorMatrix.Normal, CorMatrix.BrP, n2=ncol(allmat.by.ctype.by.ES$BrP$Epi))
+Signif.Delta.Negative <- r.test(ncol(allmat.by.ctype.by.ES$No$Epi), CorMatrix.Normal, CorMatrix.BrN, n2=ncol(allmat.by.ctype.by.ES$BrN$Epi))
 
 saveRDS(Signif.Normal, file='normal.signif.RData')
 
@@ -33,6 +33,12 @@ saveRDS(Signif.BrN, file='breastNegative.signif.RData')
 saveRDS(Signif.Delta.Positive, file='deltaPositive.signif.RData')
 
 saveRDS(Signif.Delta.Negative, file='deltaNegative.signif.RData')
+
+saveRDS(CorMatrix.Normal, "beckNormalUnadjusted.RData")
+saveRDS(CorMatrix.BrP, "beckBrPUnadjusted.RData")
+saveRDS(CorMatrix.BrN, "beckBrNUnadjusted.RData")
+saveRDS(CorMatrix.Delta.Postive, "beckDeltaPosUnadjusted.RData")
+saveRDS(CorMatrix.Delta.Negative, "beckDeltaNegUnadjusted.RData")
 
 
 # ptm <- proc.time()
