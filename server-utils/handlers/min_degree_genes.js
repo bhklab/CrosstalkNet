@@ -62,7 +62,7 @@ function callRScript(argsString, res) {
             rowNodes = geneUtils.createGeneList(rowNames, rowDegrees);
             colNodes = geneUtils.createGeneList(colNames, colDegrees);
 
-            res.send({ topGenes: { epi: rowNodes, stroma: colNodes } });
+            res.send({ topGenes: { row: rowNodes, col: colNodes } });
         });
 }
 

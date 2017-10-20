@@ -51,7 +51,7 @@
         }
 
         /**
-         * @summary Retrievies a list of the top genes for epi and stroma from the server
+         * @summary Retrievies a list of the top genes for row and col from the server
          * based on the specified query.
          *
          * @param {String} filterType The type of query to perform. This is a choice between top 

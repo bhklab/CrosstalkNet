@@ -25,8 +25,8 @@
         vm.exportTopGenesToCSV = ExportService.exportTopGenesToCSV;
 
         vm.search = search;
-        vm.paginateEpi = paginateEpi;
-        vm.paginateStroma = paginateStroma;
+        vm.paginateRow = paginateRow;
+        vm.paginateCol = paginateCol;
 
         /**
          * @summary Assigns the ctrl property of the controller and sets the appropriate within 
@@ -45,7 +45,7 @@
          * @summary Filters the the genes from the specified tissue type based on the search 
          * query made by the user.
          *
-         * @param {String} tissue A string that is either epi or stroma indicating which set
+         * @param {String} tissue A string that is either row or col indicating which set
          * of genes is to be filtered.
          *
          * @memberOf controllers.DegreeExplorerController
@@ -64,7 +64,7 @@
         }
 
         /**
-         * @summary Refreshes the displayed list of epi genes based on the new page that was navigated
+         * @summary Refreshes the displayed list of row genes based on the new page that was navigated
          * to.
          * 
          * @param {Number} page The new page number.
@@ -72,15 +72,15 @@
          *
          * @memberOf controllers.DegreeExplorerController
          */
-        function paginateEpi(page, limit) {
+        function paginateRow(page, limit) {
             var filtered = [];
 
-            filtered = filterGenesByName(vm.sdWithinTab.topGenes.epi, vm.sdWithinTab.search.epi);
-            vm.sdWithinTab.filtered.epi.genes = filterGenesPagination(filtered, page, limit);
+            filtered = filterGenesByName(vm.sdWithinTab.topGenes.row, vm.sdWithinTab.search.row);
+            vm.sdWithinTab.filtered.row.genes = filterGenesPagination(filtered, page, limit);
         }
 
         /**
-         * @summary Refreshes the displayed list of stroma genes based on the new page that was navigated
+         * @summary Refreshes the displayed list of col genes based on the new page that was navigated
          * to.
          * 
          * @param {Number} page The new page number.
@@ -88,11 +88,11 @@
          *
          * @memberOf controllers.DegreeExplorerController
          */
-        function paginateStroma(page, limit) {
+        function paginateCol(page, limit) {
             var filtered = [];
 
-            filtered = filterGenesByName(vm.sdWithinTab.topGenes.stroma, vm.sdWithinTab.search.stroma);
-            vm.sdWithinTab.filtered.stroma.genes = filterGenesPagination(filtered, page, limit);
+            filtered = filterGenesByName(vm.sdWithinTab.topGenes.col, vm.sdWithinTab.search.col);
+            vm.sdWithinTab.filtered.col.genes = filterGenesPagination(filtered, page, limit);
         }
 
         /**
@@ -150,8 +150,8 @@
 
         $scope.$watch('vm.sdWithinTab.dataLoaded', function(newValue, oldValue) {
             if (newValue != oldValue && oldValue == false) {
-                search('epi');
-                search('stroma');
+                search('row');
+                search('col');
             }
         })
     }

@@ -15,7 +15,7 @@
     function suffixTrim() {
         return function(input) {
             if (input != null) {
-                return input.slice(0, -2);
+                return input.split("-")[0];
 
             }
 

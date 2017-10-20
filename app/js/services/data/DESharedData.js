@@ -44,9 +44,9 @@
             filterAmount: {min: 1, top: 1},
             filterType: null,
             topGenes: null,
-            filtered: { epi : {genes: null, total: 0}, stroma: {genes: null, total: 0} },
-            pagination: { epi: angular.copy(paginationModel), stroma: angular.copy(paginationModel) },
-            search: {epi: "", stroma: ""}
+            filtered: { row : {genes: null, total: 0}, col: {genes: null, total: 0} },
+            pagination: { row: angular.copy(paginationModel), col: angular.copy(paginationModel) },
+            search: {row: "", col: ""}
         };
 
         service.data = angular.copy(withinTabModel);
@@ -61,8 +61,8 @@
         function resetWTM() {
             for (var prop in withinTabModel) {
                 if (prop == "pagination") {
-                    service.data[prop].epi = angular.copy(paginationModel);
-                    service.data[prop].stroma = angular.copy(paginationModel);
+                    service.data[prop].row = angular.copy(paginationModel);
+                    service.data[prop].col = angular.copy(paginationModel);
                 }
                 
                 service.data[prop] = angular.copy(withinTabModel[prop]);

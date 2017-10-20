@@ -104,28 +104,28 @@
          * @memberOf services.ExportService
          */
         function exportTopGenesToCSV(vm) {
-            var epiGenes = vm.sdWithinTab.topGenes.epi;
-            var stromaGenes = vm.sdWithinTab.topGenes.stroma;
-            var maxLength = epiGenes.length > stromaGenes.length ? epiGenes.length : stromaGenes.length;
+            var rowGenes = vm.sdWithinTab.topGenes.row;
+            var colGenes = vm.sdWithinTab.topGenes.col;
+            var maxLength = rowGenes.length > colGenes.length ? rowGenes.length : colGenes.length;
             var fileName = "topGenes" + Date.now() + ".csv";
             var rowDelim = "\r\n";
             var colDelim = ",";
             var csv = "";
-            var header = "epi" + colDelim + "stroma";
+            var header = vm.sharedData.rowPost + colDelim + vm.sharedData.colPost;
             csv += header;
             csv += rowDelim;
 
             for (var i = 0; i < maxLength; i++) {
-                if (i < epiGenes.length) {
-                    csv += $filter('suffixTrim')(epiGenes[i].value) + " " + epiGenes[i].object.degree;
+                if (i < rowGenes.length) {
+                    csv += $filter('suffixTrim')(rowGenes[i].value) + " " + rowGenes[i].object.degree;
                     csv += colDelim;
                 } else {
                     csv += "";
                     csv += colDelim;
                 }
 
-                if (i < stromaGenes.length) {
-                    csv += $filter('suffixTrim')(stromaGenes[i].value) + " " + stromaGenes[i].object.degree;
+                if (i < colGenes.length) {
+                    csv += $filter('suffixTrim')(colGenes[i].value) + " " + colGenes[i].object.degree;
                 } else {
                     csv += "";
                 }

@@ -79,8 +79,8 @@ function getSelfLoops(edges) {
     var result = [];
 
     for (var i = 0; i < edges.length; i++) {
-        var source = edges[i].data.source.substr(0, edges[i].data.source.length - 2);
-        var target = edges[i].data.target.substr(0, edges[i].data.target.length - 2);
+        var source = edges[i].data.source.split("-")[0];
+        var target = edges[i].data.target.split("-")[0];
 
         if (source == target) {
             result.push(source);

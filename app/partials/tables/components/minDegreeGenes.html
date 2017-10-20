@@ -23,16 +23,16 @@
     <md-card-content>
         <div class="bottom-margin-25">
             <div class="top-padded-10" layout="row">
-                <div flex><span class="md-title">Epi Genes</span></div>
+                <div flex><span class="md-title">{{vm.sharedData.rowPost}} Genes</span></div>
                 <div flex style="position: relative;">
                     <md-input-container class="no-margin right-aligned">
-                        <label>Filter Epi Genes</label>
-                        <input ng-model="vm.sdWithinTab.search.epi" ng-change="vm.search('epi')" ng-model-options="{ debounce: {'default': 50}}">
+                        <label>Filter {{vm.sharedData.rowPost}} Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.row" ng-change="vm.search('row')" ng-model-options="{ debounce: {'default': 50}}">
                     </md-input-container>
                 </div>
             </div>
             <div layout="row" layout-wrap>
-                <div flex="20" class="min-width-125" ng-repeat="gene in vm.sdWithinTab.filtered.epi.genes">
+                <div flex="20" class="min-width-125" ng-repeat="gene in vm.sdWithinTab.filtered.row.genes">
                     <md-menu>
                         <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
                         <md-menu-content width="6">
@@ -47,21 +47,21 @@
                 </div>
             </div>
         </div>
-        <md-table-pagination md-limit="vm.sdWithinTab.pagination.epi.query.limit" md-limit-options="vm.sdWithinTab.pagination.epi.limitOptions" md-page="vm.sdWithinTab.pagination.epi.query.page" md-total="{{vm.sdWithinTab.filtered.epi.total}}" md-on-paginate="vm.paginateEpi" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.epi.label}}"></md-table-pagination>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.row.query.limit" md-limit-options="vm.sdWithinTab.pagination.row.limitOptions" md-page="vm.sdWithinTab.pagination.row.query.page" md-total="{{vm.sdWithinTab.filtered.row.total}}" md-on-paginate="vm.paginateRow" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.row.label}}"></md-table-pagination>
         <div class="bottom-margin-25">
             <div class="top-padded-10" layout="row">
                 <div flex>
-                    <span class="md-title">Stroma Genes</span>
+                    <span class="md-title">{{vm.sharedData.colPost}} Genes</span>
                 </div>
                 <div flex style="position: relative;">
                     <md-input-container class="no-margin right-aligned">
-                        <label>Filter Stroma Genes</label>
-                        <input ng-model="vm.sdWithinTab.search.stroma" ng-change="vm.search('stroma')" ng-model-options="{ debounce: {'default': 50}}">
+                        <label>Filter {{vm.sharedData.colPost}} Genes</label>
+                        <input ng-model="vm.sdWithinTab.search.col" ng-change="vm.search('col')" ng-model-options="{ debounce: {'default': 50}}">
                     </md-input-container>
                 </div>
             </div>
             <div layout="row" layout-wrap>
-                <div flex="20" ng-repeat="gene in vm.sdWithinTab.filtered.stroma.genes">
+                <div flex="20" ng-repeat="gene in vm.sdWithinTab.filtered.col.genes">
                     <md-menu>
                         <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
                         <md-menu-content width="6">
@@ -73,7 +73,7 @@
                 </div>
             </div>
         </div>
-        <md-table-pagination md-limit="vm.sdWithinTab.pagination.stroma.query.limit" md-limit-options="vm.sdWithinTab.pagination.stroma.limitOptions" md-page="vm.sdWithinTab.pagination.stroma.query.page" md-total="{{vm.sdWithinTab.filtered.stroma.total}}" md-on-paginate="vm.paginateStroma" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.stroma.label}}"></md-table-pagination>
+        <md-table-pagination md-limit="vm.sdWithinTab.pagination.col.query.limit" md-limit-options="vm.sdWithinTab.pagination.col.limitOptions" md-page="vm.sdWithinTab.pagination.col.query.page" md-total="{{vm.sdWithinTab.filtered.col.total}}" md-on-paginate="vm.paginateCol" md-page-select="true" md-boundary-links="true" md-label="{{vm.sdWithinTab.pagination.col.label}}"></md-table-pagination>
         <md-button class="md-raised md-primary" ng-click="vm.exportTopGenesToCSV(vm)">Download As CSV</md-button>
     </md-card-content>
 </md-card>
