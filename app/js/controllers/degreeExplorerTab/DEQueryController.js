@@ -46,6 +46,8 @@
         function initializeVariables() {
             vm.topXSlider = 1;
             vm.minDegreeSlider = 0;
+
+            vm.filterType = "top";
         }
 
         /**
@@ -57,15 +59,14 @@
          *
          * @memberOf controllers.DEQueryController
          */
-        function getTopGenes(filterType) {
+        function getTopGenes() {
             $rootScope.state = $rootScope.states.loadingDegreeExplorer;
             DESharedData.resetWTM();
-            vm.sdWithinTab.filterType = filterType;
-            if (filterType == "top") {
-                vm.sdWithinTab.filterAmount = vm.topXSlider;
-            } else {
-                vm.sdWithinTab.filterAmount = vm.minDegreeSlider;
-            }
+            vm.sdWithinTab.filterType = vm.filterType;
+            
+            vm.sdWithinTab.filterAmount.top = vm.topXSlider;
+            vm.sdWithinTab.filterAmount.min = vm.minDegreeSlider;
+
             QueryService.getTopGenes(vm).then(function(result) {
                 $rootScope.state = $rootScope.states.finishedGettingTopGenes;
 

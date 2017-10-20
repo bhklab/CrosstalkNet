@@ -18,7 +18,8 @@ function handler(req, res) {
 
     args.fileName = matrixFileUtils.getCorrespondingDegreesFileName(file);
     args.path = file.path;
-    args.filterAmount = req.body.filterAmount;
+    args.minFilterAmount = req.body.filterAmount.min;
+    args.topFilterAmount = req.body.filterAmount.top;
     args.filterType = req.body.filterType;
 
     argsString = JSON.stringify(args);
@@ -49,20 +50,19 @@ function callRScript(argsString, res) {
                 return;
             }
 
-            var epiGenes = [];
-            var stromaGenes = [];
+            var rowNodes = [];
+            var colNodes = [];
 
-            var epiDegrees = parsedValue.epiDegrees;
-            var stromaDegrees = parsedValue.stromaDegrees;
+            var rowDegrees = parsedValue.rowDegrees;
+            var colDegrees = parsedValue.colDegrees;
 
-            var epiGeneNames = parsedValue.epiGeneNames;
-            var stromaGeneNames = parsedValue.stromaGeneNames;
+            var rowNames = parsedValue.rowNames;
+            var colNames = parsedValue.colNames;
 
+            rowNodes = geneUtils.createGeneList(rowNames, rowDegrees);
+            colNodes = geneUtils.createGeneList(colNames, colDegrees);
 
-            epiGenes = geneUtils.createGeneList(epiGeneNames, epiDegrees);
-            stromaGenes = geneUtils.createGeneList(stromaGeneNames, stromaDegrees);
-
-            res.send({ topGenes: { epi: epiGenes, stroma: stromaGenes } });
+            res.send({ topGenes: { epi: rowNodes, stroma: colNodes } });
         });
 }
 

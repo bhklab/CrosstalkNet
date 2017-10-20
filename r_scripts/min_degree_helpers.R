@@ -9,12 +9,12 @@ getTopGenesByDegree <- function(degrees, top) {
     #
     # Returns: 
     #   A list of degrees containing only the top number of genes.
-    topEpi <- degrees$epiDegree[1:top]
-    names(topEpi) <- names(degrees$epiDegree[1:top])
-    topStroma <- degrees$stromaDegree[1:top]
-    names(topStroma) <- names(degrees$stromaDegree[1:top])
+    topRow <- degrees[[1]][1:top]
+    names(topRow) <- names(degrees[[1]][1:top])
+    topCol <- degrees[[2]][1:top]
+    names(topCol) <- names(degrees[[2]][1:top])
 
-    result <- list(epi = topEpi, stroma = topStroma)
+    result <- list(row = topRow, col = topCol)
 }
 
 getGenesWithMinDegree <- function(degrees, minDegree) {
@@ -29,13 +29,48 @@ getGenesWithMinDegree <- function(degrees, minDegree) {
     # Returns:
     #   A list of degrees containing only the genes with a degree
     # of minDegree or higher.
-    epiIndex <- which(degrees$epiDegree >= minDegree)
-    minEpi <- degrees$epiDegree[epiIndex]
-    names(minEpi) <- names(degrees$epiDegree[epiIndex])
+    rowIndex <- which(degrees[[1]] >= minDegree)
+    minRow <- degrees[[1]][rowIndex]
+    names(minRow) <- names(degrees[[1]][rowIndex])
 
-    stromaIndex <- which(degrees$stromaDegree >= minDegree)
-    minStroma <- degrees$stromaDegree[stromaIndex]
-    names(minStroma) <- names(degrees$stromaDegree[stromaIndex])
+    colIndex <- which(degrees[[2]] >= minDegree)
+    minCol <- degrees[[2]][colIndex]
+    names(minCol) <- names(degrees[[2]][colIndex])
 
-    result <- list(epi = minEpi, stroma = minStroma)
+    result <- list(row = minRow, col = minCol)
+}
+
+getGenesBothFilters <- function(degrees, filterType, top, minDegree) {
+    minRowIndex <- which(degrees[[1]] >= minDegree)
+    minRow <- degrees[[1]][minRowIndex]
+    names(minRow) <- names(degrees[[1]][minRowIndex])
+
+    topRow <- degrees[[1]][1:top]
+    names(topRow) <- names(degrees[[1]][1:top])
+
+    rowTotal <- c(minRow, topRow)
+    rowTotal <- rowTotal[!duplicated(names(rowTotal))]
+
+    minColIndex <- which(degrees[[2]] >= minDegree)
+    minCol <- degrees[[2]][minColIndex]
+    names(minCol) <- names(degrees[[2]][minColIndex])
+
+    topCol <- degrees[[2]][1:top]
+    names(topCol) <- names(degrees[[2]][1:top])
+
+    colTotal <- c(minCol, topCol)
+    colTotal <- colTotal[!duplicated(names(colTotal))]
+
+    if (filterType == "min") {
+        rowTotal <- rowTotal[names(minRow)]
+        colTotal <- colTotal[names(minCol)]
+    } else if (filterType == "top") {
+        rowTotal <- rowTotal[names(topRow)]
+        colTotal <- colTotal[names(topCol)]
+    } else if (filterType == "both") {
+        rowTotal <- rowTotal[intersect(names(minRow), names(topRow))]
+        colTotal <- colTotal[intersect(names(minCol), names(topCol))]
+    }
+
+    result <- list(row = rowTotal, col = colTotal)
 }

@@ -3,10 +3,13 @@
         <md-card-title-text>
             <div layout="row">
                 <div ng-if="vm.sdWithinTab.filterType == 'top'" flex>
-                    <span class="md-headline">Top {{vm.sdWithinTab.filterAmount}} genes</span>
+                    <span class="md-headline">Top {{vm.sdWithinTab.filterAmount.top}} genes</span>
                 </div>
                 <div ng-if="vm.sdWithinTab.filterType == 'min'" flex>
-                    <span class="md-headline">Genes with degree {{vm.sdWithinTab.filterAmount}} or greater</span>
+                    <span class="md-headline">Genes with degree {{vm.sdWithinTab.filterAmount.min}} or greater</span>
+                </div>
+                <div ng-if="vm.sdWithinTab.filterType == 'both'" flex>
+                    <span class="md-headline">Top {{vm.sdWithinTab.filterAmount.top}} Genes with degree {{vm.sdWithinTab.filterAmount.min}} or greater</span>
                 </div>
                 <!-- <div flex style="position: relative;">
                     <md-input-container class="no-margin right-aligned">

@@ -41,7 +41,7 @@
 
         var withinTabModel = {
             dataLoaded: false,
-            filterAmount: 1,
+            filterAmount: {min: 1, top: 1},
             filterType: null,
             topGenes: null,
             filtered: { epi : {genes: null, total: 0}, stroma: {genes: null, total: 0} },

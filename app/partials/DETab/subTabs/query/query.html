@@ -8,7 +8,6 @@
                 <input flex type="number" min="1" max="{{vm.sharedData.geneList.length/2}}" ng-model="vm.topXSlider" aria-label="red" aria-controls="top-x-genes">
             </div>
         </div>
-        <md-button class="md-raised md-primary" ng-click="vm.getTopGenes('top')">Get Top Genes</md-button>
     </div>
     <md-divider></md-divider>
     <div class="md-padding">
@@ -20,6 +19,15 @@
                 <input flex type="number" min="1" max="{{vm.sharedData.maxDegree}}" ng-model="vm.minDegreeSlider" aria-label="red" aria-controls="min-degree-genes">
             </div>
         </div>
-        <md-button class="md-raised md-primary" ng-click="vm.getTopGenes('min')">Get Top Genes</md-button>
+    </div>
+    <md-divider></md-divider>
+    <div class="md-padding">
+        <h2 class="md-subhead">Filter By</h2>
+        <md-radio-group ng-model="vm.filterType">
+            <md-radio-button value="top" class="md-primary">Top Genes</md-radio-button>
+            <md-radio-button value="min">Min Degree</md-radio-button>
+            <md-radio-button value="both">Both</md-radio-button>
+        </md-radio-group>
+        <md-button class="md-raised md-primary" ng-click="vm.getTopGenes()">Get Top Genes</md-button>
     </div>
 </md-content>
