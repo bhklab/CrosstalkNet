@@ -34,7 +34,10 @@
             <div layout="row" layout-wrap>
                 <div flex="20" class="min-width-125" ng-repeat="gene in vm.sdWithinTab.filtered.row.genes">
                     <md-menu>
-                        <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
+                        <md-button ng-click="$mdOpenMenu($event)">
+                            <span>{{gene.display | split: ' ': 0}}</span>
+                            <span class="degree-color">{{gene.display | split: ' ': 1}}</span>
+                        </md-button>
                         <md-menu-content width="6">
                             <md-menu-item>
                                 <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>
@@ -63,7 +66,10 @@
             <div layout="row" layout-wrap>
                 <div flex="20" ng-repeat="gene in vm.sdWithinTab.filtered.col.genes">
                     <md-menu>
-                        <md-button ng-click="$mdOpenMenu($event)">{{gene.display}}</md-button>
+                        <md-button ng-click="$mdOpenMenu($event)">
+                            <span>{{gene.display | split: ' ': 0}}</span>
+                            <span class="degree-color">{{gene.display | split: ' ': 1}}</span>
+                        </md-button>
                         <md-menu-content width="6">
                             <md-menu-item>
                                 <md-button ng-click="vm.goToGeneCard(gene)">Gene Card</md-buttom>

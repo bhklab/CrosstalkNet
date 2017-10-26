@@ -453,6 +453,10 @@ table.md-table th.md-column {
     font-size: 18px;
 }
 
+.degree-color {
+    color: #FF6F00;
+}
+
 
 /* Disable animations*/
 
