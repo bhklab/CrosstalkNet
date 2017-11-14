@@ -22,7 +22,7 @@
     "angular-mocks": "~1.4.0",
     "html5-boilerplate": "~5.2.0",
     "angular-material-data-table": "^0.10.9",
-    "angular-cookies": "^1.5.7"
+    "angular-cookies": "1.5.7"
   },
   "resolutions": {
     "angular": "1.5.5"
