@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "angular": "~1.5.5",
+    "angular": "1.5.7",
     "angular-route": "~1.4.0",
     "angular-loader": "~1.4.0",
     "angular-material": "~1.0.8",
@@ -25,6 +25,6 @@
     "angular-cookies": "1.5.7"
   },
   "resolutions": {
-    "angular": "1.5.5"
+    "angular": "1.5.7"
   }
 }
