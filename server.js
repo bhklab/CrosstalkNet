@@ -14,7 +14,7 @@ var jwt = require('jsonwebtoken');
 var communityFileUtils = require('./server-utils/community_file_utils');
 var matrixFileUtils = require('./server-utils/matrix_file_utils');
 var handlerUtils = require("./server-utils/handler_utils");
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 
 var SECRET_KEY_ENC = 'j1cITlM3ACBNbDBOJ0roo2uwqGCk4QtoJ0sPXxnLNGeVwZlpzwScoPsEQKeHGQlfuDGgyke8FBPhGM3NkvmxYlWOPjp0VWhPCZTg58D1nkQ5t31Q3GDNjq5LUs2MlO3JFzuNsgJl9w6cLSu9ruyam2FTvaUlHIHs6shWyTb7kpSVSR0eHaOqOou0yuKMDsbqXuNMrlSr6pfGS98l0qvNtVSjcb1avIgTFts6ezrz96ZFTYeFU7N3jo6VUOUUaayO';

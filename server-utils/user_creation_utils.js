@@ -12,7 +12,7 @@
 
 var clone = require("clone");
 var async = require("async");
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 var jsonfile = require('jsonfile');
 var user = require('../server-utils/models/user');
 var existingUsersFile = './server-utils/models/users.json';
