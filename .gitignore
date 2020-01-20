@@ -1,10 +1,19 @@
 bower_components
 database
 database/*
-node_modules/* 
-!node_modules/*.js
 R_Scripts/028004_D_AA_20140813.txt
 *.swo
 *.swp
 r_scripts/uploaded_matrices/
 r_scripts/apply_p_value_adjustment.R
+
+
+# misc
+/.vscode
+.DS_Store
+
+  
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
