@@ -2,7 +2,8 @@
 <html lang="en" ng-app="myApp" class="no-js">
 
 <head>
-    <meta name="generator" content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <meta name="generator"
+        content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Crosstalk Net</title>
@@ -13,6 +14,14 @@
     <link rel="stylesheet" href="bower_components/angular-material-data-table/dist/md-data-table.css" />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="documentation.css" />
+    <!-- Google Analytics -->
+    <script>
+        window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
+        ga('create', 'UA-109682978-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
     <!-- Cytoscape Web JS API (needed to reference org.cytoscapeweb.Visualization) -->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/cytoscape/dist/cytoscape.js"></script>
@@ -72,13 +81,6 @@
     <script src="js/filters/splitFilter.js"></script>
     <script src="js/filters/suffixTrimFilter.js"></script>
     <script src="js/directives/staticInclude.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-109682978-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-    </script>
-    <!--<script type="text/javascript" src="ctyodemo.js"></script>-->
 </head>
 
 <body md-no-ink>
@@ -87,12 +89,15 @@
             <div class="toolbar-height" layout="row">
                 <div class="display-flex align-flex-vertical left-padded min-width-500" flex="33">
                     Status: {{state.text}}
-                    <md-progress-circular class="md-warn" ng-show="state.id > states.finishedGettingTopGenes.id && state.id != states.waitingForInputFiles.id" md-mode="indeterminate"></md-progress-circular>
+                    <md-progress-circular class="md-warn"
+                        ng-show="state.id > states.finishedGettingTopGenes.id && state.id != states.waitingForInputFiles.id"
+                        md-mode="indeterminate"></md-progress-circular>
                 </div>
                 <div class="display-flex align-flex-vertical align-flex-horizontal min-width-250" flex="34">
                     <div class="title-font">CrosstalkNet</div>
                 </div>
-                <div ng-class="{'min-width-250': vm.sharedData.permission !== 'admin', 'min-width-500': vm.sharedData.permission === 'admin'}" class="display-flex align-flex-right" flex="33">
+                <div ng-class="{'min-width-250': vm.sharedData.permission !== 'admin', 'min-width-500': vm.sharedData.permission === 'admin'}"
+                    class="display-flex align-flex-right" flex="33">
                     <div>
                         <md-button ng-click="vm.changeRoute('app')" ng-if="!vm.sharedData.showDocumentation">
                             <a class="unstyled-link" href="#/app">App</a>
@@ -101,15 +106,19 @@
                             <a class="unstyled-link" href="#/documentation">Documentation</a>
                         </md-button>
                     </div>
-                    <div ng-controller="UserManagementController as vm" ng-init="vm.initializeController('userManagement')">
+                    <div ng-controller="UserManagementController as vm"
+                        ng-init="vm.initializeController('userManagement')">
                         <div ng-if="vm.sharedData.permission === 'admin'">
                             <md-button ng-click="vm.showCreateUserDialog()" class="">Create User</md-button>
                             <md-button ng-click="vm.showDeleteUsersDialog()" class="">Delete Users</md-button>
                         </div>
                     </div>
                     <div ng-controller="LoginController as vm">
-                        <md-button ng-if="(vm.loggedIn == false && vm.sharedData.guest == false) || vm.sharedData.guest == true" ng-click="vm.showLoginDialog()">Login</md-button>
-                        <md-button ng-if="vm.loggedIn == true && vm.sharedData.guest == false" ng-click="vm.logout()">Logout</md-button>
+                        <md-button
+                            ng-if="(vm.loggedIn == false && vm.sharedData.guest == false) || vm.sharedData.guest == true"
+                            ng-click="vm.showLoginDialog()">Login</md-button>
+                        <md-button ng-if="vm.loggedIn == true && vm.sharedData.guest == false" ng-click="vm.logout()">
+                            Logout</md-button>
                     </div>
                 </div>
             </div>
