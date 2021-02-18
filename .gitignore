@@ -17,3 +17,4 @@ r_scripts/apply_p_value_adjustment.R
 /node_modules
 /.pnp
 .pnp.js
+.env

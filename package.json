@@ -1,5 +1,5 @@
 {
-  "name": "EpiStroma-webapp",
+  "name": "crosstalknet-webapp",
   "private": true,
   "version": "0.0.0",
   "description": "A data mining tool for analyzing large genetic networks",
@@ -24,7 +24,7 @@
     "shelljs": "^0.2.6"
   },
   "scripts": {
-    "start": "npm install && bower install",
+    "start": "node app.js",
     "test": "karma start karma.conf.js",
     "test-single-run": "karma start karma.conf.js  --single-run",
     "update-webdriver": "webdriver-manager update",
@@ -35,6 +35,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "clone": "^1.0.2",
+    "dotenv": "^8.2.0",
     "jsonfile": "^2.3.1",
     "jsonwebtoken": "^7.0.1",
     "media-typer": "^0.3.0",
