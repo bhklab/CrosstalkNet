@@ -5,7 +5,7 @@
   "description": "A data mining tool for analyzing large genetic networks",
   "license": "MIT",
   "devDependencies": {
-    "async": "2.0.0-rc.4",
+    "async": "2.6.4",
     "body-parser": "1.15.1",
     "bower": "^1.3.1",
     "connect-multiparty": "2.0.0",
